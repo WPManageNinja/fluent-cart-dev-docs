@@ -3,23 +3,29 @@
 layout: home
 
 hero:
-  name: "FluentCart Developer Docs"
-  text: "A developer docs for FluentCart WordPress plugin"
-  tagline: My great project tagline
+  name: "Fluent Cart Developer Docs"
+  text: "A complete Developer docs for Fluent Cart"
+  tagline: A ultimate e-commerce solution for WordPress
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: All Docs
+      link: CoreDocs/checkout-flow
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: DB Design (dbdocs.io)
+      link: https://dbdocs.io/project/fluent-cart
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Core plugin Docs
+    details: Fluent Cart core plugin including Architecture, codebase, available actions etc.
+    link: ./CoreDocs/checkout-flow.html
+
+  - title: Licensing
+    details: Fluent Software licensing
+    link: ./Licensing/api.html
+
+  - title: Subscriptions
+    details: Fluent Cart subscriptions
+    link: ./Subscriptions/introduction.html
+
 ---
 

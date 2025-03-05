@@ -1,4 +1,4 @@
-# FluentCart Software Licensing API
+# Fluent Cart Software Licensing API
 
 The API provided with the Fluent Software Licensing extension allows remote license key activation, deactivation, validity verification, update checks, and access to data about the most recent software versions. WordPress plugins and themes are not the only program types that may be integrated using this API. You may use any product using this Fluent Software Licensing
 
@@ -11,7 +11,7 @@ Four different API request types are available in the fluent software licensing 
 - check_license – Validate the license remotely
 - get_version – Get the plugin updated version through remote API
 
-To get all those API data we must use the FluentCart and Fluent Software Licensing plugins active. All the requests may be achieved using GET/POST requests.
+To get all those API data we must use the Fluent Cart and Fluent Software Licensing plugins active. All the requests may be achieved using GET/POST requests.
 
 ```
 https://yourSite.com/?fluent_cart_action={Action Type}&item_id={Product Id}&license={License Key}&url={URL of the site being licensed}
@@ -24,7 +24,7 @@ https://yourSite.com/?fluent_cart_action=get_version&item_id=18272&license=27a79
 
 ## The request params
 - fluent_cart_action – The action type listed on the above API actions
-- item_id – Item ID I the Product ID of FluentCart Product
+- item_id – Item ID I the Product ID of Fluent Cart Product
 - license – License key to make the action
 - URL – The site URL to make activation or deactivation for
 

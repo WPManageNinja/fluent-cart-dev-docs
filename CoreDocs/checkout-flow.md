@@ -1,12 +1,12 @@
-# FluentCart Checkout Flow
+# Fluent Cart Checkout Flow
 
 
-This document outlines the checkout flow and general architectural insights for the FluentCart plugin.
+This document outlines the checkout flow and general architectural insights for the Fluent Cart plugin.
 
 ## Architectural Principles
 
-1. **Single Source of Truth:** FluentCart maintains all checkout data from one consistent source, ensuring data integrity and minimizing discrepancies.
-2. **Standardized Extension Interface:** FluentCart offers a clear interface for integrating extensions (like payment methods), keeping extension logic separate from core checkout logic. This ensures stable communication with the server for order processing.
+1. **Single Source of Truth:** Fluent Cart maintains all checkout data from one consistent source, ensuring data integrity and minimizing discrepancies.
+2. **Standardized Extension Interface:** Fluent Cart offers a clear interface for integrating extensions (like payment methods), keeping extension logic separate from core checkout logic. This ensures stable communication with the server for order processing.
 3. **Checkout Flow Tracking:** The system tracks the checkout flow status, allowing users to monitor their progress easily.
 4. **Event-Driven Interaction:** Extensions can subscribe to events in the checkout flow, enabling them to respond dynamically to changes and improve user experience.
 
@@ -151,7 +151,7 @@ Summary for this step:
 
 - Identify new customer or existing
 - Create WordPress user if needed
-- Create FluentCart Customer with user_id
+- Create Fluent Cart Customer with user_id
 - Update Customer billing and shipping
 
 #### Checking Codebase:

@@ -16,8 +16,7 @@ export default defineConfig({
         text: 'Core Docs',
         items: [
           { text: 'Checkout Flow', link: 'CoreDocs/checkout-flow' },
-          { text: 'Payment flow', link: 'CoreDocs/payment-flow' },
-          { text: 'DB Design (dbdocs.io)', link: 'https://dbdocs.io/project/fluent-cart' },
+          { text: 'Payment Flow', link: 'CoreDocs/payment-flow' },
         ]
       },
       {
@@ -32,7 +31,13 @@ export default defineConfig({
           { text: 'API', link: 'Licensing/api' },
           { text: 'WP Plugin/Themes Updater', link: 'Licensing/wp-themes-plugins-setup.md' },
         ]
-      }
+      },
+      {
+        text: 'Database Design',
+        items: [
+          { text: 'DB Design (dbdocs.io)', link: 'https://dbdocs.io/project/fluent-cart' },
+        ]
+      },
     ],
 
     socialLinks: [

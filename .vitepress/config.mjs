@@ -17,6 +17,7 @@ export default defineConfig({
         items: [
           { text: 'Checkout Flow', link: 'CoreDocs/checkout-flow' },
           { text: 'Payment Flow', link: 'CoreDocs/payment-flow' },
+          { text: 'Initiating Payment Module', link: 'CoreDocs/initiate-payment-module.md' },        
         ]
       },
       {

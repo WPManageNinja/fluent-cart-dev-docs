@@ -31,6 +31,7 @@ export default defineConfig({
         items: [
           { text: 'API', link: 'Licensing/api' },
           { text: 'WP Plugin/Themes Updater', link: 'Licensing/wp-themes-plugins-setup.md' },
+          {text: 'Product Release And Version Update', link: 'Licensing/product-release-and-version-update.md'}
         ]
       },
       {

@@ -21,9 +21,14 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Subscriptions',
+        text: 'Payments',
         items: [
-          { text: 'Introduction', link: 'Subscriptions/introduction' },
+          { text: 'Stripe OneTime Payments', link: 'Payments/onetime-payment-stripe' },
+          { text: 'PayPal OneTime Payments', link: 'Payments/onetime-payment-paypal' },
+          { text: 'Stripe Subscriptions', link: 'Payments/subscription-payment-stripe' },
+          { text: 'PayPal Subscriptions', link: 'Payments/subscription-payment-paypal' },
+          { text: 'Stripe Refunds', link: 'Payments/refund-payment-stripe' },
+          { text: 'PayPal Refunds', link: 'Payments/refund-payment-paypal' },
         ]
       },
       {

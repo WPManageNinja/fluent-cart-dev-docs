@@ -23,9 +23,9 @@ features:
     details: Fluent Software licensing
     link: ./Licensing/api.html
 
-  - title: Subscriptions
-    details: Fluent Cart subscriptions
-    link: ./Subscriptions/introduction.html
+  - title: Payments
+    details: Fluent Cart Payments
+    link: ./Payments/introduction.html
 
 ---
 

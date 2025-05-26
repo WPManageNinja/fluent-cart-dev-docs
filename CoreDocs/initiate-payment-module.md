@@ -123,7 +123,6 @@ public function beforeRenderPaymentMethod($method, $hasSubscription): void
 
 ### Let's see an example for stripe:
 Stripe hooked the beforeRender by `before_render_payment_method_stripe` to load all necessary scripts.
-FluentCart used
 
 ```php
 class StripePayment extends BasePaymentMethod

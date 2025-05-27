@@ -20,7 +20,7 @@ This document covers the Stripe refund process and what happens when refunds are
 - **Payment Helper**: `app/Services/Payments/PaymentHelper.php` - `triggerRefund()` method
 - **Frontend**: `resources/admin/Modules/Orders/Modals/Refund.vue`
 
-### Admin-Initiated Refund Flow
+## Admin-Initiated Refund Flow
 
 #### 1. Frontend Refund Request
 
@@ -242,7 +242,7 @@ public function maybeCreateRefundTransaction($orderData, $refund)
 }
 ```
 
-### Vendor-Initiated Refund Flow (Webhooks)
+## Vendor-Initiated Refund Flow (Webhooks)
 
 #### 1. Webhook Reception
 
@@ -429,7 +429,7 @@ if (!$transaction) {
 }
 ```
 
-### Error Handling
+## Error Handling and Other Considerations
 
 #### Common Error Scenarios
 

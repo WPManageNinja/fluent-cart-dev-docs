@@ -16,13 +16,13 @@ export default defineConfig({
         text: 'Core Docs',
         items: [
           { text: 'Checkout Flow', link: 'CoreDocs/checkout-flow' },
-          { text: 'Payment Flow', link: 'CoreDocs/payment-flow' },
-          { text: 'Initiating Payment Module', link: 'CoreDocs/initiate-payment-module.md' },        
         ]
       },
       {
         text: 'Payments',
         items: [
+          { text: 'Payment Flow Overview', link: 'Payments/payment-flow' },
+          { text: 'Loading Payment Modules', link: 'Payments/initiate-payment-module.md' },
           { text: 'Stripe OneTime Payments', link: 'Payments/onetime-payment-stripe' },
           { text: 'PayPal OneTime Payments', link: 'Payments/onetime-payment-paypal' },
           { text: 'Stripe Subscriptions', link: 'Payments/subscription-payment-stripe' },

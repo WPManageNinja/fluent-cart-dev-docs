@@ -1,4 +1,4 @@
-# Initiate Payment Modules
+# Loading Payment Modules
 
 There are three types of implementation available for Payment module:
 1. Onsite Checkout : client js is required

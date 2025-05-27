@@ -20,7 +20,7 @@ The Stripe one-time payment flow involves several key steps from cart checkout t
 - **Webhook Handler**: `app/Modules/PaymentMethods/Stripe/IPN.php`
 - **Frontend**: `resources/public/payment-methods/stripe-checkout.js`
 
-## 1. Initiate & prepare payment data:
+## 1. Initiate Payment
 
 The `makePayment($orderHelper)` method in `Stripe.php` handles the core payment processing:
 
@@ -235,7 +235,7 @@ When payment is confirmed, the order goes through status transitions:
 - For digital products: Auto-complete to `ORDER_COMPLETED`
 
 
-## Error Handling
+## Error Handling and Other Considerations
 
 **Common Error Scenarios:**
 - **Invalid API Keys**: Stripe API authentication failures

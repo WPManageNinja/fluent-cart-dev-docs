@@ -22,7 +22,7 @@ This document covers the PayPal refund process and what happens when refunds are
 - **Order Controller**: `app/Http/Controllers/OrderController.php` - `refundOrder()` method
 - **Payment Helper**: `app/Services/Payments/PaymentHelper.php` - `triggerRefund()` method
 
-### Admin-Initiated Refund Flow
+## Admin-Initiated Refund Flow
 
 #### 1. Refund Request Processing
 
@@ -140,7 +140,7 @@ public function createRefund($refundData, $chargeId)
 }
 ```
 
-### Vendor-Initiated Refund Flow (Webhooks)
+## Vendor-Initiated Refund Flow (Webhooks)
 
 #### 1. Webhook Processing Entry Point
 
@@ -403,7 +403,7 @@ public function isRefundExist($refundId)
 }
 ```
 
-### Webhook Event Routing
+## Webhook Event Routing
 
 #### Webhook Events Configuration
 
@@ -487,7 +487,7 @@ public function processWebhook()
 5. Create refund transaction record
 6. Update order totals and status
 
-### Error Handling
+## Error Handling and Other Considerations
 
 #### Common Error Scenarios
 

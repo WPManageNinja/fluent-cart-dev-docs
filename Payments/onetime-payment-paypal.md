@@ -18,7 +18,7 @@ This document covers the PayPal one-time payment flow and what happens when cust
 - **Webhook Handler**: `app/Modules/PaymentMethods/PayPal/API/Webhook.php`
 - **Frontend**: `resources/public/payment-methods/paypal-checkout.js`
 
-## 1. Initiate Payment:
+## 1. Initiate Payment
 
 PayPal payment method initiated by the event triggered from frontend paypal-checkout.js. When PayPal button is clicked  `onClick` function is called as callback to place the order and return orderData to the `createOrder` function to create vendor order in PayPal.
 
@@ -151,9 +151,9 @@ The frontend JavaScript (`paypal-checkout.js`) handles PayPal Pro payments throu
 Returned data:
 ```php
 [
-    'items' => $formattedItems,
-    'total' => $total,
-    'currency' => $currency
+    'items'     => $formattedItems,
+    'total'     => $total,
+    'currency'  => $currency
 ]
 ```
 Frontend JS to create the PayPal order:
@@ -323,7 +323,7 @@ When payment is confirmed, the order goes through status transitions:
 - Events dispatched: `OrderPaid`, `OrderStatusUpdated`
 - For digital products: Auto-complete to `ORDER_COMPLETED`
 
-### Error Handling
+## Error Handling and Other Considerations
 
 **Common Error Scenarios:**
 - **Invalid PayPal Credentials**: API authentication failures

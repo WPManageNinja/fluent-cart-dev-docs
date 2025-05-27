@@ -23,7 +23,7 @@ This document covers the PayPal subscription payment flow and what happens when 
 
 ### Subscription Payment Flow
 
-#### 1. PayPal.makePayment Entry Point
+## 1. Initiate Payment
 
 The subscription flow starts with the same `makePayment` method but routes to PayPalHandler:
 
@@ -112,7 +112,7 @@ public function handleOnsiteSubscription($orderHelper): void
 }
 ```
 
-### PayPal Plan Management
+## 2. PayPal Plan & Billing
 
 #### Plan Creation Process
 
@@ -243,6 +243,71 @@ public static function createBillingCycles($subscription, $order, $onetimePaymen
 }
 ```
 
+### Billing Cycle Management
+
+#### Trial Periods
+
+PayPal supports trial periods in billing cycles:
+
+```php
+// Free trial cycle configuration
+$freeTrialCycle = [
+    'frequency' => [
+        'interval_unit' => 'DAY',
+        'interval_count' => Arr::get($subscription, 'trial_days', 0),
+    ],
+    'tenure_type' => 'TRIAL',
+    'sequence' => 1,
+    'total_cycles' => 1,
+];
+```
+
+#### Signup Fees
+
+Signup fees are handled as separate billing cycles:
+
+```php
+// Signup fee cycle configuration
+$signupFeeCycle = [
+    'frequency' => [
+        'interval_unit' => self::getIntervalUnit($subscription),
+        'interval_count' => 1,
+    ],
+    'tenure_type' => 'REGULAR',
+    'sequence' => $sequence++,
+    'total_cycles' => 1,
+    'pricing_scheme' => [
+        'fixed_price' => [
+            'value' => Helper::toDecimal($onetimePayment, false, $order->currency, true, true, false),
+            'currency_code' => strtoupper($order->currency)
+        ]
+    ]
+];
+```
+
+#### Regular Billing
+
+Regular recurring billing configuration:
+
+```php
+// Regular billing cycle configuration
+$regularCycle = [
+    'frequency' => [
+        'interval_unit' => self::getIntervalUnit($subscription), // DAY, WEEK, MONTH, YEAR
+        'interval_count' => self::getIntervalCount($subscription), // 1, 2, 3, etc.
+    ],
+    'tenure_type' => 'REGULAR',
+    'sequence' => $sequence,
+    'total_cycles' => $billTimes > 0 ? $billTimes : 0, // 0 means infinite
+    'pricing_scheme' => [
+        'fixed_price' => [
+            'value' => Helper::toDecimal(Arr::get($subscription, 'recurring_amount'), false, $order->currency, true, true, false),
+            'currency_code' => strtoupper($order->currency)
+        ]
+    ]
+];
+```
+
 #### Plan Creation via API
 
 The `create` method handles PayPal API interaction:
@@ -275,7 +340,7 @@ public static function create($plan, $vendorSubsPlanId, $orderId)
 }
 ```
 
-### Frontend Subscription Handling
+## 3. Frontend Subscription Handling
 
 #### JavaScript Subscription Payment
 
@@ -359,315 +424,76 @@ async subscriptionPaymentHandler(ref, paymentData, orderData, paypalButtonContai
 }
 ```
 
-### Subscription Status Management
+## 4. Frontend-Backend Integration
 
-#### Status Mapping
+#### Complete Frontend to Backend Flow
 
-PayPal subscription statuses are mapped to internal statuses:
+The complete flow from frontend subscription creation to backend confirmation:
 
-```php
-public function getCorrectSubscriptionStatus($paypalStatus)
-{
-    $statusMap = [
-        'ACTIVE' => Status::SUBSCRIPTION_ACTIVE,
-        'APPROVAL_PENDING' => Status::SUBSCRIPTION_PENDING,
-        'APPROVED' => Status::SUBSCRIPTION_PENDING,
-        'SUSPENDED' => Status::SUBSCRIPTION_SUSPENDED,
-        'CANCELLED' => Status::SUBSCRIPTION_CANCELED,
-        'EXPIRED' => Status::SUBSCRIPTION_EXPIRED
-    ];
-
-    return $statusMap[$paypalStatus] ?? Status::SUBSCRIPTION_PENDING;
-}
-```
-
-### Webhook Event Handling
-
-#### Remote Event Listener
-
-The `RemoteEventsListener` class handles subscription webhook events:
-
-```php
-public function register()
-{
-    add_action('fluent_cart/payments/paypal/webhook_billing_subscription_activated', [$this, 'handleSubscriptionActivated'], 10, 2);
-    add_action('fluent_cart/payments/paypal/webhook_billing_subscription_cancelled', [$this, 'handleSubscriptionCancelled'], 10, 2);
-    add_action('fluent_cart/payments/paypal/webhook_billing_subscription_suspended', [$this, 'handleSubscriptionSuspended'], 10, 2);
-    add_action('fluent_cart/payments/paypal/webhook_billing_subscription_expired', [$this, 'handleSubscriptionExpired'], 10, 2);
-    add_action('fluent_cart/payments/paypal/webhook_payment_sale_completed', [$this, 'handleRecurringPaymentReceived'], 10, 2);
-}
-```
-
-#### Subscription Activated Event
-
-Handles subscription activation:
-
-```php
-public function handleSubscriptionActivated($data, $order)
-{
-    // 1. Extract subscription ID
-    $vendorSubscriptionId = Arr::get($data, 'id');
-    $subscription = Subscription::where('vendor_subscription_id', $vendorSubscriptionId)->first();
-
-    if (!$subscription) {
-        return;
-    }
-
-    // 2. Get subscription details from PayPal
-    $response = (new API())::makeRequest('billing/subscriptions/' . $vendorSubscriptionId, 'v1', 'GET');
-    $billingInfo = Arr::get($response, 'billing_info', []);
-
-    // 3. Calculate next billing date
-    $nextBillingDate = Arr::get($billingInfo, 'next_billing_time') ?? null;
-    if (!empty($nextBillingDate)) {
-        $dateTime = new DateTime($nextBillingDate);
-        $nextBillingDate = $dateTime->format('Y-m-d H:i:s');
-    }
-
-    // 4. Update subscription status
-    $updateSubscriptionData = [
-        'status' => Status::SUBSCRIPTION_ACTIVE,
-        'next_billing_date' => $nextBillingDate,
-        'current_payment_method' => 'paypal',
-    ];
-
-    Subscriptions::updateSubscription($subscription->id, $updateSubscriptionData);
-
-    // 5. Trigger activation events
-    do_action('fluent_cart/payments/subscription_activated', $subscription->id, $order->id);
-    do_action('fluent_cart/payments/subscription_activated_paypal', $subscription->id, $order->id);
-
-    // 6. Log the event
-    fluent_cart_add_log('PayPal webhook billing.subscription.activated processed', $data, 'info', [
-        'log_type' => 'webhook',
-        'module_type' => 'FluentCart\App\Modules\Subscriptions\Modules\PayPal',
-        'module_name' => 'PayPal',
-        'module_id' => $order->id ?: null,
-    ]);
-}
-```
-
-#### Recurring Payment Received Event
-
-Handles recurring billing:
-
-```php
-public function handleRecurringPaymentReceived($data, $order)
-{
-    // 1. Extract payment data
-    $vendorSubscriptionId = Arr::get($data, 'billing_agreement_id');
-    $amount = Arr::get($data, 'amount.total');
-    $subscription = Subscription::where('vendor_subscription_id', $vendorSubscriptionId)->first();
-
-    if (!$subscription) {
-        return;
-    }
-
-    // 2. Check if this is a signup fee
-    $isSignUpFee = (new Subscriptions())->checkIsSignupFee($subscription, $amount);
-    $isSignUpFeeProcessed = (new Subscriptions())->checkIsSignupFeeProcessed($subscription, $amount);
-
-    if ($isSignUpFee && !$isSignUpFeeProcessed) {
-        // 3. Process signup fee
-        $chargeId = Arr::get($data, 'id');
-        (new Subscriptions())->processSignupFeeReceived($subscription, $amount, $chargeId);
-    } else {
-        // 4. Process regular recurring payment
-        $this->handleWebhookRecurringPaymentReceived($data, $subscription);
-    }
-
-    // 5. Log the event
-    fluent_cart_add_log('PayPal webhook payment.sale.completed processed', $data, 'info', [
-        'log_type' => 'webhook',
-        'module_type' => 'FluentCart\App\Modules\Subscriptions\Modules\PayPal',
-        'module_name' => 'PayPal',
-        'module_id' => $order->id ?: null,
-    ]);
-}
-```
-
-### Billing Cycle Management
-
-#### Trial Periods
-
-PayPal supports trial periods in billing cycles:
-
-```php
-// Free trial cycle configuration
-$freeTrialCycle = [
-    'frequency' => [
-        'interval_unit' => 'DAY',
-        'interval_count' => Arr::get($subscription, 'trial_days', 0),
-    ],
-    'tenure_type' => 'TRIAL',
-    'sequence' => 1,
-    'total_cycles' => 1,
-];
-```
-
-#### Signup Fees
-
-Signup fees are handled as separate billing cycles:
-
-```php
-// Signup fee cycle configuration
-$signupFeeCycle = [
-    'frequency' => [
-        'interval_unit' => self::getIntervalUnit($subscription),
-        'interval_count' => 1,
-    ],
-    'tenure_type' => 'REGULAR',
-    'sequence' => $sequence++,
-    'total_cycles' => 1,
-    'pricing_scheme' => [
-        'fixed_price' => [
-            'value' => Helper::toDecimal($onetimePayment, false, $order->currency, true, true, false),
-            'currency_code' => strtoupper($order->currency)
-        ]
-    ]
-];
-```
-
-#### Regular Billing
-
-Regular recurring billing configuration:
-
-```php
-// Regular billing cycle configuration
-$regularCycle = [
-    'frequency' => [
-        'interval_unit' => self::getIntervalUnit($subscription), // DAY, WEEK, MONTH, YEAR
-        'interval_count' => self::getIntervalCount($subscription), // 1, 2, 3, etc.
-    ],
-    'tenure_type' => 'REGULAR',
-    'sequence' => $sequence,
-    'total_cycles' => $billTimes > 0 ? $billTimes : 0, // 0 means infinite
-    'pricing_scheme' => [
-        'fixed_price' => [
-            'value' => Helper::toDecimal(Arr::get($subscription, 'recurring_amount'), false, $order->currency, true, true, false),
-            'currency_code' => strtoupper($order->currency)
-        ]
-    ]
-];
-```
-
-### Error Handling
-
-#### Common Error Scenarios
-
-**Subscription Module Not Found:**
-```php
-if (!(new PayPal())->hasSubscriptionModule()) {
-    $this->sendError(__('Please activate subscription module to get payment!', 'fluent-cart'));
-}
-```
-
-**Plan Creation Failed:**
-```php
-if ($response && is_wp_error($response)) {
-    return SubscriptionHelper::errorHandler($response->get_error_code(), $response->get_error_message());
-}
-```
-
-**Subscription Creation Failed:**
 ```javascript
-onError: function(err) {
-    console.error('PayPal subscription error:', err);
-    that.paymentLoader?.hideLoader();
+// Frontend: After PayPal subscription approval
+onApprove: function(data, actions) {
+    that.paymentLoader?.changeLoaderStatus('confirming');
+
+    if (data.subscriptionID) {
+        that.paymentLoader?.changeLoaderStatus('completed');
+
+        // 1. Prepare confirmation data
+        const params = new URLSearchParams({
+            action: 'fluent_cart_confirm_paypal_subscription',
+            order_id: data.orderID,
+            subscription_id: data.subscriptionID,
+            ref_id: orderData?.data?.data?.transaction.uuid,
+            order_item: orderData.data.data
+        });
+
+        // 2. Send AJAX request to backend
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', window.fluentcart_checkout_vars.ajaxurl, true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const res = JSON.parse(xhr.responseText);
+
+                    // 3. Handle successful confirmation
+                    if (res.data.success_url) {
+                        that.paymentLoader?.changeLoaderStatus('redirecting');
+                        window.location.href = res.data.success_url;
+                    }
+                } catch (error) {
+                    console.error('An error occurred while parsing the response:', error);
+                }
+            } else {
+                console.error('Network response was not ok');
+            }
+        };
+
+        // 4. Send the request
+        xhr.send(params.toString());
+    } else {
+        that.paymentLoader?.changeLoaderStatus('No Subscription ID');
+        that.paymentLoader?.hideLoader();
+    }
 }
 ```
 
-### Webhook Configuration
-
-#### Required Webhook Events
-
-PayPal webhook events for subscription management:
-
-```php
-const EVENTS = [
-    [ "name" => "PAYMENT.SALE.COMPLETED" ],        // Recurring payments
-    [ "name" => "PAYMENT.SALE.REFUNDED" ],         // Recurring payment refunds
-    [ "name" => "BILLING.SUBSCRIPTION.CREATED" ],   // Subscription created
-    [ "name" => "BILLING.SUBSCRIPTION.ACTIVATED" ], // Subscription activated
-    [ "name" => "BILLING.SUBSCRIPTION.SUSPENDED" ], // Subscription suspended
-    [ "name" => "BILLING.SUBSCRIPTION.CANCELLED" ], // Subscription cancelled
-    [ "name" => "BILLING.SUBSCRIPTION.EXPIRED" ]    // Subscription expired
-];
-```
-
-#### Webhook URL
-
-```php
-public static function getWebhookURL(): string
-{
-    return site_url() . '/wp-json/fluent-cart/v2/webhook?fct_payment_listener=1&method=paypal';
-}
-```
-
-### Security Considerations
-
-- **Plan Validation**: Plans are validated before subscription creation
-- **Webhook Verification**: All webhook events are verified for authenticity
-- **Subscription Validation**: Subscription IDs are validated against PayPal
-- **Amount Verification**: Payment amounts are verified against plan amounts
-- **Status Validation**: Only valid status transitions are processed
-
-### Configuration
-
-#### Required Settings
-
-- **PayPal API Credentials**: Client ID and Secret for API access
-- **Webhook Configuration**: Subscription events enabled
-- **Subscription Module**: FluentCart subscription module activated
-
-#### Plan Management
-
-- **Plan Caching**: Plans are cached to avoid duplicate creation
-- **Plan Naming**: Consistent plan naming convention
-- **Billing Cycles**: Support for trial, signup fee, and regular cycles
-- **Currency Support**: Multi-currency plan support
-
-### Testing Subscriptions
-
-#### Test Scenarios
-
-1. **Trial Subscription**: Create subscription with trial period
-2. **Signup Fee**: Create subscription with signup fee
-3. **Regular Billing**: Create subscription with regular billing
-4. **Webhook Events**: Test subscription status changes via webhooks
-5. **Plan Reuse**: Test plan caching and reuse
-6. **Error Handling**: Test various error scenarios
-
-#### Test Data
-
-- Use PayPal sandbox environment
-- Test with various billing intervals (daily, weekly, monthly, yearly)
-- Test with different trial periods and signup fees
-- Verify webhook delivery and processing
-- Check subscription status transitions
-
-### Key Differences from Stripe Subscriptions
-
-1. **Plan Requirement**: PayPal requires pre-created plans for subscriptions
-2. **Billing Cycles**: Complex billing cycle configuration with multiple phases
-3. **SDK Integration**: Uses PayPal JavaScript SDK instead of Elements
-4. **Webhook Events**: Different event types and data structures
-5. **Trial Handling**: Trial periods are part of billing cycle configuration
-6. **Signup Fees**: Handled as separate billing cycles, not add-on charges
-
-### PayPal-Specific Features
-
-- **Catalog Products**: Plans are associated with catalog products
-- **Billing Cycles**: Support for trial, regular, and one-time cycles
-- **Payment Preferences**: Auto-billing and failure handling configuration
-- **Plan Caching**: Efficient plan reuse to avoid API limits
-- **Multi-Phase Billing**: Support for complex billing scenarios
-
-### Backend Subscription Confirmation
+## 5. Backend Subscription Confirmation
 
 #### confirmPayPalSubscription Method
 
 After successful subscription creation on the frontend, the backend confirmation process is triggered:
+there are several steps happens here:
+1. Validate the request
+2. Extract the request data
+3. Find the transaction and order
+4. Handle subscription upgrades
+5. Find the existing subscription
+6. Verify the subscription with PayPal API
+7. Update the transaction and order
+8. Activate the subscription
+9. Return the success response
 
 ```php
 public function confirmPayPalSubscription()
@@ -831,109 +657,12 @@ private function processSubscriptionConfirmation($subscriptionInfo, $subscriptio
 }
 ```
 
-### Order Completion Logic
 
-#### maybeMarkOrderCompleted Method
+## Subscription Status Management
 
-The system automatically completes orders when appropriate:
+#### Status Mapping
 
-```php
-public function maybeMarkOrderCompleted($subscription)
-{
-    $orderId = $subscription->parent_order_id;
-    $order = Order::find($orderId);
-
-    if ($order) {
-        // 1. Check if order has zero total (free trial or signup fee only)
-        if ($order->total_amount == 0) {
-            $fulfillmentType = $order->fulfillment_type;
-            $oldStatus = $order->status;
-
-            // 2. Set appropriate status based on fulfillment type
-            if ($fulfillmentType === 'digital') {
-                $order->status = Status::ORDER_COMPLETED;
-                $order->completed_at = DateTime::gmtNow();
-            } else {
-                $order->status = Status::ORDER_PROCESSING;
-            }
-
-            $order->save();
-
-            // 3. Dispatch order status updated event
-            $newStatus = $order->status === Status::ORDER_COMPLETED ? 'completed' : 'processing';
-            $actionActivity = [
-                'title'   => 'Order status updated',
-                'content' => 'Order status has been updated from ' . $oldStatus . ' to ' . $order->status,
-            ];
-
-            (new OrderStatusUpdated($order, $oldStatus, $newStatus, true, $actionActivity))->dispatch();
-        }
-    } else {
-        error_log("Order not found for ID: $orderId");
-    }
-}
-```
-
-### Frontend-Backend Integration
-
-#### Complete Frontend to Backend Flow
-
-The complete flow from frontend subscription creation to backend confirmation:
-
-```javascript
-// Frontend: After PayPal subscription approval
-onApprove: function(data, actions) {
-    that.paymentLoader?.changeLoaderStatus('confirming');
-
-    if (data.subscriptionID) {
-        that.paymentLoader?.changeLoaderStatus('completed');
-
-        // 1. Prepare confirmation data
-        const params = new URLSearchParams({
-            action: 'fluent_cart_confirm_paypal_subscription',
-            order_id: data.orderID,
-            subscription_id: data.subscriptionID,
-            ref_id: orderData?.data?.data?.transaction.uuid,
-            order_item: orderData.data.data
-        });
-
-        // 2. Send AJAX request to backend
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', window.fluentcart_checkout_vars.ajaxurl, true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-        xhr.onload = function () {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                try {
-                    const res = JSON.parse(xhr.responseText);
-
-                    // 3. Handle successful confirmation
-                    if (res.data.success_url) {
-                        that.paymentLoader?.changeLoaderStatus('redirecting');
-                        window.location.href = res.data.success_url;
-                    }
-                } catch (error) {
-                    console.error('An error occurred while parsing the response:', error);
-                }
-            } else {
-                console.error('Network response was not ok');
-            }
-        };
-
-        // 4. Send the request
-        xhr.send(params.toString());
-    } else {
-        that.paymentLoader?.changeLoaderStatus('No Subscription ID');
-        that.paymentLoader?.hideLoader();
-    }
-}
-```
-
-### Subscription Status Updates
-
-#### Status Mapping and Updates
-
-PayPal subscription statuses are mapped and updated:
+PayPal subscription statuses are mapped to internal statuses:
 
 ```php
 public function getCorrectSubscriptionStatus($paypalStatus)
@@ -951,29 +680,226 @@ public function getCorrectSubscriptionStatus($paypalStatus)
 }
 ```
 
-### Transaction Updates
+## Webhook Event Handling
 
-#### Transaction Association
+#### Remote Event Listener
 
-Transactions are properly associated with subscriptions:
+The `RemoteEventsListener` class handles subscription webhook events:
 
 ```php
-// Update transaction with subscription ID
-if (!$transaction->subscription_id) {
-    $transactionQuery->update(['subscription_id' => $subscription->id]);
+public function register()
+{
+    add_action('fluent_cart/payments/paypal/webhook_billing_subscription_activated', [$this, 'handleSubscriptionActivated'], 10, 2);
+    add_action('fluent_cart/payments/paypal/webhook_billing_subscription_cancelled', [$this, 'handleSubscriptionCancelled'], 10, 2);
+    add_action('fluent_cart/payments/paypal/webhook_billing_subscription_suspended', [$this, 'handleSubscriptionSuspended'], 10, 2);
+    add_action('fluent_cart/payments/paypal/webhook_billing_subscription_expired', [$this, 'handleSubscriptionExpired'], 10, 2);
+    add_action('fluent_cart/payments/paypal/webhook_payment_sale_completed', [$this, 'handleRecurringPaymentReceived'], 10, 2);
 }
-
-// Update transaction status and payment details
-$updateData = [
-    'status' => Status::TRANSACTION_COMPLETED,
-    'total' => $amount,
-    'vendor_charge_id' => $chargeId,
-    'payment_mode' => $order->mode,
-    'payment_method' => 'paypal'
-];
-
-(new PayPal)->updateOrderDataByOrder($order, $updateData, $transaction);
 ```
+
+#### Subscription Activated Event
+
+Handles subscription activation:
+
+```php
+public function handleSubscriptionActivated($data, $order)
+{
+    // 1. Extract subscription ID
+    $vendorSubscriptionId = Arr::get($data, 'id');
+    $subscription = Subscription::where('vendor_subscription_id', $vendorSubscriptionId)->first();
+
+    if (!$subscription) {
+        return;
+    }
+
+    // 2. Get subscription details from PayPal
+    $response = (new API())::makeRequest('billing/subscriptions/' . $vendorSubscriptionId, 'v1', 'GET');
+    $billingInfo = Arr::get($response, 'billing_info', []);
+
+    // 3. Calculate next billing date
+    $nextBillingDate = Arr::get($billingInfo, 'next_billing_time') ?? null;
+    if (!empty($nextBillingDate)) {
+        $dateTime = new DateTime($nextBillingDate);
+        $nextBillingDate = $dateTime->format('Y-m-d H:i:s');
+    }
+
+    // 4. Update subscription status
+    $updateSubscriptionData = [
+        'status' => Status::SUBSCRIPTION_ACTIVE,
+        'next_billing_date' => $nextBillingDate,
+        'current_payment_method' => 'paypal',
+    ];
+
+    Subscriptions::updateSubscription($subscription->id, $updateSubscriptionData);
+
+    // 5. Trigger activation events
+    do_action('fluent_cart/payments/subscription_activated', $subscription->id, $order->id);
+    do_action('fluent_cart/payments/subscription_activated_paypal', $subscription->id, $order->id);
+
+    // 6. Log the event
+    fluent_cart_add_log('PayPal webhook billing.subscription.activated processed', $data, 'info', [
+        'log_type' => 'webhook',
+        'module_type' => 'FluentCart\App\Modules\Subscriptions\Modules\PayPal',
+        'module_name' => 'PayPal',
+        'module_id' => $order->id ?: null,
+    ]);
+}
+```
+
+#### Recurring Payment Received Event
+
+Handles recurring billing:
+
+```php
+public function handleRecurringPaymentReceived($data, $order)
+{
+    // 1. Extract payment data
+    $vendorSubscriptionId = Arr::get($data, 'billing_agreement_id');
+    $amount = Arr::get($data, 'amount.total');
+    $subscription = Subscription::where('vendor_subscription_id', $vendorSubscriptionId)->first();
+
+    if (!$subscription) {
+        return;
+    }
+
+    // 2. Check if this is a signup fee
+    $isSignUpFee = (new Subscriptions())->checkIsSignupFee($subscription, $amount);
+    $isSignUpFeeProcessed = (new Subscriptions())->checkIsSignupFeeProcessed($subscription, $amount);
+
+    if ($isSignUpFee && !$isSignUpFeeProcessed) {
+        // 3. Process signup fee
+        $chargeId = Arr::get($data, 'id');
+        (new Subscriptions())->processSignupFeeReceived($subscription, $amount, $chargeId);
+    } else {
+        // 4. Process regular recurring payment
+        $this->handleWebhookRecurringPaymentReceived($data, $subscription);
+    }
+
+    // 5. Log the event
+    fluent_cart_add_log('PayPal webhook payment.sale.completed processed', $data, 'info', [
+        'log_type' => 'webhook',
+        'module_type' => 'FluentCart\App\Modules\Subscriptions\Modules\PayPal',
+        'module_name' => 'PayPal',
+        'module_id' => $order->id ?: null,
+    ]);
+}
+```
+
+## Webhook Configuration
+
+#### Required Webhook Events
+
+PayPal webhook events for subscription management:
+
+```php
+const EVENTS = [
+    [ "name" => "PAYMENT.SALE.COMPLETED" ],        // Recurring payments
+    [ "name" => "PAYMENT.SALE.REFUNDED" ],         // Recurring payment refunds
+    [ "name" => "BILLING.SUBSCRIPTION.CREATED" ],   // Subscription created
+    [ "name" => "BILLING.SUBSCRIPTION.ACTIVATED" ], // Subscription activated
+    [ "name" => "BILLING.SUBSCRIPTION.SUSPENDED" ], // Subscription suspended
+    [ "name" => "BILLING.SUBSCRIPTION.CANCELLED" ], // Subscription cancelled
+    [ "name" => "BILLING.SUBSCRIPTION.EXPIRED" ]    // Subscription expired
+];
+```
+
+#### Webhook URL
+
+```php
+public static function getWebhookURL(): string
+{
+    return site_url() . '/wp-json/fluent-cart/v2/webhook?fct_payment_listener=1&method=paypal';
+}
+```
+
+
+## Error Handling and Other Considerations
+
+#### Common Error Scenarios
+
+**Subscription Module Not Found:**
+```php
+if (!(new PayPal())->hasSubscriptionModule()) {
+    $this->sendError(__('Please activate subscription module to get payment!', 'fluent-cart'));
+}
+```
+
+**Plan Creation Failed:**
+```php
+if ($response && is_wp_error($response)) {
+    return SubscriptionHelper::errorHandler($response->get_error_code(), $response->get_error_message());
+}
+```
+
+**Subscription Creation Failed:**
+```javascript
+onError: function(err) {
+    console.error('PayPal subscription error:', err);
+    that.paymentLoader?.hideLoader();
+}
+```
+
+
+### Security Considerations
+
+- **Plan Validation**: Plans are validated before subscription creation
+- **Webhook Verification**: All webhook events are verified for authenticity
+- **Subscription Validation**: Subscription IDs are validated against PayPal
+- **Amount Verification**: Payment amounts are verified against plan amounts
+- **Status Validation**: Only valid status transitions are processed
+
+### Configuration
+
+#### Required Settings
+
+- **PayPal API Credentials**: Client ID and Secret for API access
+- **Webhook Configuration**: Subscription events enabled
+- **Subscription Module**: FluentCart subscription module activated
+
+#### Plan Management
+
+- **Plan Caching**: Plans are cached to avoid duplicate creation
+- **Plan Naming**: Consistent plan naming convention
+- **Billing Cycles**: Support for trial, signup fee, and regular cycles
+- **Currency Support**: Multi-currency plan support
+
+### Testing Subscriptions
+
+#### Test Scenarios
+
+1. **Trial Subscription**: Create subscription with trial period
+2. **Signup Fee**: Create subscription with signup fee
+3. **Regular Billing**: Create subscription with regular billing
+4. **Webhook Events**: Test subscription status changes via webhooks
+5. **Plan Reuse**: Test plan caching and reuse
+6. **Error Handling**: Test various error scenarios
+
+#### Test Data
+
+- Use PayPal sandbox environment
+- Test with various billing intervals (daily, weekly, monthly, yearly)
+- Test with different trial periods and signup fees
+- Verify webhook delivery and processing
+- Check subscription status transitions
+
+### Key Differences from Stripe Subscriptions
+
+1. **Plan Requirement**: PayPal requires pre-created plans for subscriptions
+2. **Billing Cycles**: Complex billing cycle configuration with multiple phases
+3. **SDK Integration**: Uses PayPal JavaScript SDK instead of Elements
+4. **Webhook Events**: Different event types and data structures
+5. **Trial Handling**: Trial periods are part of billing cycle configuration
+6. **Signup Fees**: Handled as separate billing cycles, not add-on charges
+
+### PayPal-Specific Features
+
+- **Catalog Products**: Plans are associated with catalog products
+- **Billing Cycles**: Support for trial, regular, and one-time cycles
+- **Payment Preferences**: Auto-billing and failure handling configuration
+- **Plan Caching**: Efficient plan reuse to avoid API limits
+- **Multi-Phase Billing**: Support for complex billing scenarios
+
+
 
 ### Event System Integration
 

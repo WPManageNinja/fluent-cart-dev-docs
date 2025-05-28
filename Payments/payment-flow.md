@@ -3,10 +3,11 @@
 After completing the fourth step of the checkout process, the payment flow immediately begins, triggering the "makePayment" method from the Order flow through a hooked action.
 
 > [!WARNING]
-> There are some actions which begins before the Payment method rendered. This is not included on the payment flow implementation. we will discuss those part on another section : [Initiating Payment Method before checkout](initiate-payment-module.md).
+> There are some actions which begins before the Payment method rendered. This is not included on the payment flow implementation. we will discuss those part on another section : [Initiating/Rendering Payment Method Client before checkout](initiate-payment-module.md).
 
+### Starting the Payment flow
 
-## Starting the Payment from checkout flow
+#### Starting the Payment just after the checkout flow ends
 
 In placeOrder finalization do_action triggered with the payment method slug like this:
 'fluent_cart/payment/pay_order_with_' . $paymentMethodSlug

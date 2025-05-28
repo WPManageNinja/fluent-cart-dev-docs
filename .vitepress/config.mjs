@@ -22,7 +22,7 @@ export default defineConfig({
         text: 'Payments',
         items: [
           { text: 'Payment Flow Overview', link: 'Payments/payment-flow' },
-          { text: 'Loading Payment Modules', link: 'Payments/initiate-payment-module.md' },
+          { text: 'Rendering Payment Modules', link: 'Payments/initiate-payment-module.md' },
           { text: 'Stripe OneTime Payments', link: 'Payments/onetime-payment-stripe' },
           { text: 'PayPal OneTime Payments', link: 'Payments/onetime-payment-paypal' },
           { text: 'Stripe Subscriptions', link: 'Payments/subscription-payment-stripe' },

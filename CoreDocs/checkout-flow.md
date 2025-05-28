@@ -23,10 +23,6 @@ The process begins with Validating Order Data, where we assess the information p
 Following this, we conduct Validating Products, where we confirm product availability and stocks to ensure that the customer receives exactly what they ordered. Finally, we reach the step of Preparing and Processing Orders for Payment, where we securely handle transactions, ensuring that customers can complete their purchases with confidence.
 
 
-  ![My SVG Image](./images/fluentcart-order-flow-wide-connected.svg)
-<a href="./images/fluentcart-order-flow-wide-connected.svg" target="_blank">
-  View Full Screen
-</a>
 
 ## 1. Validating Checkout Form Data
 
@@ -360,11 +356,12 @@ fluent_cart/payment_partially-paid,
 fluent_cart/payment_one_time_paid, etc.
 
 ## Available Order status
-##### Order Payment statuses:
-- paid
-- partially-paid
-- refunded
-- partially-refunded
+##### Order statuses:
+- on-hold
+- processing
+- completed
+- canceled
+- failed
 
 ##### Order Transaction Type:
 - one_time,
@@ -372,11 +369,13 @@ fluent_cart/payment_one_time_paid, etc.
 - refund,
 - subscription_cycle
 
-##### Order Status:
-- on-hold,
-- processing,
-- completed,
-- canceled
+##### Order Payment Status:
+- paid
+- pending
+- partially-paid 
+- refunded
+- partially-refunded
+- failed
 
 ## Available transaction statuses
 - completed,

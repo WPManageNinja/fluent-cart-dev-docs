@@ -32,6 +32,13 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Create New Payment Modules',
+        items: [
+          { text: 'Payment Module Accessor', link: 'Payments/payment-accessor.md' },
+          { text: 'Guide to Build New', link: 'Payments/guide-to-build-new.md' },
+        ]
+      },
+      {
         text: 'Licensing',
         items: [
           { text: 'API', link: 'Licensing/api' },

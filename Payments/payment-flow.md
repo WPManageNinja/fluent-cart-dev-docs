@@ -1,60 +1,60 @@
 # Payment Flow Overview
 
-After completing the fourth step of the checkout process, the payment flow immediately begins, triggering the "makePayment" method from the Order flow through a hooked action.
+After completing the place order process, the payment flow immediately begins, triggering the "makePayment" method from the Order flow.
 
 > [!WARNING]
 > There are some actions which begins before the Payment method rendered. This is not included on the payment flow implementation. we will discuss those part on another section : [Initiating/Rendering Payment Method Client before checkout](initiate-payment-module.md).
 
-### Starting the Payment flow
+## 1. Triggering the payment flow
 
-#### Starting the Payment just after the checkout flow ends
+#### The Payment flow starts just after the checkout flow ends
 
-In placeOrder finalization do_action triggered with the payment method slug like this:
-'fluent_cart/payment/pay_order_with_' . $paymentMethodSlug
+In the `placeOrder` method of `FluentCart\Api\Checkout\CheckoutApi.php` the payment actions starts after finalizing the order other actions.
 
-**Example:** fluent_cart/payment/pay_order_with_stripe
+The specific payment gateway instance is retrieved using `FluentCart\App\App::gateway($methodSlug)` dynamically by passing the method slug. we must have to verify the method availability. We are skipping here cause we already did that in `place_order` method. 
+
+Example for stripe `FluentCart\App\App::gateway('stripe');`
+
 
 ```php
 public static function placeOrder(array $data)
 {
-    .......
-    if ($orderHelper instanceof OrderHelper) {
-        static::finalizeOrder($orderHelper, $orderData, $cartCheckoutHelper);
-    ....
-
+    ...
+   if ($orderHelper instanceof OrderHelper) {
+        static::finalizeOrder($orderHelper, $orderData, $cartCheckoutHelper, $userTz);
+    } else {
+        static::handleOrderError($orderHelper);
     }
+}
+```
+
+```php
+private static function finalizeOrder($orderHelper, $orderData, CartCheckoutHelper $cartCheckoutHelper, $userTz = 'UTC')
+{
     ....
+    // we don't have to validate the payment method again, as it's already validated in placeOrder method
+    $gateway = App::gateway(sanitize_text_field($orderHelper->order->payment_method));
+    $gateway->makePayment($orderHelper);
 }
 ```
 
+## 2. `makePayment` method
+
+As the payment method must have to implement the abstract before register, the payment instance have `makePayment` method already. Which will handle the payment process.
+
+Example for stripe payment method:
 ```php
-private static function finalizeOrder($orderHelper, $orderData, $cartCheckoutHelper)
+class Stripe extends AbstractPaymentGateway
 {
-    ...
-    do_action('fluent_cart/payment/pay_order_with_' . sanitize_text_field($orderHelper->order->payment_method), $orderHelper);
-    ...
+    public function makePayment(OrderHelper $orderHelper)
+    {
+        // payment process
+    }
 }
 ```
 
-## 1. Hook the action from base payment method
 
-The base payment method add that action to the abstract method of individual paymethods function **makePayment** 
-
-```php
-public function init()
-{
-    .....
-    add_action('fluent_cart/payment/pay_order_with_' . $this->slug, [$this, 'makePayment']);
-    .....
-}
-```
-
-```php
-abstract public function makePayment($orderHelper);
-```
-
-
-## 2. Retrieve all data
+## 3. Prepare data for payment
 
 **makePayment:** method accept $orderHelper `FluentCart\App\Helpers\OrderHelper`, which has all available data for payment.
 
@@ -67,10 +67,18 @@ We can access data just calling the property from $orderHelper instance:
 - Payable Amount: `$orderHelper->payableAmount`
 - Draft Transaction: `$orderHelper->transactions->first()`
 
-## 3. Making payment intent
+
+
+### Example: Payment process for Stripe
+
+**Lets breakdown **Stripe** payment module backend code for example**
+
+::: details
+
+**Making payment intent**
+
 we have all the available data now, to process payments. we have to call and format the payment module specific data. For an example if we make payment for stripe we have to format data as per stripe documentations. so the data process will be different and not the same for PayPal.
 
-### Lets breakdown **Stripe** payment module code for example
 
 To make payment using onsite embed checkout of stripe we need some info:
 
@@ -103,7 +111,8 @@ public function makePayment($orderHelper)
 }
 ```
 
-### Request for Payment API
+
+**Request for Payment API**
 
 If no subscription items are available, proceed to process the payment for one-time items; otherwise, handle the subscription through the Subscription module.
 
@@ -113,7 +122,6 @@ namespace FluentCart\App\Modules\PaymentMethods\Stripe;
 public function makePayment($orderHelper)
 {
     ......
-
     if (empty($orderHelper->subscriptionItems)) {
         $paymentArgs['public_key'] = $publicKey;
         $this->handleOnsitePaymentOnetime($orderHelper, $paymentArgs, $apiKey);
@@ -121,7 +129,6 @@ public function makePayment($orderHelper)
         // handle from subscription addon
         do_action('fluent_cart/payment/stripe_subscription_onsite', $orderHelper, $paymentArgs, $apiKey);
     }
-    .......
 }
 ```
 
@@ -145,7 +152,7 @@ we have to follow the stripe guideline, we have done a couple things in this met
 
 **In summary:** this method creates the Stripe payment intent, logs the payment completion step, and then updates the Transaction table with the intent ID as the vendor charge ID using the updateVendorChargeId method. This ID will be used to validate transaction data received from IPN in the future.
 
-##### handleOnsitePaymentOnetime:
+**handleOnsitePaymentOnetime:**
 
 ```php
 public function handleOnsitePaymentOnetime($orderHelper, $paymentArgs, $apiKey)
@@ -183,7 +190,9 @@ public function handleOnsitePaymentOnetime($orderHelper, $paymentArgs, $apiKey)
 
 }
 ```
-Updating the vendor transaction Id:
+
+**Updating the vendor transaction Id:**
+
 ```php
 public function updateVendorChargeId($orderHelper, $intent)
 {
@@ -200,7 +209,14 @@ public function updateVendorChargeId($orderHelper, $intent)
 }
 ```
 
-## 4. Charge the intent
+:::
+
+After completing the payment data processing for specific payment method, we have to return the response to the client js side
+to process onsite payment. Or we have to redirect to the vendor hosted checkout page.
+
+
+
+## 4. Charge the payment
 
 This is the step where the payment is charged. This process may vary for different types of payment API.
 The common types for all payment modules are:
@@ -208,31 +224,26 @@ The common types for all payment modules are:
 2. **Hosted checkout:** which will be handled from php side and redirect to the provider payment page.
 3. **Modal:** it will be handled from client js side on checkout page also.
 
-We used the stripe **Onsite embed payment** for checkout. Lets check this:
 
-As we used Onsite embed checkout we have to return `'ActionName' => 'custom'` and `'nextAction' => 'stripe'` which will dispatch the event when success response is received in **FluentCartCheckoutHandler.js**
+For onsite embed checkout we have to return like `'ActionName' => 'custom'` and `'nextAction' => 'stripe'` which will dispatch the event when success response is received in **FluentCartCheckoutHandler.js**
+
+**FluentCartCheckoutHandler.js** event dispatch code:
 
 ```js
-return await jQuery
-.post(this.checkoutUrl, formData)
-.then((response) => {
-        if (response.success) {
-            .....
-            if (response.data.actionName === "custom") {
-                window.dispatchEvent(
-                    new CustomEvent(
-                        "fluent_cart_payment_next_action_" + response.data.nextAction,{detail: {response: response,}}
-                    )
-                );
-            }
-            ......
-        }
-        ......
-    })
+// return the response to the client js side
+window.dispatchEvent(
+    new CustomEvent(
+        "fluent_cart_payment_next_action_" + response.data.nextAction,{detail: {response: response,}}
+    )
+)
 ```
 
 Now we have to hook that event from client js to charge the intent that we have returned earlier from [#handleOnsitePaymentOnetime](#handleonsitepaymentonetime).
 
+
+**Lets breakdown **Stripe** payment module frontend js code for example**
+
+::: details
 ### stripe-checkout.js
 
 For Stripe we have **stripe-checkout.js** `fluent-cart/resources/public/payment-methods/stripe-checkout.js` file which hooked that event like this:
@@ -276,10 +287,26 @@ window.addEventListener("fluent_cart_payment_next_action_stripe",  (data) => {
 
 Lets update the transaction details and mark the transaction as paid.
 
-## 5. Update order and transaction
+:::
 
-After a successful transaction we have to request an API to update the intent and order info, then redirect to the success page for receipt.
 
+
+> [!NOTE]
+> This is the example for stripe payment module. The code may vary for other payment modules.
+
+
+
+
+## 5. Confirm the payment
+
+The payment process will handle through the client js.
+
+After a successful transaction we have to verify the transaction from vendor, then update the intent and order info.
+
+
+**Lets breakdown **Stripe** payment module backend code for example**
+
+::: details
 ```js
 ...
 if (intentId) {
@@ -345,27 +372,30 @@ public function updateOrderDataByOrder($order, $transactionData = [], $transacti
     do_action('fluent_cart/payment/after_payment_' . $paymentStatus, $order);
 }
 ```
+:::
 
 This will do these steps:
 - Validate the order
-- Change order status to processing, If the order fulfillment_type is 'digital' then it will update current status to **completed**
-- Trigger all actions for order ans transactions
+- For digital products, update the order status to **completed**, and physical products status will be **processing** 
+- Update the order paid amount.
 
-## 6. Trigger events
+## 6. Dispatching events
 
-- Trigger all the payment paid hooks for further actions `fluent_cart/payment_paid`, check event dispatcher code for details.
-    ```php
-    namespace FluentCart\App\Events\Order;
-    class PaymentPaid extends EventDispatcher
-    {   ......
-        public string $hook = 'fluent_cart/payment_paid';
-        ....
-    }
-    ```
-- Trigger after payment actions for all status `fluent_cart/payment/after_payment_{paymentStatus}`
+- Triggered all the payment paid hooks for further actions `fluent_cart/payment_paid`
+```php
+// example use case
+do_action('fluent_cart/payment_paid', $order);
 
+```
 
-Everything is done, now redirect to the receipt page from client js on success response return.
+- Triggered after payment actions for all status `fluent_cart/payment/after_payment_{paymentStatus}`
+```php
+// example use case
+do_action('fluent_cart/payment/after_payment_pending', $order);
+
+```
+
+- Redirect to the receipt page
 ```js
 .then((response) => {
     window.location.href =  successUrl;

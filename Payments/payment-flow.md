@@ -1,405 +1,246 @@
 # Payment Flow Overview
 
-After completing the place order process, the payment flow immediately begins, triggering the "makePayment" method from the Order flow.
+This document outlines the payment processing flow in FluentCart, which begins immediately after an order is placed. The flow is initiated by the `makePayment` method within the specific payment gateway being used.
 
 > [!NOTE]
-> There are some actions which begins before the Payment method rendered. This is not part of the payment flow. Check [Initiating/Rendering Payment Method Client before checkout](initiate-payment-module.md).
+> This document covers the payment processing that happens *after* a customer submits the checkout form. For information on how payment methods are initially loaded and displayed on the checkout page, please see the [Loading Payment Modules](initiate-payment-module.md) documentation.
 
-## 1. Triggering the payment flow
+## High-Level Payment Flow
 
-#### The Payment flow starts just after the checkout flow ends
+The payment process involves a coordinated effort between the backend (your server) and the frontend (the customer's browser), and sometimes a third-party hosted page.
 
-In the `placeOrder` method of `FluentCart\Api\Checkout\CheckoutApi.php` the payment actions starts after finalizing the order other actions.
+1.  **Backend: Trigger Payment**: The checkout process calls the `makePayment` method on the selected payment gateway.
+2.  **Backend: Prepare for Payment**: The `makePayment` method gathers order details (customer, items, amount) and communicates with the payment provider's API to create a payment session or intent.
+3.  **Backend to Frontend**: The backend sends a response to the frontend.
+    *   For **onsite/modal payments**, this is typically a client secret or token for the frontend to use.
+    *   For **hosted checkouts**, this is a redirect URL.
+4.  **Frontend: Handle Payment**: The frontend JavaScript handles the payment.
+    *   For **onsite/modal payments**, it uses the provider's JS library (e.g., Stripe.js) to securely collect payment details and confirm the payment.
+    *   For **hosted checkouts**, it redirects the user to the provider's page.
+5.  **Frontend to Backend: Verify Payment**: After a successful client-side transaction, the frontend sends a request to the backend with a transaction identifier.
+6.  **Backend: Confirm Payment**: The backend securely verifies the transaction status with the payment provider using the identifier.
+7.  **Backend: Finalize Order**: The backend updates the order status, records the transaction, and dispatches final events.
+8.  **Frontend: Redirect to Success**: The user is redirected to the order confirmation page.
 
-The specific payment gateway instance is retrieved using `FluentCart\App\App::gateway($methodSlug)` dynamically by passing the method slug. we must have to verify the method availability. We are skipping here cause we already did that in `place_order` method. 
+---
 
-Example for stripe `FluentCart\App\App::gateway('stripe');`
+## Step 1: Triggering the Payment (Backend)
 
+The payment flow begins in the `placeOrder` method of `FluentCart\Api\Checkout\CheckoutApi.php`. After the order is created and saved, this method calls `finalizeOrder`, which retrieves the selected payment gateway instance and invokes its `makePayment` method.
 
+::: details Code Example: Initiating `makePayment`
 ```php
-public static function placeOrder(array $data)
-{
-    ...
-   if ($orderHelper instanceof OrderHelper) {
-        static::finalizeOrder($orderHelper, $orderData, $cartCheckoutHelper, $userTz);
-    } else {
-        static::handleOrderError($orderHelper);
-    }
-}
-```
+// In FluentCart\Api\Checkout\CheckoutApi.php
 
-```php
 private static function finalizeOrder($orderHelper, $orderData, CartCheckoutHelper $cartCheckoutHelper, $userTz = 'UTC')
 {
-    ....
-    // we don't have to validate the payment method again, as it's already validated in placeOrder method
+    // ...
+    // The payment method has already been validated in the placeOrder method.
     $gateway = App::gateway(sanitize_text_field($orderHelper->order->payment_method));
     $gateway->makePayment($orderHelper);
 }
 ```
+:::
 
-## 2. `makePayment` method
+## Step 2: Processing the Payment with `makePayment` (Backend)
 
-As the payment method must have to implement the abstract before register, the payment instance have `makePayment` method already. Which will handle the payment process.
+The `makePayment` method is the core of every payment gateway. All gateways must extend `AbstractPaymentGateway` and implement this method. It receives an `OrderHelper` object, which contains all the necessary data for the transaction.
 
-Example for stripe payment method:
+-   **Customer**: `$orderHelper->customer`
+-   **Order**: `$orderHelper->order`
+-   **OneTime Items**: `$orderHelper->items`
+-   **Subscription Items**: `$orderHelper->subscriptionItems`
+-   **Payable Amount**: `$orderHelper->payableAmount`
+-   **Draft Transaction**: `$orderHelper->transactions->first()`
+
+Inside `makePayment`, you will prepare the data according to your payment provider's requirements and make an API request to them to initiate the payment.
+
+::: details Example: Stripe `makePayment` Implementation
+The Stripe gateway's `makePayment` method prepares an array of arguments for the Stripe API. It then determines whether the cart contains a one-time purchase or a subscription and calls the appropriate handler.
+
 ```php
-class Stripe extends AbstractPaymentGateway
-{
-    public function makePayment(OrderHelper $orderHelper)
-    {
-        // payment process
-    }
-}
-```
+// In FluentCart\App\Modules\PaymentMethods\Stripe\Stripe.php
 
-
-## 3. Prepare data for payment
-
-**makePayment:** method accept $orderHelper `FluentCart\App\Helpers\OrderHelper`, which has all available data for payment.
-
-We can access data just calling the property from $orderHelper instance:
-
-- Customer: `$orderHelper->customer`
-- Order: `$orderHelper->order`
-- OneTime Items: `$orderHelper->items`
-- Subscription Items: `$orderHelper->subscriptionItems`
-- Payable Amount: `$orderHelper->payableAmount`
-- Draft Transaction: `$orderHelper->transactions->first()`
-
-
-
-### Example: Payment process for Stripe
-
-**Lets breakdown **Stripe** payment module backend code for example**
-
-::: details
-
-**Making payment intent**
-
-we have all the available data now, to process payments. we have to call and format the payment module specific data. For an example if we make payment for stripe we have to format data as per stripe documentations. so the data process will be different and not the same for PayPal.
-
-
-To make payment using onsite embed checkout of stripe we need some info:
-
-- client_reference_id : We use order hash as reference id,
-- items : Onetime items we got from checkout,
-- amount : Total Due amount to pay
-- currency : Currency for payment (ex, USD, EURO...)
-- description : Payment description for stripe,
-- customer_email : Email address for the customer,
-- success_url : After payment success which URL should redirect,
-
-Here we can retrieve those data from orderHelper:
-```php
-namespace FluentCart\App\Modules\PaymentMethods\Stripe;
-........
 public function makePayment($orderHelper)
 {
     $hash = $this->resolveOrderHash($orderHelper);
-    .....
-    $paymentArgs = array(
+    // ...
+    $paymentArgs = [
         'client_reference_id' => $hash,
-        'items' => $orderHelper->items,
-        'amount' => (int)$dueAmount,
-        'currency' => strtolower($orderHelper->order->currency),
-        'description' => "Payment for Order",
-        'customer_email' => $orderHelper->customer->email,
-        'success_url' => $this->getSuccessUrl($transaction),
-    );
-    .....
-}
-```
+        'items'               => $orderHelper->items,
+        'amount'              => (int)$dueAmount,
+        'currency'            => strtolower($orderHelper->order->currency),
+        'description'         => "Payment for Order",
+        'customer_email'      => $orderHelper->customer->email,
+        'success_url'         => $this->getSuccessUrl($transaction),
+    ];
+    
+    // ...
 
-
-**Request for Payment API**
-
-If no subscription items are available, proceed to process the payment for one-time items; otherwise, handle the subscription through the Subscription module.
-
-```php
-namespace FluentCart\App\Modules\PaymentMethods\Stripe;
-........
-public function makePayment($orderHelper)
-{
-    ......
     if (empty($orderHelper->subscriptionItems)) {
-        $paymentArgs['public_key'] = $publicKey;
+        // Handle a standard, one-time payment
         $this->handleOnsitePaymentOnetime($orderHelper, $paymentArgs, $apiKey);
     } else {
-        // handle from subscription addon
+        // Handle a subscription payment via an addon
         do_action('fluent_cart/payment/stripe_subscription_onsite', $orderHelper, $paymentArgs, $apiKey);
     }
 }
 ```
-
-Let's check the method for onetime payment :
-
-we have to follow the stripe guideline, we have done a couple things in this method.
-- Prepare session data for payment and stripe customer
-- **createCustomer:** request to the Stripe API to create customer with customer data
-- Log the data and throw necessary error if failed
-- **makeRequest:** make final request to create 'payment_intents' on Stripe
-- **updateVendorChargeId:** Update the charge id of stripe transaction to transaction table
-- Return the in intent data along with **next actions**
-
-    **nextAction:** will be the payment method slug, which may use as frontend hook to do necessary things in client side.
-    ```js
-    window.dispatchEvent(
-        new CustomEvent("fluent_cart_payment_next_action_" + response.data.nextAction,{detail: {response: response,},})
-    );
-    ```
-    **actionName:** is the next actionable things, here 'custom' will trigger a frontend hook to handle from client js side, and 'redirect' will look for the **redirect_url**. redirect_url: is used to handle the hosted redirect payment.
-
-**In summary:** this method creates the Stripe payment intent, logs the payment completion step, and then updates the Transaction table with the intent ID as the vendor charge ID using the updateVendorChargeId method. This ID will be used to validate transaction data received from IPN in the future.
-
-**handleOnsitePaymentOnetime:**
+The `handleOnsitePaymentOnetime` method then makes the actual API call to Stripe to create a `payment_intent`. After a successful API call, it updates the transaction record with the `vendor_charge_id` from Stripe and sends a JSON response to the frontend.
 
 ```php
+// In FluentCart\App\Modules\PaymentMethods\Stripe\Stripe.php
+
 public function handleOnsitePaymentOnetime($orderHelper, $paymentArgs, $apiKey)
 {
-    //preparing session data
-
-    $customer = $this->createCustomer($orderHelper, $apiKey);
-
-    if (is_wp_error($customer)) {
-        //add logs and handle error
-    }
-
-    ....
+    // ... Create customer, prepare session data ...
 
     try {
+        // Create the Payment Intent via Stripe API
         $intent = (new API())->makeRequest('payment_intents', $sessionData, $apiKey, 'POST');
-        ....
+        
+        // ...
+        
+        // Store the Stripe Intent ID in our database
         $this->updateVendorChargeId($orderHelper, $intent);
 
+        // Send a success response back to the frontend
         wp_send_json_success(
             [
-                'nextAction' => 'stripe',
-                'actionName' => 'custom',
-                'status' => 'success',
-                'message' => __('Order has been placed successfully', 'fluent-cart'),
-                'data' => $orderHelper,
+                'nextAction'   => 'stripe', // Identifies the payment gateway
+                'actionName'   => 'custom', // Tells the frontend to expect custom JS handling
+                'status'       => 'success',
+                'message'      => __('Order has been placed successfully', 'fluent-cart'),
+                'data'         => $orderHelper,
                 'payment_args' => $paymentArgs,
-                'response' => $intent
+                'response'     => $intent // Contains the client_secret
             ],
             200
         );
     } catch (\Exception $e) {
-        //send error
+        // Handle API errors
     }
-
 }
 ```
-
-**Updating the vendor transaction Id:**
-
-```php
-public function updateVendorChargeId($orderHelper, $intent)
-{
-    $intentId = Arr::get($intent, 'id', false);
-    if (!$intentId) {
-        return;
-    }
-
-    $orderHelper->transaction
-        ->update([
-            'vendor_charge_id' => sanitize_text_field($intentId),
-            'payment_mode' => sanitize_text_field($orderHelper->order->mode)
-        ]);
-}
-```
-
 :::
 
-After completing the payment data processing for specific payment method, we have to return the response to the client js side
-to process onsite payment. Or we have to redirect to the vendor hosted checkout page.
+## Step 3: Handling Onsite Payments (Frontend)
 
-
-
-## 4. Charge the payment
-
-This is the step where the payment is charged. This process may vary for different types of payment API.
-The common types for all payment modules are:
-1. **Onsite embed payment:** which will be handled from client js side on checkout page.
-2. **Hosted checkout:** which will be handled from php side and redirect to the provider payment page.
-3. **Modal:** it will be handled from client js side on checkout page also.
-
-
-For onsite embed checkout we have to return like `'ActionName' => 'custom'` and `'nextAction' => 'stripe'` which will dispatch the event when success response is received in **FluentCartCheckoutHandler.js**
-
-**FluentCartCheckoutHandler.js** event dispatch code:
+For onsite or modal checkouts, the backend sends a response to the frontend to continue the process. The main checkout handler in FluentCart dispatches a custom event based on the `nextAction` property from the backend response.
 
 ```js
-// return the response to the client js side
+// In FluentCartCheckoutHandler.js
 window.dispatchEvent(
     new CustomEvent(
-        "fluent_cart_payment_next_action_" + response.data.nextAction,{detail: {response: response,}}
+        "fluent_cart_payment_next_action_" + response.data.nextAction, 
+        { detail: { response: response } }
     )
-)
+);
 ```
 
-Now we have to hook that event from client js to charge the intent that we have returned earlier from [#handleOnsitePaymentOnetime](#handleonsitepaymentonetime).
+Your payment gateway's JavaScript file must listen for this event to take over. For Stripe, this event would be `fluent_cart_payment_next_action_stripe`.
 
-
-**Lets breakdown **Stripe** payment module frontend js code for example**
-
-::: details
-### stripe-checkout.js
-
-For Stripe we have **stripe-checkout.js** `fluent-cart/resources/public/payment-methods/stripe-checkout.js` file which hooked that event like this:
+::: details Example: Stripe `stripe-checkout.js`
+The Stripe JavaScript file listens for the event and uses the `client_secret` from the backend response to confirm the payment using Stripe.js.
 
 ```js
-window.addEventListener("fluent_cart_payment_next_action_stripe",  (data) => {
-    .......
-});
-```
+// In fluent-cart/resources/public/payment-methods/stripe-checkout.js
 
-where the data is `detail: {response: response}`, And **response** is the backend response we returned from **handleOnsitePaymentOnetime**
-
-Now retrieve all the response data from intent and charge using Stripe clientJs. The method `confirmIntent(confirmData)` will charge from stripe for the intent we generated. For successful payment we will receive intentId from `result[accessor]?.id;`. Either we have to handle the error response.
-
-```js
-window.addEventListener("fluent_cart_payment_next_action_stripe",  (data) => {
-    elements.submit().then(result=> {
-        const confirmIntent = intentType === "setup" ? stripe.confirmSetup : stripe.confirmPayment;
-        const accessor = intentType === "setup" ? 'setupIntent' : 'paymentIntent';
-        let confirmData = {
-            elements,
-                clientSecret,
-                confirmParams: {
-                    return_url: successUrl
-                },
-            redirect: 'if_required'
+window.addEventListener("fluent_cart_payment_next_action_stripe", (event) => {
+    const response = event.detail.response;
+    const clientSecret = response.data.response.client_secret;
+    const successUrl = response.data.payment_args.success_url;
+    
+    // Use the provider's JS SDK to confirm the payment
+    stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+            return_url: successUrl
+        },
+        redirect: 'if_required'
+    }).then((result) => {
+        if (result.error) {
+            // Handle payment error on the client side
+        } else {
+            // Payment succeeded on the client. Now, verify on the server.
+            const intentId = result.paymentIntent?.id;
+            if (intentId) {
+                // ... (Proceed to Step 4) ...
+            }
         }
-        confirmIntent(confirmData)
-            .then((result) => {
-                that.paymentLoader?.changeLoaderStatus('confirming');
-                const intentId = result[accessor]?.id;
-                if (intentId) {
-                    // If order complete update the transaction status
-                    // make redirection 
-            }).catch(error => {
-                // handle error
-            })
-    })
+    });
 });
 ```
-
-Lets update the transaction details and mark the transaction as paid.
-
 :::
 
+## Step 4: Confirming the Payment (Backend Verification)
 
+After the payment is successfully handled by the client-side JavaScript, it's crucial to securely verify the payment status with the provider from your backend. This prevents tampering and confirms the funds have been transferred.
 
-> [!NOTE]
-> This is the example for stripe payment module. The code may vary for other payment modules.
+The frontend script should make an AJAX request to a custom WordPress action, sending the unique transaction identifier (e.g., Stripe's Payment Intent ID).
 
+::: details Example: Stripe Payment Confirmation
+The `stripe-checkout.js` makes a POST request to the `fluent_cart_confirm_stripe_payment` action.
 
-
-
-## 5. Confirm the payment
-
-The payment process will handle through the client js.
-
-After a successful transaction we have to verify the transaction from vendor, then update the intent and order info.
-
-
-**Lets breakdown **Stripe** payment module backend code for example**
-
-::: details
 ```js
-...
+// In stripe-checkout.js, inside the .then() block from Step 3
+
 if (intentId) {
-    that.paymentLoader?.changeLoaderStatus('completed');
     jQuery.post(window.fluentcart_checkout_vars.ajaxurl, {
         action: 'fluent_cart_confirm_stripe_payment',
         intentId: intentId
     }).then((response) => {
-        window.location.href =  successUrl;
-        that.paymentLoader?.changeLoaderStatus('redirecting');
+        // Redirect to the success URL provided by the backend
+        window.location.href = successUrl;
     }).catch(error => {
-        console.log(error, 'failed')
+        // Handle verification error
     });
 }
-// handle error and redirect to error page 
 ```
 
-### Receive the request from backend
-
-The request is trigger on a custom action based on payment method slug. `fluent_cart_confirm_stripe_payment`. Which will be hooked and validated with vendor before updating the order and transactions.
-
-This **confirmStripePayment** method have done:
-- Retrieve the charge ID
-- Validate the payment in stripe using that charge id
-- Find and update the transaction status with intentId of that charge
-- Update the order status and order paid amount according to that transaction
+The backend hooks this action, retrieves the charge from the provider's API, validates it, and updates the transaction and order status accordingly.
 
 ```php
+// In FluentCart\App\Modules\PaymentMethods\Stripe\Stripe.php
+
+// Register the AJAX action
 add_action('wp_ajax_fluent_cart_confirm_stripe_payment', [$this, 'confirmStripePayment']);
-```
 
-```php
 public function confirmStripePayment()
 {
-    // retrieve the intend ID
-    .....
-    //validate the transaction from vendor
-    $response = $api->makeRequest($path, [], (new StripeSettings())->getApiKey());
-    ......
-    ......
-    // update the transaction
+    $intentId = sanitize_text_field($_REQUEST['intentId']);
+    // ...
+    // Verify the transaction directly with the Stripe API
+    $response = $api->makeRequest('payment_intents/' . $intentId, [], (new StripeSettings())->getApiKey());
+    // ...
+    
+    // Find our transaction record using the vendor charge ID
     $transaction = OrderTransaction::query()->where('vendor_charge_id', Arr::get($response, 'id'))->first();
-    ....
-    // update the order data
+    // ...
+    
+    // Update the order status, paid amount, etc.
     $this->updateOrderDataByOrder($order, $updateData, $transaction);
-}
-```
-**updateOrderDataByOrder:** will update the order status to **processing** for a paid transaction. 
-```php
-public function updateOrderDataByOrder($order, $transactionData = [], $transaction = null)
-{
-    // validate order
-    ....
-
-    // change order status 
-    ....
-
-    // trigger payment paid actions
-    if ($paymentStatus === 'paid') {
-        (new PaymentPaid($order))->dispatch();
-    }
-
-    do_action('fluent_cart/payment/after_payment_' . $paymentStatus, $order);
 }
 ```
 :::
 
-This will do these steps:
-- Validate the order
-- For digital products, update the order status to **completed**, and physical products status will be **processing** 
-- Update the order paid amount.
+## Step 5: Finalizing the Order and Dispatching Events (Backend)
 
-## 6. Dispatching events
+The final step is to update the order status and dispatch events. The `updateOrderDataByOrder` method handles this. It sets the order status to **processing** (for physical goods) or **completed** (for digital goods) and updates the total amount paid.
 
-- Triggered all the payment paid hooks for further actions `fluent_cart/payment_paid`
-```php
-// example use case
-do_action('fluent_cart/payment_paid', $order);
+Finally, it fires several actions that other plugins or themes can use.
 
-```
+-   `do_action('fluent_cart/payment_paid', $order);`: A generic hook that runs when any payment is successfully completed.
+-   `do_action('fluent_cart/payment/after_payment_{paymentStatus}', $order);`: A dynamic hook based on the payment status (e.g., `paid`, `pending`, `failed`).
 
-- Triggered after payment actions for all status `fluent_cart/payment/after_payment_{paymentStatus}`
-```php
-// example use case
-do_action('fluent_cart/payment/after_payment_pending', $order);
+After the backend verification is complete, the frontend JavaScript redirects the user to the success page.
 
-```
+## Handling Hosted Checkouts
 
-- Redirect to the receipt page
-```js
-.then((response) => {
-    window.location.href =  successUrl;
-})
-```
-
+For hosted checkouts (e.g., PayPal Standard), the flow is simpler:
+1.  In `makePayment`, your gateway generates a unique checkout URL for the provider.
+2.  Instead of returning JSON, your backend response instructs the frontend to redirect to this URL. For example: `wp_send_json_success(['actionName' => 'redirect', 'redirect_url' => $payPalUrl]);`
+3.  The user completes payment on the provider's site and is redirected back to a `return_url` you specified.
+4.  Payment confirmation often happens via a separate webhook/IPN (Instant Payment Notification) from the provider, which you must handle to verify the payment and update the order status. The verification steps are similar to Step 4, but are triggered by the provider's server instead of the user's browser.
 

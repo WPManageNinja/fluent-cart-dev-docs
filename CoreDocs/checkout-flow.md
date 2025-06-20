@@ -1,35 +1,41 @@
-# Fluent Cart Checkout Flow
+# FluentCart Checkout Flow
 
+This document provides a comprehensive overview of the FluentCart checkout process, from form submission to order creation. Understanding this flow is essential for developers building extensions or customizing the checkout experience.
 
-This document outlines the checkout flow and general architectural insights for the Fluent Cart plugin.
+## Architectural Overview
 
-## Architectural Principles
+FluentCart follows several key principles to ensure a robust and extensible checkout system:
 
-1. **Single Source of Truth:** Fluent Cart maintains all checkout data from one consistent source, ensuring data integrity and minimizing discrepancies.
-2. **Standardized Extension Interface:** Fluent Cart offers a clear interface for integrating extensions (like payment methods), keeping extension logic separate from core checkout logic. This ensures stable communication with the server for order processing.
-3. **Checkout Flow Tracking:** The system tracks the checkout flow status, allowing users to monitor their progress easily.
-4. **Event-Driven Interaction:** Extensions can subscribe to events in the checkout flow, enabling them to respond dynamically to changes and improve user experience.
+1. **Single Source of Truth**: All checkout data is maintained from one consistent source, ensuring data integrity and minimizing discrepancies.
+2. **Standardized Extension Interface**: Clear interfaces for integrating extensions (like payment methods) while keeping extension logic separate from core checkout logic.
+3. **Checkout Flow Tracking**: The system tracks checkout flow status, allowing users to monitor their progress easily.
+4. **Event-Driven Interaction**: Extensions can subscribe to events in the checkout flow, enabling dynamic responses to changes.
 
-Here is the high-level overview of the checkout flow:
+## Checkout Flow Overview
 
-## Order Flow Steps:
+The FluentCart checkout process consists of four main steps:
 
-1. **Validating Checkout Form Data**
-2. **Validating Products**
-3. **Prepare Customer Data**
-4. **Prepare and Process order for payment**
+1. **Validate Checkout Form Data** - Verify customer input and payment method availability
+2. **Validate Products** - Check product availability, stock levels, and prepare order items
+3. **Prepare Customer Data** - Create or update customer records
+4. **Process and Place Order** - Create the order, transactions, and subscriptions
 
-The process begins with Validating Order Data, where we assess the information provided to confirm the order and redirect to payment. This foundational step helps prevent errors down the line. Next, we move to Preparing Customer Data, ensuring that all necessary details about the customer are accurately captured and securely stored, essential for personalized service and smooth communication.
-Following this, we conduct Validating Products, where we confirm product availability and stocks to ensure that the customer receives exactly what they ordered. Finally, we reach the step of Preparing and Processing Orders for Payment, where we securely handle transactions, ensuring that customers can complete their purchases with confidence.
+Each step builds upon the previous one, ensuring data integrity throughout the process.
 
+---
 
+## Step 1: Validate Checkout Form Data
 
-## 1. Validating Checkout Form Data
+The checkout process begins with comprehensive data validation. This step ensures that all customer input is valid and sanitized before proceeding to order creation.
 
-After submitting the checkout form, FluentCart's first action is data validation. Initially, we focus on verifying the order's billing address and email. If shipping is required, we also validate the shipping information.
+### What Gets Validated
 
-During this validation step, we ensure the data is sanitized and prepared for the subsequent stages. Additionally, we check whether the selected **payment method** is available and functioning correctly, addressing any necessary validation errors that may arise.
+- **Billing Address**: Customer's billing information and contact details
+- **Shipping Address**: Delivery information (if shipping is required)
+- **Email Address**: Valid email format and availability
+- **Payment Method**: Availability and functionality of the selected payment gateway
 
+### Validation Process
 
 <p style="max-width: 400px; margin: 0 auto;">  
   <img src="./images/validation.svg" alt="My SVG Image" style="width: 100%; height: auto;">  
@@ -46,347 +52,326 @@ class CheckoutApi
     public static function placeOrder(array $data)
     {
         static::validateData($data);
-        ...
+        // ...
         PaymentHelper::validateMethod($paymentMethod);
-        ...
+        // ...
     }
 }
 ```
-**validateMethod :** we validate the payment method using 
-**PaymentHelper::validateMethod($paymentMethod)** which by default returns false.
-From BasePaymentMethod the validateMethod filter hook is triggered with the payment method slug like this fluent_cart/payment/validate_payment_method_stripe.
 
-PaymentHelper::validateMethod($paymentMethod);
+### Payment Method Validation
+
+Payment methods are validated using a filter-based system:
+
 ```php
-   public static function validateMethod($paymentMethod)
-    {
-        $status = apply_filters('fluent_cart/payment/validate_payment_method_' . $paymentMethod, [
-            'isValid' => false,
-            'reason' => 'No payment method found!'
-        ]);
-     ...
+// In PaymentHelper::validateMethod()
+public static function validateMethod($paymentMethod)
+{
+    $status = apply_filters('fluent_cart/payment/validate_payment_method_' . $paymentMethod, [
+        'isValid' => false,
+        'reason' => 'No payment method found!'
+    ]);
+    // ...
+}
 ```
 
-**validatePaymentMethod:** is validate finally from the child payment method like Stripe, PayPal, etc.
-FluentCart\App\Modules\PaymentMethods\BasePaymentMethod
+Each payment gateway registers its own validation filter:
 
 ```php
+// In BasePaymentMethod
 add_filter('fluent_cart/payment/validate_payment_method_' . $this->slug, [$this, 'validatePaymentMethod'], 10, 1);
 
-    public function validatePaymentMethod()
-    {
-        if (!$this->isEnabled()) {
-        ...
+public function validatePaymentMethod()
+{
+    if (!$this->isEnabled()) {
+        return [
+            'isValid' => false,
+            'reason' => 'Payment method is not enabled'
+        ];
+    }
+    // Additional validation logic...
+}
 ```
-The validation step ends with those two validations. Exception returns as wp_send_json_error() like this.
+
+### Error Handling
+
+If validation fails, the system returns a structured error response:
 
 ```php
- wp_send_json_error(
-    [
-      'status'  => 'failed',
-      'message' => Arr::get($status, 'reason'),
-      'data'    => []
-    ], 423
- );
+wp_send_json_error([
+    'status'  => 'failed',
+    'message' => Arr::get($status, 'reason'),
+    'data'    => []
+], 423);
 ```
 
-## 2. Validate Products
+---
 
-In this step, we ensure the checkout items are valid and available in stock. For Subscription products we have to check a couple of things as well. Subscription products are limited to a single quantity, which validates in the stock validation section. In exceptional cases, throws error, otherwise order items will be prepared.
+## Step 2: Validate Products
 
-For subscriptions signup, we have to extract the on-time items before applying the discount. Then prepare the data for the discounted item, which will be applicable for the first time payments.
+This step ensures that all items in the cart are available and valid for purchase. It handles both one-time purchases and subscription products.
 
+### Validation Criteria
 
+- **Quantity Validation**: Ensures quantities are within allowed limits
+- **Stock Availability**: Checks if products are in stock
+- **Product Availability**: Verifies products are active and purchasable
+- **Subscription Limits**: Validates subscription product constraints (e.g., single quantity limit)
 
+### Product Processing
 <p style="max-width: 500px; margin: 0 auto;">  
   <img src="./images/product.svg" alt="My SVG Image" style="width: 100%; height: auto;">  
 </p>  
 
-
-Summary for this step:
-
-- Quantity validation
-- Stock availability
-- Preparing one-time items
-- Preparing subscription items
-- Processing applicable discounts
-- Preparing `order_items` for the next step
-
-#### Checking Codebase:
-We introduce FluentCart\Api\Checkout\CartCheckoutHelper which is used to retrieve Cart Checkout Items.
-
-```php
-$cartCheckoutHelper->getItems()
-```
-
-Items should be validated through some certain criteria like stock, availability, max purchase quantity, etc. Check FluentCart\App\Services\OrderService::validateProducts for the validation steps.
+The system uses `CartCheckoutHelper` to retrieve and validate cart items:
 
 ```php
 class CheckoutApi
 {   
-   public static function placeOrder(array $data)
-   {
-     ...
-     $cartCheckoutHelper = new CartCheckoutHelper();
-     OrderService::validateProducts($cartCheckoutHelper->getItems());
-     ...
-   }
+    public static function placeOrder(array $data)
+    {
+        // ...
+        $cartCheckoutHelper = new CartCheckoutHelper();
+        OrderService::validateProducts($cartCheckoutHelper->getItems());
+        // ...
+    }
 }
 ```
 
-## 3. Prepare Customer Data
+### Subscription Handling
 
-In this step, the system determines whether the user is a new or existing customer. If necessary, it creates a WordPress user account and updates customer information in the FluentCart database.
+For subscription products, the system:
+- Extracts one-time items (like signup fees) before applying discounts
+- Prepares discounted items for first-time payments
+- Validates subscription-specific constraints
+
+---
+
+## Step 3: Prepare Customer Data
+
+This step handles customer creation and management, ensuring all customer information is properly stored and linked.
 
 <p style="max-width: 500px; margin: 0 auto;">  
   <img src="./images/customer.svg" alt="My SVG Image" style="width: 100%; height: auto;">  
 </p>  
 
+### Customer Processing Logic
 
-Summary for this step:
-
-- Identify new customer or existing
-- Create WordPress user if needed
-- Create Fluent Cart Customer with user_id
-- Update Customer billing and shipping
-
-#### Checking Codebase:
-
-After validation is done, we retrieve the customer data using the getOrCreateCustomer method FluentCart\Api\Checkout\CheckoutApi::getOrCreateCustomer()
+The system determines whether to create a new customer or update an existing one:
 
 ```php
 class CheckoutApi
 {   
-   public static function placeOrder(array $data)
-   {
-     ...
-     $customer = static::getOrCreateCustomer($cartCheckoutHelper, $orderData);
-   }
+    public static function placeOrder(array $data)
+    {
+        // ...
+        $customer = static::getOrCreateCustomer($cartCheckoutHelper, $orderData);
+    }
 }
 ```
 
-getOrCreateCustomer: This method is used to get the customer from $cartCheckoutHelper->getCustomer($email) using customer email. It returns null for unregistered users. If no customer is available, then a new customer will be created by the createCustomerWithAddress() method.
+### Customer Creation Process
 
 ```php
-    private static function getOrCreateCustomer(CartCheckoutHelper $cartCheckoutHelper, $orderData)
-    {
-        $customer = $cartCheckoutHelper->getCustomer(
-           static::getCustomerEmail($orderData['billing_address'])
-        );
+private static function getOrCreateCustomer(CartCheckoutHelper $cartCheckoutHelper, $orderData)
+{
+    $customer = $cartCheckoutHelper->getCustomer(
+        static::getCustomerEmail($orderData['billing_address'])
+    );
 
-        return static::createCustomerWithAddress(
-            $customer,
-            $orderData,
-            $orderData['billing_address'],
-            $orderData['shipping_address']
-        );
-    }
+    return static::createCustomerWithAddress(
+        $customer,
+        $orderData,
+        $orderData['billing_address'],
+        $orderData['shipping_address']
+    );
+}
 ```
 
-createCustomerWithAddress: which validates the customer to take action, whether the customer will be created or update the billing and shipping for an existing one. And returns the updated customer.
+### Customer Data Management
 
 ```php
- public static function createCustomerWithAddress(
-    $customer, $orderData, $billingAddress, $shippingAddress)
- {
+public static function createCustomerWithAddress($customer, $orderData, $billingAddress, $shippingAddress)
+{
     if (empty($customer)) {
-        //create customer
+        // Create new customer
     } else if ($customer instanceof Customer) {
-        //update existing customer
+        // Update existing customer
     }
     return $customer;
-  }
+}
 ```
 
-## 4. Process and Place Order
-This is the final step in our order flow before processing payment. In this stage, we focus on creating the main order, which includes compiling the order items and generating draft transactions. If the customer has selected a subscription product, we also prepare and set up the necessary subscriptions.
+---
 
-Another crucial part of this process is updating the shipping and billing addresses to ensure everything is accurate. After that, we apply any coupons the customer has used. Once everything is in place, we trigger all the events related to order creation and update our stock levels after the order is successfully placed. This step ensures a smooth transition to payment and sets the stage for excellent service.
+## Step 4: Process and Place Order
 
+This is the final step before payment processing. It creates the order, transactions, and subscriptions while handling all related events.
 
 <p style="max-width: 400px; margin: 0 auto;">  
   <img src="./images/process-order.svg" alt="My SVG Image" style="width: 100%; height: auto;">  
 </p>  
 
-Summary for this step:
+### Order Creation Process
 
-- Process the order data
-- Create transactions for order items
-- Create subscriptions
-- Update the order with applied coupons
-- Dispatch all events
-- Update stocks
-
-#### Checking Codebase:
-**prepareOrderHelper:** Order processing and creation happen in this step. Constructing the OrderHelper object based on the provided customer details and cart items is the initial step.
+The order creation involves several key components:
 
 ```php
 class CheckoutApi
 {   
-   public static function placeOrder(array $data)
-   {
-     ....
-     ....
-     ....
-     $orderHelper = static::prepareOrderHelper($customer, $cartCheckoutHelper->getItems());
-
-     $orderHelper = static::createOrderWithDraftPayments($orderHelper, $orderData, $cartCheckoutHelper->getUtmData());
-
-     if ($orderHelper instanceof OrderHelper) {
-         static::finalizeOrder($orderHelper, $orderData, $cartCheckoutHelper);
-     } else {
-         static::handleOrderError($orderHelper);
-      }
-  }
+    public static function placeOrder(array $data)
+    {
+        // ...
+        $orderHelper = static::prepareOrderHelper($customer, $cartCheckoutHelper->getItems());
+        $orderHelper = static::createOrderWithDraftPayments($orderHelper, $orderData, $cartCheckoutHelper->getUtmData());
+        
+        if ($orderHelper instanceof OrderHelper) {
+            static::finalizeOrder($orderHelper, $orderData, $cartCheckoutHelper);
+        } else {
+            static::handleOrderError($orderHelper);
+        }
+    }
+}
 ```
 
-#### Explaining OrderHelper instance:
-The OrderHelper class simplifies the order processing workflow for both order submissions and payment providers.
+### OrderHelper Class
 
-##### Required Properties 
-
-Before initializing the payment module, the following properties must be set:
-
-- $items – One-time purchase items from the cart.
-- $subscriptionItems – Subscription-based items extracted from the cart, excluding sign-up fees (which are treated as one-time purchases).
-- $customer – An instance of FluentCart\App\Models\Customer, representing the checkout user.
-- $order – An instance of FluentCart\App\Models\Order, representing the checkout order.
-- $transactions – A draft transaction instance of FluentCart\App\Models\OrderTransaction, required for payment processing.
-
-##### Other Properties 
-
-- $activeSubscription – Used for plan upgrades, representing the current subscription via an instance of FluentCart\App\Models\Subscription.
-- $paymentFrom – Used to identify the checkout is triggered from which source, like the checkout page, custom checkout page, etc.
-- $payableAmount – The total amount to pay, (the amount total – the paid amount).
+The `OrderHelper` class is central to order processing. It contains all necessary data for order creation and payment processing:
 
 ```php
 class OrderHelper
 {
-    public array $items = [];
-    public array $subscriptionItems = [];
-    public $customer = null;
-    public Order $order;
-    public $transaction = null;
-    public $activeSubscription = null;
-    public $transactions;
-    public string $paymentFrom = 'cart';
-    public int $payableAmount = 0;
-    ......
+    public array $items = [];                    // One-time purchase items
+    public array $subscriptionItems = [];        // Subscription-based items
+    public $customer = null;                     // Customer instance
+    public Order $order;                         // Order instance
+    public $transaction = null;                  // Draft transaction
+    public $activeSubscription = null;           // For plan upgrades
+    public $transactions;                        // Transaction collection
+    public string $paymentFrom = 'cart';         // Checkout source
+    public int $payableAmount = 0;               // Total amount to pay
+}
 ```
 
-**prepareOrderHelper:** This method is designed to simplify order initialization by encapsulating order preparation logic.
-It ensures that both one-time and subscription-based items are properly categorized and processed.
-The returned OrderHelper instance can then be used for further actions like payment processing, order submission, etc.
+### Order Preparation
 
 ```php
-    public static function prepareOrderHelper(Customer $customer, $items): OrderHelper
-    {
-        $orderHelper = new OrderHelper();
-        $orderHelper->setCustomer(
-            $customer
-        );
-        $checkoutItems = new CheckoutService($items);
-        $onetimeItems = $checkoutItems->onetime;
+public static function prepareOrderHelper(Customer $customer, $items): OrderHelper
+{
+    $orderHelper = new OrderHelper();
+    $orderHelper->setCustomer($customer);
+    
+    $checkoutItems = new CheckoutService($items);
+    $onetimeItems = $checkoutItems->onetime;
 
-        if (!empty($checkoutItems->subscriptions)) {
-            ....
-            // Create subscription items and process signup fee as onetime
-            // Generate subscription plan 
-        }
-        $orderHelper->addItems($onetimeItems);
-        return $orderHelper;
+    if (!empty($checkoutItems->subscriptions)) {
+        // Process subscription items and signup fees
+        // Generate subscription plans
     }
+    
+    $orderHelper->addItems($onetimeItems);
+    return $orderHelper;
+}
 ```
 
-##### Use OrderHelper instance to process order:
-
-**createOrderWithDraftPayments:** This method creates an order with draft payments using an OrderHelper instance. It processes the order, processes subscriptions data if applicable, and creates draft payment transactions before committing the order events. Here’s how subscriptions are processed and inserted as drafts.
+### Order Creation with Draft Payments
 
 ```php
 public static function createOrderWithDraftPayments(OrderHelper $orderHelper, $orderData, $utmData = [])
 {
-   ......
-   ......
     try {
         $orderHelper = $orderHelper->processOrder($data, $utmData);
 
         if (!empty($orderHelper->subscriptionItems)) {
+            // Create draft transactions for each subscription
             foreach ($orderHelper->subscriptionItems as $item) {
-                $subscriptionData = static::processSubscriptionData($orderHelper->order,$item);
+                $subscriptionData = static::processSubscriptionData($orderHelper->order, $item);
                 $orderHelper->createAndSetDraftTransaction($subscriptionData);
             }
         } else {
-        $orderHelper->createAndSetDraftTransaction([
-        'payment_method' => $data['payment_method'],
-        'status'         => 'pending'
-        ]);
+            // Create single draft transaction for one-time purchase
+            $orderHelper->createAndSetDraftTransaction([
+                'payment_method' => $data['payment_method'],
+                'status'         => 'pending'
+            ]);
+        }
         
         $orderHelper->commitEvents();
     }
-....
+    // Error handling...
+}
 ```
 
-**processOrder:** is to process the order data and the orderItems data to store in the DB, and link the customer to that order. Then updates the order status (e.g., pending, completed) with associates’ UTM data for analytics tracking. also return the orderHelper instance with the updated $order ( FluentCart\App\Models\Order) Model.
+### Event System
 
-**processSubscriptionData:** After the Order is set to the OrderHelper instance, Processing Subscriptions: If there are subscription items in the order, it processes each item to derive subscription data and creates a draft transaction for each.
+The system dispatches various events throughout the order creation process:
 
-If there are no subscription items, it creates a single draft transaction using general payment information provided in the $data array, marking it as pending.
-
-**commitEvents:** this method is responsible for committing payment events associated with an order context. It performs the following actions:
-**Validations:** It checks if the necessary properties (order, customer, and transaction) are set. If any are missing, it throws an exception with a relevant error message.
-**Action Triggers:** If the transaction status is considered successful, it triggers specific actions based on the order status and transaction type, allowing external hooks to respond appropriately to payment events.
-**Event Hooks:**
-fluent_cart/payment_{payment_status}
-fluent_cart/payment_{transaction_type}_{orderStatus}
-**Return:** It returns the current instance of OrderHelper, enabling method chaining.
-
-## Available Event Hooks
 ```php
+// Available event hooks
 do_action('fluent_cart/payment_' . $orderStatus, $order, $customer, $transaction);
 do_action('fluent_cart/payment_' . $transaction->type . '_' . $orderStatus, $order, $customer, $transaction);
 ```
-### Data served by those hooks:
-- $order - Order model instance
-- $customer - Customer model instance
-- $transaction - Transaction model instance
 
-**Example hooks:**
-fluent_cart/payment_paid,
-fluent_cart/payment_partially-paid,
-fluent_cart/payment_one_time_paid, etc.
+**Event Data Provided:**
+- `$order` - Order model instance
+- `$customer` - Customer model instance  
+- `$transaction` - Transaction model instance
 
-## Available Order status
-##### Order statuses:
-- on-hold
-- processing
-- completed
-- canceled
-- failed
+**Example Hooks:**
+- `fluent_cart/payment_paid`
+- `fluent_cart/payment_partially-paid`
+- `fluent_cart/payment_one_time_paid`
 
-##### Order Transaction Type:
-- one_time,
-- subscription,
-- refund,
-- subscription_cycle
+---
 
-##### Order Payment Status:
-- paid
-- pending
-- partially-paid 
-- refunded
-- partially-refunded
-- failed
+## Order Statuses and Types
 
-## Available transaction statuses
-- completed,
-- refunded
-- failed
+### Order Statuses
+- `on-hold` - Order is on hold (e.g., awaiting payment)
+- `processing` - Order is being processed
+- `completed` - Order is complete
+- `canceled` - Order has been canceled
+- `failed` - Order processing failed
 
-## Available subscription Status
-- active
-- canceled
-- past-due
-- expired
+### Transaction Types
+- `one_time` - Single payment transaction
+- `subscription` - Subscription payment
+- `refund` - Refund transaction
+- `subscription_cycle` - Recurring subscription payment
+
+### Payment Statuses
+- `paid` - Payment completed successfully
+- `pending` - Payment is pending
+- `partially-paid` - Partial payment received
+- `refunded` - Payment has been refunded
+- `partially-refunded` - Partial refund processed
+- `failed` - Payment failed
+
+### Transaction Statuses
+- `completed` - Transaction completed successfully
+- `refunded` - Transaction has been refunded
+- `failed` - Transaction failed
+
+### Subscription Statuses
+- `active` - Subscription is active
+- `canceled` - Subscription has been canceled
+- `past-due` - Subscription payment is overdue
+- `expired` - Subscription has expired
+
+---
+
+## Flow Diagram
+
+The checkout flow follows this sequence:
+
+1. **Form Submission** → Data validation
+2. **Product Validation** → Stock and availability checks
+3. **Customer Processing** → Create or update customer records
+4. **Order Creation** → Generate order and draft transactions
+5. **Payment Processing** → Handle payment through selected gateway
+6. **Order Completion** → Update status and dispatch events
+
+This structured approach ensures data integrity and provides a solid foundation for extensions and customizations.
 
 
 

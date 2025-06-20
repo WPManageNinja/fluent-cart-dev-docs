@@ -6,5 +6,8 @@
     "dev": "vitepress dev",
     "build": "vitepress build",
     "preview": "vitepress preview"
+  },
+  "dependencies": {
+    "vitepress-plugin-glossary": "^1.0.6"
   }
 }

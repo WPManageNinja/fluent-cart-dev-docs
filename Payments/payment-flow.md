@@ -2,8 +2,8 @@
 
 After completing the place order process, the payment flow immediately begins, triggering the "makePayment" method from the Order flow.
 
-> [!WARNING]
-> There are some actions which begins before the Payment method rendered. This is not included on the payment flow implementation. we will discuss those part on another section : [Initiating/Rendering Payment Method Client before checkout](initiate-payment-module.md).
+> [!NOTE]
+> There are some actions which begins before the Payment method rendered. This is not part of the payment flow. Check [Initiating/Rendering Payment Method Client before checkout](initiate-payment-module.md).
 
 ## 1. Triggering the payment flow
 
@@ -402,4 +402,4 @@ do_action('fluent_cart/payment/after_payment_pending', $order);
 })
 ```
 
-Upon completing the checkout, a success message will appear on the page along with a receipt.
+

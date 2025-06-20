@@ -1,4 +1,7 @@
 import { defineConfig } from 'vitepress'
+import { markdownGlossaryPlugin } from 'vitepress-plugin-glossary';
+import glossary from './glossary.json';
+
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -57,5 +60,13 @@ export default defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/wpmanageninja/fluent-cart' }
     ]
+  },
+  markdown: {
+    config: (md) => {
+      md.use(markdownGlossaryPlugin, {
+        glossary: glossary,
+        firstOccurrenceOnly: false
+      });
+    }
   }
 })

@@ -1,134 +1,125 @@
 # Loading Payment Modules
 
-There are three types of implementation available for Payment module:
-1. Onsite Checkout: The customer enters their payment details directly on your website. This requires JavaScript from the payment provider (e.g., Stripe.js) to securely handle the card information. 
+When a customer proceeds to checkout, FluentCart dynamically loads the available payment modules. This process is primarily driven by a series of WordPress hooks. This document explains the different checkout implementations and the step-by-step rendering process.
 
-2. Modal Checkout: The customer clicks a "Pay" button, and a pop-up window (a modal) from the payment provider appears over your site. This also requires the provider's JavaScript to create and manage the pop-up.
+## Checkout Types
 
-3. Hosted Checkout: The customer is redirected away from your site to a page hosted by the payment provider (e.g., PayPal's standard checkout). After paying, they are redirected back. This method is simpler because the payment provider handles everything on their own page, so no special JavaScript is needed on your website.
+FluentCart supports three types of checkout implementations for payment modules:
 
-> [!NOTE]
-> Onsite and Modal checkout needs to enqueue the client js file provided from vendor as it will be used to handle payment on the checkout page. Before rendering checkout page all available payment method should render with the required dependency. Except it will throw payment method validation exception on checkout.
+1.  **Onsite Checkout**: The customer enters their payment details directly on your website. This requires JavaScript from the payment provider (e.g., Stripe.js) to securely handle the card information.
+2.  **Modal Checkout**: The customer clicks a "Pay" button, and a pop-up window (a modal) from the payment provider appears over your site. This also requires the provider's JavaScript to create and manage the pop-up.
+3.  **Hosted Checkout**: The customer is redirected to a page hosted by the payment provider (e.g., PayPal's standard checkout). After payment, they are redirected back to your site. This method is simpler as the payment provider handles all payment processing on their page.
 
+> [!IMPORTANT]
+> For **Onsite** and **Modal** checkouts, your payment module must enqueue the necessary JavaScript files from the payment provider. These scripts are essential for handling payments on the checkout page. Failing to enqueue required scripts will result in a payment method validation exception during checkout.
 
-## Rendering checkout page
-The payment module is loaded from the checkout page. So we need to trigger the hooks from the checkout page before rendering the payment modules.
+## Checkout Page Rendering Flow
 
-## 1. Trigger hooks
-**Checkout page rendering**
+FluentCart uses a hook-based system to render the checkout page. The process starts when a user visits a page with the `[fluent_cart_checkout]` shortcode. Here's a step-by-step breakdown of how payment modules are loaded.
 
-Hook triggered `do_action('fluent_cart/views/checkout_page', $data)` from the checkout page which is loaded from the shortcode `[fluent_cart_checkout]` or from the blocks of the checkout page.
+## Step 1: Initializing the Checkout Page
 
-::: details check code for `do_action('fluent_cart/views/checkout_page', $data)`
+The rendering process begins with the `fluent_cart/views/checkout_page` hook. This action is triggered to start rendering the main checkout page components.
+
+::: details Code Example: Triggering `checkout_page` hook
 ```php
 <?php
 namespace FluentCart\App\Hooks\Handlers\ShortCodes;
-...
+// ...
 class CheckoutPageHandler
 {
-    ....
+    // ...
     public function cartCheckout()
-    {   .......
-        .......
+    {   // ...
         if ((empty($currentCart) || empty($currentCart->cart_data)) && !$hasInstantCheckoutParam ) {
             // handle empty cart items 
         } else {
-            .....
+            // ...
             do_action('fluent_cart/views/checkout_page', [
                 'checkout' => $checkoutHelper,
                 'addresses' => $userAddresses
             ]);
         }
-        .....
+        // ...
     }
 }
 ```
 :::
 
 > [!NOTE]
-> All the views hooks like `fluent_cart/views/{hooks_slug}` are triggered dynamically from the template manager of FluentCart to add some support for themes.
-> You can find the triggered hooks by searching `render_{hooks_slug}` method.
-> all templates are available in `/fluent-cart/app/FC/Template/DefaultTemplate/Views/` ( we will discuss the template manager in another docs. )
+> All view-related hooks in FluentCart, like `fluent_cart/views/{hook_slug}`, are triggered dynamically by the template manager. You can typically find the code that fires a specific hook by searching for a `render_{hook_slug}` method in the codebase. All templates are available in `/fluent-cart/app/FC/Template/DefaultTemplate/Views/`.
 
+## Step 2: Rendering the Checkout Form
 
+Next, the `fluent_cart/views/checkout_page_checkout_form` hook is fired. This hook is responsible for rendering the main checkout form, which includes fields for customer information and the payment selection area.
 
-
-## 2. Rendering the checkout page form
-
-Checkout page trigger the child component hooks like form, button, payment methods etc to render the complete checkout page.
-Let's check how the checkout_page form hook is triggered.
-
-Hook: `fluent_cart/views/checkout_page_checkout_form`
-
-::: details check code for `fluent_cart/views/checkout_page_checkout_form`
+::: details Code Example: Rendering the Checkout Form
 ```php
+<?php
 namespace FluentCart\App\FC\Template\Concerns\Checkout;
 
 trait CanRenderCheckoutPageViews
 {
-    .....
+    // ...
     // trigger the checkout_page_checkout_form hook
     public function render_checkout_page($viewData = [])
     {
-        .......
+        // ...
         $viewData['show_checkout_form'] = function () use ($viewData, $requiredLoggedIn) {
             if (!$requiredLoggedIn) {
                 do_action('fluent_cart/views/checkout_page_checkout_form', $viewData);
             }
         };
-        .....
+        // ...
         $this->loadView('checkout/checkout', $viewData);
     }
-    ....
+    // ...
 
-    // form render method catch the hook and render the form
+    // form render method catches the hook and renders the form
     public function render_checkout_page_checkout_form($viewData = [])
-    {   .......  
+    {   // ...
         $viewData['show_payment_methods'] = function () use ($viewData) {
             do_action('fluent_cart/views/checkout_page_payment_methods_wrapper', $viewData);
         };
-        .......
-        .......
+        // ...
         $this->loadView('checkout/forms/checkout-form', $viewData);
     }
 }
 ```
 :::
 
+## Step 3: Displaying Payment Methods
 
-## 3. Rendering payment methods
+Within the checkout form, the `fluent_cart/views/checkout_page_payment_methods_wrapper` hook is called. This function is responsible for rendering the payment method section. It retrieves all active payment gateways and filters them based on initial validation rules.
 
-The template renderer finally call the method **render_checkout_page_payment_methods_wrapper()** which is used to render the global payment method wrapper considering some validations. 
+This wrapper then triggers other hooks to render the title and the list of payment methods.
 
-Initially it will look for all active payment methods then filter out by initial validation.
-
-::: details check code for `fluent_cart/views/checkout_page_checkout_form`
+::: details Code Example: Rendering the Payment Methods Wrapper
 ```php
-// Hook triggered
+// Hook triggered from render_checkout_page_checkout_form
 public function render_checkout_page_checkout_form($viewData = [])
-{   .......  
+{   // ...  
     $viewData['show_payment_methods'] = function () use ($viewData) {
         do_action('fluent_cart/views/checkout_page_payment_methods_wrapper', $viewData);
     };
-    .......
-    .......
+    // ...
     $this->loadView('checkout/forms/checkout-form', $viewData);
 }
 
-//  Method called
+// Method that renders the payment methods wrapper
 public function render_checkout_page_payment_methods_wrapper($viewData = [])
 {
-    ....
+    // ...
     $paymentMethods = PaymentMethods::getActiveMethodInstance();
     $paymentMethodMode = 'fluent_cart_payment_method_mode_' . $checkout->getSettings('checkout_method_style');
-    ....
+    // ...
     // trigger the payment_methods_title hook
     $viewData['show_title'] = function () {
         do_action('fluent_cart/views/checkout_page_payment_methods_title');
     };
     // check for subscription products
     if (!Arr::has($viewData, 'hasSubscription')) {
-        .....
+        // ...
         $viewData['hasSubscription'] = $hasSubscription;
     }
 
@@ -147,18 +138,15 @@ public function render_checkout_page_payment_methods_wrapper($viewData = [])
 ```
 :::
 
-:::info
-You may check all the hooks by searching the way as we discuss before. we are skipping hooks invoking part now as it's a part of template rendering.
-Let's go to directly the root level rendering method for payment module. 
-:::
+## Step 4: Enqueuing Payment Gateway Scripts
 
-## 4. Load / Enqueue client js
-All registered payment modules must extend `FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway` class.
+This is a critical step for developers building a payment module. All payment gateway classes must extend `FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway`.
 
-Payment modules can extend the base method `getEnqueueScriptSrc()` and return `src` array which will be enqueued on the checkout page automatically. 
+To add provider-specific JavaScript (for Onsite or Modal checkouts), you need to implement the `getEnqueueScriptSrc()` method in your payment gateway class. This method should return an array of script details that FluentCart will automatically enqueue on the checkout page.
 
-::: details example code for Stripe payment method `getEnqueueScriptSrc()`
+::: details Example: `getEnqueueScriptSrc()` for Stripe
 ```php
+<?php
 class Stripe extends AbstractPaymentGateway
 {
   public function getEnqueueScriptSrc($hasSubscription = 'no'): array
@@ -183,12 +171,14 @@ class Stripe extends AbstractPaymentGateway
 
 ## Summary of the Flow
 
-A user visits the checkout page.
-FluentCart starts a chain reaction using hooks:
-- Page loading begins `(checkout_page)`.
-- The main form is rendered `(checkout_page_checkout_form)`.
-- The payment section is rendered `(checkout_page_payment_methods_wrapper)`.
-- While building this page, FluentCart asks each active payment gateway (like Stripe) what scripts it needs using the `getEnqueueScriptSrc()` method.
-- FluentCart adds all these required scripts to the page.
-- The final page is sent to the user's browser, complete with all the HTML and the necessary JavaScript to make the selected payment methods work correctly.
+Here is a summary of the entire process:
+
+1.  A user visits the checkout page.
+2.  FluentCart triggers a sequence of hooks to build the page:
+    - `checkout_page` starts the page rendering.
+    - `checkout_page_checkout_form` renders the main form.
+    - `checkout_page_payment_methods_wrapper` renders the payment section.
+3.  While rendering, FluentCart calls `getEnqueueScriptSrc()` on each active payment gateway (like Stripe) to collect required scripts.
+4.  FluentCart adds all the collected scripts to the page.
+5.  The complete HTML page, along with all necessary JavaScript for the payment methods, is sent to the user's browser.
 

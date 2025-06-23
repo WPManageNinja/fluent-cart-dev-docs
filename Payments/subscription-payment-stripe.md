@@ -1,17 +1,25 @@
-## Subscription Payment - Stripe
+# Stripe Subscription Payment Flow
 
-This document covers the Stripe subscription payment flow and what happens when customers place orders with subscription items using Stripe. The subscription flow uses the same `makePayment` method entry point but routes to specialized subscription handlers.
+This document provides a comprehensive guide to implementing Stripe subscription payments in FluentCart. It covers the complete flow from checkout to ongoing subscription management, including webhook handling and status management.
 
-### Subscription Flow Overview
+## Overview
 
-1. **Order Creation**: Customer proceeds to checkout with subscription items, order is created with `ORDER_ON_HOLD` status
-2. **Subscription Processing**: Stripe subscription method is selected and processed
-3. **Customer Creation**: Stripe customer is created or retrieved
-4. **Subscription Creation**: Stripe subscription is created with payment method
-5. **Payment Confirmation**: Payment is confirmed via frontend JavaScript and backend verification
-6. **Order Completion**: Order status is updated and subscription is activated
+Stripe subscription payments follow a specialized flow that differs from one-time payments. The process involves creating Stripe customers, managing subscription objects, and handling both immediate and future billing scenarios.
 
-### Key Components
+### Key Differences from One-Time Payments
+
+1. **Customer Requirement**: Subscriptions always require a Stripe customer record
+2. **Intent Types**: Uses both payment intents and setup intents depending on billing timing
+3. **Webhook Events**: Additional subscription-specific webhook events for status management
+4. **Status Management**: Complex subscription status tracking and transitions
+5. **Billing Cycles**: Ongoing billing cycle management with trial periods
+6. **Payment Methods**: Secure storage and reuse of payment methods for recurring billing
+
+---
+
+## Architecture Overview
+
+### Core Components
 
 - **Main Entry Point**: `app/Modules/PaymentMethods/Stripe/Stripe.php` - `makePayment()` method
 - **Subscription Handler**: `app/Modules/Subscriptions/Modules/Stripe/Subscriptions.php` - `handleOnsiteSubscription()` method
@@ -20,11 +28,22 @@ This document covers the Stripe subscription payment flow and what happens when 
 - **Webhook Handler**: `app/Modules/Subscriptions/Modules/Stripe/RemoteEventListener.php`
 - **Frontend**: `resources/public/payment-methods/stripe-checkout.js`
 
-### Subscription Payment Flow
+### Flow Overview
 
-## 1. Initiate Payment
+1. **Order Creation**: Customer proceeds to checkout with subscription items
+2. **Subscription Processing**: Stripe subscription method is selected and processed
+3. **Customer Creation**: Stripe customer is created or retrieved
+4. **Subscription Creation**: Stripe subscription is created with payment method
+5. **Payment Confirmation**: Payment is confirmed via frontend JavaScript and backend verification
+6. **Order Completion**: Order status is updated and subscription is activated
 
-The subscription flow starts with the same `makePayment` method but routes differently:
+---
+
+## Step 1: Payment Initiation
+
+The subscription flow starts with the same `makePayment` method but routes to specialized subscription handlers.
+
+### Main Entry Point
 
 ```php
 public function makePayment($orderHelper)
@@ -52,52 +71,35 @@ public function makePayment($orderHelper)
     ];
 
     // 3. Route to subscription handler for onsite checkout
-        ....
-            // Handle subscription payment - triggers subscription module
-            do_action('fluent_cart/payments/stripe_subscription_onsite', $orderHelper, $paymentArgs, $apiKey);
-        ....
+    if (!empty($orderHelper->subscriptionItems)) {
+        $stripeSubscriptionsManager = new SubscriptionsManager();
+        $stripeSubscriptionsManager->handleOnsiteSubscription($orderHelper, $paymentArgs, $apiKey);
+    }
 }
 ```
 
-## 2. Subscription Handler Registration
+---
 
-The subscription module registers the hook handler:
+## Step 2: Subscription Processing
 
-```php
-// In Subscriptions.php register() method
-add_action('fluent_cart/payments/stripe_subscription_onsite', [$this, 'handleOnsiteSubscription'], 10, 3);
-```
+The `handleOnsiteSubscription` method handles the core subscription creation logic.
 
-## 3. Process the Subscription
-
-The main subscription processing method.
-several thing happens here:
-1. Validate subscription items
-2. Initialize Stripe and prepare session data for payment
-3. Create or retrieve Stripe customer
-4. Modify session data for subscription
-5. Prepare subscription data for Stripe subscription API
-6. Add expiration date if split payment
-7. Add trial period if subscription first payment is free
-8. Create subscription via Stripe API
-9. Update local subscription record with vendor IDs
-10. Set intent type as `setup` if first iteration free
-11. Return success response to charge the subscription to the frontend
+### Subscription Processing Flow
 
 ```php
 public function handleOnsiteSubscription(OrderHelper $orderHelper, $paymentArgs, $apiKey): void
 {
-    //1. Validate subscription items
+    // 1. Validate subscription items
     if (empty($orderHelper->subscriptionItems)) return;
 
-    //2. Initialize Stripe and get session data
+    // 2. Initialize Stripe and get session data
     $stripe = new Stripe();
     $sessionData = $stripe->sessionData($orderHelper, $paymentArgs);
     $subscriptionArgs = $this->processAndGetSubscriptionArgs($orderHelper);
 
     $metadata = Arr::get($sessionData, 'metadata', []);
 
-    // Configure payment intent data if no subscription data
+    // 3. Configure payment intent data if no subscription data
     if (empty($sessionData['subscription_data'])) {
         $sessionData['payment_intent_data'] = [
             'capture_method' => 'automatic',
@@ -106,14 +108,14 @@ public function handleOnsiteSubscription(OrderHelper $orderHelper, $paymentArgs,
         ];
     }
 
-    //3. Create or retrieve Stripe customer
+    // 4. Create or retrieve Stripe customer
     $sessionData = $this->addCustomer($sessionData, $orderHelper, $apiKey);
 
-    //4. Apply filters and prepare session data
+    // 5. Apply filters and prepare session data
     $sessionData = apply_filters('fluent_cart/payments/stripe_checkout_session_args', $sessionData, $orderHelper, $subscriptionArgs);
     $sessionData = array_merge($sessionData, ['locale' => 'auto']);
 
-    //5. Prepare subscription data for Stripe API
+    // 6. Prepare subscription data for Stripe API
     $subscriptionData = [
         'customer' => Arr::get($sessionData, 'customer', ''),
         'items' => Arr::get($sessionData, 'subscription_data.items'),
@@ -123,19 +125,19 @@ public function handleOnsiteSubscription(OrderHelper $orderHelper, $paymentArgs,
         'metadata' => $metadata
     ];
 
-    //6. Add expiration date if specified
+    // 7. Add expiration date if specified
     if ($expireAt = Arr::get($sessionData, 'subscription_data.expire_at', false)) {
         $subscriptionData['cancel_at'] = $expireAt;
     }
 
     $subscriptionData = apply_filters('fluent_cart/payments/stripe_onsite_subscription_data', $subscriptionData, $sessionData, $apiKey);
 
-    //7. Add trial period if specified
+    // 8. Add trial period if specified
     if ($trialEnd = Arr::get($subscriptionArgs, 'trial_end', false)) {
         $subscriptionData['trial_end'] = $trialEnd;
     }
 
-    //8. Create subscription via Stripe API
+    // 9. Create subscription via Stripe API
     $subscription = $this->createSubscription($subscriptionData, $apiKey, $orderHelper->order->id);
     if (is_wp_error($subscription)) {
         wp_send_json_error([
@@ -143,7 +145,7 @@ public function handleOnsiteSubscription(OrderHelper $orderHelper, $paymentArgs,
         ], 423);
     }
 
-    //9. Update local subscription record with vendor IDs
+    // 10. Update local subscription record with vendor IDs
     $chargeId = Arr::get($subscription, 'id');
     if ($chargeId) {
         Subscription::query()
@@ -154,10 +156,10 @@ public function handleOnsiteSubscription(OrderHelper $orderHelper, $paymentArgs,
             ]);
     }
 
-    //10. Set intent type as `setup` if first iteration free 
+    // 11. Set intent type as `setup` if first iteration free 
     $paymentArgs = $this->updateClientSecretInfo($paymentArgs, $subscription);
 
-    //11. Return success response with subscription data to frontend
+    // 12. Return success response with subscription data to frontend
     wp_send_json_success([
         'nextAction' => 'stripe',
         'actionName' => 'custom',
@@ -170,9 +172,7 @@ public function handleOnsiteSubscription(OrderHelper $orderHelper, $paymentArgs,
 }
 ```
 
-**Customer Management**
-
-The `addCustomer` method creates or retrieves a Stripe customer:
+### Customer Management
 
 ```php
 public function addCustomer($sessionData, $orderItem, $apiKey)
@@ -187,15 +187,12 @@ public function addCustomer($sessionData, $orderItem, $apiKey)
 }
 ```
 
-**Stripe Subscription Creation**
-
-The core subscription creation via Stripe API:
+### Stripe Subscription Creation
 
 ```php
 public function createSubscription($subscriptionData, $apiKey, $orderId = '')
 {
-    ....
-    // 1. Create subscription via Stripe API
+    // Create subscription via Stripe API
     try {
         $api = new API();
         return $api->makeRequest('subscriptions', $subscriptionData, $apiKey, 'POST');
@@ -205,16 +202,13 @@ public function createSubscription($subscriptionData, $apiKey, $orderId = '')
 }
 ```
 
+---
 
-## 4. Frontend Payment Confirmation
+## Step 3: Frontend Payment Confirmation
 
-#### JavaScript Subscription Handling
+The frontend JavaScript handles the payment confirmation process, determining the appropriate intent type and confirming the payment.
 
-The frontend JavaScript (`stripe-checkout.js`) handles the confirmation.
-There are several things happens here:
-1. **Determine intent type:** Based on response It may be a payment intent or setup intent, setup intent is used for the first payment of subscription if it's free. we will use it to confirm the payment from backend.
-2. **Charge the subscription:** Stripe clientJS will charge the intent that we have returned from backend and return the intent id.
-3. **Send confirmation to backend:** After a successful payment, the frontend sends a confirmation request to the backend to update the order and transaction status.
+### JavaScript Subscription Handling
 
 ```javascript
 // stripe-checkout.js - Subscription payment handling
@@ -249,12 +243,12 @@ window.addEventListener("fluent_cart_payment_next_action_stripe", (e) => {
             redirect: 'if_required'
         };
 
-        // 3. Confirm payment/setup intent
+        // 4. Confirm payment/setup intent
         confirmIntent(confirmData).then((result) => {
             const intentId = result[accessor]?.id;
 
             if (intentId) {
-                //Send confirmation to backend
+                // Send confirmation to backend
                 const params = new URLSearchParams({
                     action: 'fluent_cart_confirm_stripe_payment',
                     intentId: intentId
@@ -280,13 +274,13 @@ window.addEventListener("fluent_cart_payment_next_action_stripe", (e) => {
 });
 ```
 
-## 5. Backend Payment Confirmation
+---
 
-#### confirmStripePayment Method
+## Step 4: Backend Payment Confirmation
 
-The frontend confirmation AJAX request triggers the `confirmStripePayment` method in `Stripe.php` file.
-The backend confirmation handler processes both payment intents and setup intents to update the Transaction and Subscription in FluentCart:
-For zero payment Subscription Stripe has no payment Intent except the setup intent. So we have to handle it differently using confirmSetupIntent method.
+The backend confirmation handler processes both payment intents and setup intents to update the transaction and subscription in FluentCart.
+
+### Main Confirmation Method
 
 ```php
 public function confirmStripePayment()
@@ -340,7 +334,7 @@ public function confirmStripePayment()
 }
 ```
 
-#### Setup Intent Confirmation
+### Setup Intent Confirmation
 
 For subscriptions requiring setup intents (future payments):
 
@@ -380,9 +374,29 @@ public function confirmSetupIntent($setupIntent)
 }
 ```
 
+---
+
+## Payment Intent vs Setup Intent
+
+### When Each is Used
+
+**Payment Intent:**
+- Used when subscription has an immediate charge
+- Contains `latest_invoice.payment_intent.client_secret`
+- Requires payment confirmation on frontend
+- Used for subscriptions with no trial period or setup fees
+
+**Setup Intent:**
+- Used when subscription has no immediate charge
+- Contains `pending_setup_intent.client_secret`
+- Requires setup confirmation on frontend
+- Used for subscriptions with trial periods or future billing
+
+---
+
 ## Subscription Status Management
 
-#### Status Mapping
+### Status Mapping
 
 The system maps Stripe subscription statuses to internal statuses:
 
@@ -404,10 +418,9 @@ public function getCorrectSubscriptionStatus($stripeStatus)
 }
 ```
 
-#### Subscription Confirmation
+### Subscription Confirmation
 
-The `confirmSubscription` method updates subscription details after successful payment, 
-we have to update the bill count if it's a recurring payment:
+The `confirmSubscription` method updates subscription details after successful payment:
 
 ```php
 public function confirmSubscription($vendorId, $subscription, $billingInfo)
@@ -450,9 +463,11 @@ public function confirmSubscription($vendorId, $subscription, $billingInfo)
 }
 ```
 
+---
+
 ## Webhook Event Handling
 
-#### Remote Event Listener
+### Remote Event Listener
 
 The `RemoteEventListener` class handles subscription webhook events:
 
@@ -464,7 +479,7 @@ public function register()
 }
 ```
 
-#### Subscription Updated Event
+### Subscription Updated Event
 
 Handles subscription status changes:
 
@@ -510,7 +525,7 @@ public function handleSubscriptionUpdated($event, $order)
 }
 ```
 
-#### Subscription Deleted Event
+### Subscription Deleted Event
 
 Handles subscription cancellation:
 
@@ -552,26 +567,11 @@ public function handleSubscriptionDeleted($event, $order)
 }
 ```
 
-## Payment Intent vs Setup Intent
+---
 
-#### When Each is Used
+## Error Handling
 
-**Payment Intent:**
-- Used when subscription has an immediate charge
-- Contains `latest_invoice.payment_intent.client_secret`
-- Requires payment confirmation on frontend
-- Used for subscriptions with no trial period or setup fees
-
-**Setup Intent:**
-- Used when subscription has no immediate charge
-- Contains `pending_setup_intent.client_secret`
-- Requires setup confirmation on frontend
-- Used for subscriptions with trial periods or future billing
-
-
-## Error Handling and Other Considerations
-
-#### Common Error Scenarios
+### Common Error Scenarios
 
 **Subscription Module Not Found:**
 ```php
@@ -596,7 +596,9 @@ if (result?.error) {
 }
 ```
 
-### Security Considerations
+---
+
+## Security Considerations
 
 - **Customer Verification**: Stripe customer is created/verified for each subscription
 - **Payment Method Security**: Payment methods are securely stored by Stripe
@@ -604,16 +606,18 @@ if (result?.error) {
 - **Metadata Validation**: Order references are validated in payment metadata
 - **Setup Intent Security**: Setup intents ensure secure future payment collection
 
-### Configuration
+---
 
-#### Required Settings
+## Configuration
+
+### Required Settings
 
 - **Stripe API Keys**: Live/Test secret and publishable keys
 - **Webhook Configuration**: Subscription events enabled
 - **Subscription Module**: FluentCart subscription module activated
 - **Payment Mode**: Onsite checkout mode for subscription handling
 
-#### Webhook Events
+### Webhook Events
 
 Required webhook events for subscription management:
 - `customer.subscription.updated` - Subscription status changes
@@ -621,9 +625,11 @@ Required webhook events for subscription management:
 - `invoice.paid` - Successful billing
 - `invoice.payment_failed` - Failed billing
 
-### Testing Subscriptions
+---
 
-#### Test Scenarios
+## Testing
+
+### Test Scenarios
 
 1. **Trial Subscription**: Create subscription with trial period
 2. **Immediate Billing**: Create subscription with immediate charge
@@ -632,21 +638,12 @@ Required webhook events for subscription management:
 5. **Webhook Events**: Test subscription status changes via webhooks
 6. **Cancellation**: Test subscription cancellation flow
 
-#### Test Data
+### Test Data
 
 - Use Stripe test mode and test API keys
 - Use test card numbers for payment methods
 - Test with various billing intervals (monthly, yearly)
 - Verify webhook delivery and processing
 - Check subscription status transitions
-
-### Key Differences from One-Time Payments
-
-1. **Customer Requirement**: Subscriptions always require a Stripe customer
-2. **Intent Types**: Uses both subscription payment and subscription with 100% coupon
-3. **Webhook Events**: Additional subscription-specific webhook events
-4. **Status Management**: Complex subscription status tracking
-5. **Billing Cycles**: Ongoing billing cycle management
-6. **Trial Periods**: Support for trial periods and delayed billing
 
 This completes the comprehensive documentation for Stripe subscription payment processing, covering the complete flow from checkout to ongoing subscription management.

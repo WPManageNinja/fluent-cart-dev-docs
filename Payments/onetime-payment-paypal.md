@@ -22,7 +22,7 @@ This document covers the PayPal one-time payment flow and what happens when cust
 
 PayPal payment method initiated by the event triggered from frontend paypal-checkout.js. When PayPal button is clicked  `onClick` function is called as callback to place the order and return orderData to the `createOrder` function to create vendor order in PayPal.
 
-    `createOrder` and `onClick` methods are as followed:
+`createOrder` and `onClick` methods are as followed:
 
 
 ```javascript

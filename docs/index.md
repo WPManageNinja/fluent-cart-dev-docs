@@ -33,7 +33,7 @@ features:
     link: /
   - title: Payment Gateway Integration (coming soon)
     details: Complete guide for third-party developers to integrate custom payment methods with FluentCart.
-    link: /
+    link: /payment-methods-integration/
 #   - title: Shipping Module
 #     details: Shipping zones, methods, rate calculations, and custom shipping method development for delivery management.
 #     link: /modules/shipping

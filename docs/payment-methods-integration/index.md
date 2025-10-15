@@ -105,7 +105,6 @@ $allGateways = GatewayManager::getInstance()->all();
 Choose your implementation approach:
 
 - **[Quick Implementation](./quick-implementation)** - Fast setup with minimal features
-- **[Complete Implementation](./complete-implementation)** - Full-featured gateway with all capabilities
 - **[Integration Methods](./integration-methods)** - Different ways to integrate with FluentCart
 - **[Security Guide](./security)** - Best practices for secure payment processing
 

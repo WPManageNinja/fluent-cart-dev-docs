@@ -958,6 +958,211 @@ public function getOrderInfo(array $data)
 
 **Key Insights:**
 - **Dynamic Asset Loading**: External SDK + custom integration scripts
+
+### Paddle Checkout JavaScript Implementation
+
+The frontend JavaScript implementation handles the customer checkout experience:
+
+```javascript
+// File: resources/public/payment-methods/paddle-checkout.js
+class PaddleCheckout {
+    constructor(form, orderHandler, response, paymentLoader) {
+        this.form = form;
+        this.orderHandler = orderHandler;
+        this.data = response;
+        this.paymentArgs = response?.payment_args || {};
+        this.intent = response?.intent || {};
+        this.paymentLoader = paymentLoader;
+        this.currentOrderData = null;
+        this.$t = this.translate.bind(this);
+    }
+
+    translate(string) {
+        const translations = window.fct_paddle_data?.translations || {};
+        return translations[string] || string;
+    }
+
+    init() {
+        const paddleButtonContainer = document.querySelector('.fluent-cart-checkout_embed_payment_container_paddle');
+        if (!paddleButtonContainer) {
+            console.error('Paddle container not found');
+            return;
+        }
+
+        // Clear any existing content
+        paddleButtonContainer.innerHTML = '';
+
+        // Initialize Paddle SDK and create button
+        this.initializePaddleSDK()
+            .then(() => {
+                this.createPaddleButton(paddleButtonContainer);
+            })
+            .catch((error) => {
+                console.error('Paddle initialization error:', error);
+                this.displayErrorMessage(paddleButtonContainer, error.message);
+            });
+    }
+
+    async initializePaddleSDK() {
+        if (typeof Paddle === 'undefined') {
+            throw new Error(this.$t('Paddle SDK is not loaded. Please ensure the Paddle script is included.'));
+        }
+
+        const clientToken = this.paymentArgs?.client_token;
+        const environment = this.paymentArgs?.mode === 'test' ? 'sandbox' : 'production';
+
+        if (!clientToken) {
+            throw new Error(this.$t('Paddle client token is missing or invalid.'));
+        }
+
+        Paddle.Environment.set(environment);
+        Paddle.Initialize({
+            token: clientToken.trim(),
+            eventCallback: (data) => {
+                this.handlePaddleEvent(data);
+            }
+        });
+    }
+
+    createPaddleButton(container) {
+        const paddleButton = document.createElement('button');
+        paddleButton.id = 'paddle-pay-button';
+        paddleButton.className = 'paddle-checkout-button';
+        paddleButton.innerHTML = this.$t('Pay with Paddle');
+        paddleButton.style.cssText = `
+            width: 100%;
+            padding: 12px 24px;
+            background: #1a73e8;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        `;
+
+        paddleButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await this.handlePaddleButtonClick();
+        });
+
+        container.appendChild(paddleButton);
+    }
+
+    async handlePaddleButtonClick() {
+        try {
+            this.paymentLoader?.changeLoaderStatus('processing');
+            
+            if (typeof this.orderHandler === 'function') {
+                const orderData = await this.orderHandler();
+                if (!orderData) {
+                    throw new Error(this.$t('Failed to create order'));
+                }
+
+                // Open Paddle overlay checkout
+                await this.openPaddleOverlay(orderData);
+            } else {
+                throw new Error(this.$t('Order handler is not properly configured'));
+            }
+        } catch (error) {
+            this.paymentLoader?.changeLoaderStatus('Error: ' + error.message);
+            this.displayErrorMessage(
+                document.querySelector('.fluent-cart-checkout_embed_payment_container_paddle'),
+                error.message
+            );
+        }
+    }
+
+    async openPaddleOverlay(orderData) {
+        this.currentOrderData = orderData;
+
+        const paddleData = orderData?.response || orderData;
+        const items = paddleData?.paddle_price_ids?.map(item => ({
+            priceId: item.price_id,
+            quantity: parseInt(item.quantity) || 1
+        }));
+
+        if (!items || items.length === 0) {
+            throw new Error(this.$t('No Paddle price IDs found in order data'));
+        }
+
+        Paddle.Checkout.open({
+            settings: {
+                displayMode: 'overlay',
+                theme: this.intent?.theme || 'light',
+                locale: this.intent?.locale || 'en'
+            },
+            items: items,
+            customData: {
+                fct_order_hash: orderData?.data?.order?.hash || '',
+                fct_transaction_hash: orderData?.data?.transaction?.hash || '',
+            }
+        });
+    }
+
+    handlePaddleEvent(eventData) {
+        switch (eventData.name) {
+            case 'checkout.completed':
+                this.handlePaddlePaymentSuccess(eventData.data);
+                break;
+            case 'checkout.closed':
+                this.handlePaddleCheckoutClosed(eventData.data);
+                break;
+            case 'checkout.payment.failed':
+                this.handlePaddlePaymentFailed(eventData.data);
+                break;
+            case 'checkout.error':
+                this.handlePaddleError(eventData.data);
+                break;
+        }
+    }
+
+    async handlePaddlePaymentSuccess(paddleData) {
+        try {
+            this.paymentLoader?.changeLoaderStatus('confirming');
+            const transactionId = paddleData?.transaction_id;
+
+            if (!transactionId) {
+                this.paymentLoader?.changeLoaderStatus(this.$t('Error: Missing transaction ID'));
+                return;
+            }
+
+            const customData = paddleData.custom_data;
+            const confirmResponse = await this.confirmPayment(transactionId, customData);
+
+            if (confirmResponse?.redirect_url) {
+                this.paymentLoader?.changeLoaderStatus('redirecting');
+                window.location.href = confirmResponse.redirect_url;
+            }
+        } catch (error) {
+            this.paymentLoader?.changeLoaderStatus('Error: ' + error.message);
+        }
+    }
+
+    displayErrorMessage(container, message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.color = 'red';
+        errorDiv.textContent = message;
+        container.appendChild(errorDiv);
+    }
+}
+
+// Initialize when FluentCart triggers the event
+window.addEventListener("fluent_cart_load_payments_paddle", function (e) {
+    fetch(e.detail.paymentInfoUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-WP-Nonce": e.detail.nonce,
+        },
+        credentials: 'include'
+    }).then(async (response) => {
+        response = await response.json();
+        new PaddleCheckout(e.detail.form, e.detail.orderHandler, response, e.detail.paymentLoader).init();
+    }).catch(error => {
+        console.error('Failed to load Paddle payment info:', error);
+    });
+});
+```
 - **Comprehensive Localization**: All user-facing messages translated
 - **Real-time Order Processing**: Cart data processed on-demand
 - **Subscription Detection**: Automatic mode switching based on cart contents
@@ -1386,7 +1591,7 @@ This comprehensive case study demonstrates that a complete payment gateway imple
 4. **Feature Detection**
    ```php
    // Declare supported features clearly
-   public array $supportedFeatures = ['payment', 'refund', 'webhook'];
+   public array $supportedFeatures = ['payment', 'refund', 'subscriptions', 'webhook'];
    ```
 
 ### Architecture Decisions
@@ -1397,6 +1602,6 @@ This comprehensive case study demonstrates that a complete payment gateway imple
 4. **Plan for localization** from the start
 5. **Design for testability** with dependency injection
 
----
+**Next:** [Get Started](./index) integrating custom payment gateways with FluentCart.
 
-**Next:** [Simple Example](./simple-example) for a basic implementation template based on these patterns.
+

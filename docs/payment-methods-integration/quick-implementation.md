@@ -1,40 +1,47 @@
 ---
 title: Quick Implementation
-description: Fast setup guide for integrating a basic payment gateway with FluentCart
+description: Step-by-step guide for integrating a payment gateway with FluentCart
 ---
 
-# Quick Implementation
+# Payment Gateway Implementation Guide
 
-Get your payment gateway integrated with FluentCart quickly with this streamlined approach. Perfect for developers who want to get up and running fast with essential features.
+This guide provides a step-by-step approach to integrate your payment gateway with FluentCart. Follow these steps to create a fully functional payment gateway with support for one-time payments, subscriptions, and web hooks.
 
-## Overview
+## Implementation Steps
 
-This guide focuses on the minimum viable implementation covering:
-- Basic gateway registration
-- Payment processing
-- Settings configuration
-- Order completion
+### Step 1: Register Your Gateway
 
-**Estimated Time:** 2-4 hours for a basic implementation
+In your plugin's main file, register your gateway with FluentCart using the hook approach (recommended):
 
-## File Structure
-
-Create these files in your plugin:
-
-```
-your-plugin/
-├── includes/
-│   └── PaymentMethods/
-│       └── YourGateway/
-│           ├── YourGateway.php
-│           ├── YourGatewaySettings.php
-│           └── API.php
-└── your-plugin.php
+```php
+// In your-plugin.php
+add_action('fluent_cart/register_payment_methods', function() {
+    if (!function_exists('fluent_cart_api')) {
+        return; // FluentCart not active
+    }
+    
+    // Register your custom gateway
+    fluent_cart_api()->registerCustomPaymentMethod(
+        'your_gateway', 
+        new \YourPlugin\PaymentMethods\YourGateway\YourGateway()
+    );
+});
 ```
 
-## Step 1: Create Gateway Settings
+Alternatively, you can register on the `init` hook (not recommended):
 
-**File:** `includes/PaymentMethods/YourGateway/YourGatewaySettings.php`
+```php
+add_action('init', function() {
+    if (!function_exists('fluent_cart_api')) {
+        return;
+    }
+    fluent_cart_api()->registerCustomPaymentMethod('your_gateway', new \YourPlugin\PaymentMethods\YourGateway\YourGateway());
+});
+```
+
+### Step 2: Create the Settings Class
+
+Create a settings class that extends `BaseGatewaySettings`:
 
 ```php
 <?php
@@ -51,45 +58,36 @@ class YourGatewaySettings extends BaseGatewaySettings
     {
         return [
             'is_active' => 'no',
-            'api_key' => '',
-            'secret_key' => '',
-            'test_mode' => 'yes',
+            'payment_mode' => 'test', // test or live
+            'test_api_key' => '',
+            'test_secret_key' => '',
+            'live_api_key' => '',
+            'live_secret_key' => '',
         ];
-    }
-
-    public function isActive(): bool
-    {
-        return $this->settings['is_active'] == 'yes';
-    }
-
-    public function get($key = '')
-    {
-        if ($key && isset($this->settings[$key])) {
-            return $this->settings[$key];
-        }
-        return $this->settings;
     }
 
     public function getApiKey()
     {
-        return $this->get('api_key');
+        $mode = $this->get('payment_mode');
+        return $this->get($mode . '_api_key');
     }
 
     public function getSecretKey()
     {
-        return Helper::decryptKey($this->get('secret_key'));
+        $mode = $this->get('payment_mode');
+        return Helper::decryptKey($this->get($mode . '_secret_key'));
     }
 
     public function isTestMode()
     {
-        return $this->get('test_mode') === 'yes';
+        return $this->get('payment_mode') === 'test';
     }
 }
 ```
 
-## Step 2: Create API Handler
+### Step 3: Create an API Handler
 
-**File:** `includes/PaymentMethods/YourGateway/API.php`
+Create a class for API communications with your payment provider:
 
 ```php
 <?php
@@ -104,20 +102,26 @@ class API
     {
         $this->settings = $settings;
         $this->baseUrl = $settings->isTestMode() 
-            ? 'https://api-test.yourgateway.com' 
-            : 'https://api.yourgateway.com';
+            ? 'https://api-test.yourgateway.com/v1' 
+            : 'https://api.yourgateway.com/v1';
     }
 
-    public function createPayment($paymentData)
+    public function makeRequest($method, $endpoint, $data = [])
     {
-        $response = wp_remote_post($this->baseUrl . '/payments', [
+        $args = [
+            'method' => $method,
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->settings->getApiKey(),
                 'Content-Type' => 'application/json',
             ],
-            'body' => json_encode($paymentData),
             'timeout' => 30
-        ]);
+        ];
+
+        if (!empty($data) && in_array($method, ['POST', 'PUT'])) {
+            $args['body'] = json_encode($data);
+        }
+
+        $response = wp_remote_request($this->baseUrl . $endpoint, $args);
 
         if (is_wp_error($response)) {
             return [
@@ -133,38 +137,186 @@ class API
         if ($code >= 400) {
             return [
                 'success' => false,
-                'message' => $data['error'] ?? 'Payment failed'
+                'message' => $data['error'] ?? 'API request failed'
             ];
         }
 
         return [
             'success' => true,
-            'payment_id' => $data['id'],
-            'redirect_url' => $data['checkout_url']
+            'data' => $data
         ];
     }
 
-    public function getPaymentStatus($paymentId)
+    public function createPayment($paymentData)
     {
-        $response = wp_remote_get($this->baseUrl . '/payments/' . $paymentId, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->settings->getApiKey(),
-            ],
+        return $this->makeRequest('POST', '/payments', $paymentData);
+    }
+
+    public function createSubscription($subscriptionData)
+    {
+        return $this->makeRequest('POST', '/subscriptions', $subscriptionData);
+    }
+
+    public function refundPayment($paymentId, $amount, $reason = '')
+    {
+        return $this->makeRequest('POST', "/payments/{$paymentId}/refund", [
+            'amount' => $amount,
+            'reason' => $reason
         ]);
-
-        if (is_wp_error($response)) {
-            return false;
-        }
-
-        $body = wp_remote_retrieve_body($response);
-        return json_decode($body, true);
     }
 }
 ```
 
-## Step 3: Create Main Gateway Class
+### Step 4: Create a Web Hook Handler
 
-**File:** `includes/PaymentMethods/YourGateway/YourGateway.php`
+Create a handler for processing web hooks (IPNs) from your payment provider:
+
+```php
+<?php
+namespace YourPlugin\PaymentMethods\YourGateway;
+
+use FluentCart\App\Models\OrderTransaction;
+use FluentCart\App\Models\Subscription;
+use FluentCart\App\Helpers\StatusHelper;
+use FluentCart\App\Services\Payments\Refund;
+
+class WebHookHandler
+{
+    private $settings;
+
+    public function __construct(YourGatewaySettings $settings)
+    {
+        $this->settings = $settings;
+    }
+
+    public function init()
+    {
+        // Register handlers for specific webhook events
+        add_action('fluent_cart/payments/your_gateway/webhook_payment_completed', [$this, 'handlePaymentCompleted']);
+        add_action('fluent_cart/payments/your_gateway/webhook_payment_failed', [$this, 'handlePaymentFailed']);
+        add_action('fluent_cart/payments/your_gateway/webhook_refund', [$this, 'handleRefund']);
+        add_action('fluent_cart/payments/your_gateway/webhook_subscription_created', [$this, 'handleSubscriptionCreated']);
+        add_action('fluent_cart/payments/your_gateway/webhook_subscription_payment', [$this, 'handleSubscriptionPayment']);
+        add_action('fluent_cart/payments/your_gateway/webhook_subscription_canceled', [$this, 'handleSubscriptionCanceled']);
+    }
+
+    public function process()
+    {
+        // Get and verify the webhook payload
+        $payload = file_get_contents('php://input');
+        $signature = $_SERVER['HTTP_SIGNATURE'] ?? '';
+        
+        if (!$this->verifySignature($payload, $signature)) {
+            http_response_code(401);
+            echo 'Invalid signature';
+            exit;
+        }
+        
+        $data = json_decode($payload, true);
+        if (!$data) {
+            http_response_code(400);
+            echo 'Invalid JSON';
+            exit;
+        }
+        
+        // Determine event type and trigger the corresponding action
+        $eventType = $data['event'] ?? '';
+        $eventTypeFormatted = str_replace('.', '_', $eventType);
+        
+        if (has_action('fluent_cart/payments/your_gateway/webhook_' . $eventTypeFormatted)) {
+            do_action(
+                'fluent_cart/payments/your_gateway/webhook_' . $eventTypeFormatted, 
+                $data
+            );
+            http_response_code(200);
+            echo 'Webhook processed';
+        } else {
+            http_response_code(200);
+            echo 'Event not handled';
+        }
+        
+        exit;
+    }
+
+    public function handlePaymentCompleted($data)
+    {
+        $paymentId = $data['payment']['id'] ?? '';
+        
+        // Find the transaction
+        $transaction = OrderTransaction::where('vendor_charge_id', $paymentId)->first();
+        if (!$transaction) {
+            return;
+        }
+        
+        // Update the transaction status
+        $transaction->update([
+            'status' => 'completed'
+        ]);
+        
+        // Use StatusHelper to sync order status and fire all necessary hooks
+        (new StatusHelper($transaction->order))->syncOrderStatuses($transaction);
+    }
+
+    public function handleRefund($data)
+    {
+        $paymentId = $data['payment']['id'] ?? '';
+        $refundId = $data['refund']['id'] ?? '';
+        $refundAmount = $data['refund']['amount'] ?? 0;
+        
+        // Find the parent transaction
+        $parentTransaction = OrderTransaction::where('vendor_charge_id', $paymentId)->first();
+        if (!$parentTransaction) {
+            return;
+        }
+        
+        // Use FluentCart's Refund service - handles all refund-related hooks
+        Refund::createOrRecordRefund([
+            'vendor_charge_id' => $refundId,
+            'payment_method' => 'your_gateway',
+            'status' => 'refunded',
+            'total' => $refundAmount,
+        ], $parentTransaction);
+    }
+
+    public function handleSubscriptionCreated($data)
+    {
+        $subscriptionId = $data['subscription']['id'] ?? '';
+        
+        // Find the subscription
+        $subscription = Subscription::where('vendor_subscription_id', $subscriptionId)->first();
+        if (!$subscription) {
+            return;
+        }
+        
+        // Update the subscription status
+        $subscription->update([
+            'status' => 'active'
+        ]);
+        
+        // Fire subscription activation hook
+        do_action('fluent_cart/subscription_activated', $subscription);
+    }
+
+    private function verifySignature($payload, $signature)
+    {
+        if (empty($signature)) {
+            return false;
+        }
+        
+        $expectedSignature = hash_hmac(
+            'sha256', 
+            $payload, 
+            $this->settings->getSecretKey()
+        );
+        
+        return hash_equals($expectedSignature, $signature);
+    }
+}
+```
+
+### Step 5: Create the Main Gateway Class
+
+Create your main gateway class that implements all required methods:
 
 ```php
 <?php
@@ -172,20 +324,36 @@ namespace YourPlugin\PaymentMethods\YourGateway;
 
 use FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway;
 use FluentCart\App\Services\Payments\PaymentInstance;
-use FluentCart\App\Models\Order;
+use FluentCart\Framework\Support\Arr;
 
 class YourGateway extends AbstractPaymentGateway
 {
+    // Define supported features
     public array $supportedFeatures = [
         'payment',
-        'webhook'
+        'webhook',
+        'refund',
+        'subscriptions'
     ];
+    
+    private $webhookHandler;
 
     public function __construct()
     {
+        // Initialize settings
         parent::__construct(new YourGatewaySettings());
+        
+        // Create webhook handler
+        $this->webhookHandler = new WebHookHandler($this->settings);
     }
 
+    public function boot()
+    {
+        // Initialize webhook handlers
+        $this->webhookHandler->init();
+    }
+
+    // Required: Return gateway metadata
     public function meta(): array
     {
         return [
@@ -193,40 +361,44 @@ class YourGateway extends AbstractPaymentGateway
             'route' => 'your_gateway',
             'slug' => 'your_gateway',
             'description' => __('Accept payments with Your Gateway', 'your-plugin'),
-            'logo' => plugin_dir_url(__FILE__) . 'assets/logo.svg',
-            'icon' => plugin_dir_url(__FILE__) . 'assets/icon.svg',
-            'brand_color' => '#007cba',
+            'logo' => plugin_dir_url(__FILE__) . '../../assets/images/logo.svg',
+            'icon' => plugin_dir_url(__FILE__) . '../../assets/images/icon.svg',
+            'brand_color' => '#007bff',
             'status' => $this->settings->get('is_active') === 'yes',
             'supported_features' => $this->supportedFeatures
         ];
     }
 
-    public function boot()
+    // Required: Check if gateway supports a feature
+    public function has(string $feature): bool
     {
-        // Register webhook handler
-        add_action('wp_ajax_your_gateway_webhook', [$this, 'handleWebhook']);
-        add_action('wp_ajax_nopriv_your_gateway_webhook', [$this, 'handleWebhook']);
-        
-        // Register individual webhook event handlers
-        $this->initWebhookHandlers();
+        return in_array($feature, $this->supportedFeatures);
     }
 
-    /**
-     * Initialize webhook event handlers
-     */
-    private function initWebhookHandlers()
-    {
-        // Register handlers for specific webhook events
-        add_action('fluent_cart/payments/your_gateway/webhook_payment_completed', [$this, 'handleWebhookPaymentCompleted'], 10, 1);
-        add_action('fluent_cart/payments/your_gateway/webhook_payment_failed', [$this, 'handleWebhookPaymentFailed'], 10, 1);
-        add_action('fluent_cart/payments/your_gateway/webhook_payment_refunded', [$this, 'handleWebhookPaymentRefunded'], 10, 1);
-    }
-
+    // Required: Process payment
     public function makePaymentFromPaymentInstance(PaymentInstance $paymentInstance)
     {
         $order = $paymentInstance->order;
         $transaction = $paymentInstance->transaction;
-
+        
+        // Check if this is a subscription payment
+        if ($paymentInstance->subscription) {
+            return $this->handleSubscriptionPayment($paymentInstance);
+        }
+        
+        // This is a regular one-time payment
+        return $this->handleOneTimePayment($paymentInstance);
+    }
+    
+    // Handle one-time payment
+    private function handleOneTimePayment(PaymentInstance $paymentInstance)
+    {
+        $order = $paymentInstance->order;
+        $transaction = $paymentInstance->transaction;
+        
+        $api = new API($this->settings);
+        
+        // Prepare payment data for the API
         $paymentData = [
             'amount' => $transaction->total,
             'currency' => $transaction->currency,
@@ -235,429 +407,414 @@ class YourGateway extends AbstractPaymentGateway
             'return_url' => $this->getSuccessUrl($transaction),
             'cancel_url' => $this->getCancelUrl()
         ];
-
-        $api = new API($this->settings);
+        
+        // Create payment in your gateway
         $result = $api->createPayment($paymentData);
-
+        
         if ($result['success']) {
             // Store payment ID for later reference
             $transaction->update([
-                'vendor_charge_id' => $result['payment_id']
+                'vendor_charge_id' => $result['data']['id']
             ]);
-
+            
+            // Return redirect URL (for redirect-based gateways)
             return [
                 'success' => true,
-                'redirect_url' => $result['redirect_url']
+                'redirect_url' => $result['data']['checkout_url']
             ];
         }
-
+        
+        return [
+            'success' => false,
+            'message' => $result['message']
+        ];
+    }
+    
+    // Handle subscription payment
+    private function handleSubscriptionPayment(PaymentInstance $paymentInstance)
+    {
+        $order = $paymentInstance->order;
+        $transaction = $paymentInstance->transaction;
+        $subscription = $paymentInstance->subscription;
+        
+        $api = new API($this->settings);
+        
+        // Prepare subscription data for the API
+        $subscriptionData = [
+            'plan_id' => $subscription->vendor_plan_id,
+            'customer_email' => $order->email,
+            'metadata' => [
+                'subscription_id' => $subscription->uuid,
+                'order_id' => $order->uuid
+            ],
+            'return_url' => $this->getSuccessUrl($transaction),
+            'cancel_url' => $this->getCancelUrl()
+        ];
+        
+        // Create subscription in your gateway
+        $result = $api->createSubscription($subscriptionData);
+        
+        if ($result['success']) {
+            // Store subscription ID
+            $subscription->update([
+                'vendor_subscription_id' => $result['data']['id']
+            ]);
+            
+            // Store transaction ID
+            $transaction->update([
+                'vendor_charge_id' => $result['data']['payment_id'] ?? ''
+            ]);
+            
+            // Return redirect URL (for redirect-based gateways)
+            return [
+                'success' => true,
+                'redirect_url' => $result['data']['checkout_url']
+            ];
+        }
+        
         return [
             'success' => false,
             'message' => $result['message']
         ];
     }
 
+    // Required: Handle IPNs/Webhooks
     public function handleIPN()
     {
-        // Entry point for all webhooks - delegates to verifyAndProcess
-        $this->verifyAndProcess();
+        // Process the webhook
+        $this->webhookHandler->process();
     }
 
-    /**
-     * Main webhook processor - handles verification and routing
-     */
-    private function verifyAndProcess()
-    {
-        $rawPayload = file_get_contents('php://input');
-        $payload = json_decode($rawPayload, true);
-
-        if (!$payload) {
-            $this->sendWebhookResponse(400, 'Invalid JSON payload');
-            return;
-        }
-
-        // Verify webhook signature
-        if (!$this->verifyWebhookSignature($rawPayload)) {
-            error_log('Your Gateway Webhook Failed: Invalid signature');
-            $this->sendWebhookResponse(401, 'Invalid signature');
-            return;
-        }
-
-        // Find the related order
-        $order = $this->getOrderFromWebhookData($payload);
-        if (!$order) {
-            $this->sendWebhookResponse(200, 'Order not found');
-            return;
-        }
-
-        // Get event type
-        $eventType = $payload['event'] ?? '';
-        
-        // Validate event type
-        $acceptedEvents = ['payment.completed', 'payment.failed', 'payment.refunded'];
-        if (!in_array($eventType, $acceptedEvents)) {
-            $this->sendWebhookResponse(200, 'Event type not handled');
-            return;
-        }
-
-        // Log webhook for debugging
-        do_action('fluent_cart/your_gateway_webhook_received', [
-            'event_type' => $eventType,
-            'data' => $payload,
-            'raw' => $rawPayload,
-            'order' => $order
-        ]);
-
-        // Process the specific webhook event
-        $eventTypeFormatted = str_replace('.', '_', $eventType);
-        
-        if (has_action('fluent_cart/payments/your_gateway/webhook_' . $eventTypeFormatted)) {
-            do_action('fluent_cart/payments/your_gateway/webhook_' . $eventTypeFormatted, [
-                'event_type' => $eventType,
-                'data' => $payload,
-                'raw' => $rawPayload,
-                'order' => $order
-            ]);
-            
-            $this->sendWebhookResponse(200, 'Webhook processed successfully');
-        } else {
-            $this->sendWebhookResponse(200, 'No handler found for event type');
-        }
-    }
-
-    /**
-     * Verify webhook signature
-     */
-    private function verifyWebhookSignature($payload)
-    {
-        $signature = $_SERVER['HTTP_X_SIGNATURE'] ?? '';
-        $secretKey = $this->settings->getSecretKey();
-        
-        if (!$signature || !$secretKey) {
-            return false;
-        }
-
-        $expectedSignature = hash_hmac('sha256', $payload, $secretKey);
-        return hash_equals($expectedSignature, $signature);
-    }
-
-    /**
-     * Get order from webhook data
-     */
-    private function getOrderFromWebhookData($payload)
-    {
-        // Extract order identifier from webhook data
-        $orderId = $payload['order_id'] ?? '';
-        $transactionId = $payload['transaction_id'] ?? '';
-        
-        if ($orderId) {
-            return \FluentCart\App\Models\Order::find($orderId);
-        }
-        
-        if ($transactionId) {
-            $transaction = \FluentCart\App\Models\OrderTransaction::where('vendor_charge_id', $transactionId)->first();
-            return $transaction ? $transaction->order : null;
-        }
-        
-        return null;
-    }
-
-    /**
-     * Send webhook response
-     */
-    private function sendWebhookResponse($code, $message)
-    {
-        http_response_code($code);
-        echo $message;
-        exit;
-    }
-
-    /**
-     * Handle payment completed webhook event
-     */
-    public function handleWebhookPaymentCompleted($webhookData)
-    {
-        $payload = $webhookData['data'] ?? [];
-        $order = $webhookData['order'] ?? null;
-        $paymentId = $payload['payment']['id'] ?? '';
-
-        if (!$order || !$paymentId) {
-            return false;
-        }
-
-        $transaction = \FluentCart\App\Models\OrderTransaction::where('vendor_charge_id', $paymentId)->first();
-        
-        if (!$transaction) {
-            return false;
-        }
-
-        // Update transaction status
-        $transaction->update([
-            'status' => 'completed',
-            'vendor_charge_id' => $paymentId
-        ]);
-
-        // Use FluentCart's StatusHelper to sync order status and fire hooks
-        (new \FluentCart\App\Helpers\StatusHelper($order))->syncOrderStatuses($transaction);
-
-        return true;
-    }
-
-    /**
-     * Handle payment failed webhook event
-     */
-    public function handleWebhookPaymentFailed($webhookData)
-    {
-        $payload = $webhookData['data'] ?? [];
-        $order = $webhookData['order'] ?? null;
-        $paymentId = $payload['payment']['id'] ?? '';
-
-        if (!$order || !$paymentId) {
-            return false;
-        }
-
-        $transaction = \FluentCart\App\Models\OrderTransaction::where('vendor_charge_id', $paymentId)->first();
-        
-        if (!$transaction) {
-            return false;
-        }
-
-        // Update transaction status
-        $transaction->update([
-            'status' => 'failed',
-            'vendor_charge_id' => $paymentId
-        ]);
-
-        // Use FluentCart's StatusHelper to sync order status and fire hooks
-        (new \FluentCart\App\Helpers\StatusHelper($order))->syncOrderStatuses($transaction);
-
-        return true;
-    }
-
-    /**
-     * Handle payment refunded webhook event
-     */
-    public function handleWebhookPaymentRefunded($webhookData)
-    {
-        $payload = $webhookData['data'] ?? [];
-        $order = $webhookData['order'] ?? null;
-        $refundData = $payload['refund'] ?? [];
-        
-        if (!$order || !$refundData) {
-            return false;
-        }
-
-        $refundAmount = $refundData['amount'] ?? 0;
-        $refundId = $refundData['id'] ?? '';
-        $parentTransactionId = $refundData['transaction_id'] ?? '';
-
-        $parentTransaction = \FluentCart\App\Models\OrderTransaction::where('vendor_charge_id', $parentTransactionId)->first();
-        
-        if (!$parentTransaction) {
-            return false;
-        }
-
-        // Use FluentCart's Refund service to handle refunds
-        \FluentCart\App\Services\Payments\Refund::createOrRecordRefund([
-            'vendor_charge_id' => $refundId,
-            'payment_method' => 'your_gateway',
-            'status' => 'refunded',
-            'total' => $refundAmount,
-        ], $parentTransaction);
-
-        return true;
-    }
-
-    public function handleWebhook()
-    {
-        $this->handleIPN();
-    }
-
+    // Required: Get order information for frontend
     public function getOrderInfo(array $data)
     {
-        // Return order information for frontend
-        return [
-            'gateway_config' => [
-                'test_mode' => $this->settings->isTestMode(),
-                'public_key' => $this->settings->getApiKey()
-            ]
+        // Prepare frontend data for checkout
+        $cart = \FluentCart\App\Helpers\CartHelper::getCart();
+        $checkOutHelper = new \FluentCart\App\Helpers\CartCheckoutHelper();
+        
+        // Get total price
+        $totalPrice = $checkOutHelper->getItemsAmountTotal(true);
+        
+        // Get items and check for subscriptions
+        $items = $checkOutHelper->getItems();
+        $hasSubscription = false;
+        foreach ($items as $item) {
+            if ($item->product && $item->product->type === 'subscription') {
+                $hasSubscription = true;
+                break;
+            }
+        }
+        
+        // Get API credentials
+        $apiKey = $this->settings->getApiKey();
+        if (empty($apiKey)) {
+            wp_send_json([
+                'status' => 'failed',
+                'message' => __('API credentials missing', 'your-plugin')
+            ], 422);
+        }
+        
+        // Payment configuration for frontend
+        $paymentArgs = [
+            'mode' => $this->settings->isTestMode() ? 'test' : 'live',
+            'public_key' => $apiKey
         ];
+        
+        // Return data for frontend
+        wp_send_json([
+            'status' => 'success',
+            'payment_args' => $paymentArgs,
+            'has_subscription' => $hasSubscription,
+            'currency' => strtoupper(\FluentCart\Api\CurrencySettings::get('currency')),
+            'amount' => \FluentCart\App\Helpers\Helper::toDecimalWithoutComma($totalPrice),
+            'message' => __('Order info retrieved', 'your-plugin')
+        ], 200);
     }
-
+    
+    // Required: Return settings fields configuration
     public function fields(): array
     {
         $webhookUrl = site_url('?fluent-cart=fct_payment_listener_ipn&method=your_gateway');
         
-        $webhookInstructions = '<div style="padding:12px 0;">'
-            . '<p><strong>' . __('Webhook URL:', 'your-plugin') . '</strong> '
-            . '<code>' . esc_html($webhookUrl) . '</code></p>'
-            . '<p>' . __('Configure this URL in your payment provider dashboard to receive real-time payment notifications.', 'your-plugin') . '</p>'
-            . '</div>';
-
-        $testSchema = [
-            'test_api_key' => [
-                'value' => '',
-                'label' => __('Test API Key', 'your-plugin'),
-                'type' => 'password',
-                'placeholder' => __('Your test API key', 'your-plugin'),
-                'help_text' => __('Get your test API key from your payment provider dashboard', 'your-plugin')
-            ],
-            'test_secret_key' => [
-                'value' => '',
-                'label' => __('Test Secret Key', 'your-plugin'),
-                'type' => 'password',
-                'placeholder' => __('Your test secret key', 'your-plugin'),
-                'help_text' => __('Used to verify webhook signatures', 'your-plugin')
-            ],
-            'test_webhook_instructions' => [
-                'value' => $webhookInstructions,
-                'label' => __('Webhook Configuration', 'your-plugin'),
-                'type' => 'html_attr'
-            ]
-        ];
-
-        $liveSchema = [
-            'live_api_key' => [
-                'value' => '',
-                'label' => __('Live API Key', 'your-plugin'),
-                'type' => 'password',
-                'placeholder' => __('Your live API key', 'your-plugin'),
-                'help_text' => __('Get your live API key from your payment provider dashboard', 'your-plugin')
-            ],
-            'live_secret_key' => [
-                'value' => '',
-                'label' => __('Live Secret Key', 'your-plugin'),
-                'type' => 'password',
-                'placeholder' => __('Your live secret key', 'your-plugin'),
-                'help_text' => __('Used to verify webhook signatures', 'your-plugin')
-            ],
-            'live_webhook_instructions' => [
-                'value' => $webhookInstructions,
-                'label' => __('Webhook Configuration', 'your-plugin'),
-                'type' => 'html_attr'
-            ]
-        ];
-
         return [
             'is_active' => [
                 'type' => 'yes_no',
-                'label' => __('Enable Your Gateway', 'your-plugin'),
-                'default' => 'no'
+                'default' => 'no',
+                'label' => __('Enable Gateway', 'your-plugin')
             ],
             'payment_mode' => [
-                'type' => 'tabs',
-                'schema' => [
-                    [
-                        'type' => 'tab',
-                        'label' => __('Live credentials', 'your-plugin'),
-                        'value' => 'live',
-                        'schema' => $liveSchema
-                    ],
-                    [
-                        'type' => 'tab',
-                        'label' => __('Test credentials', 'your-plugin'),
-                        'value' => 'test',
-                        'schema' => $testSchema
-                    ]
-                ]
+                'type' => 'radio',
+                'options' => [
+                    'test' => __('Test Mode', 'your-plugin'),
+                    'live' => __('Live Mode', 'your-plugin')
+                ],
+                'default' => 'test',
+                'label' => __('Payment Mode', 'your-plugin')
             ],
-            'payment_title' => [
-                'value' => __('Your Gateway', 'your-plugin'),
-                'label' => __('Payment Method Title', 'your-plugin'),
+            'test_api_key' => [
                 'type' => 'text',
-                'placeholder' => __('Your Gateway', 'your-plugin')
+                'label' => __('Test API Key', 'your-plugin')
             ],
-            'payment_description' => [
-                'value' => __('Pay securely with Your Gateway', 'your-plugin'),
-                'label' => __('Payment Method Description', 'your-plugin'),
-                'type' => 'textarea',
-                'placeholder' => __('Payment method description', 'your-plugin')
+            'test_secret_key' => [
+                'type' => 'password',
+                'label' => __('Test Secret Key', 'your-plugin')
+            ],
+            'live_api_key' => [
+                'type' => 'text',
+                'label' => __('Live API Key', 'your-plugin')
+            ],
+            'live_secret_key' => [
+                'type' => 'password',
+                'label' => __('Live Secret Key', 'your-plugin')
+            ],
+            'webhook_info' => [
+                'type' => 'html_attr',
+                'value' => '<p><strong>' . __('Webhook URL:', 'your-plugin') . '</strong> <code>' . $webhookUrl . '</code></p>'
             ]
         ];
     }
-
-    private function verifyWebhook($payload)
+    
+    // Handle refunds
+    public function processRefund($transaction, $amount, $args)
     {
-        $signature = $_SERVER['HTTP_X_SIGNATURE'] ?? '';
-        $expectedSignature = hash_hmac('sha256', $payload, $this->settings->getSecretKey());
+        if (!$amount || $amount <= 0) {
+            return new \WP_Error('invalid_amount', __('Invalid refund amount', 'your-plugin'));
+        }
         
-        return hash_equals($expectedSignature, $signature);
+        $api = new API($this->settings);
+        $result = $api->refundPayment(
+            $transaction->vendor_charge_id, 
+            $amount, 
+            Arr::get($args, 'reason', '')
+        );
+        
+        if (!$result['success']) {
+            return new \WP_Error('refund_failed', $result['message']);
+        }
+        
+        return [
+            'status' => 'success',
+            'message' => __('Refund processed successfully', 'your-plugin'),
+            'transaction_id' => $result['data']['id']
+        ];
     }
-
-    private function getSuccessUrl($transaction)
+    
+    // Register scripts (automatically called by base gateway)
+    public function getEnqueueScriptSrc($hasSubscription = 'no'): array
     {
-        return site_url('?fluent-cart=payment-success&transaction=' . $transaction->uuid);
+        // External gateway library (if needed)
+        $gatewayLibUrl = 'https://js.yourgateway.com/v1/checkout.js';
+        
+        return [
+            [
+                'handle' => 'your-gateway-external-lib',
+                'src' => $gatewayLibUrl,
+            ],
+            [
+                'handle' => 'fluent-cart-your-gateway-checkout',
+                'src' => plugin_dir_url(__FILE__) . '../../assets/js/your-gateway-checkout.js',
+                'deps' => ['your-gateway-external-lib'],
+                'version' => FLUENTCART_PLUGIN_VERSION
+            ]
+        ];
     }
-
-    private function getCancelUrl()
+    
+    // Register localized data (automatically called by base gateway)
+    public function getLocalizeData(): array
     {
-        return site_url('?fluent-cart=payment-cancelled');
+        return [
+            'your_gateway_data' => [
+                'translations' => [
+                    'Pay with Your Gateway' => __('Pay with Your Gateway', 'your-plugin'),
+                    'Processing payment' => __('Processing payment', 'your-plugin'),
+                    'Payment failed' => __('Payment failed', 'your-plugin')
+                ]
+            ]
+        ];
     }
 }
 ```
 
-## Step 4: Register the Gateway
+### Step 6: Create Frontend JavaScript
 
-**File:** `your-plugin.php`
+Create a JavaScript file to handle the frontend checkout experience:
 
-```php
-<?php
-/*
-Plugin Name: Your Gateway for FluentCart
-Description: Payment gateway integration for FluentCart
-Version: 1.0.0
-*/
+```javascript
+// File: assets/js/your-gateway-checkout.js
 
-// Prevent direct access
-if (!defined('ABSPATH')) {
-    exit;
-}
+class YourGatewayCheckout {
+    constructor(form, orderHandler, response, paymentLoader) {
+        this.form = form;
+        this.orderHandler = orderHandler;
+        this.response = response;
+        this.paymentLoader = paymentLoader;
+        this.paymentArgs = response?.payment_args || {};
+    }
 
-// Include your gateway files
-require_once plugin_dir_path(__FILE__) . 'includes/PaymentMethods/YourGateway/YourGatewaySettings.php';
-require_once plugin_dir_path(__FILE__) . 'includes/PaymentMethods/YourGateway/API.php';
-require_once plugin_dir_path(__FILE__) . 'includes/PaymentMethods/YourGateway/YourGateway.php';
+    init() {
+        // Find the payment container
+        const paymentContainer = document.querySelector('.fluent-cart-checkout_embed_payment_container_your_gateway');
+        if (!paymentContainer) {
+            console.error('Payment container not found');
+            return;
+        }
 
-// Register the gateway when FluentCart is ready
-add_action('fluent_cart/register_payment_methods', function() {
-    if (!function_exists('fluent_cart_api')) {
-        return; // FluentCart not active
+        // Create payment button
+        this.createPaymentButton(paymentContainer);
+        
+        // Initialize gateway SDK (if applicable)
+        this.initGatewaySDK();
+    }
+
+    createPaymentButton(container) {
+        // Clear container
+        container.innerHTML = '';
+        
+        // Create button
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'your-gateway-checkout-button';
+        button.textContent = 'Pay with Your Gateway';
+        button.style.cssText = `
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        `;
+        
+        // Add click event
+        button.addEventListener('click', () => {
+            this.handlePaymentButtonClick();
+        });
+        
+        // Add to container
+        container.appendChild(button);
+    }
+
+    initGatewaySDK() {
+        // Initialize your gateway's SDK if required
+        if (window.YourGatewaySDK) {
+            window.YourGatewaySDK.initialize({
+                publicKey: this.paymentArgs.public_key,
+                environment: this.paymentArgs.mode
+            });
+        }
+    }
+
+    async handlePaymentButtonClick() {
+        try {
+            this.paymentLoader?.changeLoaderStatus('processing');
+            
+            // Create order in FluentCart first
+            const orderResponse = await this.orderHandler.createOrder();
+            
+            if (!orderResponse?.success) {
+                throw new Error('Failed to create order');
+            }
+            
+            // For redirect-based gateways
+            if (orderResponse.redirect_url) {
+                window.location.href = orderResponse.redirect_url;
+                return;
+            }
+            
+            // For JS-based gateways, open checkout modal
+            if (window.YourGatewaySDK) {
+                const result = await window.YourGatewaySDK.openCheckout({
+                    amount: this.response.amount,
+                    currency: this.response.currency,
+                    orderId: orderResponse.order_id,
+                    onSuccess: (data) => {
+                        // Confirm payment on your server
+                        this.confirmPayment(data, orderResponse);
+                    },
+                    onCancel: () => {
+                        this.paymentLoader?.hideLoader();
+                    }
+                });
+            }
+        } catch (error) {
+            this.paymentLoader?.changeLoaderStatus('Error: ' + error.message);
+            this.paymentLoader?.hideLoader();
+        }
     }
     
-    $gateway = new \YourPlugin\PaymentMethods\YourGateway\YourGateway();
-    fluent_cart_api()->registerCustomPaymentMethod('your_gateway', $gateway);
+    async confirmPayment(gatewayData, orderData) {
+        try {
+            // Confirm payment on your server
+            const confirmResponse = await fetch(fluentCartData.ajax_url, {
+                method: 'POST',
+                headers: {"Content-Type": "application/json"},
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    action: 'fluent_cart_confirm_your_gateway_payment',
+                    transaction_id: orderData.transaction_id,
+                    payment_id: gatewayData.paymentId
+                })
+            });
+            
+            const confirmation = await confirmResponse.json();
+            
+            if (confirmation.success && confirmation.redirect_url) {
+                window.location.href = confirmation.redirect_url;
+            } else {
+                throw new Error(confirmation.message || 'Payment confirmation failed');
+            }
+        } catch (error) {
+            this.paymentLoader?.changeLoaderStatus('Error: ' + error.message);
+            this.paymentLoader?.hideLoader();
+        }
+    }
+}
+
+// Initialize when FluentCart triggers the event
+window.addEventListener("fluent_cart_load_payments_your_gateway", function (e) {
+    fetch(e.detail.paymentInfoUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        new YourGatewayCheckout(
+            e.detail.form, 
+            e.detail.orderHandler, 
+            data, 
+            e.detail.paymentLoader
+        ).init();
+    })
+    .catch(error => {
+        console.error('Error initializing gateway:', error);
+    });
 });
 ```
 
-## Step 5: Test Your Integration
+## Key FluentCart Services to Use
 
-1. **Activate your plugin** in WordPress admin
-2. **Navigate to** FluentCart → Settings → Payment Methods
-3. **Configure your gateway** with test credentials
-4. **Enable the gateway** and save settings
-5. **Test a payment** on your checkout page
+FluentCart provides these services to make gateway development easier:
 
-## Essential FluentCart Service Methods & Events
+### StatusHelper for Order Updates
 
-**Important**: FluentCart provides service classes that automatically handle hook firing. Instead of manually firing hooks, use these service methods:
-
-### Payment Confirmation Services
-
-#### StatusHelper (Recommended Approach)
 ```php
-// Use StatusHelper to sync order status - automatically fires all payment hooks
+// Update order status and fire all necessary hooks
 (new \FluentCart\App\Helpers\StatusHelper($order))->syncOrderStatuses($transaction);
 
 // This automatically fires:
-// - fluent_cart/payment_success (for successful payments)
-// - fluent_cart/payment_failed (for failed payments)
-// - fluent_cart/payment_status_changed
-// - fluent_cart/order_status_changed
+// - fluent_cart/order_paid (for successful payments)
+// - fluent_cart/order_failed (for failed payments)
+// - fluent_cart/order_status_updated
 ```
 
-#### Refund Service (Recommended Approach)
+### Refund Service for Handling Refunds
+
 ```php
-// Use Refund service - automatically handles all refund hooks and logic
+// Use Refund service for all refund operations
 \FluentCart\App\Services\Payments\Refund::createOrRecordRefund([
     'vendor_charge_id' => $refundId,
     'payment_method' => 'your_gateway',
@@ -665,146 +822,927 @@ add_action('fluent_cart/register_payment_methods', function() {
     'total' => $refundAmount,
 ], $parentTransaction);
 
-// This automatically fires:
-// - fluent_cart/order_refunded
-// - fluent_cart/order_fully_refunded or fluent_cart/order_partially_refunded
+// This automatically handles:
+// - Creating refund transaction
+// - Updating order status
+// - Firing all refund-related hooks
 ```
 
-### Subscription Services
+### Subscription Handling
 
-#### For Subscription Renewals
+For subscription renewals, use the SubscriptionRenewal service:
+
 ```php
-// Use SubscriptionService for renewals - automatically handles subscription hooks
-\FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::recordManualRenewal(
+\FluentCart\App\Services\Subscription\SubscriptionRenewal::recordRenewalPayment(
     $subscription, 
-    $transaction, 
-    $renewalArgs
+    [
+        'amount' => $amount,
+        'transaction_id' => $paymentId,
+        'payment_method' => 'your_gateway',
+        'status' => 'completed'
+    ]
 );
-
-// This automatically fires subscription-related hooks
 ```
 
-### Manual Hook Firing (Only if service methods don't cover your needs)
+## Important Hooks
 
-#### Payment Events
-```php
-do_action('fluent_cart/payment_success', [
-    'order' => $order,
-    'transaction' => $transaction,
-    'gateway' => 'your_gateway'
-]);
+Key hooks to be aware of:
 
-do_action('fluent_cart/payment_failed', [
-    'order' => $order,
-    'transaction' => $transaction,
-    'gateway' => 'your_gateway'
-]);
-```
+1. **Payment Hooks** (Handled by StatusHelper):
+   - `fluent_cart/order_paid`
+   - `fluent_cart/order_failed`
+   - `fluent_cart/order_status_updated`
 
-### Gateway-Specific Events
+2. **Subscription Hooks**:
+   - `fluent_cart/subscription_created`
+   - `fluent_cart/subscription_activated`
+   - `fluent_cart/subscription_renewed`
+   - `fluent_cart/subscription_cancelled`
 
-For your own gateway, you can also fire custom events that follow FluentCart's naming convention:
+## Testing Your Gateway
 
-```php
-// Gateway-specific webhook events
-do_action('fluent_cart/payments/your_gateway/webhook_payment_failed', $data);
-do_action('fluent_cart/payments/your_gateway/webhook_order_refunded', $data);
-```
+1. **Install & Activate**: Activate your plugin in WordPress
+2. **Configure**: Go to FluentCart → Settings → Payment Methods
+3. **Test Payment**: Test a one-time payment on the checkout page
+4. **Test Subscription**: Test a subscription product if supported
+5. **Test Web Hook**: Test web hook processing using a tool like RequestBin
 
-## Key Points
+## Additional Resources
 
-- **Use service methods first**: FluentCart's service classes handle most hook firing automatically
-- **StatusHelper** is your main tool for payment status updates
-- **Refund service** handles all refund scenarios  
-- **SubscriptionService** handles subscription lifecycle
-- Only fire hooks manually when service methods don't cover your specific needs
-- Always follow FluentCart's naming conventions for custom events
+For more detailed examples, you can refer to:
 
-### Gateway-Specific Events
-
-For your own gateway, you can also fire custom events that follow FluentCart's naming convention:
-
-```php
-// Gateway-specific webhook events
-do_action('fluent_cart/payments/your_gateway/webhook_payment_failed', $data);
-do_action('fluent_cart/payments/your_gateway/webhook_order_refunded', $data);
-```
-
-### Why These Service Methods Matter
-
-These events are essential because they:
-
-1. **Trigger FluentCart's internal processes** - Order status updates, email notifications, inventory management
-2. **Enable third-party integrations** - CRM sync, analytics tracking, membership access
-3. **Support FluentCart Pro features** - License generation, subscription management, advanced reporting  
-4. **Maintain data consistency** - Ensures all parts of FluentCart stay synchronized
-
-### Event Data Format
-
-Always include these core fields in your event data:
-
-```php
-$eventData = [
-    'order' => $order,              // Order model instance
-    'transaction' => $transaction,   // Transaction model instance  
-    'customer' => $customer,         // Customer model instance (if available)
-    'gateway' => 'your_gateway',     // Your gateway identifier
-    'webhook_data' => $rawData       // Original webhook data (for debugging)
-];
-```
-
-### Using FluentCart's Built-in Helper
-
-FluentCart's `AbstractPaymentGateway` provides a helper method that automatically fires the core events:
-
-```php
-// In your webhook processing method
-$this->updateOrderDataByOrder($order, [
-    'status' => 'completed',
-    'total' => $transaction->total,
-    'gateway_response' => json_encode($webhookData)
-], $transaction);
-```
-
-This method automatically handles:
-- Order status updates
-- Transaction status updates  
-- Firing `fluent_cart/payment_success` or `fluent_cart/payment_failed` events
-- Triggering inventory management
-- Sending notifications
-
-## Web Hook Setup
-
-Configure webhooks in your payment provider dashboard:
-
-- **Webhook URL:** `https://yoursite.com/wp-admin/admin-ajax.php?action=your_gateway_webhook`
-- **Events:** payment.completed, payment.failed
-- **Signature:** Use your secret key for HMAC SHA256
-
-## What's Next?
-
-This quick implementation covers the basics. For production use, consider:
-
-- **[Complete Implementation](./complete-implementation)** - Add refunds, subscriptions, and advanced features
-- **[Security Guide](./security)** - Implement proper security measures
-- **[Error Handling](./error-handling)** - Robust error handling and logging
-
-## Common Issues
-
-### Gateway Not Appearing
-- Ensure FluentCart is active
-- Check that your hook is registered correctly
-- Verify class namespaces and file paths
-
-### Payment Not Processing
-- Check API credentials in test mode
-- Verify webhook URL is accessible
-- Review error logs for API responses
-
-### Settings Not Saving
-- Confirm field definitions in `fields()` method
-- Check methodHandler property matches your gateway
-
+- Built-in payment methods in FluentCart (Stripe, PayPal)
+- [Paddle Gateway Implementation](./paddle-implementation) for a complete, real-world example
+---
+title: Quick Implementation
+description: Step-by-step guide for integrating a payment gateway with FluentCart
 ---
 
-**Next:** [Complete Implementation](./complete-implementation) for production-ready features.
+# Payment Gateway Implementation Guide
+
+This guide provides a step-by-step approach to integrate your payment gateway with FluentCart. Follow these steps to create a fully functional payment gateway with support for one-time payments, subscriptions, and web hooks.
+
+## Implementation Steps
+
+### Step 1: Register Your Gateway
+
+In your plugin's main file, register your gateway with FluentCart using the hook approach (recommended):
+
+```php
+// In your-plugin.php
+add_action('fluent_cart/register_payment_methods', function() {
+    if (!function_exists('fluent_cart_api')) {
+        return; // FluentCart not active
+    }
+    
+    // Register your custom gateway
+    fluent_cart_api()->registerCustomPaymentMethod(
+        'your_gateway', 
+        new \YourPlugin\PaymentMethods\YourGateway\YourGateway()
+    );
+});
+```
+
+Alternatively, you can register on the `init` hook (not recommended):
+
+```php
+add_action('init', function() {
+    if (!function_exists('fluent_cart_api')) {
+        return;
+    }
+    fluent_cart_api()->registerCustomPaymentMethod('your_gateway', new \YourPlugin\PaymentMethods\YourGateway\YourGateway());
+});
+```
+
+### Step 2: Create the Settings Class
+
+Create a settings class that extends `BaseGatewaySettings`:
+
+```php
+<?php
+namespace YourPlugin\PaymentMethods\YourGateway;
+
+use FluentCart\App\Modules\PaymentMethods\Core\BaseGatewaySettings;
+use FluentCart\App\Helpers\Helper;
+
+class YourGatewaySettings extends BaseGatewaySettings
+{
+    public $methodHandler = 'fluent_cart_payment_settings_your_gateway';
+
+    public static function getDefaults()
+    {
+        return [
+            'is_active' => 'no',
+            'payment_mode' => 'test', // test or live
+            'test_api_key' => '',
+            'test_secret_key' => '',
+            'live_api_key' => '',
+            'live_secret_key' => '',
+        ];
+    }
+
+    public function getApiKey()
+    {
+        $mode = $this->get('payment_mode');
+        return $this->get($mode . '_api_key');
+    }
+
+    public function getSecretKey()
+    {
+        $mode = $this->get('payment_mode');
+        return Helper::decryptKey($this->get($mode . '_secret_key'));
+    }
+
+    public function isTestMode()
+    {
+        return $this->get('payment_mode') === 'test';
+    }
+}
+```
+
+### Step 3: Create an API Handler
+
+Create a class for API communications with your payment provider:
+
+```php
+<?php
+namespace YourPlugin\PaymentMethods\YourGateway;
+
+class API
+{
+    private $settings;
+    private $baseUrl;
+
+    public function __construct(YourGatewaySettings $settings)
+    {
+        $this->settings = $settings;
+        $this->baseUrl = $settings->isTestMode() 
+            ? 'https://api-test.yourgateway.com/v1' 
+            : 'https://api.yourgateway.com/v1';
+    }
+
+    public function makeRequest($method, $endpoint, $data = [])
+    {
+        $args = [
+            'method' => $method,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->settings->getApiKey(),
+                'Content-Type' => 'application/json',
+            ],
+            'timeout' => 30
+        ];
+
+        if (!empty($data) && in_array($method, ['POST', 'PUT'])) {
+            $args['body'] = json_encode($data);
+        }
+
+        $response = wp_remote_request($this->baseUrl . $endpoint, $args);
+
+        if (is_wp_error($response)) {
+            return [
+                'success' => false,
+                'message' => $response->get_error_message()
+            ];
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        $code = wp_remote_retrieve_response_code($response);
+
+        if ($code >= 400) {
+            return [
+                'success' => false,
+                'message' => $data['error'] ?? 'API request failed'
+            ];
+        }
+
+        return [
+            'success' => true,
+            'data' => $data
+        ];
+    }
+
+    public function createPayment($paymentData)
+    {
+        return $this->makeRequest('POST', '/payments', $paymentData);
+    }
+
+    public function createSubscription($subscriptionData)
+    {
+        return $this->makeRequest('POST', '/subscriptions', $subscriptionData);
+    }
+
+    public function refundPayment($paymentId, $amount, $reason = '')
+    {
+        return $this->makeRequest('POST', "/payments/{$paymentId}/refund", [
+            'amount' => $amount,
+            'reason' => $reason
+        ]);
+    }
+}
+```
+
+### Step 4: Create a Web Hook Handler
+
+Create a handler for processing web hooks (IPNs) from your payment provider:
+
+```php
+<?php
+namespace YourPlugin\PaymentMethods\YourGateway;
+
+use FluentCart\App\Models\OrderTransaction;
+use FluentCart\App\Models\Subscription;
+use FluentCart\App\Helpers\StatusHelper;
+use FluentCart\App\Services\Payments\Refund;
+
+class WebHookHandler
+{
+    private $settings;
+
+    public function __construct(YourGatewaySettings $settings)
+    {
+        $this->settings = $settings;
+    }
+
+    public function init()
+    {
+        // Register handlers for specific webhook events
+        add_action('fluent_cart/payments/your_gateway/webhook_payment_completed', [$this, 'handlePaymentCompleted']);
+        add_action('fluent_cart/payments/your_gateway/webhook_payment_failed', [$this, 'handlePaymentFailed']);
+        add_action('fluent_cart/payments/your_gateway/webhook_refund', [$this, 'handleRefund']);
+        add_action('fluent_cart/payments/your_gateway/webhook_subscription_created', [$this, 'handleSubscriptionCreated']);
+        add_action('fluent_cart/payments/your_gateway/webhook_subscription_payment', [$this, 'handleSubscriptionPayment']);
+        add_action('fluent_cart/payments/your_gateway/webhook_subscription_canceled', [$this, 'handleSubscriptionCanceled']);
+    }
+
+    public function process()
+    {
+        // Get and verify the webhook payload
+        $payload = file_get_contents('php://input');
+        $signature = $_SERVER['HTTP_SIGNATURE'] ?? '';
+        
+        if (!$this->verifySignature($payload, $signature)) {
+            http_response_code(401);
+            echo 'Invalid signature';
+            exit;
+        }
+        
+        $data = json_decode($payload, true);
+        if (!$data) {
+            http_response_code(400);
+            echo 'Invalid JSON';
+            exit;
+        }
+        
+        // Determine event type and trigger the corresponding action
+        $eventType = $data['event'] ?? '';
+        $eventTypeFormatted = str_replace('.', '_', $eventType);
+        
+        if (has_action('fluent_cart/payments/your_gateway/webhook_' . $eventTypeFormatted)) {
+            do_action(
+                'fluent_cart/payments/your_gateway/webhook_' . $eventTypeFormatted, 
+                $data
+            );
+            http_response_code(200);
+            echo 'Webhook processed';
+        } else {
+            http_response_code(200);
+            echo 'Event not handled';
+        }
+        
+        exit;
+    }
+
+    public function handlePaymentCompleted($data)
+    {
+        $paymentId = $data['payment']['id'] ?? '';
+        
+        // Find the transaction
+        $transaction = OrderTransaction::where('vendor_charge_id', $paymentId)->first();
+        if (!$transaction) {
+            return;
+        }
+        
+        // Update the transaction status
+        $transaction->update([
+            'status' => 'completed'
+        ]);
+        
+        // Use StatusHelper to sync order status and fire all necessary hooks
+        (new StatusHelper($transaction->order))->syncOrderStatuses($transaction);
+    }
+
+    public function handleRefund($data)
+    {
+        $paymentId = $data['payment']['id'] ?? '';
+        $refundId = $data['refund']['id'] ?? '';
+        $refundAmount = $data['refund']['amount'] ?? 0;
+        
+        // Find the parent transaction
+        $parentTransaction = OrderTransaction::where('vendor_charge_id', $paymentId)->first();
+        if (!$parentTransaction) {
+            return;
+        }
+        
+        // Use FluentCart's Refund service - handles all refund-related hooks
+        Refund::createOrRecordRefund([
+            'vendor_charge_id' => $refundId,
+            'payment_method' => 'your_gateway',
+            'status' => 'refunded',
+            'total' => $refundAmount,
+        ], $parentTransaction);
+    }
+
+    public function handleSubscriptionCreated($data)
+    {
+        $subscriptionId = $data['subscription']['id'] ?? '';
+        
+        // Find the subscription
+        $subscription = Subscription::where('vendor_subscription_id', $subscriptionId)->first();
+        if (!$subscription) {
+            return;
+        }
+        
+        // Update the subscription status
+        $subscription->update([
+            'status' => 'active'
+        ]);
+        
+        // Fire subscription activation hook
+        do_action('fluent_cart/subscription_activated', $subscription);
+    }
+
+    private function verifySignature($payload, $signature)
+    {
+        if (empty($signature)) {
+            return false;
+        }
+        
+        $expectedSignature = hash_hmac(
+            'sha256', 
+            $payload, 
+            $this->settings->getSecretKey()
+        );
+        
+        return hash_equals($expectedSignature, $signature);
+    }
+}
+```
+
+### Step 5: Create the Main Gateway Class
+
+Create your main gateway class that implements all required methods:
+
+```php
+<?php
+namespace YourPlugin\PaymentMethods\YourGateway;
+
+use FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway;
+use FluentCart\App\Services\Payments\PaymentInstance;
+use FluentCart\Framework\Support\Arr;
+
+class YourGateway extends AbstractPaymentGateway
+{
+    // Define supported features
+    public array $supportedFeatures = [
+        'payment',
+        'webhook',
+        'refund',
+        'subscriptions'
+    ];
+    
+    private $webhookHandler;
+
+    public function __construct()
+    {
+        // Initialize settings
+        parent::__construct(new YourGatewaySettings());
+        
+        // Create webhook handler
+        $this->webhookHandler = new WebHookHandler($this->settings);
+    }
+
+    public function boot()
+    {
+        // Initialize webhook handlers
+        $this->webhookHandler->init();
+    }
+
+    // Required: Return gateway metadata
+    public function meta(): array
+    {
+        return [
+            'title' => __('Your Gateway', 'your-plugin'),
+            'route' => 'your_gateway',
+            'slug' => 'your_gateway',
+            'description' => __('Accept payments with Your Gateway', 'your-plugin'),
+            'logo' => plugin_dir_url(__FILE__) . '../../assets/images/logo.svg',
+            'icon' => plugin_dir_url(__FILE__) . '../../assets/images/icon.svg',
+            'brand_color' => '#007bff',
+            'status' => $this->settings->get('is_active') === 'yes',
+            'supported_features' => $this->supportedFeatures
+        ];
+    }
+
+    // Required: Check if gateway supports a feature
+    public function has(string $feature): bool
+    {
+        return in_array($feature, $this->supportedFeatures);
+    }
+
+    // Required: Process payment
+    public function makePaymentFromPaymentInstance(PaymentInstance $paymentInstance)
+    {
+        $order = $paymentInstance->order;
+        $transaction = $paymentInstance->transaction;
+        
+        // Check if this is a subscription payment
+        if ($paymentInstance->subscription) {
+            return $this->handleSubscriptionPayment($paymentInstance);
+        }
+        
+        // This is a regular one-time payment
+        return $this->handleOneTimePayment($paymentInstance);
+    }
+    
+    // Handle one-time payment
+    private function handleOneTimePayment(PaymentInstance $paymentInstance)
+    {
+        $order = $paymentInstance->order;
+        $transaction = $paymentInstance->transaction;
+        
+        $api = new API($this->settings);
+        
+        // Prepare payment data for the API
+        $paymentData = [
+            'amount' => $transaction->total,
+            'currency' => $transaction->currency,
+            'order_id' => $order->uuid,
+            'customer_email' => $order->email,
+            'return_url' => $this->getSuccessUrl($transaction),
+            'cancel_url' => $this->getCancelUrl()
+        ];
+        
+        // Create payment in your gateway
+        $result = $api->createPayment($paymentData);
+        
+        if ($result['success']) {
+            // Store payment ID for later reference
+            $transaction->update([
+                'vendor_charge_id' => $result['data']['id']
+            ]);
+            
+            // Return redirect URL (for redirect-based gateways)
+            return [
+                'success' => true,
+                'redirect_url' => $result['data']['checkout_url']
+            ];
+        }
+        
+        return [
+            'success' => false,
+            'message' => $result['message']
+        ];
+    }
+    
+    // Handle subscription payment
+    private function handleSubscriptionPayment(PaymentInstance $paymentInstance)
+    {
+        $order = $paymentInstance->order;
+        $transaction = $paymentInstance->transaction;
+        $subscription = $paymentInstance->subscription;
+        
+        $api = new API($this->settings);
+        
+        // Prepare subscription data for the API
+        $subscriptionData = [
+            'plan_id' => $subscription->vendor_plan_id,
+            'customer_email' => $order->email,
+            'metadata' => [
+                'subscription_id' => $subscription->uuid,
+                'order_id' => $order->uuid
+            ],
+            'return_url' => $this->getSuccessUrl($transaction),
+            'cancel_url' => $this->getCancelUrl()
+        ];
+        
+        // Create subscription in your gateway
+        $result = $api->createSubscription($subscriptionData);
+        
+        if ($result['success']) {
+            // Store subscription ID
+            $subscription->update([
+                'vendor_subscription_id' => $result['data']['id']
+            ]);
+            
+            // Store transaction ID
+            $transaction->update([
+                'vendor_charge_id' => $result['data']['payment_id'] ?? ''
+            ]);
+            
+            // Return redirect URL (for redirect-based gateways)
+            return [
+                'success' => true,
+                'redirect_url' => $result['data']['checkout_url']
+            ];
+        }
+        
+        return [
+            'success' => false,
+            'message' => $result['message']
+        ];
+    }
+
+    // Required: Handle IPNs/Webhooks
+    public function handleIPN()
+    {
+        // Process the webhook
+        $this->webhookHandler->process();
+    }
+
+    // Required: Get order information for frontend
+    public function getOrderInfo(array $data)
+    {
+        // Prepare frontend data for checkout
+        $cart = \FluentCart\App\Helpers\CartHelper::getCart();
+        $checkOutHelper = new \FluentCart\App\Helpers\CartCheckoutHelper();
+        
+        // Get total price
+        $totalPrice = $checkOutHelper->getItemsAmountTotal(true);
+        
+        // Get items and check for subscriptions
+        $items = $checkOutHelper->getItems();
+        $hasSubscription = false;
+        foreach ($items as $item) {
+            if ($item->product && $item->product->type === 'subscription') {
+                $hasSubscription = true;
+                break;
+            }
+        }
+        
+        // Get API credentials
+        $apiKey = $this->settings->getApiKey();
+        if (empty($apiKey)) {
+            wp_send_json([
+                'status' => 'failed',
+                'message' => __('API credentials missing', 'your-plugin')
+            ], 422);
+        }
+        
+        // Payment configuration for frontend
+        $paymentArgs = [
+            'mode' => $this->settings->isTestMode() ? 'test' : 'live',
+            'public_key' => $apiKey
+        ];
+        
+        // Return data for frontend
+        wp_send_json([
+            'status' => 'success',
+            'payment_args' => $paymentArgs,
+            'has_subscription' => $hasSubscription,
+            'currency' => strtoupper(\FluentCart\Api\CurrencySettings::get('currency')),
+            'amount' => \FluentCart\App\Helpers\Helper::toDecimalWithoutComma($totalPrice),
+            'message' => __('Order info retrieved', 'your-plugin')
+        ], 200);
+    }
+    
+    // Required: Return settings fields configuration
+    public function fields(): array
+    {
+        $webhookUrl = site_url('?fluent-cart=fct_payment_listener_ipn&method=your_gateway');
+        
+        return [
+            'is_active' => [
+                'type' => 'yes_no',
+                'default' => 'no',
+                'label' => __('Enable Gateway', 'your-plugin')
+            ],
+            'payment_mode' => [
+                'type' => 'radio',
+                'options' => [
+                    'test' => __('Test Mode', 'your-plugin'),
+                    'live' => __('Live Mode', 'your-plugin')
+                ],
+                'default' => 'test',
+                'label' => __('Payment Mode', 'your-plugin')
+            ],
+            'test_api_key' => [
+                'type' => 'text',
+                'label' => __('Test API Key', 'your-plugin')
+            ],
+            'test_secret_key' => [
+                'type' => 'password',
+                'label' => __('Test Secret Key', 'your-plugin')
+            ],
+            'live_api_key' => [
+                'type' => 'text',
+                'label' => __('Live API Key', 'your-plugin')
+            ],
+            'live_secret_key' => [
+                'type' => 'password',
+                'label' => __('Live Secret Key', 'your-plugin')
+            ],
+            'webhook_info' => [
+                'type' => 'html_attr',
+                'value' => '<p><strong>' . __('Webhook URL:', 'your-plugin') . '</strong> <code>' . $webhookUrl . '</code></p>'
+            ]
+        ];
+    }
+    
+    // Handle refunds
+    public function processRefund($transaction, $amount, $args)
+    {
+        if (!$amount || $amount <= 0) {
+            return new \WP_Error('invalid_amount', __('Invalid refund amount', 'your-plugin'));
+        }
+        
+        $api = new API($this->settings);
+        $result = $api->refundPayment(
+            $transaction->vendor_charge_id, 
+            $amount, 
+            Arr::get($args, 'reason', '')
+        );
+        
+        if (!$result['success']) {
+            return new \WP_Error('refund_failed', $result['message']);
+        }
+        
+        return [
+            'status' => 'success',
+            'message' => __('Refund processed successfully', 'your-plugin'),
+            'transaction_id' => $result['data']['id']
+        ];
+    }
+    
+    // Required: Register scripts (automatically called by base gateway)
+    public function getEnqueueScriptSrc($hasSubscription = 'no'): array
+    {
+        // External gateway library (if needed)
+        $gatewayLibUrl = 'https://js.yourgateway.com/v1/checkout.js';
+        
+        return [
+            [
+                'handle' => 'your-gateway-external-lib',
+                'src' => $gatewayLibUrl,
+            ],
+            [
+                'handle' => 'fluent-cart-your-gateway-checkout',
+                'src' => plugin_dir_url(__FILE__) . '../../assets/js/your-gateway-checkout.js',
+                'deps' => ['your-gateway-external-lib'],
+                'version' => FLUENTCART_PLUGIN_VERSION
+            ]
+        ];
+    }
+    
+    // Register localized data (automatically called by base gateway)
+    public function getLocalizeData(): array
+    {
+        return [
+            'your_gateway_data' => [
+                'translations' => [
+                    'Pay with Your Gateway' => __('Pay with Your Gateway', 'your-plugin'),
+                    'Processing payment' => __('Processing payment', 'your-plugin'),
+                    'Payment failed' => __('Payment failed', 'your-plugin')
+                ]
+            ]
+        ];
+    }
+}
+```
+
+### Step 6: Create Frontend JavaScript
+
+Create a JavaScript file to handle the frontend checkout experience:
+
+```javascript
+// File: assets/js/your-gateway-checkout.js
+
+class YourGatewayCheckout {
+    constructor(form, orderHandler, response, paymentLoader) {
+        this.form = form;
+        this.orderHandler = orderHandler;
+        this.response = response;
+        this.paymentLoader = paymentLoader;
+        this.paymentArgs = response?.payment_args || {};
+    }
+
+    init() {
+        // Find the payment container
+        const paymentContainer = document.querySelector('.fluent-cart-checkout_embed_payment_container_your_gateway');
+        if (!paymentContainer) {
+            console.error('Payment container not found');
+            return;
+        }
+
+        // Create payment button
+        this.createPaymentButton(paymentContainer);
+        
+        // Initialize gateway SDK (if applicable)
+        this.initGatewaySDK();
+    }
+
+    createPaymentButton(container) {
+        // Clear container
+        container.innerHTML = '';
+        
+        // Create button
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'your-gateway-checkout-button';
+        button.textContent = 'Pay with Your Gateway';
+        button.style.cssText = `
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        `;
+        
+        // Add click event
+        button.addEventListener('click', () => {
+            this.handlePaymentButtonClick();
+        });
+        
+        // Add to container
+        container.appendChild(button);
+    }
+
+    initGatewaySDK() {
+        // Initialize your gateway's SDK if required
+        if (window.YourGatewaySDK) {
+            window.YourGatewaySDK.initialize({
+                publicKey: this.paymentArgs.public_key,
+                environment: this.paymentArgs.mode
+            });
+        }
+    }
+
+    async handlePaymentButtonClick() {
+        try {
+            this.paymentLoader?.changeLoaderStatus('processing');
+            
+            // Create order in FluentCart first
+            const orderResponse = await this.orderHandler.createOrder();
+            
+            if (!orderResponse?.success) {
+                throw new Error('Failed to create order');
+            }
+            
+            // For redirect-based gateways
+            if (orderResponse.redirect_url) {
+                window.location.href = orderResponse.redirect_url;
+                return;
+            }
+            
+            // For JS-based gateways, open checkout modal
+            if (window.YourGatewaySDK) {
+                const result = await window.YourGatewaySDK.openCheckout({
+                    amount: this.response.amount,
+                    currency: this.response.currency,
+                    orderId: orderResponse.order_id,
+                    onSuccess: (data) => {
+                        // Confirm payment on your server
+                        this.confirmPayment(data, orderResponse);
+                    },
+                    onCancel: () => {
+                        this.paymentLoader?.hideLoader();
+                    }
+                });
+            }
+        } catch (error) {
+            this.paymentLoader?.changeLoaderStatus('Error: ' + error.message);
+            this.paymentLoader?.hideLoader();
+        }
+    }
+    
+    async confirmPayment(gatewayData, orderData) {
+        try {
+            // Confirm payment on your server
+            const confirmResponse = await fetch(fluentCartData.ajax_url, {
+                method: 'POST',
+                headers: {"Content-Type": "application/json"},
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    action: 'fluent_cart_confirm_your_gateway_payment',
+                    transaction_id: orderData.transaction_id,
+                    payment_id: gatewayData.paymentId
+                })
+            });
+            
+            const confirmation = await confirmResponse.json();
+            
+            if (confirmation.success && confirmation.redirect_url) {
+                window.location.href = confirmation.redirect_url;
+            } else {
+                throw new Error(confirmation.message || 'Payment confirmation failed');
+            }
+        } catch (error) {
+            this.paymentLoader?.changeLoaderStatus('Error: ' + error.message);
+            this.paymentLoader?.hideLoader();
+        }
+    }
+}
+
+// Initialize when FluentCart triggers the event
+window.addEventListener("fluent_cart_load_payments_your_gateway", function (e) {
+    fetch(e.detail.paymentInfoUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        new YourGatewayCheckout(
+            e.detail.form, 
+            e.detail.orderHandler, 
+            data, 
+            e.detail.paymentLoader
+        ).init();
+    })
+    .catch(error => {
+        console.error('Error initializing gateway:', error);
+    });
+});
+```
+
+## Key FluentCart Services to Use
+
+FluentCart provides these services to make gateway development easier:
+
+### StatusHelper for Order Updates
+
+```php
+// Update order status and fire all necessary updates and trigger hooks , related to order
+(new \FluentCart\App\Helpers\StatusHelper($order))->syncOrderStatuses($transaction);
+
+// This automatically fires:
+// - fluent_cart/order_paid (for successful payments)
+// - fluent_cart/order_status_updated
+```
+
+### Refund Service for Handling Refunds
+
+```php
+// Use Refund service for all refund operations
+\FluentCart\App\Services\Payments\Refund::createOrRecordRefund([
+    'vendor_charge_id' => $refundId,
+    'payment_method' => 'your_gateway',
+    'status' => 'refunded',
+    'total' => $refundAmount,
+], $parentTransaction);
+
+// This automatically handles:
+// - Creating refund transaction
+// - Updating order status
+// - Firing all refund-related hooks
+```
+
+### Subscription Handling
+
+For subscription renewals, use the SubscriptionRenewal service:
+
+```php
+\FluentCart\App\Services\Subscription\SubscriptionRenewal::recordRenewalPayment(
+    $subscription, 
+    [
+        'amount' => $amount,
+        'transaction_id' => $paymentId,
+        'payment_method' => 'your_gateway',
+        'status' => 'completed'
+    ]
+);
+```
+
+## Important Hooks
+
+Key hooks to be aware of:
+
+1. **Payment Hooks** (Handled by StatusHelper):
+   - `fluent_cart/order_paid`
+   - `fluent_cart/order_status_updated`
+
+2. **Subscription Hooks**:
+   - `fluent_cart/subscription_created`
+   - `fluent_cart/subscription_activated`
+   - `fluent_cart/subscription_renewed`
+   - `fluent_cart/subscription_cancelled`
+
+## Testing Your Gateway
+
+1. **Install & Activate**: Activate your plugin in WordPress
+2. **Configure**: Go to FluentCart → Settings → Payment Methods
+3. **Test Payment**: Test a one-time payment on the checkout page
+4. **Test Subscription**: Test a subscription product if supported
+5. **Test Web Hook**: Test web hook processing using a tool like RequestBin
+
+## Additional Resources
+
+For more detailed examples, you can refer to:
+
+- Built-in payment methods in FluentCart (Stripe, PayPal)
+- [Paddle Gateway Implementation](./paddle-implementation) for a complete, real-world example

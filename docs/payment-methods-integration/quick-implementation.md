@@ -345,6 +345,10 @@ class YourGateway extends AbstractPaymentGateway
         
         // Create webhook handler
         $this->webhookHandler = new WebHookHandler($this->settings);
+
+        // Register confirmation handlers
+        add_action('wp_ajax_fluent_cart_confirm_your_gateway_payment', [$this, 'confirmPayment']);
+        add_action('wp_ajax_nopriv_fluent_cart_confirm_your_gateway_payment', [$this, 'confirmPayment']);
     }
 
     public function boot()
@@ -631,6 +635,77 @@ class YourGateway extends AbstractPaymentGateway
                 ]
             ]
         ];
+    }
+
+    // confirmPayment method with the same logic as above
+    ### Payment Confirmation Implementation
+
+    public function confirmPayment()
+    {
+        // Get data from request
+        $transactionId = sanitize_text_field($_REQUEST['transaction_id'] ?? '');
+        $paymentId = sanitize_text_field($_REQUEST['payment_id'] ?? '');
+        
+        if (!$transactionId || !$paymentId) {
+            wp_send_json([
+                'message' => 'Transaction ID and Payment ID are required.',
+                'status' => 'failed'
+            ], 400);
+        }
+        
+        // Find the transaction
+        $transaction = OrderTransaction::query()->where('uuid', $transactionId)->first();
+        
+        if (!$transaction) {
+            wp_send_json([
+                'message' => 'Transaction not found.',
+                'status' => 'failed'
+            ], 404);
+        }
+        
+        // Check if already processed
+        if ($transaction->status === Status::TRANSACTION_SUCCEEDED) {
+            wp_send_json([
+                'redirect_url' => $transaction->getReceiptPageUrl(),
+                'order' => ['uuid' => $transaction->order->uuid],
+                'message' => __('Payment already confirmed.', 'your-plugin'),
+                'status' => 'success'
+            ], 200);
+        }
+        
+        // Verify payment with gateway API
+        // $paymentStatus = YourGatewayAPI::verifyPayment($paymentId);
+        
+        // Update transaction and order status
+        $transaction->fill([
+            'status' => Status::TRANSACTION_SUCCEEDED,
+            'vendor_charge_id' => $paymentId,
+            // Add other fields as needed
+        ]);
+        $transaction->save();
+        
+        // Add success log
+        fluent_cart_add_log(
+            __('Payment Confirmation', 'your-plugin'), 
+            __('Payment confirmed successfully.', 'your-plugin'), 
+            'info', 
+            [
+                'module_name' => 'order',
+                'module_id' => $transaction->order_id,
+            ]
+        );
+        
+        // Update order status
+        $order = Order::query()->find($transaction->order_id);
+        (new StatusHelper($order))->syncOrderStatuses($transaction);
+        
+        // Send success response
+        wp_send_json([
+            'redirect_url' => $transaction->getReceiptPageUrl(),
+            'order' => ['uuid' => $transaction->order->uuid],
+            'message' => __('Payment confirmed successfully.', 'your-plugin'),
+            'status' => 'success'
+        ], 200);
     }
 }
 ```

@@ -6,6 +6,10 @@ hero:
   name: "FluentCart"
   text: "Developer Documentation"
   tagline: "Complete developer guide for FluentCart e-commerce plugin development and customization"
+  image:
+    src: /warning-notice.svg
+    alt: Documentation Status
+
   actions:
     - theme: brand
       text: Get Started

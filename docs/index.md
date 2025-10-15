@@ -27,9 +27,9 @@ features:
   - title: REST API (coming soon)
     details: Complete REST API documentation including authentication, core endpoints, and FluentCart Pro API for all e-commerce operations.
     link: /
-  - title: Payment Gateway Integration
+  - title: Payment Gateway Integration (coming soon)
     details: Complete guide for third-party developers to integrate custom payment methods with FluentCart.
-    link: /payment-methods-integration/
+    link: /
 #   - title: Shipping Module
 #     details: Shipping zones, methods, rate calculations, and custom shipping method development for delivery management.
 #     link: /modules/shipping

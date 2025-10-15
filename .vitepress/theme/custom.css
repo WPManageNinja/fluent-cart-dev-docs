@@ -178,14 +178,31 @@
   font-weight: 500;
 }
 
-
 details {
-    border: 3px solid #f3f3f3;
-    padding: 10px 20px;
+    border: 1px solid #f3f3f3;
+    padding: 10px 10px 0px 10px;
     border-radius: 12px;
     margin-top: 19px;
 }
 
+details[open]{
+  padding: 10px;
+}
+
 .dark details {
-    border: 3px solid #202022;
+    border: 1px solid #202022;
+}
+
+details ul, ol{
+  padding-left: 0px !important;
+  list-style:none !important;
+}
+
+details summary {
+  margin-top: 5px !important;
+}
+
+
+details .language-php {
+  margin-bottom: 0px !important;
 }

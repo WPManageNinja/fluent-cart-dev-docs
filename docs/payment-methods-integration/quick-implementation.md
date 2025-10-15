@@ -324,6 +324,7 @@ namespace YourPlugin\PaymentMethods\YourGateway;
 
 use FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway;
 use FluentCart\App\Services\Payments\PaymentInstance;
+use FluentCart\App\Helpers\StatusHelper;
 use FluentCart\Framework\Support\Arr;
 
 class YourGateway extends AbstractPaymentGateway
@@ -421,17 +422,23 @@ class YourGateway extends AbstractPaymentGateway
                 'vendor_charge_id' => $result['data']['id']
             ]);
             
-            // Return redirect URL (for redirect-based gateways)
-            return [
-                'success' => true,
-                'redirect_url' => $result['data']['checkout_url']
+            // Return success response, ig hosted add return redirect_url, or just return success to confirm payment
+              return [
+                'nextAction'         => 'your_gateway',
+                'actionName'         => 'custom',
+                'status'             => 'success',
+                'data'               => [
+                    'order'       => [
+                        'hash' => $order->uuid,
+                    ],
+                    ...,
+                    'success_url' => $transaction->getReceiptPageUrl(),
+                    'cancel_url' =>  Paddle::getCancelUrl()
+                ],
+                'message' => __('Order has been placed successfully', 'fluent-cart'),
+                'response' => $result,
             ];
         }
-        
-        return [
-            'success' => false,
-            'message' => $result['message']
-        ];
     }
     
     // Handle subscription payment
@@ -469,7 +476,7 @@ class YourGateway extends AbstractPaymentGateway
                 'vendor_charge_id' => $result['data']['payment_id'] ?? ''
             ]);
             
-            // Return redirect URL (for redirect-based gateways)
+            // Return redirect URL (for redirect-based gateways) or if not hosted add return success to confirm payment
             return [
                 'success' => true,
                 'redirect_url' => $result['data']['checkout_url']

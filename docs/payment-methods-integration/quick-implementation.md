@@ -157,65 +157,19 @@ class YourGateway extends AbstractPaymentGateway
         
     }
     
+
     #required: Return settings fields configuration
     public function fields(): array
     {
-        $testSchema = [
-            'test_api_key' => array(
-                'value' => '',
-                'label' => __('Sandbox API Key', 'your-plugin'),
-                'type' => 'password',
-                'placeholder' => __('Your sandbox API key', 'your-plugin'),
-                'help_text' => __('Get your API key from Your Gateway Dashboard > Developer Tools > Authentication', 'your-plugin')
-            ),
-            'test_client_token' => array(
-                'value' => '',
-                'label' => __('Sandbox Client Token / Public Key', 'your-plugin'),
-                'type' => 'text',
-                'placeholder' => __('Your sandbox client token', 'your-plugin'),
-                'help_text' => __('Optional: Used for frontend checkout integration', 'your-plugin')
-            ),
-           
-        ];
-
-        // Live schema similar structure...
-
-        #type is important, it will be used to render the field
-        #available types: input, tabs, text, password, textarea, select, radio, checkbox, enable, notice,color, radio-select-dependants, radio-select-group, html_attr , will add more types
-
-        return array(
-            'notice' => [
-                'value' => 'notice',
-                'label' => __('Store Mode notice', 'your-plugin'),
-                'type' => 'notice'
-            ],
-            'payment_mode' => [
-                'type' => 'tabs',
-                'schema' => [
-                    [
-                        'type' => 'tab',
-                        'label' => __('Live credentials', 'your-plugin'),
-                        'value' => 'live',
-                        'schema' => $liveSchema
-                    ],
-                    [
-                        'type' => 'tab',
-                        'label' => __('Test credentials', 'your-plugin'),
-                        'value' => 'test',
-                        'schema' => $testSchema
-                    ]
-                ]
-            ],
-            'disable_webhook_verification' => [
-                'value' => 'no',
-                'label' => __('Disable Webhook Verification', 'your-plugin'),
-                'type' => 'checkbox',
-                'tooltip' => __('Only disable this for testing purposes. Keep enabled for production.', 'your-plugin')
-                
-            ]
+        // For a comprehensive guide on building gateway settings fields,
+        // see the detailed [Payment Gateway Settings Fields] documentation link given below
+        return [
             ....
-        );
+        ];
     }
+    
+    // For a comprehensive guide on building gateway settings fields,
+    // see the detailed documentation: [Payment Gateway Settings Fields](./payment_setting_fields.md)
 
     #required: Get order information for frontend
     public function getOrderInfo(array $data)
@@ -227,9 +181,6 @@ class YourGateway extends AbstractPaymentGateway
         wp_send_json([
             'status' => 'success',
             'payment_args' => $paymentArgs,
-            'has_subscription' => $hasSubscription,
-            'currency' => strtoupper(\FluentCart\Api\CurrencySettings::get('currency')),
-            'amount' => \FluentCart\App\Helpers\Helper::toDecimalWithoutComma($totalPrice),
             'message' => __('Order info retrieved', 'your-plugin')
         ], 200);
     }
@@ -256,7 +207,10 @@ class YourGateway extends AbstractPaymentGateway
 }
 ```
 
-Now your gateway registration is done, you can see your gateway in the payment methods list in FluentCart admin dashboard. Configure your gateway settings and save with active status, you will see the gateway in the payment methods list in FluentCart checkout page.
+#### fields() method setup
+ For a comprehensive guide on building gateway settings fields, see the detailed documentation: [Payment Gateway Settings Fields](./payment_setting_fields.md)
+
+Now your gateway registration is done, you will see your gateway in the payment methods list in FluentCart admin dashboard. And if you follow the [Fields](./payment_setting_fields.md) guide and Configure your gateway settings and save with <b>Payment activation</b> on, you will see the gateway in the payment methods list in FluentCart checkout page.
 
 #### Payment methods list in FluentCart admin dashboard
 ![Payment methods list in FluentCart admin dashboard](./assets/images/payment-mthods-list.png)

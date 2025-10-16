@@ -102,7 +102,8 @@ $allGateways = GatewayManager::getInstance()->all();
 
 ## Next Steps
 
-- **[Integration](./quick-implementation)** - Step by step guide to integrate custom payment methods with fluent-cart 
+- **[Complete Integration](./quick-implementation)** - Step by step guide to integrate custom payment methods with fluent-cart 
+- **[Payment Gateway Settings Fields](./payment_setting_fields)** - Detailed guide to build settings fields for your custom payment gateway
 
 ## Examples
 

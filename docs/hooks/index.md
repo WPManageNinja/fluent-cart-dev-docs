@@ -16,13 +16,18 @@ To use hooks in your custom code, you can add them to your theme's `functions.ph
 
 ```php
 // Example of using an action hook
-add_action('fluent_cart_after_checkout', function($order) {
+add_action('fluent_cart/cart_completed', function($data) {
     // Your custom code here
 });
 
 // Example of using a filter hook
-add_filter('fluent_cart_product_price', function($price, $product) {
-    // Modify the price
-    return $price;
+add_filter('fluent_cart/checkout_address_fields', function($fields, $data) {
+    // Add a custom address field
+    $fields['company'] = [
+        'label' => 'Company Name',
+        'type' => 'text',
+        'required' => false
+    ];
+    return $fields;
 }, 10, 2);
 ```

@@ -254,16 +254,19 @@ class YourGateway extends AbstractPaymentGateway
 }
 ```
 
-Now your gateway registration is done, you can see your gateway in the payment methods list. and save the settings from the settings page , after saving configure your gateway settings, you will see the gateway is active in the payment methods list in fluent-cart checkout page.
+Now your gateway registration is done, you can see your gateway in the payment methods list in FluentCart admin dashboard. Configure your gateway settings and save with active status, you will see the gateway in the payment methods list in FluentCart checkout page.
 
-// image 1 - payment methods list
-// image 2 - payment method settings page
-// image 3 - active gateway in checkout page
+#### Payment methods list in FluentCart admin dashboard
+![Payment methods list in FluentCart admin dashboard](./assets/images/payment-mthods-list.png)
+
+#### Payment method settings configuration page
+![Payment method settings configuration page](./assets/images/payment-settings.png)
+
+#### Active payment methods displayed in checkout page
+![Active payment gateway displayed in checkout page](./assets/images/active-payment-methods-in-checkout.png)
 
 
-
----
-# Start taking payments with your gateway
+## Start taking payments with your gateway
 
 ## Step 4: Create an API Handler
 
@@ -854,6 +857,8 @@ Key hooks to be aware of:
        'customer' => $this->customer ?? [],
    );
    ```
+
+Learn more about hooks in [FluentCart Hooks](../hooks) documentation.
 
 ## Testing Your Gateway
 

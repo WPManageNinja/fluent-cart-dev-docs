@@ -102,8 +102,6 @@ $allGateways = GatewayManager::getInstance()->all();
 
 ## Next Steps
 
-Choose your implementation approach:
-
 - **[Integration](./quick-implementation)** - Step by step guide to integrate custom payment methods with fluent-cart 
 
 ## Examples

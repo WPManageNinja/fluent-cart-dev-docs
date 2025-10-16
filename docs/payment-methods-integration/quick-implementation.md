@@ -120,7 +120,7 @@ class YourGateway extends AbstractPaymentGateway
         // initialize any hanldere, webhook/ payment confirmation class if needed
     }
 
-    // Required: Return gateway metadata
+    #equired: Return gateway metadata
     public function meta(): array
     {
         return [
@@ -137,7 +137,7 @@ class YourGateway extends AbstractPaymentGateway
         ];
     }
 
-    // Required: Check if gateway supports a feature
+    #equired: Check if gateway supports a feature
     public function has(string $feature): bool
     {
         return in_array($feature, $this->supportedFeatures);
@@ -156,28 +156,10 @@ class YourGateway extends AbstractPaymentGateway
         // Process the webhook
         
     }
-
-    // Required: Get order information for frontend
-    public function getOrderInfo(array $data)
-    {
-        // Prepare frontend data for checkout
-        
-        // Return data for frontend
-        wp_send_json([
-            'status' => 'success',
-            'payment_args' => $paymentArgs,
-            'has_subscription' => $hasSubscription,
-            'currency' => strtoupper(\FluentCart\Api\CurrencySettings::get('currency')),
-            'amount' => \FluentCart\App\Helpers\Helper::toDecimalWithoutComma($totalPrice),
-            'message' => __('Order info retrieved', 'your-plugin')
-        ], 200);
-    }
     
-    // Required: Return settings fields configuration
+    #required: Return settings fields configuration
     public function fields(): array
     {
-        $webhookInstructions = $this->getWebhookInstructions();
-
         $testSchema = [
             'test_api_key' => array(
                 'value' => '',
@@ -198,9 +180,12 @@ class YourGateway extends AbstractPaymentGateway
 
         // Live schema similar structure...
 
+        #type is important, it will be used to render the field
+        #available types: input, tabs, text, password, textarea, select, radio, checkbox, enable, notice,color, radio-select-dependants, radio-select-group, html_attr , will add more types
+
         return array(
             'notice' => [
-                'value' => $this->renderStoreModeNotice(),
+                'value' => 'notice',
                 'label' => __('Store Mode notice', 'your-plugin'),
                 'type' => 'notice'
             ],
@@ -232,7 +217,24 @@ class YourGateway extends AbstractPaymentGateway
         );
     }
 
-    // required: Register scripts (automatically called by base gateway)
+    #required: Get order information for frontend
+    public function getOrderInfo(array $data)
+    {
+        // Prepare frontend data for checkout
+        $paymentArgs = [];
+        
+        // Return data for frontend
+        wp_send_json([
+            'status' => 'success',
+            'payment_args' => $paymentArgs,
+            'has_subscription' => $hasSubscription,
+            'currency' => strtoupper(\FluentCart\Api\CurrencySettings::get('currency')),
+            'amount' => \FluentCart\App\Helpers\Helper::toDecimalWithoutComma($totalPrice),
+            'message' => __('Order info retrieved', 'your-plugin')
+        ], 200);
+    }
+
+    #required: Register scripts (automatically called by base gateway)
     public function getEnqueueScriptSrc($hasSubscription = 'no'): array
     {
         // External gateway library, custom checkout scripts (if needed), otherwise return empty array

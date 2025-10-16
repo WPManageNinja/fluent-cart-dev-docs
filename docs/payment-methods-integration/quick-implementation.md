@@ -858,7 +858,7 @@ Key hooks to be aware of:
    );
    ```
 
-Learn more about hooks in [FluentCart Hooks](../hooks) documentation.
+Learn more about hooks in [FluentCart Hooks](/hooks/) documentation.
 
 ## Testing Your Gateway
 

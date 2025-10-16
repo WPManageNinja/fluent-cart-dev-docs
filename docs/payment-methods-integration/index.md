@@ -102,18 +102,11 @@ $allGateways = GatewayManager::getInstance()->all();
 
 ## Next Steps
 
-Choose your implementation approach:
-
-- **[Quick Implementation](./quick-implementation)** - Fast setup with minimal features
-- **[Integration Methods](./integration-methods)** - Different ways to integrate with FluentCart
-- **[Security Guide](./security)** - Best practices for secure payment processing
+- **[Integration](./quick-implementation)** - Step by step guide to integrate custom payment methods with fluent-cart 
 
 ## Examples
 
 - **[Paddle Gateway Case Study](./paddle-example)** - Real implementation analysis
-- **[Simple Gateway](./simple-example)** - Basic implementation template
-- **[Advanced Features](./advanced-features)** - Subscriptions, refunds, and webhooks
-
 ---
 
 **Need Help?** Check out the [FluentCart Core Payment Methods](../modules/payment-methods) documentation for deeper technical details.

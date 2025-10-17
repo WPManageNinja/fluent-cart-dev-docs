@@ -212,6 +212,53 @@ class YourGateway extends AbstractPaymentGateway
 
 Now your gateway registration is done, you will see your gateway in the payment methods list in FluentCart admin dashboard. And if you follow the [Fields](./payment_setting_fields.md) guide and Configure your gateway settings and save with <b>Payment activation</b> on, you will see the gateway in the payment methods list in FluentCart checkout page.
 
+### Step 4: Create JavaScript File for Frontend Checkout
+
+FluentCart uses a custom event system to load payment methods in the checkout page. When a customer selects your payment method, FluentCart triggers a custom event in the format: `fluent_cart_load_payments_[payment_method_slug]`.
+
+Your JavaScript file should listen for this event and handle the payment process accordingly. Here's a simple example:
+
+```javascript
+window.addEventListener("fluent_cart_load_payments_your_gateway", function (e) {
+    const submitButton = window.fluentcart_checkout_vars?.submit_button;
+    const gatewayContainer = document.querySelector('.fluent-cart-checkout_embed_payment_container_your_gateway');
+    const translations = window.fct_your_gateway_data?.translations || {};
+
+    function $t(string) {
+        return translations[string] || string;
+    }
+
+    // Simple implementation (like COD/offline payments)
+    if (gatewayContainer) {
+        gatewayContainer.innerHTML = `<p>${$t('Your payment instructions here.')}</p>`;
+    }
+
+    // Enable the checkout button
+    e.detail.paymentLoader.enableCheckoutButton(submitButton.text);
+    
+    // OR if you need to integrate with a third-party SDK:
+    // loadYourGatewaySDK(e.detail.paymentInfoUrl, e.detail.nonce, e.detail.form, e.detail.paymentLoader);
+});
+
+// Example function for loading a more complex gateway SDK
+function loadYourGatewaySDK(paymentInfoUrl, nonce, form, paymentLoader) {
+    // Fetch payment information from server
+    fetch(paymentInfoUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-WP-Nonce": nonce,
+        },
+        credentials: 'include'
+    }).then(response => response.json())
+    .then(data => {
+        // Initialize your gateway SDK with the data
+        // When ready, enable the checkout button:
+        paymentLoader.enableCheckoutButton('Pay Now');
+    });
+}
+```
+
 #### Payment methods list in FluentCart admin dashboard
 ![Payment methods list in FluentCart admin dashboard](./assets/images/payment-mthods-list.png)
 
@@ -569,7 +616,7 @@ public function handlePaymentCompleted($data)
 
 ### Step 7: (optional) Create your-gateway-checkout.js
 
-Create custom JavaScript file to handle (onsite) payment checkout
+Create custom JavaScript file to handle (onsite) payment checkout, step #3 above is enough for (hosted) payment checkout.
 
 #### Example of onsite payment checkout with custom checkout button
 
@@ -814,7 +861,7 @@ Key hooks to be aware of:
    );
    ```
 
-Learn more about hooks in [FluentCart Hooks](/hooks/) documentation.
+Learn more about hooks in [FluentCart Hooks](../hooks) documentation.
 
 ## Testing Your Gateway
 

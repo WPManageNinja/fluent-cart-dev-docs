@@ -16,6 +16,7 @@ FluentCart's payment gateway system is designed for extensibility, allowing deve
 - **Gateway Architecture** - Understanding FluentCart's payment system structure
 - **Implementation Steps** - Step-by-step guide to building a payment gateway
 - **Integration Methods** - How to register and hook into FluentCart
+- **Custom Event System** - How to use FluentCart's custom events for payment method integration
 - **Real-world Example** - Based on the Paddle Gateway implementation
 - **Best Practices** - Security, error handling, and WordPress standards
 
@@ -99,6 +100,38 @@ $allGateways = GatewayManager::getInstance()->all();
 3. **Payment Processing** - Customer initiates payment
 4. **Webhook Handling** - Gateway processes payment confirmations
 5. **Order Completion** - FluentCart updates order status
+
+### Frontend Integration with Custom Events
+
+FluentCart uses a custom event system to load payment methods in the checkout page. When a customer selects a payment method, FluentCart triggers a custom event in the format:
+
+```
+fluent_cart_load_payments_[payment_method_slug]
+```
+
+Your JavaScript file should listen for this event and handle the payment process. Here's a simple example:
+
+```javascript
+// Example for a simple payment method (like Cash on Delivery)
+window.addEventListener("fluent_cart_load_payments_your_gateway", function (e) {
+    const submitButton = window.fluentcart_checkout_vars?.submit_button;
+    const gatewayContainer = document.querySelector('.fluent-cart-checkout_embed_payment_container_your_gateway');
+    
+    // Simple implementation
+    if (gatewayContainer) {
+        gatewayContainer.innerHTML = '<p>Your payment instructions here.</p>';
+    }
+
+    // Enable the checkout button
+    e.detail.paymentLoader.enableCheckoutButton(submitButton.text);
+});
+```
+
+The event object provides these important properties:
+- `e.detail.form` - The checkout form element
+- `e.detail.paymentLoader` - Helper object to manage checkout button state
+- `e.detail.paymentInfoUrl` - URL to fetch payment information
+- `e.detail.nonce` - WordPress nonce for secure API calls
 
 ## Next Steps
 

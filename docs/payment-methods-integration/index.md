@@ -93,14 +93,6 @@ if (GatewayManager::has('your_gateway')) {
 $allGateways = GatewayManager::getInstance()->all();
 ```
 
-### Payment Flow
-
-1. **Registration** - Gateway registers with FluentCart
-2. **Configuration** - Admin configures gateway settings
-3. **Payment Processing** - Customer initiates payment
-4. **Webhook Handling** - Gateway processes payment confirmations
-5. **Order Completion** - FluentCart updates order status
-
 ### Frontend Integration with Custom Events
 
 FluentCart uses a custom event system to load payment methods in the checkout page. When a customer selects a payment method, FluentCart triggers a custom event in the format:
@@ -132,6 +124,15 @@ The event object provides these important properties:
 - `e.detail.paymentLoader` - Helper object to manage checkout button state
 - `e.detail.paymentInfoUrl` - URL to fetch payment information
 - `e.detail.nonce` - WordPress nonce for secure API calls
+
+### Payment Flow
+
+1. **Registration** - Gateway registers with FluentCart
+2. **Configuration** - Admin configures gateway settings
+3. **Payment Processing** - Customer initiates payment
+4. **Webhook Handling** - Gateway processes payment confirmations
+5. **Order Completion** - FluentCart updates order status
+
 
 ## Next Steps
 

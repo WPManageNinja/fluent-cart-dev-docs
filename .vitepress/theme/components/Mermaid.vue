@@ -80,6 +80,23 @@ onMounted(async () => {
     setTimeout(() => {
       if (mermaidContainer.value) {
         mermaidContainer.value.dataset.rendered = 'true'
+        
+        // Modify foreignObject elements
+        const foreignObjects = mermaidContainer.value.querySelectorAll('foreignObject')
+        foreignObjects.forEach(foreignObj => {
+          // Set height to 40 if it's currently 21
+          if (foreignObj.getAttribute('height') === '21') {
+            foreignObj.setAttribute('height', '40')
+          }
+          
+          // Add 20 to the width value
+          const currentWidth = foreignObj.getAttribute('width')
+          if (currentWidth) {
+            const newWidth = parseFloat(currentWidth) + 20
+            foreignObj.setAttribute('width', newWidth.toString())
+          }
+        })
+        
         // Dispatch a custom event to trigger zoom setup
         const event = new CustomEvent('mermaidRendered', { 
           detail: { element: mermaidContainer.value } 
@@ -114,5 +131,11 @@ onMounted(async () => {
 .mermaid:hover {
   transform: scale(1.01);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.labelBkg) {
+  background: white !important;
+  padding: 4px 8px !important;
+  border: 1px solid #3b82f6;
 }
 </style>

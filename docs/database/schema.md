@@ -9,52 +9,141 @@ FluentCart uses custom database tables to store all the e-commerce data. Here ar
 
 ### Core Entity Relationships
 
+::: tip 🔍 Interactive ER Diagram
+Click on the diagram below to zoom in for better readability. The diagram shows the relationships between all FluentCart database tables.
+:::
+
+<div class="diagram-container">
+
 ```mermaid
 erDiagram
-    fct_customers ||--o{ fct_orders : "places"
-    fct_customers ||--o{ fct_customer_addresses : "has"
-    fct_customers ||--o{ fct_subscriptions : "subscribes"
-    fct_customers ||--o{ fct_carts : "owns"
-    fct_customers ||--o{ fct_licenses : "owns"
+    fct_customers {
+        bigint id PK
+        bigint user_id FK
+    }
     
-    fct_orders ||--o{ fct_order_items : "contains"
-    fct_orders ||--o{ fct_order_transactions : "has"
-    fct_orders ||--o{ fct_subscriptions : "creates"
-    fct_orders ||--o{ fct_applied_coupons : "uses"
-    fct_orders ||--o{ fct_licenses : "generates"
-    fct_orders ||--o{ fct_carts : "completes"
-    fct_orders ||--o{ fct_orders : "parent/child"
-    fct_orders ||--o{ fct_order_promotions : "has"
-    fct_orders ||--o{ fct_activity : "logs"
-    fct_orders ||--o{ fct_order_meta : "has_meta"
-    fct_orders ||--o{ fct_order_tax_rate : "has_tax"
+    fct_orders {
+        bigint id PK
+        bigint parent_id FK
+        bigint customer_id FK
+    }
     
-    fct_coupons ||--o{ fct_applied_coupons : "applied_to"
+    fct_order_items {
+        bigint id PK
+        bigint order_id FK
+        bigint post_id FK
+        bigint object_id FK
+    }
     
-    fct_licenses ||--o{ fct_license_activations : "activated_on"
-    fct_licenses ||--o{ fct_license_sites : "manages"
-    fct_licenses ||--o{ fct_license_meta : "has_meta"
-    fct_licenses ||--o{ fct_licenses : "parent/child"
+    fct_order_transactions {
+        bigint id PK
+        bigint order_id FK
+        bigint subscription_id FK
+    }
     
-    fct_license_sites ||--o{ fct_license_activations : "hosts"
+    fct_subscriptions {
+        bigint id PK
+        bigint customer_id FK
+        bigint parent_order_id FK
+        bigint product_id FK
+        bigint variation_id FK
+    }
     
-    fct_product_details ||--o{ fct_product_variations : "has"
-    fct_product_details ||--o{ fct_order_items : "ordered_as"
-    fct_product_variations ||--o{ fct_order_items : "ordered_as"
+    fct_product_details {
+        bigint id PK
+        bigint post_id FK
+        bigint default_variation_id FK
+    }
     
-    fct_atts_groups ||--o{ fct_atts_terms : "contains"
-    fct_atts_groups ||--o{ fct_atts_relations : "relates"
-    fct_atts_terms ||--o{ fct_atts_relations : "relates"
+    fct_product_variations {
+        bigint id PK
+        bigint post_id FK
+    }
     
-    fct_label ||--o{ fct_label_relationships : "tags"
+    fct_customer_addresses {
+        bigint id PK
+        bigint customer_id FK
+    }
     
-    fct_scheduled_actions ||--o{ fct_activity : "logs"
+    fct_coupons {
+        bigint id PK
+    }
     
-    fct_shipping_zones ||--o{ fct_shipping_methods : "has"
+    fct_applied_coupons {
+        bigint id PK
+        bigint order_id FK
+        bigint coupon_id FK
+        bigint customer_id FK
+    }
     
-    fct_order_promotions ||--o{ fct_order_promotion_stats : "tracks"
-    fct_order_promotions ||--o{ fct_orders : "applies_to"
+    fct_licenses {
+        bigint id PK
+        bigint product_id FK
+        bigint customer_id FK
+        bigint order_id FK
+    }
+    
+    fct_license_activations {
+        bigint id PK
+        bigint site_id FK
+        bigint license_id FK
+        bigint product_id FK
+    }
+    
+    fct_license_sites {
+        bigint id PK
+        bigint license_id FK
+    }
+    
+    fct_carts {
+        bigint customer_id FK
+        bigint user_id FK
+        bigint order_id FK
+    }
+    
+    fct_activity {
+        bigint id PK
+        bigint module_id FK
+        bigint user_id FK
+    }
+
+    %% Core Customer Relationships
+    fct_customers ||--o{ fct_orders : customer_id
+    fct_customers ||--o{ fct_customer_addresses : customer_id
+    fct_customers ||--o{ fct_subscriptions : customer_id
+    fct_customers ||--o{ fct_carts : customer_id
+    fct_customers ||--o{ fct_licenses : customer_id
+    fct_customers ||--o{ fct_applied_coupons : customer_id
+    
+    %% Order Relationships
+    fct_orders ||--o{ fct_order_items : order_id
+    fct_orders ||--o{ fct_order_transactions : order_id
+    fct_orders ||--o{ fct_subscriptions : parent_order_id
+    fct_orders ||--o{ fct_applied_coupons : order_id
+    fct_orders ||--o{ fct_licenses : order_id
+    fct_orders ||--o{ fct_carts : order_id
+    fct_orders ||--o{ fct_orders : parent_id
+    
+    %% Product Relationships
+    fct_product_details ||--o{ fct_product_variations : post_id
+    fct_product_variations ||--o{ fct_order_items : object_id
+    fct_product_details ||--o{ fct_subscriptions : product_id
+    fct_product_variations ||--o{ fct_subscriptions : variation_id
+    fct_product_details ||--o{ fct_licenses : product_id
+    
+    %% Coupon Relationships
+    fct_coupons ||--o{ fct_applied_coupons : coupon_id
+    
+    %% License Relationships
+    fct_licenses ||--o{ fct_license_activations : license_id
+    fct_licenses ||--o{ fct_license_sites : license_id
+    fct_license_sites ||--o{ fct_license_activations : site_id
+    
+    %% Subscription Relationships
+    fct_subscriptions ||--o{ fct_order_transactions : subscription_id
 ```
+
+</div>
 
 ### Schema Overview
 

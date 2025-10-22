@@ -44,6 +44,215 @@
   background-color: var(--vp-c-bg-soft);
   border-radius: 8px;
   padding: 20px;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 80vh;
+  cursor: zoom-in;
+  transition: all 0.3s ease;
+}
+
+.mermaid:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.mermaid.zoomed {
+  position: fixed !important;
+  top: 5vh !important;
+  left: 5vw !important;
+  width: 90vw !important;
+  height: 90vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  transform: none !important;
+  z-index: 10000 !important;
+  background-color: var(--vp-c-bg) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+  cursor: zoom-out !important;
+  overflow: auto !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+}
+
+/* Create backdrop overlay */
+.mermaid.zoomed::before {
+  content: '' !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(0, 0, 0, 0.85) !important;
+  z-index: -1 !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Ensure the SVG scales properly in fullscreen */
+.mermaid.zoomed svg {
+  width: 100% !important;
+  height: auto !important;
+  max-width: none !important;
+  min-height: 100% !important;
+}
+
+/* Close button for zoomed state */
+.mermaid.zoomed::after {
+  content: '✕' !important;
+  position: absolute !important;
+  top: 10px !important;
+  right: 15px !important;
+  color: var(--vp-c-text-1) !important;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  z-index: 10001 !important;
+  background: var(--vp-c-bg-soft) !important;
+  border-radius: 50% !important;
+  width: 35px !important;
+  height: 35px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+/* Light mode override for zoom overlay */
+html:not(.dark) .mermaid.zoomed::before {
+  background-color: transparent !important;
+}
+
+/* Enhanced ER diagram styling */
+.mermaid .er.entityBox {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  fill: #ffffff !important;
+  stroke: #3b82f6 !important;
+  stroke-width: 2px !important;
+  rx: 8 !important;
+  ry: 8 !important;
+}
+
+.mermaid .er.entityLabel {
+  fill: #1e293b !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  padding: 12px !important;
+}
+
+.mermaid .er.attributeBoxEven,
+.mermaid .er.attributeBoxOdd {
+  font-size: 12px !important;
+  fill: #f8fafc !important;
+  stroke: #e2e8f0 !important;
+  stroke-width: 1px !important;
+  padding: 8px 16px !important;
+}
+
+/* Fix text color issues */
+.mermaid .er text {
+  fill: #1e293b !important;
+  font-family: 'Segoe UI', system-ui, sans-serif !important;
+  padding: 6px 12px !important;
+}
+
+/* Ensure attribute text is readable */
+.mermaid .er .er-attribute-text {
+  fill: #374151 !important;
+  padding: 8px 16px !important;
+  margin: 3px 0 !important;
+  font-size: 12px !important;
+}
+
+/* Entity title styling */
+.mermaid .er .er-entity-name {
+  fill: #1e293b !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+}
+
+.mermaid .er.relationshipLine {
+  stroke: #3b82f6 !important;
+  stroke-width: 2px !important;
+  opacity: 0.9 !important;
+}
+
+.mermaid .er.relationshipLabel {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  fill: #1e293b !important;
+  background: #ffffff !important;
+  padding: 4px 8px !important;
+}
+
+/* Dark mode overrides */
+.dark .mermaid .er.entityBox {
+  fill: var(--vp-c-bg-soft) !important;
+  stroke: var(--vp-c-brand-1) !important;
+}
+
+.dark .mermaid .er.entityLabel,
+.dark .mermaid .er text,
+.dark .mermaid .er .er-attribute-text,
+.dark .mermaid .er .er-entity-name {
+  fill: var(--vp-c-text-1) !important;
+}
+
+.dark .mermaid .er.attributeBoxEven,
+.dark .mermaid .er.attributeBoxOdd {
+  fill: var(--vp-c-bg) !important;
+  stroke: var(--vp-c-divider) !important;
+}
+
+.dark .mermaid .er.relationshipLine {
+  stroke: var(--vp-c-brand-1) !important;
+}
+
+.dark .mermaid .er.relationshipLabel {
+  fill: var(--vp-c-text-1) !important;
+  background: var(--vp-c-bg) !important;
+}
+
+/* Add shadows and modern look */
+.mermaid .er.entityBox {
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1)) !important;
+}
+
+/* Improve spacing and prevent text cutoff */
+.mermaid svg {
+  max-width: 100% !important;
+  height: auto !important;
+  padding: 30px !important;
+  overflow: visible !important;
+}
+
+/* Ensure text doesn't get cut off */
+.mermaid .er rect {
+  padding: 10px !important;
+}
+
+/* Add more space for text content */
+.mermaid .er g.er-entity {
+  margin: 10px !important;
+}
+
+/* Diagram container styling */
+.diagram-container {
+  margin: 20px 0;
+  border: 2px dashed var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 10px;
+  background: linear-gradient(45deg, var(--vp-c-bg-soft) 25%, transparent 25%), 
+              linear-gradient(-45deg, var(--vp-c-bg-soft) 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, var(--vp-c-bg-soft) 75%), 
+              linear-gradient(-45deg, transparent 75%, var(--vp-c-bg-soft) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.diagram-container .mermaid {
+  margin: 0;
+  background-color: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
 }
 
 /* Custom badge styling */

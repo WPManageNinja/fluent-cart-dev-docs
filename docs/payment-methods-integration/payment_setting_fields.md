@@ -37,15 +37,18 @@ All field types support these common properties:
 | `value` | Default value for the field |
 | `placeholder` | Placeholder text for input fields |
 | `tooltip` | Brief tooltip displayed on hover |
+| `description` | Brief description displayed below the field |
+| `max_length` | Maximum length of the text/input/password field |
 | `disabled` | Whether the field is disabled (boolean) |
 
 ## Available Field Types
 
 ### Text Fields
 
-#### `text`, `input`, `password`, `email`
+#### `text`, `input`, `password`, `email`, `number`
 
-Basic input fields for text, passwords, and emails.
+Basic input fields for text, passwords, number(with min, max), and emails.
+
 
 ```php
 'api_key' => [

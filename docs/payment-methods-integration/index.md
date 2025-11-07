@@ -11,6 +11,10 @@ Build and integrate custom payment gateways with FluentCart to extend payment pr
 
 FluentCart's payment gateway system is designed for extensibility, allowing developers to integrate any payment processor while maintaining consistent user experience and following WordPress best practices.
 
+## Live example
+
+You can test the PayStack integration in our (https://github.com/WPManageNinja/paystack-for-fluent-cart). available with full source code and detailed documentation on how to integrate any custom payment gateway.
+
 ### What You'll Learn
 
 - **Gateway Architecture** - Understanding FluentCart's payment system structure

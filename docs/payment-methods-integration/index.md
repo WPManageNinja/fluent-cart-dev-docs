@@ -13,7 +13,7 @@ FluentCart's payment gateway system is designed for extensibility, allowing deve
 
 ## Live example
 
-You can test the PayStack integration in our (https://github.com/WPManageNinja/paystack-for-fluent-cart). available with full source code and detailed documentation on how to integrate any custom payment gateway.
+You can test our live PayStack integration (https://github.com/WPManageNinja/paystack-for-fluent-cart). available with full source code and detailed documentation on how to integrate any custom payment gateway.
 
 ### What You'll Learn
 

@@ -1,0 +1,458 @@
+{
+	"info": {
+		"_postman_id": "shipping-api-collection-001",
+		"name": "Shipping",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Shipping API collection for managing shipping zones, methods, and classes"
+	},
+	"item": [
+		{
+			"name": "Shipping Zones",
+			"item": [
+				{
+					"name": "List Shipping Zones",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/zones?per_page=10&page=1",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "zones"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "per_page",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Retrieve a paginated list of all shipping zones."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shipping Zone",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/zones/{{zone_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "zones", "{{zone_id}}"]
+						},
+						"description": "Retrieve details for a specific shipping zone, including its shipping methods."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Shipping Zone",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"United States\",\n  \"region\": \"US\",\n  \"order\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/zones",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "zones"]
+						},
+						"description": "Create a new shipping zone."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shipping Zone",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"United States & Canada\",\n  \"region\": \"US\",\n  \"order\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/zones/{{zone_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "zones", "{{zone_id}}"]
+						},
+						"description": "Update an existing shipping zone."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shipping Zone",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/zones/{{zone_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "zones", "{{zone_id}}"]
+						},
+						"description": "Delete a shipping zone and all its associated shipping methods."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shipping Zones Order",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"zones\": [3, 1, 2]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/zones/update-order",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "zones", "update-order"]
+						},
+						"description": "Update the display order of multiple shipping zones."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Zone States",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/zone/states?country_code=US",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "zone", "states"],
+							"query": [
+								{
+									"key": "country_code",
+									"value": "US"
+								}
+							]
+						},
+						"description": "Get state/province information for a specific country."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shipping Methods",
+			"item": [
+				{
+					"name": "Create Shipping Method",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"zone_id\": 1,\n  \"title\": \"Standard Shipping\",\n  \"type\": \"flat_rate\",\n  \"amount\": \"5.00\",\n  \"is_enabled\": 1,\n  \"settings\": {\n    \"configure_rate\": \"per_order\",\n    \"class_aggregation\": \"sum\"\n  },\n  \"states\": [\"CA\", \"NY\", \"TX\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/methods",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "methods"]
+						},
+						"description": "Create a new shipping method for a shipping zone."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shipping Method",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"method_id\": 1,\n  \"zone_id\": 1,\n  \"title\": \"Express Shipping\",\n  \"type\": \"flat_rate\",\n  \"amount\": \"10.00\",\n  \"is_enabled\": 1,\n  \"states\": [\"CA\", \"NY\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/methods",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "methods"]
+						},
+						"description": "Update an existing shipping method."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shipping Method",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/methods/{{method_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "methods", "{{method_id}}"]
+						},
+						"description": "Delete a shipping method."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Shipping Classes",
+			"item": [
+				{
+					"name": "List Shipping Classes",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/classes?per_page=10&page=1",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "classes"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "per_page",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Retrieve a paginated list of all shipping classes."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shipping Class",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/classes/{{class_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "classes", "{{class_id}}"]
+						},
+						"description": "Retrieve details for a specific shipping class."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Shipping Class",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Heavy Items\",\n  \"cost\": \"10.00\",\n  \"type\": \"fixed\",\n  \"per_item\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/classes",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "classes"]
+						},
+						"description": "Create a new shipping class."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shipping Class",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Heavy Items - Updated\",\n  \"cost\": \"15.00\",\n  \"type\": \"fixed\",\n  \"per_item\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/classes/{{class_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "classes", "{{class_id}}"]
+						},
+						"description": "Update an existing shipping class."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shipping Class",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/shipping/classes/{{class_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "shipping", "classes", "{{class_id}}"]
+						},
+						"description": "Delete a shipping class."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "zone_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "method_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "class_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
+

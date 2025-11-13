@@ -1,0 +1,223 @@
+{
+	"info": {
+		"_postman_id": "email-notification-api-collection-001",
+		"name": "Email Notification",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Email Notification API collection for managing email notifications, templates, and settings"
+	},
+	"item": [
+		{
+			"name": "List Notifications",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "email-notification", ""]
+				},
+				"description": "Retrieve all available email notifications."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Notification Details",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/{{notification_name}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "email-notification", "{{notification_name}}"]
+				},
+				"description": "Retrieve details for a specific email notification."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Notification",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"settings\": {\n    \"active\": true,\n    \"subject\": \"Order #{{order_id}}\",\n    \"content\": \"Thank you for your order...\",\n    \"from_name\": \"My Store\",\n    \"from_email\": \"store@example.com\"\n  }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/{{notification_name}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "email-notification", "{{notification_name}}"]
+				},
+				"description": "Update settings for a specific email notification."
+			},
+			"response": []
+		},
+		{
+			"name": "Enable/Disable Notification",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"active\": \"yes\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/enable-notification/{{notification_name}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "email-notification", "enable-notification", "{{notification_name}}"]
+				},
+				"description": "Enable or disable a specific email notification."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Shortcodes",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/get-short-codes",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "email-notification", "get-short-codes"]
+				},
+				"description": "Retrieve available shortcodes for email templates and settings."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Template",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"template\": \"order_placed\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/get-template",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "email-notification", "get-template"]
+				},
+				"description": "Retrieve email template content by path name."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Email Settings",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/get-settings",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "email-notification", "get-settings"]
+				},
+				"description": "Retrieve global email notification settings."
+			},
+			"response": []
+		},
+		{
+			"name": "Save Email Settings",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"from_name\": \"My Store\",\n  \"from_email\": \"store@example.com\",\n  \"reply_to\": \"support@example.com\",\n  \"show_email_footer\": \"yes\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/save-settings",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "email-notification", "save-settings"]
+				},
+				"description": "Update global email notification settings."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "notification_name",
+			"value": "order_placed",
+			"type": "string"
+		}
+	]
+}
+

@@ -1,0 +1,349 @@
+{
+	"info": {
+		"_postman_id": "coupons-api-collection-001",
+		"name": "Coupons",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Coupons API collection with all coupon management endpoints"
+	},
+	"item": [
+		{
+			"name": "List Coupons",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons?page=1&per_page=10",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons"],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "10"
+						},
+						{
+							"key": "search",
+							"value": "",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Retrieve a paginated list of coupons with optional filtering and searching."
+			},
+			"response": []
+		},
+		{
+			"name": "List Coupons (Alternative)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/listCoupons",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "listCoupons"]
+				},
+				"description": "Alternative endpoint for listing coupons with different permissions."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Coupon",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"code\": \"SAVE20\",\n  \"name\": \"20% Off Discount\",\n  \"type\": \"percentage\",\n  \"value\": 20,\n  \"status\": \"active\",\n  \"usage_limit\": 50,\n  \"minimum_amount\": 1000,\n  \"maximum_amount\": 10000,\n  \"valid_from\": \"2024-01-01T00:00:00Z\",\n  \"valid_until\": \"2024-12-31T23:59:59Z\",\n  \"applicable_products\": [1, 2, 3],\n  \"applicable_categories\": [1, 2],\n  \"customer_restrictions\": {\n    \"new_customers_only\": true,\n    \"customer_ids\": [1, 2, 3]\n  }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons"]
+				},
+				"description": "Create a new discount coupon."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Coupon Details",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/{{coupon_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "{{coupon_id}}"]
+				},
+				"description": "Retrieve detailed information about a specific coupon."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Coupon",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Updated 10% Off Discount\",\n  \"value\": 15,\n  \"usage_limit\": 150,\n  \"status\": \"active\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/{{coupon_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "{{coupon_id}}"]
+				},
+				"description": "Update an existing coupon."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Coupon",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/{{coupon_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "{{coupon_id}}"]
+				},
+				"description": "Delete a coupon."
+			},
+			"response": []
+		},
+		{
+			"name": "Apply Coupon",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"coupon_code\": \"SAVE10\",\n  \"order_id\": 1,\n  \"cart_items\": [\n    {\n      \"product_id\": 1,\n      \"variation_id\": 1,\n      \"quantity\": 2,\n      \"price\": 2500\n    }\n  ],\n  \"customer_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/apply",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "apply"]
+				},
+				"description": "Apply a coupon to an order or cart."
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Coupon",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"coupon_code\": \"SAVE10\",\n  \"order_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/cancel",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "cancel"]
+				},
+				"description": "Cancel/remove a coupon from an order."
+			},
+			"response": []
+		},
+		{
+			"name": "Re-apply Coupon",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"coupon_code\": \"SAVE10\",\n  \"order_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/re-apply",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "re-apply"]
+				},
+				"description": "Re-apply a coupon to an order."
+			},
+			"response": []
+		},
+		{
+			"name": "Check Product Eligibility",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"coupon_code\": \"SAVE10\",\n  \"product_id\": 1,\n  \"variation_id\": 1,\n  \"quantity\": 2,\n  \"price\": 2500\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/checkProductEligibility",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "checkProductEligibility"]
+				},
+				"description": "Check if a product is eligible for a coupon."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Coupon Settings",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/getSettings",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "getSettings"]
+				},
+				"description": "Get global coupon settings and configuration."
+			},
+			"response": []
+		},
+		{
+			"name": "Store Coupon Settings",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"auto_apply_coupons\": true,\n  \"allow_multiple_coupons\": false,\n  \"coupon_usage_tracking\": true,\n  \"coupon_expiry_notifications\": true,\n  \"default_coupon_restrictions\": {\n    \"minimum_amount\": 1000,\n    \"maximum_amount\": 10000,\n    \"usage_limit\": 100\n  }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/storeCouponSettings",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "coupons", "storeCouponSettings"]
+				},
+				"description": "Update global coupon settings."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "coupon_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
+

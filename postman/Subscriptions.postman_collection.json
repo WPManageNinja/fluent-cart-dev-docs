@@ -1,0 +1,440 @@
+{
+	"info": {
+		"_postman_id": "subscriptions-api-collection-001",
+		"name": "Subscriptions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Subscriptions API collection with all subscription management endpoints"
+	},
+	"item": [
+		{
+			"name": "List Subscriptions",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/subscriptions?page=1&per_page=10",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "subscriptions"],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "10"
+						},
+						{
+							"key": "search",
+							"value": "",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Retrieve a paginated list of subscriptions with optional filtering and searching."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Subscription Details",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/subscriptions/{{subscription_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "subscriptions", "{{subscription_id}}"]
+				},
+				"description": "Retrieve detailed information about a specific subscription."
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Subscription",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"reason\": \"Customer requested cancellation\",\n  \"cancel_immediately\": false\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/subscriptions/{{subscription_id}}/cancel",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "orders", "{{order_id}}", "subscriptions", "{{subscription_id}}", "cancel"]
+				},
+				"description": "Cancel a subscription."
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Subscription",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/subscriptions/{{subscription_id}}/fetch",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "orders", "{{order_id}}", "subscriptions", "{{subscription_id}}", "fetch"]
+				},
+				"description": "Fetch subscription data from payment gateway."
+			},
+			"response": []
+		},
+		{
+			"name": "Reactivate Subscription",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"reactivation_date\": \"2024-02-01T00:00:00Z\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/subscriptions/{{subscription_id}}/reactivate",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "orders", "{{order_id}}", "subscriptions", "{{subscription_id}}", "reactivate"]
+				},
+				"description": "Reactivate a cancelled subscription."
+			},
+			"response": []
+		},
+		{
+			"name": "Pause Subscription",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"pause_until\": \"2024-03-01T00:00:00Z\",\n  \"reason\": \"Customer requested pause\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/subscriptions/{{subscription_id}}/pause",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "orders", "{{order_id}}", "subscriptions", "{{subscription_id}}", "pause"]
+				},
+				"description": "Pause a subscription."
+			},
+			"response": []
+		},
+		{
+			"name": "Resume Subscription",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/subscriptions/{{subscription_id}}/resume",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "orders", "{{order_id}}", "subscriptions", "{{subscription_id}}", "resume"]
+				},
+				"description": "Resume a paused subscription."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Subscriptions",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/subscriptions",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "subscriptions"]
+				},
+				"description": "Get all subscriptions for the authenticated customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Subscription Details",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/subscriptions/{{subscription_uuid}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "subscriptions", "{{subscription_uuid}}"]
+				},
+				"description": "Get detailed information about a specific customer subscription."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Payment Method",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"payment_method_id\": \"pm_1234567890\",\n  \"payment_method_type\": \"card\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/subscriptions/{{subscription_uuid}}/update-payment-method",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "subscriptions", "{{subscription_uuid}}", "update-payment-method"]
+				},
+				"description": "Update the payment method for a subscription."
+			},
+			"response": []
+		},
+		{
+			"name": "Get or Create Plan",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"plan_id\": \"plan_1234567890\",\n  \"amount\": 2500,\n  \"billing_cycle\": \"monthly\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/subscriptions/{{subscription_uuid}}/get-or-create-plan",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "subscriptions", "{{subscription_uuid}}", "get-or-create-plan"]
+				},
+				"description": "Get or create a subscription plan."
+			},
+			"response": []
+		},
+		{
+			"name": "Switch Payment Method",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"new_payment_method_id\": \"pm_0987654321\",\n  \"payment_method_type\": \"card\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/subscriptions/{{subscription_uuid}}/switch-payment-method",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "subscriptions", "{{subscription_uuid}}", "switch-payment-method"]
+				},
+				"description": "Switch the payment method for a subscription."
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm Subscription Switch",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"confirmation_token\": \"conf_1234567890\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/subscriptions/{{subscription_uuid}}/confirm-subscription-switch",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "subscriptions", "{{subscription_uuid}}", "confirm-subscription-switch"]
+				},
+				"description": "Confirm a subscription payment method switch."
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm Subscription Reactivation",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"reactivation_token\": \"react_1234567890\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/subscriptions/{{subscription_uuid}}/confirm-subscription-reactivation",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "subscriptions", "{{subscription_uuid}}", "confirm-subscription-reactivation"]
+				},
+				"description": "Confirm a subscription reactivation."
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Auto Renew",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"reason\": \"Customer requested cancellation\",\n  \"cancel_at_period_end\": true\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/subscriptions/{{subscription_uuid}}/cancel-auto-renew",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "subscriptions", "{{subscription_uuid}}", "cancel-auto-renew"]
+				},
+				"description": "Cancel auto-renewal for a subscription."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "subscription_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "subscription_uuid",
+			"value": "sub_abc123",
+			"type": "string"
+		},
+		{
+			"key": "order_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
+

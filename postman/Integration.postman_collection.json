@@ -1,0 +1,507 @@
+{
+	"info": {
+		"_postman_id": "integration-api-collection-001",
+		"name": "Integration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Integration API collection for managing global and product-specific integrations and addons"
+	},
+	"item": [
+		{
+			"name": "Global Integrations",
+			"item": [
+				{
+					"name": "List Addons",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/addons",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "addons"],
+							"query": [
+								{
+									"key": "status",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve a list of available integration addons."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Global Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/global-settings",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "global-settings"]
+						},
+						"description": "Retrieve global settings for integrations."
+					},
+					"response": []
+				},
+				{
+					"name": "Set Global Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"enabled\": true,\n  \"default_provider\": \"mailchimp\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/global-settings",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "global-settings"]
+						},
+						"description": "Update global settings for integrations."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Global Feeds",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/global-feeds",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "global-feeds"]
+						},
+						"description": "Retrieve all global integration feeds."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Integration Feed Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/global-feeds/settings?integration_name=mailchimp",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "global-feeds", "settings"],
+							"query": [
+								{
+									"key": "integration_name",
+									"value": "mailchimp"
+								},
+								{
+									"key": "integration_id",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve settings for a specific integration feed (for editing)."
+					},
+					"response": []
+				},
+				{
+					"name": "Save Integration Feed Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"integration_name\": \"mailchimp\",\n  \"integration_id\": 1,\n  \"integration\": {\n    \"name\": \"Main Mailchimp Feed\",\n    \"enabled\": true,\n    \"settings\": {\n      \"list_id\": \"abc123\",\n      \"tags\": [\"customer\"]\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/global-feeds/settings",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "global-feeds", "settings"]
+						},
+						"description": "Create or update an integration feed."
+					},
+					"response": []
+				},
+				{
+					"name": "Change Integration Feed Status",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"yes\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/global-feeds/change-status/{{integration_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "global-feeds", "change-status", "{{integration_id}}"]
+						},
+						"description": "Enable or disable an integration feed."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Integration Feed",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/global-feeds/{{integration_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "global-feeds", "{{integration_id}}"]
+						},
+						"description": "Delete a global integration feed."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Feed Lists",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/feed/lists",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "feed", "lists"],
+							"query": [
+								{
+									"key": "provider",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve a list of integration feeds."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dynamic Options",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/feed/dynamic_options?option_key=post_type",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "feed", "dynamic_options"],
+							"query": [
+								{
+									"key": "option_key",
+									"value": "post_type"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "sub_option_key",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve dynamic options for integration fields (e.g., lists, tags, custom fields)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Chained Data",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"option_key\": \"list\",\n  \"parent_value\": \"list_id_123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/feed/chained",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "feed", "chained"]
+						},
+						"description": "Retrieve chained/dependent data for integration fields."
+					},
+					"response": []
+				},
+				{
+					"name": "Install Plugin",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"addon_key\": \"mailchimp\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/install-plugin",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "integration", "install-plugin"]
+						},
+						"description": "Install an integration plugin/addon."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product Integrations",
+			"item": [
+				{
+					"name": "Get Product Integration Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{product_id}}/integrations/{{integration_name}}/settings",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "products", "{{product_id}}", "integrations", "{{integration_name}}", "settings"],
+							"query": [
+								{
+									"key": "integration_id",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve integration settings for a specific product."
+					},
+					"response": []
+				},
+				{
+					"name": "Save Product Integration",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"integration_name\": \"mailchimp\",\n  \"integration\": {\n    \"name\": \"Product Mailchimp Feed\",\n    \"enabled\": true,\n    \"settings\": {}\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{product_id}}/integrations",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "products", "{{product_id}}", "integrations"]
+						},
+						"description": "Create or update a product-specific integration feed."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product Integration",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{product_id}}/integrations/{{integration_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "products", "{{product_id}}", "integrations", "{{integration_id}}"]
+						},
+						"description": "Delete a product-specific integration feed."
+					},
+					"response": []
+				},
+				{
+					"name": "Change Product Integration Status",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"integration_id\": 1,\n  \"status\": \"yes\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{product_id}}/integrations/feed/change-status",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "products", "{{product_id}}", "integrations", "feed", "change-status"]
+						},
+						"description": "Enable or disable a product-specific integration feed."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product Integration Feeds",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{product_id}}/integrations",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "products", "{{product_id}}", "integrations"]
+						},
+						"description": "Retrieve all integration feeds for a specific product."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "integration_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "product_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "integration_name",
+			"value": "mailchimp",
+			"type": "string"
+		}
+	]
+}
+

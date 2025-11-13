@@ -1,47 +1,135 @@
 ---
-title: Order Bump API (Pro)
-description: FluentCart Pro Order Bump API for promotional order bump management and upselling features.
+title: Order Bump API
+description: FluentCart Order Bump API for promotional order bump management and upselling features.
 ---
 
-# Order Bump API (Pro)
+# Order Bump API
 
-The Order Bump system provides advanced promotional tools for increasing average order value through strategic product offers during the checkout process. Order bumps are implemented through hooks and filters rather than REST API endpoints.
+The Order Bump system provides promotional tools for increasing average order value through strategic product offers during the checkout process. Order bumps are primarily implemented through AJAX endpoints and hooks/filters rather than REST API endpoints.
 
-## Implementation
+## Base URL
 
-Order bumps are handled through the `FluentCartPro\App\Modules\Promotional\OrderBump\OrderBumpBoot` class and use the `OrderPromotion` model with `type = 'order_bump'`.
+Order bump functionality is accessed through AJAX endpoints:
+
+```
+/wp-admin/admin-ajax.php
+```
+
+## Authentication
+
+Order bump AJAX endpoints require:
+- WordPress nonce verification
+- Active cart session
+- No authentication required for public checkout (handled via `wp_ajax_nopriv_`)
+
+## Order Bump AJAX Endpoint
+
+### Apply/Remove Order Bump
+
+Apply or remove an order bump (upgrade) from the cart during checkout.
+
+**Endpoint:** `POST /wp-admin/admin-ajax.php`
+
+**Action:** `fluent_cart_checkout_routes` with `fc_checkout_action=apply_order_bump`
+
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `action` | string | Yes | Must be `fluent_cart_checkout_routes` |
+| `fc_checkout_action` | string | Yes | Must be `apply_order_bump` |
+| `upgrade_form` | int | Yes | Variation ID to upgrade from |
+| `upgrade_to` | int | Yes | Target variation ID to upgrade to |
+| `is_upgraded` | string | Yes | `'yes'` to apply bump, `'no'` to remove |
+| `bump_id` | int | No | Order bump ID (if using bump-based system) |
+
+#### Example Request
+
+```bash
+curl -X POST "https://yoursite.com/wp-admin/admin-ajax.php" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "action=fluent_cart_checkout_routes" \
+  -d "fc_checkout_action=apply_order_bump" \
+  -d "upgrade_form=123" \
+  -d "upgrade_to=456" \
+  -d "is_upgraded=yes"
+```
+
+#### Example Request (JavaScript)
+
+```javascript
+const formData = new FormData();
+formData.append('action', 'fluent_cart_checkout_routes');
+formData.append('fc_checkout_action', 'apply_order_bump');
+formData.append('upgrade_form', '123');
+formData.append('upgrade_to', '456');
+formData.append('is_upgraded', 'yes');
+
+const response = await fetch('/wp-admin/admin-ajax.php', {
+    method: 'POST',
+    body: formData,
+    credentials: 'include'
+});
+
+const data = await response.json();
+```
+
+#### Response
+
+**Success Response** (200):
+
+```json
+{
+  "message": "Item has been applied successfully"
+}
+```
+
+Or when removing:
+
+```json
+{
+  "message": "Item has been reverted successfully"
+}
+```
+
+**Error Response** (422):
+
+```json
+{
+  "message": "No active cart found"
+}
+```
+
+#### Error Codes
+
+| Error | Description |
+|-------|-------------|
+| `no_cart` | No active cart found |
+| `invalid_request` | Cart is locked, already has an upgrade, or invalid upgrade request |
+| `invalid_variation` | The selected product variation is not available for purchase |
+| `invalid_bump` | Could not apply item at this time (when using bump_id) |
 
 ## Order Bump Hooks and Filters
 
-### 1. Display Order Bumps
+### Apply Order Bump Filter
 
-Order bumps are displayed during checkout using this action hook:
+This filter allows you to customize the order bump application logic when using `bump_id`.
 
-- **Action Hook:** `fluent_cart/after_order_notes`
-- **Description:** Displays available order bumps during the checkout process
-- **Parameters:**
-  - `$data` (array): Contains the cart object and other checkout data
-- **Implementation:** Handled by `OrderBumpBoot::maybeShowBumps()`
+**Filter Hook:** `fluent_cart/apply_order_bump`
 
-### 2. Apply/Remove Order Bump
+**Parameters:**
+- `$response` (WP_Error): Default error response
+- `$data` (array): Array containing:
+  - `bump_id` (int): The ID of the order bump
+  - `cart` (object): The current cart object
+  - `request_data` (array): Request data including `is_upgraded`
 
-This filter is used internally by FluentCart to apply or remove an order bump from the cart based on user interaction during checkout.
+**Return:** A success message (string) or a `WP_Error` object if the operation fails.
 
-- **Filter Hook:** `fluent_cart/apply_order_bump`
-- **Description:** Handles the logic for adding or removing an order bump product to/from the cart.
-- **Parameters:**
-  - `$message` (string): A default success or error message.
-  - `$data` (array): An array containing:
-    - `cart` (object): The current cart object.
-    - `bump_id` (int): The ID of the order bump.
-    - `request_data` (array): Request data, typically including `is_upgraded` ('yes' or 'no') to indicate if the bump should be added or removed.
-- **Return:** A success message (string) or a `WP_Error` object if the operation fails.
-- **Use Case:** Custom validation for applying bumps, adding custom tracking, or sending notifications when a bump is added/removed.
-
-**Example Usage (within a custom plugin):**
+**Example Usage:**
 
 ```php
-add_filter('fluent_cart/apply_order_bump', function($message, $data) {
+add_filter('fluent_cart/apply_order_bump', function($response, $data) {
     $cart = $data['cart'];
     $bumpId = $data['bump_id'] ?? 0;
     $willAdd = ($data['request_data']['is_upgraded'] ?? '') === 'yes';
@@ -58,324 +146,94 @@ add_filter('fluent_cart/apply_order_bump', function($message, $data) {
         error_log("Order Bump #{$bumpId} removed from cart for customer {$cart->customer_id}");
     }
 
-    return $message; // Return the original message or a custom one
+    return "Order bump processed successfully";
 }, 10, 2);
 ```
 
-## Order Bump Model
+### Order Bump Success Action
 
-### OrderPromotion Model
+This action fires when an order with an order bump is successfully placed.
 
-```php
-use FluentCartPro\App\Modules\Promotional\Models\OrderPromotion;
+**Action Hook:** `fluent_cart/order_bump_succeed`
 
-class OrderPromotion extends Model
-{
-    protected $table = 'fct_order_promotions';
-    
-    protected $fillable = [
-        'title',
-        'description',
-        'product_id',
-        'variation_id',
-        'discount_type',
-        'discount_value',
-        'is_active',
-        'conditions',
-        'settings'
-    ];
-    
-    protected $casts = [
-        'conditions' => 'array',
-        'settings' => 'array',
-        'is_active' => 'boolean'
-    ];
-}
-```
+**Parameters:**
+- `$data` (array): Array containing:
+  - `cart` (object): The cart object
+  - `order` (object): The order object
 
-### Creating Order Bumps
+**Example Usage:**
 
 ```php
-// Create an order bump
-$orderBump = OrderPromotion::create([
-    'title' => 'Premium Support Add-on',
-    'description' => 'Get 1 year of premium support with your purchase',
-    'product_id' => 123,
-    'variation_id' => 456,
-    'discount_type' => 'percentage',
-    'discount_value' => 20, // 20% off
-    'is_active' => true,
-    'conditions' => [
-        'minimum_cart_total' => 5000, // $50 minimum
-        'product_categories' => ['software', 'plugins'],
-        'customer_segments' => ['new_customers']
-    ],
-    'settings' => [
-        'display_position' => 'after_order_notes',
-        'auto_select' => false,
-        'show_urgency' => true
-    ]
-]);
-```
-
-## Order Bump Display
-
-### Order Bump Boot Class
-
-```php
-use FluentCartPro\App\Modules\Promotional\OrderBump\OrderBumpBoot;
-
-class OrderBumpBoot
-{
-    public function register()
-    {
-        // Display order bumps in checkout
-        add_action('fluent_cart/after_order_notes', [$this, 'maybeShowBumps']);
-        
-        // Handle order bump application
-        add_filter('fluent_cart/apply_order_bump', [$this, 'applyOrderBump'], 10, 2);
-    }
-    
-    public function maybeShowBumps($data)
-    {
-        $cart = $data['cart'];
-        $availableBumps = $this->getAvailableBumps($cart);
-        
-        if (!empty($availableBumps)) {
-            $this->renderOrderBumps($availableBumps, $cart);
-        }
-    }
-    
-    private function getAvailableBumps($cart)
-    {
-        return OrderPromotion::where('is_active', true)
-            ->where(function($query) use ($cart) {
-                $query->whereNull('conditions->minimum_cart_total')
-                      ->orWhere('conditions->minimum_cart_total', '<=', $cart->total);
-            })
-            ->get();
-    }
-}
-```
-
-### Order Bump Application
-
-```php
-// Apply order bump to cart
-add_filter('fluent_cart/apply_order_bump', function($message, $data) {
+add_action('fluent_cart/order_bump_succeed', function ($data) {
     $cart = $data['cart'];
-    $bumpId = $data['bump_id'] ?? 0;
-    $willAdd = $data['request_data']['is_upgraded'] ?? false;
+    $order = $data['order'];
     
-    if ($willAdd) {
-        $bump = OrderPromotion::find($bumpId);
-        
-        if ($bump && $this->isBumpAvailable($bump, $cart)) {
-            // Add bump product to cart
-            $cart->addItem([
-                'product_id' => $bump->product_id,
-                'variation_id' => $bump->variation_id,
-                'quantity' => 1,
-                'is_bump' => true,
-                'bump_id' => $bumpId
-            ]);
-            
-            return "Order bump added successfully";
-        }
-    } else {
-        // Remove bump from cart
-        $cart->removeBumpItems($bumpId);
-        return "Order bump removed";
-    }
-    
-    return $message;
-}, 10, 2);
-```
-
-## Order Bump Conditions
-
-### Condition Types
-
-#### Minimum Cart Total
-```php
-'conditions' => [
-    'minimum_cart_total' => 5000, // $50 minimum
-]
-```
-
-#### Product Categories
-```php
-'conditions' => [
-    'product_categories' => ['software', 'plugins', 'themes']
-]
-```
-
-#### Customer Segments
-```php
-'conditions' => [
-    'customer_segments' => ['new_customers', 'returning_customers']
-]
-```
-
-#### Excluded Products
-```php
-'conditions' => [
-    'excluded_products' => [123, 456, 789]
-]
-```
-
-#### Date Range
-```php
-'conditions' => [
-    'start_date' => '2024-01-01',
-    'end_date' => '2024-12-31'
-]
-```
-
-### Custom Conditions
-
-```php
-// Custom condition validation
-add_filter('fluent_cart/order_bump/conditions', function($conditions, $bump, $cart) {
-    // Add custom conditions
-    $conditions['custom_condition'] = $this->checkCustomCondition($cart);
-    
-    return $conditions;
-}, 10, 3);
-
-private function checkCustomCondition($cart)
-{
-    // Custom logic here
-    return $cart->customer->total_orders > 5;
-}
-```
-
-## Order Bump Hooks and Filters
-
-### Order Bump Hooks
-
-```php
-// Before order bump is displayed
-add_action('fluent_cart/order_bump/before_display', function($bump, $cart) {
-    // Custom logic before displaying bump
-    if ($cart->hasCoupon('NO_BUMPS')) {
-        return false; // Don't show bumps
-    }
-}, 10, 2);
-
-// After order bump is applied
-add_action('fluent_cart/order_bump/applied', function($bump, $cart) {
-    // Track bump application
-    error_log("Order bump applied: {$bump->title} to cart {$cart->id}");
+    // Track order bump conversion
+    error_log("Order bump succeeded in order #{$order->id}");
     
     // Send notification
     wp_mail(
         get_option('admin_email'),
         'Order Bump Applied',
-        "Order bump '{$bump->title}' was applied to a cart"
+        "Order #{$order->id} includes an order bump upgrade"
     );
-}, 10, 2);
-
-// Order bump conditions
-add_action('fluent_cart/order_bump/conditions', function($conditions, $bump, $cart) {
-    // Add custom conditions
-    $conditions['custom_condition'] = $this->checkCustomCondition($cart);
-    
-    return $conditions;
-}, 10, 3);
-```
-
-### Order Bump Filters
-
-```php
-// Modify order bump display
-add_filter('fluent_cart/order_bump/display_data', function($data, $bump, $cart) {
-    // Add custom data to bump display
-    $data['custom_message'] = "Limited time offer!";
-    $data['urgency_text'] = "Only 3 left in stock!";
-    
-    return $data;
-}, 10, 3);
-
-// Modify promotional settings
-add_filter('fluent_cart/promotional/settings', function($settings) {
-    // Add custom promotional settings
-    $settings['custom_promotion'] = [
-        'title' => 'Custom Promotion',
-        'type' => 'checkbox',
-        'default' => false
-    ];
-    
-    return $settings;
 });
 ```
 
-## Order Bump Settings
+### Checkout Cart Amount Updated Action
 
-### Display Settings
+This action fires when the cart amount is updated, including when order bumps are applied.
 
-```php
-'settings' => [
-    'display_position' => 'after_order_notes', // Where to show the bump
-    'auto_select' => false, // Auto-select the bump
-    'show_urgency' => true, // Show urgency messaging
-    'urgency_text' => 'Limited time offer!',
-    'discount_display' => 'percentage', // How to show discount
-    'button_text' => 'Add to Order',
-    'decline_text' => 'No Thanks'
-]
-```
+**Action Hook:** `fluent_cart/checkout/cart_amount_updated`
 
-### Styling Settings
+**Parameters:**
+- `$data` (array): Array containing:
+  - `cart` (object): The updated cart object
+
+**Example Usage:**
 
 ```php
-'settings' => [
-    'background_color' => '#f8f9fa',
-    'border_color' => '#dee2e6',
-    'text_color' => '#212529',
-    'button_color' => '#007cba',
-    'button_text_color' => '#ffffff'
-]
+add_action('fluent_cart/checkout/cart_amount_updated', function ($data) {
+    $cart = $data['cart'];
+    
+    // Update cart display or trigger custom logic
+    error_log("Cart amount updated: {$cart->total}");
+});
 ```
 
-## Order Bump Analytics
+## How Order Bumps Work
 
-### Tracking Bump Performance
+Order bumps allow customers to upgrade their purchase during checkout by replacing a product variation with a higher-tier variation. The system:
+
+1. **Upgrade Process**: Replaces one variation with another (e.g., Basic → Pro)
+2. **Cart Modification**: Removes the original variation and adds the upgraded variation
+3. **Order Tracking**: Stores upgrade information in order meta (`_order_bump`)
+4. **Order Logs**: Records the upgrade in order logs
+
+### Order Bump Data Structure
+
+When an order bump is applied, the following data is stored in the cart's `checkout_data`:
 
 ```php
-// Track bump views
-add_action('fluent_cart/order_bump/viewed', function($bump, $cart) {
-    // Log bump view
-    error_log("Order bump viewed: {$bump->title} by customer {$cart->customer_id}");
-    
-    // Store analytics data
-    $this->storeBumpAnalytics($bump->id, 'viewed', $cart->customer_id);
-}, 10, 2);
-
-// Track bump conversions
-add_action('fluent_cart/order_bump/converted', function($bump, $cart, $order) {
-    // Log bump conversion
-    error_log("Order bump converted: {$bump->title} in order {$order->id}");
-    
-    // Store conversion data
-    $this->storeBumpAnalytics($bump->id, 'converted', $cart->customer_id, $order->id);
-}, 10, 3);
-
-private function storeBumpAnalytics($bumpId, $action, $customerId, $orderId = null)
-{
-    // Store analytics data in database or external service
-    $analytics = [
-        'bump_id' => $bumpId,
-        'action' => $action,
-        'customer_id' => $customerId,
-        'order_id' => $orderId,
-        'timestamp' => current_time('mysql')
-    ];
-    
-    // Store in custom analytics table or external service
-    $this->analyticsService->store($analytics);
-}
+$checkoutData['order_bump'] = [
+    'upgraded_from' => 123, // Original variation ID
+    'upgraded_to'   => 456  // Upgraded variation ID
+];
 ```
+
+This data is then:
+- Stored in order meta as `_order_bump`
+- Logged in order logs
+- Triggered via `fluent_cart/order_bump_succeed` action when order is placed
+
+## Order Bump Filter Service
+
+FluentCart includes an `OrderBumpFilter` service for filtering order bumps in admin interfaces. This is used for:
+- Searching order bumps by title or ID
+- Filtering by active/inactive status
+- Advanced filtering by product, customer, or license properties
+
+**Note**: Full order bump management features (CRUD operations, conditions, settings) may be available in FluentCart Pro through the `OrderPromotion` model.
 
 ---
 

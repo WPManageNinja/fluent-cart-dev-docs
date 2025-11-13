@@ -817,4 +817,5 @@ add_action('fluent_cart/shipping/method/before_delete', function($method) {
 
 **Next Steps:**
 - [Storage Drivers](./storage) - File storage integration
-- [Modules Overview](./index) - Back to modules overview
+- [Pro Modules](./pro-modules) - Advanced Pro features
+- [Modules Overview](../modules) - Back to modules overview

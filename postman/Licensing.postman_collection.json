@@ -1,0 +1,505 @@
+{
+	"info": {
+		"_postman_id": "licensing-api-collection-001",
+		"name": "Licensing (Pro)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Pro Licensing API collection for software license management"
+	},
+	"item": [
+		{
+			"name": "Get License Details",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/settings/license",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "settings", "license"]
+				},
+				"description": "Retrieve details for the current FluentCart Pro license."
+			},
+			"response": []
+		},
+		{
+			"name": "Activate License",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"license_key\": \"your-license-key-here\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/settings/license",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "settings", "license"]
+				},
+				"description": "Activate a FluentCart Pro license."
+			},
+			"response": []
+		},
+		{
+			"name": "Deactivate License",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/settings/license",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "settings", "license"]
+				},
+				"description": "Deactivate the current FluentCart Pro license."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Licenses",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses"]
+				},
+				"description": "Retrieve all product licenses."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Licenses",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/customer/{{customer_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "customer", "{{customer_id}}"]
+				},
+				"description": "Retrieve all licenses for a specific customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Get License Details",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/{{license_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "{{license_id}}"]
+				},
+				"description": "Retrieve details for a specific license."
+			},
+			"response": []
+		},
+		{
+			"name": "Regenerate License Key",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/{{license_id}}/regenerate-key",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "{{license_id}}", "regenerate-key"]
+				},
+				"description": "Regenerate the license key for a specific license."
+			},
+			"response": []
+		},
+		{
+			"name": "Extend License Validity",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"days\": 30\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/{{license_id}}/extend-validity",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "{{license_id}}", "extend-validity"]
+				},
+				"description": "Extend the validity period of a license."
+			},
+			"response": []
+		},
+		{
+			"name": "Update License Status",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"status\": \"active\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/{{license_id}}/update_status",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "{{license_id}}", "update_status"]
+				},
+				"description": "Update the status of a license."
+			},
+			"response": []
+		},
+		{
+			"name": "Update License Limit",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"limit\": 5\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/{{license_id}}/update_limit",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "{{license_id}}", "update_limit"]
+				},
+				"description": "Update the activation limit for a license."
+			},
+			"response": []
+		},
+		{
+			"name": "Deactivate Site",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"site_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/{{license_id}}/deactivate_site",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "{{license_id}}", "deactivate_site"]
+				},
+				"description": "Deactivate a specific site from a license."
+			},
+			"response": []
+		},
+		{
+			"name": "Activate Site",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"site_url\": \"https://newsite.com\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/{{license_id}}/activate_site",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "{{license_id}}", "activate_site"]
+				},
+				"description": "Activate a site for a license."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete License",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/licenses/{{license_id}}/delete",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "licenses", "{{license_id}}", "delete"]
+				},
+				"description": "Delete a license permanently."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Product License Settings",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/products/{{product_id}}/settings",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "products", "{{product_id}}", "settings"]
+				},
+				"description": "Retrieve license settings for a specific product."
+			},
+			"response": []
+		},
+		{
+			"name": "Save Product License Settings",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"settings\": {\n    \"license_type\": \"standard\",\n    \"activation_limit\": 5,\n    \"expiry_days\": 365\n  }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/licensing/products/{{product_id}}/settings",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "licensing", "products", "{{product_id}}", "settings"]
+				},
+				"description": "Save license settings for a specific product."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Licenses (Frontend)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/licenses",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "licenses"]
+				},
+				"description": "Retrieve all licenses for the current customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Get License Details by Key (Frontend)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/licenses/{{license_key}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "licenses", "{{license_key}}"]
+				},
+				"description": "Retrieve details for a specific license by license key."
+			},
+			"response": []
+		},
+		{
+			"name": "Get License Activations (Frontend)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/licenses/{{license_key}}/activations",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "licenses", "{{license_key}}", "activations"]
+				},
+				"description": "Retrieve all activations for a specific license."
+			},
+			"response": []
+		},
+		{
+			"name": "Deactivate Site (Frontend)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"site_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customer-profile/licenses/{{license_key}}/deactivate_site",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customer-profile", "licenses", "{{license_key}}", "deactivate_site"]
+				},
+				"description": "Deactivate a site from a customer's license."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "license_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "license_key",
+			"value": "YOUR_LICENSE_KEY_HERE",
+			"type": "string"
+		},
+		{
+			"key": "customer_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "product_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
+

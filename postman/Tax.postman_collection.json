@@ -1,0 +1,755 @@
+{
+	"info": {
+		"_postman_id": "tax-api-collection-001",
+		"name": "Tax",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Tax API collection for managing tax classes, tax rates, and tax configuration including EU VAT"
+	},
+	"item": [
+		{
+			"name": "Tax Classes",
+			"item": [
+				{
+					"name": "List Tax Classes",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/classes",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "classes"]
+						},
+						"description": "Retrieve all tax classes, sorted by priority."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tax Class",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Reduced Rate\",\n  \"description\": \"Reduced tax rate for essential goods\",\n  \"categories\": [1, 2],\n  \"priority\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/classes",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "classes"]
+						},
+						"description": "Create a new tax class."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tax Class",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Reduced Rate - Updated\",\n  \"description\": \"Updated description\",\n  \"categories\": [1, 2, 3],\n  \"priority\": 6\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/classes/{{tax_class_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "classes", "{{tax_class_id}}"]
+						},
+						"description": "Update an existing tax class."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tax Class",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/classes/{{tax_class_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "classes", "{{tax_class_id}}"]
+						},
+						"description": "Delete a tax class."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tax Rates",
+			"item": [
+				{
+					"name": "List Tax Rates",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/rates",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "rates"]
+						},
+						"description": "Retrieve all tax rates."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Country Tax Rates",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/rates/country/rates/{{country_code}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "rates", "country", "rates", "{{country_code}}"]
+						},
+						"description": "Retrieve tax rates for a specific country, including country configuration."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tax Rate",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"class_id\": 1,\n  \"country\": \"US\",\n  \"state\": \"CA\",\n  \"rate\": 7.5,\n  \"priority\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/country/rate",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "country", "rate"]
+						},
+						"description": "Create a new tax rate for a country."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tax Rate",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"class_id\": 1,\n  \"country\": \"US\",\n  \"state\": \"CA\",\n  \"rate\": 8.0,\n  \"priority\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/country/rate/{{tax_rate_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "country", "rate", "{{tax_rate_id}}"]
+						},
+						"description": "Update an existing tax rate."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tax Rate",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/country/rate/{{tax_rate_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "country", "rate", "{{tax_rate_id}}"]
+						},
+						"description": "Delete a tax rate."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Country Tax Rates",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/country/{{country_code}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "country", "{{country_code}}"]
+						},
+						"description": "Delete all tax rates for a specific country."
+					},
+					"response": []
+				},
+				{
+					"name": "Save Shipping Override",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"override_tax_rate\": 5.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/rates/country/override",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "rates", "country", "override"]
+						},
+						"description": "Set a shipping tax override rate for a tax rate."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shipping Override",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/rates/country/override/{{tax_rate_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "rates", "country", "override", "{{tax_rate_id}}"]
+						},
+						"description": "Remove shipping tax override from a tax rate."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Country Tax ID",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/country-tax-id/{{country_code}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "country-tax-id", "{{country_code}}"]
+						},
+						"description": "Retrieve tax ID for a specific country."
+					},
+					"response": []
+				},
+				{
+					"name": "Save Country Tax ID",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tax_id\": \"US123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/country-tax-id/{{country_code}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "country-tax-id", "{{country_code}}"]
+						},
+						"description": "Save tax ID for a specific country."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tax Configuration",
+			"item": [
+				{
+					"name": "Get Tax Rates from Configuration",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/rates",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "rates"]
+						},
+						"description": "Retrieve tax rates from the tax configuration file."
+					},
+					"response": []
+				},
+				{
+					"name": "Save Configured Countries",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"countries\": [\"US\", \"CA\", \"GB\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/countries",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "countries"]
+						},
+						"description": "Save configured countries and generate tax classes for them."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tax Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/settings",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "settings"]
+						},
+						"description": "Retrieve tax module settings."
+					},
+					"response": []
+				},
+				{
+					"name": "Save Tax Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"settings\": {\n    \"enabled\": true,\n    \"prices_include_tax\": false,\n    \"display_prices\": \"excl\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/settings",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "settings"]
+						},
+						"description": "Update tax module settings."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "EU VAT Settings",
+			"item": [
+				{
+					"name": "Save EU VAT Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"enabled\": true,\n  \"oss_enabled\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "settings", "eu-vat"]
+						},
+						"description": "Save EU VAT configuration settings."
+					},
+					"response": []
+				},
+				{
+					"name": "Get EU Tax Rates",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/rates",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "settings", "eu-vat", "rates"]
+						},
+						"description": "Retrieve EU tax rates."
+					},
+					"response": []
+				},
+				{
+					"name": "Save OSS Tax Override",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"country\": \"DE\",\n  \"rate\": 19.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/override",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "settings", "eu-vat", "oss", "override"]
+						},
+						"description": "Save One Stop Shop (OSS) tax override."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete OSS Tax Override",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/override?id={{oss_override_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "settings", "eu-vat", "oss", "override"],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{oss_override_id}}"
+								}
+							]
+						},
+						"description": "Delete a One Stop Shop (OSS) tax override."
+					},
+					"response": []
+				},
+				{
+					"name": "Save OSS Shipping Override",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"country\": \"DE\",\n  \"rate\": 19.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/shipping-override",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "settings", "eu-vat", "oss", "shipping-override"]
+						},
+						"description": "Save One Stop Shop (OSS) shipping tax override."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete OSS Shipping Override",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/shipping-override?id={{oss_shipping_override_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "tax", "configuration", "settings", "eu-vat", "oss", "shipping-override"],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{oss_shipping_override_id}}"
+								}
+							]
+						},
+						"description": "Delete a One Stop Shop (OSS) shipping tax override."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tax Filing",
+			"item": [
+				{
+					"name": "List Tax Records",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/taxes/?per_page=10&page=1",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "taxes", ""],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "per_page",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "filed",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve a paginated list of tax records."
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Taxes as Filed",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ids\": [1, 2, 3, 4, 5]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/taxes/",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "taxes", ""]
+						},
+						"description": "Mark one or more tax records as filed."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "tax_class_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "tax_rate_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "country_code",
+			"value": "US",
+			"type": "string"
+		},
+		{
+			"key": "oss_override_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "oss_shipping_override_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
+

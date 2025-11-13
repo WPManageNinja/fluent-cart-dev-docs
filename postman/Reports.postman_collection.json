@@ -1,0 +1,1330 @@
+{
+	"info": {
+		"_postman_id": "reports-api-collection-001",
+		"name": "Reports",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Reports API collection for analytics, statistics, and business intelligence"
+	},
+	"item": [
+		{
+			"name": "Overview Reports",
+			"item": [
+				{
+					"name": "Get Overview",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/overview?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "overview"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve a comprehensive overview report with key metrics."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report Meta",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-report-meta",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-report-meta"]
+						},
+						"description": "Retrieve metadata for reports, including available filters and options."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Quick Order Stats",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/quick-order-stats?day_range=this_month",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "quick-order-stats"],
+							"query": [
+								{
+									"key": "day_range",
+									"value": "this_month",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve quick statistics about orders."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sales Growth",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/sales-growth?start_date=2024-01-01&end_date=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "sales-growth"],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2024-01-01",
+									"disabled": true
+								},
+								{
+									"key": "end_date",
+									"value": "2024-12-31",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve sales growth data over time."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report Overview",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/report-overview?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "report-overview"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve a detailed report overview with order summaries."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Stats",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/dashboard-stats",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "dashboard-stats"]
+						},
+						"description": "Retrieve dashboard statistics."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Summary",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/get-dashboard-summary",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "get-dashboard-summary"]
+						},
+						"description": "Retrieve dashboard summary data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recent Orders",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/get-recent-orders",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "get-recent-orders"]
+						},
+						"description": "Retrieve recent orders."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unfulfilled Orders",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/get-unfulfilled-orders",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "get-unfulfilled-orders"]
+						},
+						"description": "Retrieve unfulfilled orders."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recent Activities",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/get-recent-activities",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "get-recent-activities"]
+						},
+						"description": "Retrieve recent activities."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Sales Reports",
+			"item": [
+				{
+					"name": "Get Default Report",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-default-report?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-default-report"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve the default sales report."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sales Report",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/sales-report?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "sales-report"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve a sales report."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Default Report Graphs",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-default-report-graphs?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-default-report-graphs"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve graph data for the default report."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Default Report Fluctuations",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-default-report-fluctuations?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-default-report-fluctuations"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve fluctuation data for the default report."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sales Growth Chart",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/sales-growth-chart?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "sales-growth-chart"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve sales growth chart data."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product Reports",
+			"item": [
+				{
+					"name": "Get Top Products Sold",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/top-products-sold?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "top-products-sold"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve a list of top-selling products."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Sold Products",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-top-sold-products?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-top-sold-products"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve top-selling products."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Sold Variants",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-top-sold-variants?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-top-sold-variants"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve top-selling product variants."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Frequently Bought Together",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-frequently-bought-together?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-frequently-bought-together"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve products that are frequently bought together."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product Report",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/product-report?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "product-report"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve product report data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product Performance",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/product-performance?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "product-performance"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve product performance data."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Revenue Reports",
+			"item": [
+				{
+					"name": "Get Revenue",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/revenue?params[startDate]=2024-01-01&params[endDate]=2024-12-31&params[groupKey]=monthly",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "revenue"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								},
+								{
+									"key": "params[groupKey]",
+									"value": "monthly",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve revenue data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Revenue by Group",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/revenue-by-group?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "revenue-by-group"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve revenue data grouped by specified criteria."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order Reports",
+			"item": [
+				{
+					"name": "Get Order Value Distribution",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/order-value-distribution?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "order-value-distribution"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve distribution of order values."
+					},
+					"response": []
+				},
+				{
+					"name": "Get New vs Returning Customers",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-new-vs-returning-customer?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-new-vs-returning-customer"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve statistics comparing new and returning customers."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders by Group",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-order-by-group?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-order-by-group"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve orders grouped by specified criteria."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report by Day and Hour",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-report-by-day-and-hour?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-report-by-day-and-hour"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve order statistics grouped by day and hour."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Item Count Distribution",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/item-count-distribution?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "item-count-distribution"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve distribution of item counts per order."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Completion Time",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/order-completion-time?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "order-completion-time"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve statistics about order completion times."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Chart",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/order-chart?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "order-chart"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve chart data for orders."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Failed Orders",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/fetch-failed-orders?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "fetch-failed-orders"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve a list of failed orders."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Repeat Customers",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/search-repeat-customer?params[per_page]=10&params[current_page]=1",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "search-repeat-customer"],
+							"query": [
+								{
+									"key": "params[per_page]",
+									"value": "10"
+								},
+								{
+									"key": "params[current_page]",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Search for repeat customers based on criteria."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Refund Reports",
+			"item": [
+				{
+					"name": "Get Refund Chart",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/refund-chart?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "refund-chart"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve chart data for refunds."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Weeks Between Refund",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/weeks-between-refund?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "weeks-between-refund"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve statistics about time between purchase and refund."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Refund Data by Group",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/refund-data-by-group?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "refund-data-by-group"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve refund data grouped by specified criteria."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subscription Reports",
+			"item": [
+				{
+					"name": "Get Subscription Chart",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/subscription-chart?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "subscription-chart"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve subscription chart data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Daily Signups",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/daily-signups?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "daily-signups"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve daily signup statistics."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Retention Chart",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/retention-chart?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "retention-chart"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve retention chart data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Future Renewals",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/future-renewals?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "future-renewals"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve future renewal statistics."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Other Reports",
+			"item": [
+				{
+					"name": "Get Country Heat Map",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/country-heat-map?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "country-heat-map"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve country heat map data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cart Report",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/cart-report?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "cart-report"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve cart report data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer Report",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/customer-report?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "customer-report"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve customer report data."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sources",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/reports/sources?params[startDate]=2024-01-01&params[endDate]=2024-12-31",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "reports", "sources"],
+							"query": [
+								{
+									"key": "params[startDate]",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "params[endDate]",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Retrieve source report data."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": []
+}
+

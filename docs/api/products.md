@@ -26,6 +26,8 @@ All endpoints require authentication and appropriate permissions:
 
 Retrieve a paginated list of products with optional filtering and searching.
 
+**Permission Required**: `products/view`
+
 ### Parameters
 
 | Parameter         | Type    | Description                                        | Default    |
@@ -593,11 +595,13 @@ curl --location 'https://cart.junior.ninja/wp-json/fluent-cart/v2/products/75293
 
 Retrieve detailed information about a specific product.
 
+**Permission Required**: `products/view`
+
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `product` | integer | Product ID |
+| `product` | integer | Product ID (route parameter) |
 
 #### Response
 
@@ -691,15 +695,17 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/products/33" \
 
 ## Update Product
 
-**PUT** `/products/{postId}/pricing`
+**POST** `/products/{postId}/pricing`
 
 Update product pricing information.
+
+**Permission Required**: `products/edit`
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `postId` | integer | Product ID |
+| `postId` | integer | Product ID (route parameter) |
 
 #### Request Body
 
@@ -731,7 +737,7 @@ Update product pricing information.
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/products/1/pricing" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/products/1/pricing" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -744,13 +750,15 @@ curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/products/1/pricing" \
 
 **DELETE** `/products/{product}`
 
-Delete a product (soft delete).
+Delete a product.
+
+**Permission Required**: `products/delete`
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `product` | integer | Product ID |
+| `product` | integer | Product ID (route parameter) |
 
 #### Response
 
@@ -764,7 +772,7 @@ Delete a product (soft delete).
 #### Example Request
 
 ```bash
-curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v1/products/1" \
+curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/products/1" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -775,11 +783,13 @@ curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v1/products/1" \
 
 Set product image for a variant.
 
+**Permission Required**: `products/view`
+
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `variantId` | integer | Variant ID |
+| `variantId` | integer | Variant ID (route parameter) |
 
 #### Response
 
@@ -799,7 +809,7 @@ Set product image for a variant.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/products/1/thumbnail" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/products/1/thumbnail" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -808,6 +818,8 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/products/1/thumbnail" \
 **POST** `/products/{postId}/update-variant-option`
 
 Update a product variant option.
+
+**Permission Required**: `products/edit`
 
 #### Parameters
 
@@ -845,7 +857,7 @@ Update a product variant option.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/products/1/update-variant-option" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/products/1/update-variant-option" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -860,6 +872,8 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/products/1/update-vari
 **POST** `/products/add-product-terms`
 
 Add terms (categories, tags) to a product.
+
+**Permission Required**: `products/edit`
 
 #### Request Body
 
@@ -905,7 +919,7 @@ Add terms (categories, tags) to a product.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/products/add-product-terms" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/products/add-product-terms" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -924,6 +938,8 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/products/add-product-t
 **POST** `/products/do-bulk-action`
 
 Perform bulk actions on multiple products.
+
+**Permission Required**: `products/edit`
 
 #### Request Body
 
@@ -972,7 +988,7 @@ Perform bulk actions on multiple products.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/products/do-bulk-action" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/products/do-bulk-action" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -989,6 +1005,8 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/products/do-bulk-actio
 ### List Variations
 
 **GET** `/products/variants`
+
+**Permission Required**: `products/view`
 
 List all product variations.
 
@@ -1015,7 +1033,7 @@ List all product variations.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/products/variants" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/products/variants" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -1024,6 +1042,8 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/products/variants" \
 **POST** `/products/variants`
 
 Create a new product variation.
+
+**Permission Required**: `products/create`
 
 #### Request Body
 
@@ -1063,7 +1083,7 @@ Create a new product variation.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/products/variants" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/products/variants" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1075,16 +1095,350 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/products/variants" \
 ```
 
 
-## Rate Limiting
+### Additional Product Endpoints
 
-- **List operations**: 100 requests per hour
-- **Create operations**: 50 requests per hour
-- **Update operations**: 200 requests per hour
-- **Delete operations**: 20 requests per hour
+#### Search Product by Name
 
-## Related Documentation
+**GET** `/products/searchProductByName`
 
-- [Orders API](./orders) - Order management endpoints
-- [Customers API](./customers) - Customer management endpoints
-- [Database Models](/database/models) - Product data models
-- [Developer Hooks](/hooks/) - Product-related hooks
+Search for products by name.
+
+**Permission Required**: `products/view`
+
+#### Search Variant by Name
+
+**GET** `/products/searchVariantByName`
+
+Search for product variants by name.
+
+**Permission Required**: `products/view`
+
+#### Search Product Variant Options
+
+**GET** `/products/search-product-variant-options`
+
+Search for product variant options.
+
+**Permission Required**: `products/view`
+
+#### Find Subscription Variants
+
+**GET** `/products/findSubscriptionVariants`
+
+Find subscription variants.
+
+**Permission Required**: `products/view`
+
+#### Fetch Products by IDs
+
+**GET** `/products/fetchProductsByIds`
+
+Fetch multiple products by their IDs.
+
+**Permission Required**: `products/view`
+
+#### Fetch Variations by IDs
+
+**GET** `/products/fetchVariationsByIds`
+
+Fetch multiple variations by their IDs.
+
+**Permission Required**: `products/view`
+
+#### Get Product Terms List
+
+**GET** `/products/fetch-term`
+
+Get product terms list.
+
+**Permission Required**: `products/view`
+
+#### Get Product Term List by Parent
+
+**POST** `/products/fetch-term-by-parent`
+
+Get product terms filtered by parent.
+
+**Permission Required**: `products/view`
+
+#### Get Max Excerpt Word Count
+
+**GET** `/products/get-max-excerpt-word-count`
+
+Get maximum excerpt word count.
+
+**Permission Required**: `products/view`
+
+#### Get Product Pricing
+
+**GET** `/products/{productId}/pricing`
+
+Get product pricing information.
+
+**Permission Required**: `products/view`
+
+#### Get Product Pricing Widgets
+
+**GET** `/products/{productId}/pricing-widgets`
+
+Get pricing widgets for a product.
+
+**Permission Required**: `products/view`
+
+#### Update Long Description Editor Mode
+
+**POST** `/products/{postId}/update-long-desc-editor-mode`
+
+Update the editor mode for long description.
+
+**Permission Required**: `products/edit`
+
+#### Update Tax Class
+
+**POST** `/products/{postId}/tax-class`
+
+Update product tax class.
+
+**Permission Required**: `products/edit`
+
+#### Remove Tax Class
+
+**POST** `/products/{postId}/tax-class/remove`
+
+Remove product tax class.
+
+**Permission Required**: `products/edit`
+
+#### Sync Downloadable Files
+
+**POST** `/products/{postId}/sync-downloadable-files`
+
+Sync downloadable files for a product.
+
+**Permission Required**: `products/edit`
+
+#### Update Downloadable File
+
+**PUT** `/products/{downloadableId}/update`
+
+Update a downloadable file.
+
+**Permission Required**: `products/edit`
+
+#### Delete Downloadable File
+
+**DELETE** `/products/{downloadableId}/delete`
+
+Delete a downloadable file.
+
+**Permission Required**: `products/delete`
+
+#### Get Downloadable URL
+
+**GET** `/products/getDownloadableUrl/{downloadableId}`
+
+Get downloadable file URL.
+
+**Permission Required**: `products/view`
+
+#### Update Variation
+
+**POST** `/products/variants/{variantId}`
+
+Update a product variation.
+
+**Permission Required**: `products/edit`
+
+#### Delete Variation
+
+**DELETE** `/products/variants/{variantId}`
+
+Delete a product variation.
+
+**Permission Required**: `products/delete`
+
+#### Set Variation Media
+
+**POST** `/products/variants/{variantId}/setMedia`
+
+Set media for a variation.
+
+**Permission Required**: `products/edit`
+
+#### Update Variation Pricing Table
+
+**PUT** `/products/variants/{variantId}/pricing-table`
+
+Update pricing table for a variation.
+
+**Permission Required**: `products/edit`
+
+#### Get Upgrade Settings
+
+**GET** `/products/{id}/upgrade-paths`
+
+Get upgrade paths for a product.
+
+**Permission Required**: `products/view`
+
+#### Save Upgrade Setting
+
+**POST** `/products/{id}/upgrade-path`
+
+Save upgrade path setting.
+
+**Permission Required**: `products/edit`
+
+#### Update Upgrade Path
+
+**POST** `/products/upgrade-path/{id}/update`
+
+Update an upgrade path.
+
+**Permission Required**: `products/edit`
+
+#### Delete Upgrade Path
+
+**DELETE** `/products/upgrade-path/{id}/delete`
+
+Delete an upgrade path.
+
+**Permission Required**: `products/delete`
+
+#### Get Variation Upgrade Paths
+
+**GET** `/products/variation/{variantId}/upgrade-paths`
+
+Get upgrade paths for a variation.
+
+**Permission Required**: `products/view`
+
+#### Sync Taxonomy Terms
+
+**POST** `/products/sync-taxonomy-term/{postId}`
+
+Sync taxonomy terms for a product.
+
+**Permission Required**: `products/edit`
+
+#### Delete Taxonomy Terms
+
+**POST** `/products/delete-taxonomy-term/{postId}`
+
+Delete taxonomy terms for a product.
+
+**Permission Required**: `products/edit`
+
+#### Update Product Detail
+
+**POST** `/products/detail/{detailId}`
+
+Update product detail.
+
+**Permission Required**: `products/edit`
+
+#### Create Dummy Products
+
+**POST** `/products/create-dummy`
+
+Create dummy products for testing.
+
+**Permission Required**: `products/create`
+
+#### Product Integrations
+
+**GET** `/products/{productId}/integrations`
+
+Get product integrations.
+
+**Permission Required**: `products/view`
+
+**GET** `/products/{product_id}/integrations/{integration_name}/settings`
+
+Get product integration settings.
+
+**Permission Required**: `products/view`
+
+**POST** `/products/{product_id}/integrations`
+
+Save product integration.
+
+**Permission Required**: `products/manage`
+
+**DELETE** `/products/{product_id}/integrations/{integration_id}`
+
+Delete product integration.
+
+**Permission Required**: `products/manage`
+
+**POST** `/products/{product_id}/integrations/feed/change-status`
+
+Change product integration feed status.
+
+**Permission Required**: `products/manage`
+
+---
+
+## Variants
+
+### List Variants
+
+Retrieve all product variants.
+
+**Endpoint:** `GET /variants/`
+
+**Permission Required**: `ProductPolicy`
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `params` | object | No | Optional parameters for filtering/searching |
+
+#### Response
+
+```json
+[
+  {
+    "id": 1,
+    "post_id": 100,
+    "variation_title": "Product Variant 1",
+    "serial_index": 1,
+    "stock_status": "in-stock",
+    "available": 1,
+    "total_stock": 10,
+    "payment_type": "onetime",
+    "fulfillment_type": "physical",
+    "created_at": "2024-01-01 10:00:00",
+    "updated_at": "2024-01-01 10:00:00"
+  },
+  {
+    "id": 2,
+    "post_id": 100,
+    "variation_title": "Product Variant 2",
+    "serial_index": 2,
+    "stock_status": "in-stock",
+    "available": 1,
+    "total_stock": 5,
+    "payment_type": "onetime",
+    "fulfillment_type": "physical",
+    "created_at": "2024-01-01 10:00:00",
+    "updated_at": "2024-01-01 10:00:00"
+  }
+]
+```
+
+#### Example Request
+
+```bash
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/variants/" \
+  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
+```
+
+#### Notes
+
+- This endpoint returns all product variants in the system
+- Variants are linked to products via `post_id`
+- The `serial_index` determines the display order of variants
+- For more detailed variant management (create, update, delete), see the Products API variant endpoints above
+

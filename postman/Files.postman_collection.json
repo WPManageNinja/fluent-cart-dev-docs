@@ -1,0 +1,299 @@
+{
+	"info": {
+		"_postman_id": "files-api-collection-001",
+		"name": "Files",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Files API collection with all file management endpoints"
+	},
+	"item": [
+		{
+			"name": "List Files",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/files?page=1&per_page=10",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "files"],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "10"
+						},
+						{
+							"key": "search",
+							"value": "",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Retrieve a paginated list of uploaded files."
+			},
+			"response": []
+		},
+		{
+			"name": "Upload File",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "storage_driver",
+							"value": "local",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "folder",
+							"value": "products",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "public",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/files/upload",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "files", "upload"]
+				},
+				"description": "Upload a new file to the storage system."
+			},
+			"response": []
+		},
+		{
+			"name": "Get File Bucket List",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/files/bucket-list",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "files", "bucket-list"]
+				},
+				"description": "Get list of available file buckets/storage locations."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete File",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"file_id\": 1,\n  \"file_path\": \"/uploads/2024/01/product-image.jpg\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/files/delete",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "files", "delete"]
+				},
+				"description": "Delete a file from storage."
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Editor File",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "editor_type",
+							"value": "tinymce",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/upload-editor-file",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "upload-editor-file"]
+				},
+				"description": "Upload a file for use in rich text editors."
+			},
+			"response": []
+		},
+		{
+			"name": "Sync Downloadable Files",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"files\": [\n    {\n      \"file_id\": 1,\n      \"file_name\": \"product-manual.pdf\",\n      \"file_url\": \"https://yoursite.com/wp-content/uploads/2024/01/product-manual.pdf\",\n      \"file_size\": 2048000,\n      \"download_limit\": 5,\n      \"expiry_days\": 30\n    }\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{product_id}}/sync-downloadable-files",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "products", "{{product_id}}", "sync-downloadable-files"]
+				},
+				"description": "Sync downloadable files for a product."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Downloadable File",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"file_name\": \"updated-manual.pdf\",\n  \"download_limit\": 10,\n  \"expiry_days\": 60\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{downloadable_id}}/update",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "products", "{{downloadable_id}}", "update"]
+				},
+				"description": "Update a downloadable file."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Downloadable File",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{downloadable_id}}/delete",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "products", "{{downloadable_id}}", "delete"]
+				},
+				"description": "Delete a downloadable file."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Downloadable URL",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/getDownloadableUrl/{{downloadable_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "products", "getDownloadableUrl", "{{downloadable_id}}"]
+				},
+				"description": "Get a secure download URL for a downloadable file."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "product_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "downloadable_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
+

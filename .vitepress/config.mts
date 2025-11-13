@@ -60,14 +60,6 @@ export default defineConfig({
               { text: 'Filter Hooks', link: '/hooks/filters' }
             ]
           },
-          {
-            text: 'Tutorials',
-            items: [
-              { text: 'Custom Payment Gateway', link: '/payment-methods-integration/' },
-              { text: '(Payment Gateway) Example', link: '/payment-methods-integration/paddle-example' }
-            ]
-          },
-      
           // {
           //   text: 'REST API',
           //   items: [

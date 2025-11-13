@@ -1,0 +1,218 @@
+{
+	"info": {
+		"_postman_id": "dashboard-api-collection-001",
+		"name": "Dashboard",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Dashboard API collection for retrieving dashboard statistics and onboarding data"
+	},
+	"item": [
+		{
+			"name": "Get Dashboard Stats",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/dashboard/stats",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "dashboard", "stats"]
+				},
+				"description": "Retrieve dashboard statistics and widgets."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Onboarding Data",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/dashboard/",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "dashboard", ""]
+				},
+				"description": "Retrieve onboarding steps and completion status."
+			},
+			"response": []
+		},
+		{
+			"name": "Widgets",
+			"item": [
+				{
+					"name": "Get Widgets",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/widgets?filter=fluent_cart_single_customer",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "widgets"],
+							"query": [
+								{
+									"key": "filter",
+									"value": "fluent_cart_single_customer"
+								},
+								{
+									"key": "data",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve widgets based on a filter type."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Welcome",
+			"item": [
+				{
+					"name": "Get Welcome Message",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/welcome",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "welcome"]
+						},
+						"description": "Retrieve the welcome message. This is a public endpoint that does not require authentication."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Onboarding",
+			"item": [
+				{
+					"name": "Get Onboarding Data",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/onboarding/",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "onboarding", ""]
+						},
+						"description": "Retrieve onboarding configuration including available pages, currencies, and default settings."
+					},
+					"response": []
+				},
+				{
+					"name": "Save Onboarding Settings",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"store_name\": \"My New Store\",\n  \"store_email\": \"store@example.com\",\n  \"currency\": \"USD\",\n  \"category\": \"electronics\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/onboarding/",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "onboarding", ""]
+						},
+						"description": "Save initial store settings during onboarding."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Pages",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/onboarding/create-pages",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "onboarding", "create-pages"]
+						},
+						"description": "Create all required FluentCart pages at once."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Single Page",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"checkout_page_id\",\n  \"page_name\": \"Checkout\",\n  \"save_settings\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/onboarding/create-page",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "onboarding", "create-page"]
+						},
+						"description": "Create a single specific page."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": []
+}
+

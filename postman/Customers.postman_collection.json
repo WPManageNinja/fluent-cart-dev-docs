@@ -1,0 +1,651 @@
+{
+	"info": {
+		"_postman_id": "customers-api-collection-001",
+		"name": "Customers",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23389172",
+		"description": "FluentCart Customers API collection with all customer management endpoints"
+	},
+	"item": [
+		{
+			"name": "List Customers",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers?page=1&per_page=10",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers"],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "10"
+						},
+						{
+							"key": "search",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "order_by",
+							"value": "id",
+							"disabled": true
+						},
+						{
+							"key": "order_type",
+							"value": "DESC",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Retrieve a paginated list of customers with optional filtering and searching."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Customer",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"newcustomer@example.com\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"phone\": \"+1234567890\",\n  \"status\": \"active\",\n  \"additional_info\": {\n    \"company\": \"Example Corp\",\n    \"notes\": \"VIP customer\"\n  }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers"]
+				},
+				"description": "Create a new customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Details",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}"]
+				},
+				"description": "Retrieve detailed information about a specific customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Customer",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"phone\": \"+1234567890\",\n  \"status\": \"active\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}"]
+				},
+				"description": "Update an existing customer's information."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Customer Additional Info",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"company\": \"Updated Corp\",\n  \"notes\": \"Updated VIP customer\",\n  \"custom_field_1\": \"Custom value\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/additional-info",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "additional-info"]
+				},
+				"description": "Update customer's additional information."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Stats",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/get-stats/{{customer_id}}",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "get-stats", "{{customer_id}}"]
+				},
+				"description": "Get statistics for a specific customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Orders (Simple)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/order",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "order"]
+				},
+				"description": "Get customer orders in a simplified format."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Orders (Paginated)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/orders?page=1&per_page=10",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "orders"],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "10"
+						},
+						{
+							"key": "search",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "order_by",
+							"value": "id",
+							"disabled": true
+						},
+						{
+							"key": "order_type",
+							"value": "DESC",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Get paginated orders for a specific customer with filtering support."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customer Addresses",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/address",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "address"]
+				},
+				"description": "Get all addresses for a specific customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Customer Address",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": \"shipping\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"address_1\": \"789 New St\",\n  \"city\": \"Queens\",\n  \"state\": \"NY\",\n  \"postcode\": \"11301\",\n  \"country\": \"US\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/address",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "address"]
+				},
+				"description": "Create a new address for a customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Customer Address",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"address_id\": 1,\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"address_1\": \"123 Updated St\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"postcode\": \"10001\",\n  \"country\": \"US\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/address",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "address"]
+				},
+				"description": "Update customer's address information."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Customer Address",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"address_id\": 2\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/address",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "address"]
+				},
+				"description": "Delete a customer's address."
+			},
+			"response": []
+		},
+		{
+			"name": "Set Primary Address",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"address_id\": 2\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/address/make-primary",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "address", "make-primary"]
+				},
+				"description": "Set an address as the primary address for a customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Attachable Users",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/attachable-user",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "attachable-user"]
+				},
+				"description": "Get WordPress users that can be attached to customers."
+			},
+			"response": []
+		},
+		{
+			"name": "Attach User to Customer",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": 1\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/attachable-user",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "attachable-user"]
+				},
+				"description": "Attach a WordPress user to a customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Detach User from Customer",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}/detach-user",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "{{customer_id}}", "detach-user"]
+				},
+				"description": "Detach a WordPress user from a customer."
+			},
+			"response": []
+		},
+		{
+			"name": "Bulk Actions",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"password": "{{password}}",
+						"username": "{{username}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"action\": \"update_status\",\n  \"customer_ids\": [1, 2, 3],\n  \"data\": {\n    \"status\": \"inactive\"\n  }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/do-bulk-action",
+					"host": ["{{base_url}}"],
+					"path": ["wp-json", "fluent-cart", "v2", "customers", "do-bulk-action"]
+				},
+				"description": "Perform bulk actions on multiple customers. Available actions: update_status, delete, export."
+			},
+			"response": []
+		},
+		{
+			"name": "Address Info",
+			"item": [
+				{
+					"name": "Get Countries Options",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/address-info/countries",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "address-info", "countries"]
+						},
+						"description": "Retrieve a list of all available countries as options."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Country Info",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/address-info/get-country-info?country_code=US",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "address-info", "get-country-info"],
+							"query": [
+								{
+									"key": "country_code",
+									"value": "US"
+								},
+								{
+									"key": "timezone",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Retrieve detailed information about a specific country including states/provinces and address locale."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Labels",
+			"item": [
+				{
+					"name": "List Labels",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/labels/",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "labels", ""]
+						},
+						"description": "Retrieve all available labels."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Label",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"value\": \"New Customer\",\n  \"color\": \"#3366FF\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/labels/",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "labels", ""]
+						},
+						"description": "Create a new label."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Label Selections",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": {
+								"password": "{{password}}",
+								"username": "{{username}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bind_to_type\": \"Order\",\n  \"bind_to_id\": 123,\n  \"selectedLabels\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/wp-json/fluent-cart/v2/labels/update-selections",
+							"host": ["{{base_url}}"],
+							"path": ["wp-json", "fluent-cart", "v2", "labels", "update-selections"]
+						},
+						"description": "Update which labels are assigned to a specific entity (order, customer, etc.)."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "customer_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
+

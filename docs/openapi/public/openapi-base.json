@@ -1,0 +1,58 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://yoursite.com/wp-json/fluent-cart/v2",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost/wp-json/fluent-cart/v2",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "integer",
+                "description": "HTTP status code"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "wordpressAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "WordPress Application Password or Cookie authentication"
+      }
+    }
+  },
+  "security": [
+    {
+      "wordpressAuth": []
+    }
+  ]
+}
+

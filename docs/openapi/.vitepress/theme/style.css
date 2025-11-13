@@ -1,0 +1,127 @@
+/* Completely remove the aside from layout */
+.aside,
+.VPDocAside,
+.VPDoc .aside {
+  display: none !important;
+  width: 0 !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* Remove has-aside class effects */
+.VPDoc.has-aside .container {
+  display: block !important;
+}
+
+.VPDoc.has-aside .container > .content {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Remove max-width from content-container - target all variations */
+.VPDoc.has-aside .content-container,
+.VPDoc .content-container,
+.content-container{
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Make content full width by removing all max-width constraints */
+.VPDoc.has-aside .container,
+.VPDoc .container {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+}
+
+.VPDoc .content,
+.VPDoc.has-aside .content {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+}
+
+/* Remove max-width from the main content wrapper */
+.VPContent.has-sidebar .VPContent-main {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+}
+
+/* Target the actual content area */
+.VPDoc .container .content {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+}
+
+/* Ensure no padding/margin constraints */
+.VPDoc.has-aside {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Make sure the grid layout uses full width */
+.VPContent.has-sidebar {
+  grid-template-columns: var(--vp-sidebar-width) 1fr !important;
+}
+
+/* Target any nested containers that might limit width */
+.VPDoc .container > *:not(.aside) {
+  max-width: 100% !important;
+}
+
+/* Remove any default VitePress content width constraints */
+main.VPContent {
+  max-width: 100% !important;
+}
+
+/* Target vitepress-openapi component containers */
+.vitepress-openapi,
+.vitepress-openapi > *,
+[class*="openapi"],
+[class*="OpenAPI"] {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Ensure the OpenAPI operation component uses full width */
+.oa-operation,
+.oa-spec {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Fix any remaining width constraints */
+.VPDoc .container > .content-container {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Hide VitePress title since OAOperation will render it */
+.VPDoc h1:first-of-type {
+  display: none !important;
+}
+
+/* Hide VitePress description paragraph */
+.VPDoc .content > p:first-child {
+  display: none !important;
+}
+
+/* Ensure OAOperation component is full width at top */
+.VPDoc .content > :first-child {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Ensure full width for all content wrappers */
+.VPDoc.has-aside .container > .content-container > .content {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+

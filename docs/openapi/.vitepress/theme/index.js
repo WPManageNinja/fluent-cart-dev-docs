@@ -3,6 +3,27 @@ import { theme, useOpenapi } from 'vitepress-openapi/client'
 import 'vitepress-openapi/dist/style.css'
 import './style.css'
 
+// Playground instructions configuration - update these variables to change instruction text globally
+const PLAYGROUND_INSTRUCTIONS = {
+  title: '📡 Interactive API Playground',
+  description: 'This is a live API playground where you can test endpoints and see real-time responses.',
+  instructions: [
+    'Enter your WordPress website domain in the Server URL field below',
+    'Add your Application Password credentials in the Authorization field',
+    'Fill in any required parameters or request body data',
+    'Click "Try it out" to execute the API request',
+    'View the real-time response from your API below'
+  ],
+  warning: '⚠️ Important: Use test sites only. Requests make permanent changes. We do not collect or store any data.',
+  style: {
+    backgroundColor: 'var(--vp-c-bg-soft, #f6f6f7)',
+    borderColor: 'var(--vp-c-divider, #e5e7eb)',
+    textColor: 'var(--vp-c-text-1, #1f2937)',
+    titleColor: 'var(--vp-c-brand-1, #3b82f6)',
+    warningColor: 'var(--vp-c-yellow-1, #d97706)'
+  }
+}
+
 export default {
   extends: DefaultTheme,
   async enhanceApp({ app }) {
@@ -304,10 +325,11 @@ export default {
           }
         }
 
-        // If we found the Authorization section, add server URL input inside it
+        // If we found the Authorization section, add instructions and server URL input inside it
         if (authSection) {
+          const existingInstructions = authSection.querySelector('[data-playground-instructions]')
           const existingServerInput = authSection.querySelector('[data-server-url-input]')
-          if (existingServerInput) return // Already added
+          if (existingInstructions && existingServerInput) return // Already added
 
           // Find the content area inside the details element
           // Look for the div that contains the authorization content
@@ -317,6 +339,28 @@ export default {
             contentArea = document.createElement('div')
             authSection.appendChild(contentArea)
           }
+
+          // Create playground instructions HTML with integrated warning
+          const instructionItems = PLAYGROUND_INSTRUCTIONS.instructions.map(instruction => 
+            `<li style="margin-bottom: 8px; line-height: 1.6;">${instruction}</li>`
+          ).join('')
+          
+          const instructionsHtml = `
+            <div data-playground-instructions style="margin-bottom: 20px; padding: 16px; background: ${PLAYGROUND_INSTRUCTIONS.style.backgroundColor}; border: 1px solid ${PLAYGROUND_INSTRUCTIONS.style.borderColor}; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 0.95rem; color: ${PLAYGROUND_INSTRUCTIONS.style.titleColor}; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                ${PLAYGROUND_INSTRUCTIONS.title}
+              </div>
+              <p style="margin: 0 0 12px 0; color: ${PLAYGROUND_INSTRUCTIONS.style.textColor}; font-size: 0.875rem; line-height: 1.5;">
+                ${PLAYGROUND_INSTRUCTIONS.description}
+              </p>
+              <ol style="margin: 0 0 12px 20px; color: ${PLAYGROUND_INSTRUCTIONS.style.textColor}; font-size: 0.875rem; line-height: 1.6;">
+                ${instructionItems}
+              </ol>
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid ${PLAYGROUND_INSTRUCTIONS.style.borderColor}; color: ${PLAYGROUND_INSTRUCTIONS.style.warningColor}; font-size: 0.85rem; line-height: 1.5;">
+                ${PLAYGROUND_INSTRUCTIONS.warning}
+              </div>
+            </div>
+          `
 
           // Create server URL input HTML
           const serverUrlHtml = `
@@ -342,15 +386,21 @@ export default {
             </div>
           `
 
-          // Create a temporary container to parse the HTML
+          // Create temporary containers to parse the HTML
+          const tempInstructionsDiv = document.createElement('div')
+          tempInstructionsDiv.innerHTML = instructionsHtml
+          const instructionsElement = tempInstructionsDiv.firstElementChild
+
           const tempDiv = document.createElement('div')
           tempDiv.innerHTML = serverUrlHtml
           const serverUrlElement = tempDiv.firstElementChild
 
-          // Insert at the beginning of the content area
+          // Insert instructions first, then server URL input
           if (contentArea.firstChild) {
-            contentArea.insertBefore(serverUrlElement, contentArea.firstChild)
+            contentArea.insertBefore(instructionsElement, contentArea.firstChild)
+            contentArea.insertBefore(serverUrlElement, instructionsElement.nextSibling)
           } else {
+            contentArea.appendChild(instructionsElement)
             contentArea.appendChild(serverUrlElement)
           }
 

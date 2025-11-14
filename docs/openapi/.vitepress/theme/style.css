@@ -175,3 +175,30 @@ footer:has([class*="openapi"]) {
     font-size: 10px;
     border-radius: 4px;
 }
+
+/* Playground Instructions Box Styles */
+[data-playground-instructions] {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+[data-playground-instructions] ol {
+    list-style-type: decimal;
+}
+
+[data-playground-instructions] li::marker {
+    color: var(--vp-c-brand-1, #3b82f6);
+    font-weight: 600;
+}
+
+/* Playground Warning Box Styles */
+[data-playground-warning] {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-playground-warning] ul {
+    list-style-type: disc;
+}
+
+[data-playground-warning] li::marker {
+    color: var(--vp-c-yellow-1, #d97706);
+}

@@ -18,7 +18,12 @@ export default {
         '/orders/delete-order.json',
         '/orders/mark-as-paid.json',
         '/orders/refund-order.json',
-        '/orders/update-statuses.json'
+        '/orders/update-statuses.json',
+        '/products/list-products.json',
+        '/products/create-product.json',
+        '/products/get-product.json',
+        '/products/update-product-pricing.json',
+        '/products/delete-product.json'
       ]
       
       // Fetch all spec files

@@ -1,0 +1,7 @@
+---
+title: List Products
+description: "Retrieve a paginated list of products with optional filtering and searching."
+outline: false
+---
+<OAOperation operationId="listProducts" />
+

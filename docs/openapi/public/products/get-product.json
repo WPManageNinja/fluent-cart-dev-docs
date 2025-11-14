@@ -1,0 +1,330 @@
+{
+  "paths": {
+    "/products/{product}": {
+      "get": {
+        "operationId": "getProduct",
+        "summary": "GET Get Product Details",
+        "description": "Retrieve detailed information about a specific product.",
+        "tags": ["Products"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "product",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Product ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Product not found"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProductResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "product": {
+                "$ref": "#/components/schemas/ProductDetail"
+              }
+            }
+          }
+        }
+      },
+      "ProductDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Product detail ID",
+            "example": 33
+          },
+          "post_id": {
+            "type": "integer",
+            "description": "Product post ID",
+            "example": 7529108
+          },
+          "fulfillment_type": {
+            "type": "string",
+            "enum": ["digital", "physical"],
+            "description": "Fulfillment type",
+            "example": "digital"
+          },
+          "min_price": {
+            "type": "integer",
+            "description": "Minimum price in cents",
+            "example": 8900
+          },
+          "max_price": {
+            "type": "integer",
+            "description": "Maximum price in cents",
+            "example": 129900
+          },
+          "default_variation_id": {
+            "type": "string",
+            "description": "Default variation ID",
+            "example": "145"
+          },
+          "default_media": {
+            "type": "object",
+            "nullable": true,
+            "description": "Default media"
+          },
+          "manage_stock": {
+            "type": "string",
+            "description": "Whether stock is managed",
+            "example": "0"
+          },
+          "stock_availability": {
+            "type": "string",
+            "description": "Stock availability status",
+            "example": "in-stock"
+          },
+          "variation_type": {
+            "type": "string",
+            "enum": ["simple", "simple_variations"],
+            "description": "Variation type",
+            "example": "simple_variations"
+          },
+          "manage_downloadable": {
+            "type": "string",
+            "description": "Whether downloadable files are managed",
+            "example": "1"
+          },
+          "other_info": {
+            "type": "object",
+            "description": "Additional product information",
+            "properties": {
+              "group_pricing_by": {
+                "type": "string",
+                "example": "repeat_interval"
+              },
+              "use_pricing_table": {
+                "type": "string",
+                "example": "yes"
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2021-09-22T07:09:20+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-09-24T09:09:50+00:00"
+          },
+          "featured_media": {
+            "type": "object",
+            "nullable": true,
+            "description": "Featured media"
+          },
+          "gallery_image": {
+            "type": "object",
+            "nullable": true,
+            "description": "Gallery images"
+          },
+          "variations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductVariation"
+            },
+            "description": "Product variations"
+          }
+        }
+      },
+      "ProductVariation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Variation ID",
+            "example": 145
+          },
+          "post_id": {
+            "type": "integer",
+            "description": "Product post ID",
+            "example": 7529108
+          },
+          "serial_index": {
+            "type": "integer",
+            "description": "Serial index",
+            "example": 6
+          },
+          "sold_individually": {
+            "type": "integer",
+            "description": "Whether sold individually",
+            "example": 0
+          },
+          "variation_title": {
+            "type": "string",
+            "description": "Variation title",
+            "example": "Unlimited Sites Lifetime License"
+          },
+          "variation_identifier": {
+            "type": "string",
+            "description": "Variation identifier",
+            "example": "6"
+          },
+          "manage_stock": {
+            "type": "string",
+            "description": "Whether stock is managed",
+            "example": "0"
+          },
+          "payment_type": {
+            "type": "string",
+            "description": "Payment type",
+            "example": "onetime"
+          },
+          "stock_status": {
+            "type": "string",
+            "description": "Stock status",
+            "example": "in-stock"
+          },
+          "backorders": {
+            "type": "integer",
+            "description": "Backorders allowed",
+            "example": 0
+          },
+          "total_stock": {
+            "type": "integer",
+            "description": "Total stock",
+            "example": 0
+          },
+          "on_hold": {
+            "type": "integer",
+            "description": "Stock on hold",
+            "example": 0
+          },
+          "committed": {
+            "type": "integer",
+            "description": "Committed stock",
+            "example": 0
+          },
+          "available": {
+            "type": "integer",
+            "description": "Available stock",
+            "example": 0
+          },
+          "fulfillment_type": {
+            "type": "string",
+            "description": "Fulfillment type",
+            "example": "digital"
+          },
+          "item_status": {
+            "type": "string",
+            "description": "Item status",
+            "example": "active"
+          },
+          "manage_cost": {
+            "type": "string",
+            "description": "Whether cost is managed",
+            "example": "false"
+          },
+          "item_price": {
+            "type": "integer",
+            "description": "Item price in cents",
+            "example": 129900
+          },
+          "item_cost": {
+            "type": "integer",
+            "description": "Item cost in cents",
+            "example": 0
+          },
+          "compare_price": {
+            "type": "integer",
+            "description": "Compare price in cents",
+            "example": 0
+          },
+          "shipping_class": {
+            "type": "string",
+            "description": "Shipping class",
+            "example": "0"
+          },
+          "other_info": {
+            "type": "object",
+            "description": "Additional variation information"
+          },
+          "downloadable": {
+            "type": "string",
+            "description": "Whether downloadable",
+            "example": "1"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          },
+          "thumbnail": {
+            "type": "object",
+            "nullable": true,
+            "description": "Thumbnail image"
+          },
+          "formatted_total": {
+            "type": "string",
+            "description": "Formatted total price",
+            "example": "&#36;1,299.00"
+          },
+          "media": {
+            "type": "object",
+            "nullable": true,
+            "description": "Media"
+          }
+        }
+      }
+    }
+  }
+}
+

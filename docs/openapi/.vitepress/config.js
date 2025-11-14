@@ -39,6 +39,20 @@ export default defineConfig({
             ]
           }
         ]
+      },
+      {
+        text: 'Products',
+        items: [
+          {
+            items: [
+              { text: 'List Products (GET)', link: '/operations/products/list-products' },
+              { text: 'Create Product', link: '/operations/products/create-product' },
+              { text: 'Get Product', link: '/operations/products/get-product' },
+              { text: 'Update Product Pricing', link: '/operations/products/update-product-pricing' },
+              { text: 'Delete Product', link: '/operations/products/delete-product' }
+            ]
+          }
+        ]
       }
     ],
     

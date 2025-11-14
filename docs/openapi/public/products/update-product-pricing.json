@@ -1,0 +1,154 @@
+{
+  "paths": {
+    "/products/{postId}/pricing": {
+      "post": {
+        "operationId": "updateProductPricing",
+        "summary": "POST Update Product Pricing",
+        "description": "Update product pricing information.",
+        "tags": ["Products"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Product ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductPricingRequest"
+              },
+              "example": {
+                "price": 3000,
+                "sale_price": 2500,
+                "sku": "SP-001-UPDATED"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product pricing updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductPricingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateProductPricingRequest": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "integer",
+            "description": "Product price in cents",
+            "example": 3000
+          },
+          "sale_price": {
+            "type": "integer",
+            "description": "Sale price in cents",
+            "example": 2500
+          },
+          "sku": {
+            "type": "string",
+            "description": "Product SKU",
+            "example": "SP-001-UPDATED"
+          },
+          "detail": {
+            "type": "object",
+            "description": "Product detail updates",
+            "properties": {
+              "min_price": {
+                "type": "integer",
+                "description": "Minimum price in cents"
+              },
+              "max_price": {
+                "type": "integer",
+                "description": "Maximum price in cents"
+              }
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Variant ID"
+                },
+                "item_price": {
+                  "type": "integer",
+                  "description": "Variant price in cents"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ProductPricingResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "product": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "Product ID",
+                    "example": 1
+                  },
+                  "price": {
+                    "type": "integer",
+                    "description": "Product price in cents",
+                    "example": 3000
+                  },
+                  "sale_price": {
+                    "type": "integer",
+                    "description": "Sale price in cents",
+                    "example": 2500
+                  },
+                  "sku": {
+                    "type": "string",
+                    "description": "Product SKU",
+                    "example": "SP-001-UPDATED"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Last update timestamp",
+                    "example": "2024-01-01T11:00:00Z"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

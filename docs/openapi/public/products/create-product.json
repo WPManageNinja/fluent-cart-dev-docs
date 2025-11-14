@@ -1,0 +1,142 @@
+{
+  "paths": {
+    "/products": {
+      "post": {
+        "operationId": "createProduct",
+        "summary": "POST Create Product",
+        "description": "Create a new product.",
+        "tags": ["Products"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductRequest"
+              },
+              "example": {
+                "post_title": "Dynamic Product",
+                "post_status": "draft",
+                "detail": {
+                  "fulfillment_type": "digital"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateProductResponse"
+                },
+                "example": {
+                  "data": {
+                    "ID": 7529320,
+                    "product_details": null
+                  },
+                  "message": "Product has been created successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateProductRequest": {
+        "type": "object",
+        "required": ["post_title", "detail"],
+        "properties": {
+          "post_title": {
+            "type": "string",
+            "description": "Product title",
+            "example": "Dynamic Product"
+          },
+          "post_status": {
+            "type": "string",
+            "enum": ["draft", "publish", "private"],
+            "default": "draft",
+            "description": "Post status",
+            "example": "draft"
+          },
+          "post_content": {
+            "type": "string",
+            "description": "Product description/content",
+            "required": false
+          },
+          "post_excerpt": {
+            "type": "string",
+            "description": "Product excerpt",
+            "required": false
+          },
+          "detail": {
+            "$ref": "#/components/schemas/ProductDetailInput"
+          }
+        }
+      },
+      "ProductDetailInput": {
+        "type": "object",
+        "required": ["fulfillment_type"],
+        "properties": {
+          "fulfillment_type": {
+            "type": "string",
+            "enum": ["digital", "physical"],
+            "description": "Fulfillment type for the product",
+            "example": "digital"
+          },
+          "variation_type": {
+            "type": "string",
+            "enum": ["simple", "simple_variations"],
+            "description": "Variation type",
+            "required": false
+          },
+          "manage_stock": {
+            "type": "string",
+            "description": "Whether to manage stock",
+            "required": false
+          },
+          "stock_availability": {
+            "type": "string",
+            "description": "Stock availability status",
+            "required": false
+          }
+        }
+      },
+      "CreateProductResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "ID": {
+                "type": "integer",
+                "description": "Created product ID",
+                "example": 7529320
+              },
+              "product_details": {
+                "type": "object",
+                "nullable": true,
+                "description": "Product details (may be null initially)"
+              }
+            }
+          },
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Product has been created successfully"
+          }
+        }
+      }
+    }
+  }
+}
+

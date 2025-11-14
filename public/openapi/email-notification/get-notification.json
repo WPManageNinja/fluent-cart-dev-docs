@@ -1,0 +1,297 @@
+{
+  "paths": {
+    "/email-notification/get-settings": {
+      "get": {
+        "operationId": "getEmailNotification",
+        "summary": "GET Get Notification Settings",
+        "description": "Retrieve settings and available shortcodes for email notifications.",
+        "tags": [
+          "Email Notification"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Notification name/identifier",
+            "example": "order_paid_admin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "from_name": {
+                          "type": "string",
+                          "description": "Default from name",
+                          "example": "Hello"
+                        },
+                        "from_email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Default from email",
+                          "example": "hello@fluentcart.com"
+                        },
+                        "reply_to_name": {
+                          "type": "string",
+                          "description": "Reply-to name",
+                          "example": ""
+                        },
+                        "reply_to_email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Reply-to email",
+                          "example": ""
+                        },
+                        "email_footer": {
+                          "type": "string",
+                          "description": "Email footer text",
+                          "example": ""
+                        },
+                        "show_email_footer": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Whether to show email footer",
+                          "example": "yes"
+                        },
+                        "admin_email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Admin email address",
+                          "example": "hello@fluentcart.com"
+                        },
+                        "notification_config": {
+                          "type": "object",
+                          "description": "Notification-specific configurations",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "active": {
+                                "type": "string",
+                                "enum": [
+                                  "yes",
+                                  "no"
+                                ],
+                                "example": "no"
+                              },
+                              "subject": {
+                                "type": "string",
+                                "example": "Refund sent to {{order.customer.full_name}}"
+                              },
+                              "is_default_body": {
+                                "type": "string",
+                                "enum": [
+                                  "yes",
+                                  "no"
+                                ],
+                                "example": "yes"
+                              },
+                              "email_body": {
+                                "type": "string",
+                                "example": ""
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "shortcodes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ShortcodeGroup"
+                      },
+                      "description": "Available shortcode groups"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "from_name": "Hello",
+                    "from_email": "hello@fluentcart.com",
+                    "reply_to_name": "",
+                    "reply_to_email": "",
+                    "email_footer": "",
+                    "show_email_footer": "yes",
+                    "admin_email": "hello@fluentcart.com",
+                    "notification_config": {
+                      "order_refunded_admin": {
+                        "active": "no",
+                        "subject": "Refund sent to {{order.customer.full_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      }
+                    }
+                  },
+                  "shortcodes": [
+                    {
+                      "title": "General",
+                      "key": "wp",
+                      "shortcodes": {
+                        "{{wp.admin_email}}": "Admin Email",
+                        "{{wp.site_url}}": "Site URL",
+                        "{{wp.site_title}}": "Site Title",
+                        "{{user.ID}}": "User ID",
+                        "{{user.display_name}}": "User Display Name"
+                      }
+                    },
+                    {
+                      "title": "Settings",
+                      "key": "settings",
+                      "shortcodes": {
+                        "{{settings.store_name}}": "Store Name",
+                        "{{settings.store_logo}}": "Store Logo"
+                      },
+                      "group": "settings"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmailNotificationSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "from_name": {
+                "type": "string",
+                "description": "Default from name",
+                "example": "Hello"
+              },
+              "from_email": {
+                "type": "string",
+                "format": "email",
+                "description": "Default from email",
+                "example": "hello@fluentcart.com"
+              },
+              "reply_to_name": {
+                "type": "string",
+                "description": "Reply-to name",
+                "example": ""
+              },
+              "reply_to_email": {
+                "type": "string",
+                "format": "email",
+                "description": "Reply-to email",
+                "example": ""
+              },
+              "email_footer": {
+                "type": "string",
+                "description": "Email footer text",
+                "example": ""
+              },
+              "show_email_footer": {
+                "type": "string",
+                "enum": [
+                  "yes",
+                  "no"
+                ],
+                "description": "Whether to show email footer",
+                "example": "yes"
+              },
+              "admin_email": {
+                "type": "string",
+                "format": "email",
+                "description": "Admin email address",
+                "example": "hello@fluentcart.com"
+              },
+              "notification_config": {
+                "type": "object",
+                "description": "Notification-specific configurations",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "active": {
+                      "type": "string",
+                      "enum": [
+                        "yes",
+                        "no"
+                      ],
+                      "example": "no"
+                    },
+                    "subject": {
+                      "type": "string",
+                      "example": "Refund sent to {{order.customer.full_name}}"
+                    },
+                    "is_default_body": {
+                      "type": "string",
+                      "enum": [
+                        "yes",
+                        "no"
+                      ],
+                      "example": "yes"
+                    },
+                    "email_body": {
+                      "type": "string",
+                      "example": ""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "shortcodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShortcodeGroup"
+            },
+            "description": "Available shortcode groups"
+          }
+        }
+      },
+      "ShortcodeGroup": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Group title",
+            "example": "General"
+          },
+          "key": {
+            "type": "string",
+            "description": "Group key",
+            "example": "wp"
+          },
+          "shortcodes": {
+            "type": "object",
+            "description": "Shortcodes in this group, keyed by shortcode with description as value",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "group": {
+            "type": "string",
+            "nullable": true,
+            "description": "Group identifier",
+            "example": "settings"
+          }
+        }
+      }
+    }
+  }
+}

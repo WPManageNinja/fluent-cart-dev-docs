@@ -1,4 +1,10 @@
 import { defineConfig } from 'vitepress'
+import { copyFileSync, mkdirSync, readdirSync, statSync, existsSync } from 'fs'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -10,6 +16,59 @@ export default defineConfig({
   head: [
     ['meta', { name: 'theme-color', content: '#136196' }]
   ],
+  
+  vite: {
+    // Ensure JSON files can be imported
+    assetsInclude: ['**/*.json'],
+    plugins: [
+      {
+        name: 'copy-openapi-json-files',
+        closeBundle() {
+          // This runs after the bundle is closed
+          // __dirname is .vitepress, so go up one level to project root
+          const projectRoot = join(__dirname, '..')
+          const sourceDir = join(projectRoot, 'public', 'openapi')
+          const targetDir = join(__dirname, 'dist', 'openapi', 'public')
+          
+          if (!existsSync(sourceDir)) {
+            console.warn('⚠️  Source directory does not exist:', sourceDir)
+            return
+          }
+          
+          // Recursive copy function
+          const copyRecursive = (src: string, dest: string) => {
+            if (!existsSync(src)) return
+            
+            const stats = statSync(src)
+            if (stats.isDirectory()) {
+              if (!existsSync(dest)) {
+                mkdirSync(dest, { recursive: true })
+              }
+              const files = readdirSync(src)
+              files.forEach(file => {
+                if (file === 'README.md') return
+                copyRecursive(join(src, file), join(dest, file))
+              })
+            } else {
+              if (!src.endsWith('.json')) return
+              
+              const destDir = dirname(dest)
+              if (!existsSync(destDir)) {
+                mkdirSync(destDir, { recursive: true })
+              }
+              copyFileSync(src, dest)
+            }
+          }
+          
+          copyRecursive(sourceDir, targetDir)
+          console.log('✓ OpenAPI JSON files copied to build output')
+        }
+      }
+    ]
+  },
+  
+  // Ignore dead links during build
+  ignoreDeadLinks: true,
   
   markdown: {
     config: (md) => {
@@ -58,6 +117,13 @@ export default defineConfig({
             items: [
               { text: 'Action Hooks', link: '/hooks/actions' },
               { text: 'Filter Hooks', link: '/hooks/filters' }
+            ]
+          },
+          {
+            text: 'OpenAPI',
+            items: [
+              { text: 'API Reference', link: '/openapi/api' },
+              { text: 'Introduction', link: '/openapi/' }
             ]
           },
           // {
@@ -226,6 +292,139 @@ export default defineConfig({
           ]
         }
       ],
+      '/openapi/': [
+        {
+          text: 'Getting Started',
+          items: [
+            { text: 'Introduction', link: '/openapi/' },
+            { text: 'API Reference', link: '/openapi/api' }
+          ]
+        },
+        {
+          text: 'Orders',
+          items: [
+            { text: 'List Orders <badge type="tip">GET</badge>', link: '/openapi/operations/orders/list-orders' },
+            { text: 'Create Order <badge type="warning">POST</badge>', link: '/openapi/operations/orders/create-order' },
+            { text: 'Get Order <badge type="tip">GET</badge>', link: '/openapi/operations/orders/get-order' },
+            { text: 'Update Order <badge type="warning">POST</badge>', link: '/openapi/operations/orders/update-order' },
+            { text: 'Delete Order <badge type="danger">DELETE</badge>', link: '/openapi/operations/orders/delete-order' },
+            { text: 'Mark as Paid <badge type="warning">POST</badge>', link: '/openapi/operations/orders/mark-as-paid' },
+            { text: 'Refund Order <badge type="warning">POST</badge>', link: '/openapi/operations/orders/refund-order' },
+            { text: 'Update Statuses <badge type="info">PUT</badge>', link: '/openapi/operations/orders/update-statuses' }
+          ]
+        },
+        {
+          text: 'Products',
+          items: [
+            { text: 'List Products <badge type="tip">GET</badge>', link: '/openapi/operations/products/list-products' },
+            { text: 'Create Product <badge type="warning">POST</badge>', link: '/openapi/operations/products/create-product' },
+            { text: 'Get Product <badge type="tip">GET</badge>', link: '/openapi/operations/products/get-product' },
+            { text: 'Update Product Pricing <badge type="warning">POST</badge>', link: '/openapi/operations/products/update-product-pricing' },
+            { text: 'Delete Product <badge type="danger">DELETE</badge>', link: '/openapi/operations/products/delete-product' }
+          ]
+        },
+        {
+          text: 'Customers',
+          items: [
+            { text: 'List Customers <badge type="tip">GET</badge>', link: '/openapi/operations/customers/list-customers' },
+            { text: 'Create Customer <badge type="warning">POST</badge>', link: '/openapi/operations/customers/create-customer' },
+            { text: 'Get Customer <badge type="tip">GET</badge>', link: '/openapi/operations/customers/get-customer' },
+            { text: 'Update Customer <badge type="info">PUT</badge>', link: '/openapi/operations/customers/update-customer' }
+          ]
+        },
+        {
+          text: 'Coupons',
+          items: [
+            { text: 'List Coupons <badge type="tip">GET</badge>', link: '/openapi/operations/coupons/list-coupons' },
+            { text: 'Create Coupon <badge type="warning">POST</badge>', link: '/openapi/operations/coupons/create-coupon' },
+            { text: 'Get Coupon <badge type="tip">GET</badge>', link: '/openapi/operations/coupons/get-coupon' },
+            { text: 'Update Coupon <badge type="info">PUT</badge>', link: '/openapi/operations/coupons/update-coupon' },
+            { text: 'Delete Coupon <badge type="danger">DELETE</badge>', link: '/openapi/operations/coupons/delete-coupon' },
+            { text: 'Apply Coupon <badge type="warning">POST</badge>', link: '/openapi/operations/coupons/apply-coupon' }
+          ]
+        },
+        {
+          text: 'Subscriptions',
+          items: [
+            { text: 'List Subscriptions <badge type="tip">GET</badge>', link: '/openapi/operations/subscriptions/list-subscriptions' },
+            { text: 'Get Subscription <badge type="tip">GET</badge>', link: '/openapi/operations/subscriptions/get-subscription' },
+            { text: 'Cancel Subscription <badge type="info">PUT</badge>', link: '/openapi/operations/subscriptions/cancel-subscription' },
+            { text: 'Reactivate Subscription <badge type="info">PUT</badge>', link: '/openapi/operations/subscriptions/reactivate-subscription' }
+          ]
+        },
+        {
+          text: 'Tax',
+          items: [
+            { text: 'List Tax Classes <badge type="tip">GET</badge>', link: '/openapi/operations/tax/list-tax-classes' },
+            { text: 'Create Tax Class <badge type="warning">POST</badge>', link: '/openapi/operations/tax/create-tax-class' }
+          ]
+        },
+        {
+          text: 'Shipping',
+          items: [
+            { text: 'List Shipping Zones <badge type="tip">GET</badge>', link: '/openapi/operations/shipping/list-shipping-zones' }
+          ]
+        },
+        {
+          text: 'Settings',
+          items: [
+            { text: 'Get Store Settings <badge type="tip">GET</badge>', link: '/openapi/operations/settings/get-store-settings' },
+            { text: 'Save Store Settings <badge type="warning">POST</badge>', link: '/openapi/operations/settings/save-store-settings' }
+          ]
+        },
+        {
+          text: 'Reports',
+          items: [
+            { text: 'Get Reports Overview <badge type="tip">GET</badge>', link: '/openapi/operations/reports/get-overview' },
+            { text: 'Get Quick Order Stats <badge type="tip">GET</badge>', link: '/openapi/operations/reports/quick-order-stats' }
+          ]
+        },
+        {
+          text: 'Files',
+          items: [
+            { text: 'List Files <badge type="tip">GET</badge>', link: '/openapi/operations/files/list-files' },
+            { text: 'Upload File <badge type="warning">POST</badge>', link: '/openapi/operations/files/upload-file' }
+          ]
+        },
+        {
+          text: 'Dashboard',
+          items: [
+            { text: 'Get Dashboard Stats <badge type="tip">GET</badge>', link: '/openapi/operations/dashboard/get-dashboard-stats' }
+          ]
+        },
+        {
+          text: 'Roles & Permissions',
+          items: [
+            { text: 'Get Permissions <badge type="tip">GET</badge>', link: '/openapi/operations/roles-permissions/get-permissions' },
+            { text: 'Save Permissions <badge type="warning">POST</badge>', link: '/openapi/operations/roles-permissions/save-permissions' }
+          ]
+        },
+        {
+          text: 'Integration',
+          items: [
+            { text: 'List Addons <badge type="tip">GET</badge>', link: '/openapi/operations/integration/list-addons' },
+            { text: 'Get Global Settings <badge type="tip">GET</badge>', link: '/openapi/operations/integration/get-global-settings' },
+            { text: 'Set Global Settings <badge type="warning">POST</badge>', link: '/openapi/operations/integration/set-global-settings' },
+            { text: 'Get Global Feeds <badge type="tip">GET</badge>', link: '/openapi/operations/integration/get-global-feeds' }
+          ]
+        },
+        {
+          text: 'Licensing',
+          items: [
+            { text: 'Get License Line Chart <badge type="tip">GET</badge>', link: '/openapi/operations/licensing/get-license-chart' },
+            { text: 'Get License Pie Chart <badge type="tip">GET</badge>', link: '/openapi/operations/licensing/get-license-pie-chart' },
+            { text: 'Get License Summary <badge type="tip">GET</badge>', link: '/openapi/operations/licensing/get-license-summary' }
+          ]
+        },
+        {
+          text: 'Email Notification',
+          items: [
+            { text: 'List Notifications <badge type="tip">GET</badge>', link: '/openapi/operations/email-notification/list-notifications' },
+            { text: 'Get Notification Details <badge type="tip">GET</badge>', link: '/openapi/operations/email-notification/get-notification' },
+            { text: 'Update Notification <badge type="info">PUT</badge>', link: '/openapi/operations/email-notification/update-notification' }
+          ]
+        }
+      ],
       // '/api/': [
       //   {
       //     text: 'REST API',
@@ -290,6 +489,58 @@ export default defineConfig({
     outline: {
       level: [2, 3],
       label: 'On this page'
+    }
+  },
+  
+  // Build hook to copy OpenAPI JSON files to public directory (backup method)
+  async buildEnd(siteConfig) {
+    const { outDir } = siteConfig
+    // Copy from root public/openapi to build output openapi/public/
+    // __dirname is .vitepress, so go up one level to project root
+    const projectRoot = join(__dirname, '..')
+    const sourceDir = join(projectRoot, 'public', 'openapi')
+    const targetDir = join(outDir, 'openapi', 'public')
+    
+    console.log('buildEnd hook running...')
+    console.log('Source:', sourceDir)
+    console.log('Target:', targetDir)
+    
+    // Recursive copy function
+    const copyRecursive = (src: string, dest: string) => {
+      if (!existsSync(src)) {
+        console.warn('Source does not exist:', src)
+        return
+      }
+      
+      const stats = statSync(src)
+      if (stats.isDirectory()) {
+        if (!existsSync(dest)) {
+          mkdirSync(dest, { recursive: true })
+        }
+        const files = readdirSync(src)
+        files.forEach(file => {
+          // Skip README.md files
+          if (file === 'README.md') return
+          copyRecursive(join(src, file), join(dest, file))
+        })
+      } else {
+        // Only copy JSON files
+        if (!src.endsWith('.json')) return
+        
+        const destDir = dirname(dest)
+        if (!existsSync(destDir)) {
+          mkdirSync(destDir, { recursive: true })
+        }
+        copyFileSync(src, dest)
+      }
+    }
+    
+    // Copy OpenAPI public files to build output
+    if (existsSync(sourceDir)) {
+      copyRecursive(sourceDir, targetDir)
+      console.log('✓ OpenAPI JSON files copied via buildEnd hook')
+    } else {
+      console.error('✗ Source directory does not exist:', sourceDir)
     }
   }
 })

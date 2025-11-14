@@ -1,0 +1,434 @@
+{
+  "paths": {
+    "/customers": {
+      "get": {
+        "operationId": "listCustomers",
+        "summary": "GET List Customers",
+        "description": "Retrieve a paginated list of customers with optional filtering and searching.",
+        "tags": [
+          "Customers"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "Page number",
+            "example": 1
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Items per page (max 100)",
+            "example": 10
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query",
+            "required": false
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "json"
+            },
+            "description": "Filter options as JSON string",
+            "required": false
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "id"
+            },
+            "description": "Sort field",
+            "example": "id"
+          },
+          {
+            "name": "order_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "default": "DESC"
+            },
+            "description": "Sort direction",
+            "example": "DESC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns a paginated list of customers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customers": {
+                      "$ref": "#/components/schemas/CustomerPagination"
+                    }
+                  }
+                },
+                "example": {
+                  "customers": {
+                    "current_page": 1,
+                    "data": [
+                      {
+                        "id": 63212,
+                        "user_id": null,
+                        "contact_id": "0",
+                        "email": "newcustomer@example.com",
+                        "first_name": "Jane",
+                        "last_name": "Sina",
+                        "status": "active",
+                        "purchase_value": [],
+                        "purchase_count": "0",
+                        "ltv": "0",
+                        "first_purchase_date": null,
+                        "last_purchase_date": null,
+                        "aov": null,
+                        "notes": "",
+                        "uuid": "886b646789e0479b175c05ccebfa9b81",
+                        "country": null,
+                        "city": null,
+                        "state": null,
+                        "postcode": null,
+                        "created_at": "2025-11-13T06:57:28+00:00",
+                        "updated_at": "2025-11-13T06:57:28+00:00",
+                        "full_name": "Jane Sina",
+                        "photo": "https://secure.gravatar.com/avatar/...",
+                        "country_name": "",
+                        "formatted_address": {
+                          "country": "",
+                          "state": null,
+                          "city": null,
+                          "postcode": null,
+                          "first_name": "Jane",
+                          "last_name": "Sina",
+                          "full_name": "Jane Sina"
+                        },
+                        "user_link": ""
+                      }
+                    ],
+                    "first_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/customers/?page=1",
+                    "from": 1,
+                    "last_page": 25861,
+                    "last_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/customers/?page=25861",
+                    "links": [],
+                    "next_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/customers/?page=2",
+                    "path": "https://YourWebsite.com/wp-json/fluent-cart/v2/customers",
+                    "per_page": 2,
+                    "prev_page_url": null,
+                    "to": 2,
+                    "total": 51722
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CustomerListResponse": {
+        "type": "object",
+        "properties": {
+          "customers": {
+            "$ref": "#/components/schemas/CustomerPagination"
+          }
+        }
+      },
+      "CustomerPagination": {
+        "type": "object",
+        "description": "Laravel pagination format",
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "description": "Current page number",
+            "example": 1
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Customer"
+            }
+          },
+          "first_page_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to first page"
+          },
+          "from": {
+            "type": "integer",
+            "description": "Starting record number"
+          },
+          "last_page": {
+            "type": "integer",
+            "description": "Last page number"
+          },
+          "last_page_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to last page"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaginationLink"
+            }
+          },
+          "next_page_url": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "description": "URL to next page"
+          },
+          "path": {
+            "type": "string",
+            "format": "uri",
+            "description": "Base path"
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Items per page"
+          },
+          "prev_page_url": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "description": "URL to previous page"
+          },
+          "to": {
+            "type": "integer",
+            "description": "Ending record number"
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total number of records"
+          }
+        }
+      },
+      "PaginationLink": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true,
+            "description": "Link URL"
+          },
+          "label": {
+            "type": "string",
+            "description": "Link label"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether this is the active page"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "example": 63212
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "WordPress user ID",
+            "example": null
+          },
+          "contact_id": {
+            "type": "string",
+            "description": "Contact ID",
+            "example": "0"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Customer email address",
+            "example": "newcustomer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Customer first name",
+            "example": "Jane"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Customer last name",
+            "example": "Sina"
+          },
+          "full_name": {
+            "type": "string",
+            "description": "Customer full name",
+            "example": "Jane Sina"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Customer status",
+            "example": "active"
+          },
+          "purchase_value": {
+            "type": "array",
+            "nullable": true,
+            "description": "Purchase value array",
+            "example": []
+          },
+          "purchase_count": {
+            "type": "string",
+            "description": "Number of purchases",
+            "example": "0"
+          },
+          "ltv": {
+            "type": "string",
+            "description": "Lifetime value",
+            "example": "0"
+          },
+          "first_purchase_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "First purchase date",
+            "example": null
+          },
+          "last_purchase_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last purchase date",
+            "example": null
+          },
+          "aov": {
+            "type": "string",
+            "nullable": true,
+            "description": "Average order value",
+            "example": null
+          },
+          "notes": {
+            "type": "string",
+            "description": "Customer notes",
+            "example": ""
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Customer UUID",
+            "example": "886b646789e0479b175c05ccebfa9b81"
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "description": "Country code",
+            "example": null
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "description": "City",
+            "example": null
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "description": "State",
+            "example": null
+          },
+          "postcode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Postal code",
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2025-11-13T06:57:28+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-11-13T06:57:28+00:00"
+          },
+          "photo": {
+            "type": "string",
+            "format": "uri",
+            "description": "Customer photo URL (Gravatar)",
+            "example": "https://secure.gravatar.com/avatar/..."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Country name",
+            "example": ""
+          },
+          "formatted_address": {
+            "type": "object",
+            "description": "Formatted address object",
+            "properties": {
+              "country": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string",
+                "nullable": true
+              },
+              "city": {
+                "type": "string",
+                "nullable": true
+              },
+              "postcode": {
+                "type": "string",
+                "nullable": true
+              },
+              "first_name": {
+                "type": "string"
+              },
+              "last_name": {
+                "type": "string"
+              },
+              "full_name": {
+                "type": "string"
+              }
+            }
+          },
+          "user_link": {
+            "type": "string",
+            "format": "uri",
+            "description": "Link to WordPress user edit page",
+            "example": ""
+          }
+        }
+      }
+    }
+  }
+}

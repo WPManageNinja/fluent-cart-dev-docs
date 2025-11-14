@@ -1,0 +1,134 @@
+{
+  "paths": {
+    "/settings/permissions": {
+      "get": {
+        "operationId": "getPermissions",
+        "summary": "GET Get Permissions",
+        "description": "Retrieve a list of available WordPress roles and the currently configured capability permissions.",
+        "tags": [
+          "Roles & Permissions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roles": {
+                      "type": "object",
+                      "properties": {
+                        "capability": {
+                          "type": "boolean",
+                          "description": "Whether capability is enabled",
+                          "example": false
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/WordPressRole"
+                          },
+                          "description": "Array of available WordPress roles (excluding administrator and subscriber)"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "roles": {
+                    "capability": false,
+                    "roles": [
+                      {
+                        "name": "Editor",
+                        "key": "editor"
+                      },
+                      {
+                        "name": "Author",
+                        "key": "author"
+                      },
+                      {
+                        "name": "Contributor",
+                        "key": "contributor"
+                      },
+                      {
+                        "name": "Translator",
+                        "key": "translator"
+                      },
+                      {
+                        "name": "LMS Manager",
+                        "key": "lms_manager"
+                      },
+                      {
+                        "name": "Instructor",
+                        "key": "instructor"
+                      },
+                      {
+                        "name": "Instructor's Assistant",
+                        "key": "instructors_assistant"
+                      },
+                      {
+                        "name": "Student",
+                        "key": "student"
+                      },
+                      {
+                        "name": "Group Leader",
+                        "key": "group_leader"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PermissionsResponse": {
+        "type": "object",
+        "properties": {
+          "roles": {
+            "type": "object",
+            "properties": {
+              "capability": {
+                "type": "boolean",
+                "description": "Whether capability is enabled",
+                "example": false
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WordPressRole"
+                },
+                "description": "Array of available WordPress roles (excluding administrator and subscriber)"
+              }
+            }
+          }
+        }
+      },
+      "WordPressRole": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name of the role",
+            "example": "Editor"
+          },
+          "key": {
+            "type": "string",
+            "description": "WordPress role key/identifier",
+            "example": "editor"
+          }
+        }
+      }
+    }
+  }
+}

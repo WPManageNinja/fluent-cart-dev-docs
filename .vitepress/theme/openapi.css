@@ -1,7 +1,21 @@
-/* Completely remove the aside from layout */
-.aside,
-.VPDocAside,
-.VPDoc .aside {
+/* OpenAPI styles - only apply to OpenAPI pages */
+:root {
+  --openapi-page: false;
+}
+
+/* Scope all OpenAPI styles to pages with OpenAPI content */
+.VPDoc:has(.oa-operation),
+.VPDoc:has([class*="openapi"]),
+.VPDoc:has([class*="OpenAPI"]) {
+  --openapi-page: true;
+}
+
+/* Completely remove the aside from layout (only on OpenAPI pages) */
+.VPDoc:has(.oa-operation) .aside,
+.VPDoc:has(.oa-operation) .VPDocAside,
+.VPDoc:has(.oa-operation) .VPDoc .aside,
+.VPDoc:has([class*="openapi"]) .aside,
+.VPDoc:has([class*="OpenAPI"]) .aside {
   display: none !important;
   width: 0 !important;
   visibility: hidden !important;
@@ -9,8 +23,10 @@
   left: -9999px !important;
 }
 
-/* Remove has-aside class effects */
-.VPDoc.has-aside .container {
+/* Remove has-aside class effects (only on OpenAPI pages) */
+.VPDoc:has(.oa-operation).has-aside .container,
+.VPDoc:has([class*="openapi"]).has-aside .container,
+.VPDoc:has([class*="OpenAPI"]).has-aside .container {
   display: block !important;
 }
 
@@ -111,13 +127,17 @@ main.VPContent {
   width: 100% !important;
 }
 
-/* Hide VitePress title since OAOperation will render it */
-.VPDoc h1:first-of-type {
+/* Hide VitePress title since OAOperation will render it (only on OpenAPI pages) */
+.VPDoc:has(.oa-operation) h1:first-of-type,
+.VPDoc:has([class*="openapi"]) h1:first-of-type,
+.VPDoc:has([class*="OpenAPI"]) h1:first-of-type {
   display: none !important;
 }
 
-/* Hide VitePress description paragraph */
-.VPDoc .content > p:first-child {
+/* Hide VitePress description paragraph (only on OpenAPI pages) */
+.VPDoc:has(.oa-operation) .content > p:first-child,
+.VPDoc:has([class*="openapi"]) .content > p:first-child,
+.VPDoc:has([class*="OpenAPI"]) .content > p:first-child {
   display: none !important;
 }
 
@@ -146,8 +166,6 @@ footer:has([class*="openapi"]) {
   padding: 0 !important;
 }
 
-
-
 .VPSidebarItem badge[type="tip"] {
     background-color: rgb(22 101 52 / var(--tw-bg-opacity, 1));
     color: rgba(187 247 208, .4);
@@ -167,8 +185,6 @@ footer:has([class*="openapi"]) {
     background-color: rgb(133 77 14 / var(--tw-bg-opacity, 1));
     color: rgba(254 240 138, .4);
 }
-
-
 
 .VPSidebarItem badge{
     padding: 5px;
@@ -202,3 +218,4 @@ footer:has([class*="openapi"]) {
 [data-playground-warning] li::marker {
     color: var(--vp-c-yellow-1, #d97706);
 }
+

@@ -1,0 +1,53 @@
+{
+  "paths": {
+    "/orders/{order_id}": {
+      "delete": {
+        "operationId": "deleteOrder",
+        "summary": "DELETE Delete Order",
+        "description": "Delete an order.",
+        "tags": ["Orders"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": "Order deleted successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

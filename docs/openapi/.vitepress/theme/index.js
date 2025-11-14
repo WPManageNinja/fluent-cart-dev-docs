@@ -10,8 +10,15 @@ export default {
     try {
       // List of spec files to load and merge
       const specFiles = [
-        '/openapi-base.json',
-        '/orders.json'
+        '/fluentcart-base.json',
+        '/orders/list-orders.json',
+        '/orders/create-order.json',
+        '/orders/get-order.json',
+        '/orders/update-order.json',
+        '/orders/delete-order.json',
+        '/orders/mark-as-paid.json',
+        '/orders/refund-order.json',
+        '/orders/update-statuses.json'
       ]
       
       // Fetch all spec files
@@ -49,7 +56,14 @@ export default {
         // Merge paths and schemas from all specs
         validSpecs.forEach(spec => {
           if (spec.paths) {
-            Object.assign(mergedSpec.paths, spec.paths)
+            // Merge paths, combining HTTP methods for the same path
+            Object.keys(spec.paths).forEach(path => {
+              if (!mergedSpec.paths[path]) {
+                mergedSpec.paths[path] = {}
+              }
+              // Merge HTTP methods (get, post, put, delete, etc.)
+              Object.assign(mergedSpec.paths[path], spec.paths[path])
+            })
           }
           if (spec.components?.schemas) {
             Object.assign(mergedSpec.components.schemas, spec.components.schemas)
@@ -132,7 +146,8 @@ export default {
             const className = parent.className || ''
             
             // Check if this is the authorization section
-            if (text.includes('wordpressAuth') || 
+            if (text.includes('ApplicationPasswords') || 
+                text.includes('wordpressAuth') || 
                 text.includes('Authorization') || 
                 className.toLowerCase().includes('auth') ||
                 className.toLowerCase().includes('security')) {
@@ -165,11 +180,194 @@ export default {
         observer.observe(document.body, { childList: true, subtree: true })
       }
     }
+
+    // Add server URL input field to playground
+    if (typeof window !== 'undefined') {
+      const addServerUrlInput = () => {
+        // Find the playground container - look for common vitepress-openapi classes
+        const playgroundSelectors = [
+          '[class*="playground"]',
+          '[class*="Playground"]',
+          '[class*="oa-playground"]',
+          '.OAPlayground'
+        ]
+
+        let playgroundContainer = null
+        
+        // First try standard selectors
+        for (const selector of playgroundSelectors) {
+          try {
+            const elements = document.querySelectorAll(selector)
+            if (elements.length > 0) {
+              // Find the parent container that likely contains the playground
+              for (const el of elements) {
+                let parent = el.closest('[class*="operation"]') || 
+                            el.closest('[class*="Operation"]') ||
+                            el.closest('details')?.parentElement
+                if (parent) {
+                  playgroundContainer = parent
+                  break
+                }
+              }
+              if (playgroundContainer) break
+            }
+          } catch (e) {
+            // Skip invalid selectors
+            continue
+          }
+        }
+
+        // If not found, try finding by content (Authorization or Variables sections)
+        if (!playgroundContainer) {
+          const allDetails = document.querySelectorAll('details')
+          for (const details of allDetails) {
+            const summary = details.querySelector('summary')
+            if (summary) {
+              const text = summary.textContent || ''
+              if (text.includes('Authorization') || text.includes('Variables')) {
+                playgroundContainer = details.parentElement
+                break
+              }
+            }
+          }
+        }
+
+        // Find the Authorization section specifically
+        const allDetails = document.querySelectorAll('details')
+        let authSection = null
+        
+        for (const details of allDetails) {
+          const summary = details.querySelector('summary')
+          if (summary) {
+            const text = summary.textContent || ''
+            if (text.includes('Authorization')) {
+              authSection = details
+              break
+            }
+          }
+        }
+
+        // If we found the Authorization section, add server URL input inside it
+        if (authSection) {
+          const existingServerInput = authSection.querySelector('[data-server-url-input]')
+          if (existingServerInput) return // Already added
+
+          // Find the content area inside the details element
+          // Look for the div that contains the authorization content
+          let contentArea = authSection.querySelector('div')
+          if (!contentArea) {
+            // If no div found, create one
+            contentArea = document.createElement('div')
+            authSection.appendChild(contentArea)
+          }
+
+          // Create server URL input HTML
+          const serverUrlHtml = `
+            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--vp-c-divider, #ddd);">
+              <label style="display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; color: var(--vp-c-text-1, #000);">
+                Server URL
+              </label>
+              <div style="margin-bottom: 8px;">
+                <label style="display: block; margin-bottom: 4px; font-size: 0.85rem; color: var(--vp-c-text-2, #666);">
+                  Your WordPress website domain (without https://)
+                </label>
+                <input 
+                  type="text" 
+                  data-server-url-input
+                  placeholder="YourWebsite.com"
+                  value="YourWebsite.com"
+                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--vp-c-divider, #ddd); border-radius: 4px; background: var(--vp-c-bg, #fff); color: var(--vp-c-text-1, #000); font-size: 0.9rem;"
+                />
+              </div>
+              <div style="font-size: 0.85rem; color: var(--vp-c-text-2, #666);">
+                Full URL: <span data-server-url-display>https://YourWebsite.com/wp-json/fluent-cart/v2</span>
+              </div>
+            </div>
+          `
+
+          // Create a temporary container to parse the HTML
+          const tempDiv = document.createElement('div')
+          tempDiv.innerHTML = serverUrlHtml
+          const serverUrlElement = tempDiv.firstElementChild
+
+          // Insert at the beginning of the content area
+          if (contentArea.firstChild) {
+            contentArea.insertBefore(serverUrlElement, contentArea.firstChild)
+          } else {
+            contentArea.appendChild(serverUrlElement)
+          }
+
+          // Add event listener to update server URL
+          const input = serverUrlElement.querySelector('[data-server-url-input]')
+          const display = serverUrlElement.querySelector('[data-server-url-display]')
+          
+          if (input && display) {
+            const updateServerUrl = () => {
+              const website = input.value.trim() || 'YourWebsite.com'
+              const fullUrl = `https://${website}/wp-json/fluent-cart/v2`
+              display.textContent = fullUrl
+
+              // Update the OpenAPI spec server variable
+              // This will be handled by intercepting fetch and modifying the URL
+              window.__customServerUrl = fullUrl
+            }
+
+            input.addEventListener('input', updateServerUrl)
+            input.addEventListener('change', updateServerUrl)
+          }
+        }
+      }
+
+      // Try multiple times to catch dynamically loaded content
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', addServerUrlInput)
+      } else {
+        addServerUrlInput()
+      }
+
+      setTimeout(addServerUrlInput, 500)
+      setTimeout(addServerUrlInput, 1000)
+      setTimeout(addServerUrlInput, 2000)
+
+      // Watch for DOM changes
+      const serverObserver = new MutationObserver(() => {
+        addServerUrlInput()
+      })
+      if (document.body) {
+        serverObserver.observe(document.body, { childList: true, subtree: true })
+      }
+    }
     
     // Fix: Intercept fetch to add "Basic " prefix to Authorization header if missing
+    // Also update server URL if custom server URL is set
     if (typeof window !== 'undefined') {
       const originalFetch = window.fetch
       window.fetch = function(...args) {
+        // Update server URL if custom server URL is set
+        if (window.__customServerUrl && args[0] && typeof args[0] === 'string') {
+          // Check if this is an API request (contains /wp-json/fluent-cart/v2)
+          if (args[0].includes('/wp-json/fluent-cart/v2')) {
+            try {
+              // Extract the endpoint path (everything after /wp-json/fluent-cart/v2)
+              const match = args[0].match(/\/wp-json\/fluent-cart\/v2(\/[^?#]*)?(\?.*)?(#.*)?/)
+              if (match) {
+                // window.__customServerUrl already includes /wp-json/fluent-cart/v2
+                // So we just append the endpoint path and query string
+                const endpointPath = match[1] || ''
+                const queryString = match[2] || ''
+                args[0] = window.__customServerUrl + endpointPath + queryString
+              }
+            } catch (e) {
+              // If regex fails, try simple string replacement
+              const baseMatch = args[0].match(/https?:\/\/[^\/]+(\/wp-json\/fluent-cart\/v2.*)/)
+              if (baseMatch) {
+                const endpointPath = baseMatch[1].replace('/wp-json/fluent-cart/v2', '')
+                args[0] = window.__customServerUrl + endpointPath
+              }
+            }
+          }
+        }
+
         // Fix Authorization header if needed
         if (args[1] && args[1].headers) {
           const headers = args[1].headers

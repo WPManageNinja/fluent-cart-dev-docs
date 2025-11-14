@@ -28,14 +28,14 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Orders (GET)', link: '/operations/orders/list-orders' },
-              { text: 'Create Order', link: '/operations/orders/create-order' },
-              { text: 'Get Order', link: '/operations/orders/get-order' },
-              { text: 'Update Order', link: '/operations/orders/update-order' },
-              { text: 'Delete Order', link: '/operations/orders/delete-order' },
-              { text: 'Mark as Paid', link: '/operations/orders/mark-as-paid' },
-              { text: 'Refund Order', link: '/operations/orders/refund-order' },
-              { text: 'Update Statuses', link: '/operations/orders/update-statuses' }
+              { text: 'List Orders <badge type="tip">GET</badge>', link: '/operations/orders/list-orders' },
+              { text: 'Create Order <badge type="warning">POST</badge>', link: '/operations/orders/create-order' },
+              { text: 'Get Order <badge type="tip">GET</badge>', link: '/operations/orders/get-order' },
+              { text: 'Update Order <badge type="warning">POST</badge>', link: '/operations/orders/update-order' },
+              { text: 'Delete Order <badge type="danger">DELETE</badge>', link: '/operations/orders/delete-order' },
+              { text: 'Mark as Paid <badge type="warning">POST</badge>', link: '/operations/orders/mark-as-paid' },
+              { text: 'Refund Order <badge type="warning">POST</badge>', link: '/operations/orders/refund-order' },
+              { text: 'Update Statuses <badge type="info">PUT</badge>', link: '/operations/orders/update-statuses' }
             ]
           }
         ]
@@ -45,11 +45,11 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Products (GET)', link: '/operations/products/list-products' },
-              { text: 'Create Product', link: '/operations/products/create-product' },
-              { text: 'Get Product', link: '/operations/products/get-product' },
-              { text: 'Update Product Pricing', link: '/operations/products/update-product-pricing' },
-              { text: 'Delete Product', link: '/operations/products/delete-product' }
+              { text: 'List Products <badge type="tip">GET</badge>', link: '/operations/products/list-products' },
+              { text: 'Create Product <badge type="warning">POST</badge>', link: '/operations/products/create-product' },
+              { text: 'Get Product <badge type="tip">GET</badge>', link: '/operations/products/get-product' },
+              { text: 'Update Product Pricing <badge type="warning">POST</badge>', link: '/operations/products/update-product-pricing' },
+              { text: 'Delete Product <badge type="danger">DELETE</badge>', link: '/operations/products/delete-product' }
             ]
           }
         ]
@@ -59,10 +59,10 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Customers (GET)', link: '/operations/customers/list-customers' },
-              { text: 'Create Customer', link: '/operations/customers/create-customer' },
-              { text: 'Get Customer', link: '/operations/customers/get-customer' },
-              { text: 'Update Customer', link: '/operations/customers/update-customer' }
+              { text: 'List Customers <badge type="tip">GET</badge>', link: '/operations/customers/list-customers' },
+              { text: 'Create Customer <badge type="warning">POST</badge>', link: '/operations/customers/create-customer' },
+              { text: 'Get Customer <badge type="tip">GET</badge>', link: '/operations/customers/get-customer' },
+              { text: 'Update Customer <badge type="info">PUT</badge>', link: '/operations/customers/update-customer' }
             ]
           }
         ]
@@ -72,12 +72,12 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Coupons (GET)', link: '/operations/coupons/list-coupons' },
-              { text: 'Create Coupon', link: '/operations/coupons/create-coupon' },
-              { text: 'Get Coupon', link: '/operations/coupons/get-coupon' },
-              { text: 'Update Coupon', link: '/operations/coupons/update-coupon' },
-              { text: 'Delete Coupon', link: '/operations/coupons/delete-coupon' },
-              { text: 'Apply Coupon', link: '/operations/coupons/apply-coupon' }
+              { text: 'List Coupons <badge type="tip">GET</badge>', link: '/operations/coupons/list-coupons' },
+              { text: 'Create Coupon <badge type="warning">POST</badge>', link: '/operations/coupons/create-coupon' },
+              { text: 'Get Coupon <badge type="tip">GET</badge>', link: '/operations/coupons/get-coupon' },
+              { text: 'Update Coupon <badge type="info">PUT</badge>', link: '/operations/coupons/update-coupon' },
+              { text: 'Delete Coupon <badge type="danger">DELETE</badge>', link: '/operations/coupons/delete-coupon' },
+              { text: 'Apply Coupon <badge type="warning">POST</badge>', link: '/operations/coupons/apply-coupon' }
             ]
           }
         ]
@@ -87,10 +87,10 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Subscriptions (GET)', link: '/operations/subscriptions/list-subscriptions' },
-              { text: 'Get Subscription', link: '/operations/subscriptions/get-subscription' },
-              { text: 'Cancel Subscription', link: '/operations/subscriptions/cancel-subscription' },
-              { text: 'Reactivate Subscription', link: '/operations/subscriptions/reactivate-subscription' }
+              { text: 'List Subscriptions <badge type="tip">GET</badge>', link: '/operations/subscriptions/list-subscriptions' },
+              { text: 'Get Subscription <badge type="tip">GET</badge>', link: '/operations/subscriptions/get-subscription' },
+              { text: 'Cancel Subscription <badge type="info">PUT</badge>', link: '/operations/subscriptions/cancel-subscription' },
+              { text: 'Reactivate Subscription <badge type="info">PUT</badge>', link: '/operations/subscriptions/reactivate-subscription' }
             ]
           }
         ]
@@ -100,8 +100,8 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Tax Classes (GET)', link: '/operations/tax/list-tax-classes' },
-              { text: 'Create Tax Class', link: '/operations/tax/create-tax-class' }
+              { text: 'List Tax Classes <badge type="tip">GET</badge>', link: '/operations/tax/list-tax-classes' },
+              { text: 'Create Tax Class <badge type="warning">POST</badge>', link: '/operations/tax/create-tax-class' }
             ]
           }
         ]
@@ -111,7 +111,7 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Shipping Zones (GET)', link: '/operations/shipping/list-shipping-zones' }
+              { text: 'List Shipping Zones <badge type="tip">GET</badge>', link: '/operations/shipping/list-shipping-zones' }
             ]
           }
         ]
@@ -121,8 +121,8 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'Get Store Settings (GET)', link: '/operations/settings/get-store-settings' },
-              { text: 'Save Store Settings', link: '/operations/settings/save-store-settings' }
+              { text: 'Get Store Settings <badge type="tip">GET</badge>', link: '/operations/settings/get-store-settings' },
+              { text: 'Save Store Settings <badge type="warning">POST</badge>', link: '/operations/settings/save-store-settings' }
             ]
           }
         ]
@@ -132,8 +132,8 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'Get Reports Overview (GET)', link: '/operations/reports/get-overview' },
-              { text: 'Get Quick Order Stats (GET)', link: '/operations/reports/quick-order-stats' }
+              { text: 'Get Reports Overview <badge type="tip">GET</badge>', link: '/operations/reports/get-overview' },
+              { text: 'Get Quick Order Stats <badge type="tip">GET</badge>', link: '/operations/reports/quick-order-stats' }
             ]
           }
         ]
@@ -143,8 +143,8 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Files (GET)', link: '/operations/files/list-files' },
-              { text: 'Upload File', link: '/operations/files/upload-file' }
+              { text: 'List Files <badge type="tip">GET</badge>', link: '/operations/files/list-files' },
+              { text: 'Upload File <badge type="warning">POST</badge>', link: '/operations/files/upload-file' }
             ]
           }
         ]
@@ -154,7 +154,7 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'Get Dashboard Stats (GET)', link: '/operations/dashboard/get-dashboard-stats' }
+              { text: 'Get Dashboard Stats <badge type="tip">GET</badge>', link: '/operations/dashboard/get-dashboard-stats' }
             ]
           }
         ]
@@ -164,8 +164,8 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'Get Permissions (GET)', link: '/operations/roles-permissions/get-permissions' },
-              { text: 'Save Permissions', link: '/operations/roles-permissions/save-permissions' }
+              { text: 'Get Permissions <badge type="tip">GET</badge>', link: '/operations/roles-permissions/get-permissions' },
+              { text: 'Save Permissions <badge type="warning">POST</badge>', link: '/operations/roles-permissions/save-permissions' }
             ]
           }
         ]
@@ -175,10 +175,10 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Addons (GET)', link: '/operations/integration/list-addons' },
-              { text: 'Get Global Settings (GET)', link: '/operations/integration/get-global-settings' },
-              { text: 'Set Global Settings', link: '/operations/integration/set-global-settings' },
-              { text: 'Get Global Feeds (GET)', link: '/operations/integration/get-global-feeds' }
+              { text: 'List Addons <badge type="tip">GET</badge>', link: '/operations/integration/list-addons' },
+              { text: 'Get Global Settings <badge type="tip">GET</badge>', link: '/operations/integration/get-global-settings' },
+              { text: 'Set Global Settings <badge type="warning">POST</badge>', link: '/operations/integration/set-global-settings' },
+              { text: 'Get Global Feeds <badge type="tip">GET</badge>', link: '/operations/integration/get-global-feeds' }
             ]
           }
         ]
@@ -188,9 +188,9 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'Get License Line Chart (GET)', link: '/operations/licensing/get-license-chart' },
-              { text: 'Get License Pie Chart (GET)', link: '/operations/licensing/get-license-pie-chart' },
-              { text: 'Get License Summary (GET)', link: '/operations/licensing/get-license-summary' }
+              { text: 'Get License Line Chart <badge type="tip">GET</badge>', link: '/operations/licensing/get-license-chart' },
+              { text: 'Get License Pie Chart <badge type="tip">GET</badge>', link: '/operations/licensing/get-license-pie-chart' },
+              { text: 'Get License Summary <badge type="tip">GET</badge>', link: '/operations/licensing/get-license-summary' }
             ]
           }
         ]
@@ -200,9 +200,9 @@ export default defineConfig({
         items: [
           {
             items: [
-              { text: 'List Notifications (GET)', link: '/operations/email-notification/list-notifications' },
-              { text: 'Get Notification Details (GET)', link: '/operations/email-notification/get-notification' },
-              { text: 'Update Notification', link: '/operations/email-notification/update-notification' }
+              { text: 'List Notifications <badge type="tip">GET</badge>', link: '/operations/email-notification/list-notifications' },
+              { text: 'Get Notification Details <badge type="tip">GET</badge>', link: '/operations/email-notification/get-notification' },
+              { text: 'Update Notification <badge type="info">PUT</badge>', link: '/operations/email-notification/update-notification' }
             ]
           }
         ]

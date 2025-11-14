@@ -146,3 +146,32 @@ footer:has([class*="openapi"]) {
   padding: 0 !important;
 }
 
+
+
+.VPSidebarItem badge[type="tip"] {
+    background-color: rgb(22 101 52 / var(--tw-bg-opacity, 1));
+    color: rgb(187 247 208 / var(--tw-text-opacity, 1));
+}
+
+.VPSidebarItem badge[type="warning"] {
+    background-color: rgb(30 64 175 / var(--tw-bg-opacity, 1));
+    color: rgb(191 219 254 / var(--tw-text-opacity, 1));
+}
+
+.VPSidebarItem badge[type="danger"] {
+    background-color: rgb(153 27 27 / var(--tw-bg-opacity, 1));
+    color: rgb(254 202 202 / var(--tw-text-opacity, 1));
+}
+
+.VPSidebarItem badge[type="info"] {
+    background-color: rgb(133 77 14 / var(--tw-bg-opacity, 1));
+    color: rgb(254 240 138 / var(--tw-text-opacity, 1));
+}
+
+
+
+.VPSidebarItem badge{
+    padding: 5px;
+    font-size: 10px;
+    border-radius: 4px;
+}

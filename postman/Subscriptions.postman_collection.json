@@ -83,7 +83,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"reason\": \"Customer requested cancellation\",\n  \"cancel_immediately\": false\n}"
+					"raw": "{\n  \"cancel_reason\": \"Customer requested cancellation\"\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/subscriptions/{{subscription_id}}/cancel",

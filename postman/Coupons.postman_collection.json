@@ -83,7 +83,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"code\": \"SAVE20\",\n  \"name\": \"20% Off Discount\",\n  \"type\": \"percentage\",\n  \"value\": 20,\n  \"status\": \"active\",\n  \"usage_limit\": 50,\n  \"minimum_amount\": 1000,\n  \"maximum_amount\": 10000,\n  \"valid_from\": \"2024-01-01T00:00:00Z\",\n  \"valid_until\": \"2024-12-31T23:59:59Z\",\n  \"applicable_products\": [1, 2, 3],\n  \"applicable_categories\": [1, 2],\n  \"customer_restrictions\": {\n    \"new_customers_only\": true,\n    \"customer_ids\": [1, 2, 3]\n  }\n}"
+					"raw": "{\n  \"title\": \"20% Off Discount\",\n  \"code\": \"SAVE20\",\n  \"type\": \"percentage\",\n  \"amount\": \"20\",\n  \"status\": \"active\",\n  \"stackable\": \"no\",\n  \"show_on_checkout\": \"no\",\n  \"notes\": \"\",\n  \"priority\": \"5\",\n  \"conditions\": {\n    \"min_purchase_amount\": 0,\n    \"max_discount_amount\": 0,\n    \"max_purchase_amount\": 0,\n    \"apply_to_whole_cart\": \"yes\",\n    \"apply_to_quantity\": \"no\",\n    \"max_uses\": 0,\n    \"max_per_customer\": 0,\n    \"excluded_categories\": [],\n    \"included_categories\": [],\n    \"excluded_products\": [],\n    \"included_products\": [],\n    \"buy_quantity\": null,\n    \"get_quantity\": null\n  }\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons",
@@ -185,7 +185,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"coupon_code\": \"SAVE10\",\n  \"order_id\": 1,\n  \"cart_items\": [\n    {\n      \"product_id\": 1,\n      \"variation_id\": 1,\n      \"quantity\": 2,\n      \"price\": 2500\n    }\n  ],\n  \"customer_id\": 1\n}"
+					"raw": "{\n  \"coupon_code\": \"WINTER20\",\n  \"order_uuid\": null,\n  \"order_items\": [\n    {\n      \"id\": 1,\n      \"order_id\": 7536300,\n      \"post_id\": 7529088,\n      \"variation_id\": 59,\n      \"quantity\": 1,\n      \"unit_price\": 500,\n      \"item_price\": 500,\n      \"item_total\": 500,\n      \"line_total\": 500\n    }\n  ],\n  \"applied_coupons\": []\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/coupons/apply",

@@ -76,10 +76,10 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"enabled\": true,\n  \"default_provider\": \"mailchimp\"\n}"
-						},
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"integration_name\": \"webhook\",\n  \"integration\": \"{\\\"api_key\\\":\\\"your-api-key\\\",\\\"enabled\\\":true}\",\n  \"integration_id\": null\n}"
+				},
 						"url": {
 							"raw": "{{base_url}}/wp-json/fluent-cart/v2/integration/global-settings",
 							"host": ["{{base_url}}"],

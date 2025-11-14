@@ -68,7 +68,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"settings\": {\n    \"active\": true,\n    \"subject\": \"Order #{{order_id}}\",\n    \"content\": \"Thank you for your order...\",\n    \"from_name\": \"My Store\",\n    \"from_email\": \"store@example.com\"\n  }\n}"
+					"raw": "{\n  \"settings\": {\n    \"active\": \"yes\",\n    \"subject\": \"New Sales On {{settings.store_name}}\",\n    \"is_default_body\": \"yes\",\n    \"email_body\": \"\"\n  }\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/email-notification/{{notification_name}}",

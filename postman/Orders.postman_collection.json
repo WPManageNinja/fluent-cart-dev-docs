@@ -72,7 +72,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"customer_id\": 123,\n  \"items\": [\n    {\n      \"product_id\": 456,\n      \"variation_id\": 789,\n      \"quantity\": 2\n    }\n  ],\n  \"billing_address\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"address_1\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postcode\": \"10001\",\n    \"country\": \"US\"\n  },\n  \"shipping_address\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"address_1\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postcode\": \"10001\",\n    \"country\": \"US\"\n  },\n  \"payment_method\": \"stripe\",\n  \"note\": \"Special delivery instructions\"\n}"
+					"raw": "{\n  \"customer_id\": 63195,\n  \"order_items\": [\n    {\n      \"post_id\": 7529088,\n      \"object_id\": 59,\n      \"quantity\": 1,\n      \"unit_price\": 500,\n      \"item_price\": 500,\n      \"item_cost\": 0,\n      \"item_total\": 500,\n      \"line_total\": 500,\n      \"tax_amount\": 0,\n      \"discount_total\": 0,\n      \"shipping_charge\": 0,\n      \"title\": \"Orange\",\n      \"other_info\": {\n        \"payment_type\": \"onetime\"\n      }\n    }\n  ],\n  \"customer\": {\n    \"id\": 63195,\n    \"email\": \"customer@example.com\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"full_name\": \"John Doe\"\n  },\n  \"payment_method\": \"stripe\",\n  \"payment_status\": \"pending\",\n  \"currency\": \"USD\",\n  \"subtotal\": 500,\n  \"shipping_total\": 0,\n  \"tax_total\": 0,\n  \"total_amount\": 500,\n  \"note\": \"Test order\"\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders",
@@ -123,7 +123,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"status\": \"processing\",\n  \"note\": \"Updated order note\",\n  \"billing_address\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john@example.com\"\n  }\n}"
+					"raw": "{\n  \"order_items\": [\n    {\n      \"id\": 283870,\n      \"order_id\": 7536300,\n      \"post_id\": 7529088,\n      \"variation_id\": 59,\n      \"quantity\": 1,\n      \"unit_price\": 500,\n      \"item_price\": 500,\n      \"item_cost\": 0,\n      \"item_total\": 500,\n      \"line_total\": 500,\n      \"tax_amount\": 0,\n      \"discount_total\": 0,\n      \"shipping_charge\": 0,\n      \"title\": \"Orange\"\n    }\n  ],\n  \"status\": \"processing\",\n  \"note\": \"Updated order note\",\n  \"total_amount\": 500\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}",
@@ -174,7 +174,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"payment_method\": \"manual\",\n  \"transaction_id\": \"manual_123\",\n  \"note\": \"Manual payment confirmation\"\n}"
+					"raw": "{\n  \"payment_method\": \"manual\",\n  \"vendor_charge_id\": \"manual_123\",\n  \"transaction_type\": \"charge\",\n  \"mark_paid_note\": \"Manual payment confirmation\"\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/mark-as-paid",
@@ -204,7 +204,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"amount\": 2500,\n  \"reason\": \"Customer requested refund\",\n  \"refund_method\": \"original_payment_method\"\n}"
+					"raw": "{\n  \"refund_info\": {\n    \"transaction_id\": 129237,\n    \"amount\": 2500,\n    \"cancelSubscription\": \"false\"\n  }\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/refund",
@@ -234,7 +234,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"payment_status\": \"paid\",\n  \"shipping_status\": \"shipped\",\n  \"order_status\": \"processing\"\n}"
+					"raw": "{\n  \"statuses\": {\n    \"payment_status\": \"paid\",\n    \"shipping_status\": \"shipped\",\n    \"status\": \"processing\"\n  },\n  \"manage_stock\": true,\n  \"action\": \"update\"\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/orders/{{order_id}}/statuses",

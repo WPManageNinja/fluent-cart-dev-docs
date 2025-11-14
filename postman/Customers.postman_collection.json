@@ -72,7 +72,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"newcustomer@example.com\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"phone\": \"+1234567890\",\n  \"status\": \"active\",\n  \"additional_info\": {\n    \"company\": \"Example Corp\",\n    \"notes\": \"VIP customer\"\n  }\n}"
+					"raw": "{\n  \"email\": \"newcustomer@example.com\",\n  \"full_name\": \"Jane Smith\",\n  \"city\": \"New York\",\n  \"status\": \"active\",\n  \"country\": \"US\",\n  \"state\": \"NY\",\n  \"postcode\": \"10001\",\n  \"wp_user\": \"yes\"\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers",
@@ -123,7 +123,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"phone\": \"+1234567890\",\n  \"status\": \"active\"\n}"
+					"raw": "{\n  \"full_name\": \"John Doe\",\n  \"email\": \"customer@example.com\",\n  \"status\": \"active\",\n  \"city\": \"New York\",\n  \"country\": \"US\",\n  \"state\": \"NY\",\n  \"postcode\": \"10001\"\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/customers/{{customer_id}}",

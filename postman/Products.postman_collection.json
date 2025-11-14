@@ -133,7 +133,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"price\": 3000,\n  \"sale_price\": 2500,\n  \"sku\": \"SP-001-UPDATED\"\n}"
+					"raw": "{\n  \"detail\": {\n    \"fulfillment_type\": \"digital\"\n  },\n  \"variants\": [\n    {\n      \"id\": 1,\n      \"item_price\": 3000,\n      \"sale_price\": 2500,\n      \"sku\": \"SP-001-UPDATED\"\n    }\n  ]\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/wp-json/fluent-cart/v2/products/{{product_id}}/pricing",

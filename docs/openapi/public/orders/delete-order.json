@@ -28,7 +28,42 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeleteOrderResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Order 7536300 deleted successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "order_id": {
+                          "type": "integer",
+                          "description": "Deleted order ID",
+                          "example": 7536300
+                        },
+                        "invoice_no": {
+                          "type": "string",
+                          "description": "Invoice number",
+                          "example": "INV-163762"
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "Deletion status",
+                          "example": "success"
+                        }
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "description": "Array of error messages (empty on success)",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": []
+                    }
+                  }
                 },
                 "example": {
                   "message": "Order 7536300 deleted successfully",

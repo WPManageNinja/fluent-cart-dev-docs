@@ -5,7 +5,9 @@
         "operationId": "listEmailNotifications",
         "summary": "GET List Notifications",
         "description": "Retrieve all available email notifications.",
-        "tags": ["Email Notification"],
+        "tags": [
+          "Email Notification"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EmailNotificationsResponse"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Email notifications keyed by notification name",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/EmailNotification"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "data": {
@@ -129,7 +140,10 @@
             "properties": {
               "active": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Whether the notification is active",
                 "example": "yes"
               },
@@ -140,7 +154,10 @@
               },
               "is_default_body": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Whether using default email body",
                 "example": "yes"
               },

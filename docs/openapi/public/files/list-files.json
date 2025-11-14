@@ -5,7 +5,9 @@
         "operationId": "listFiles",
         "summary": "GET List Files",
         "description": "Retrieve a list of uploaded files.",
-        "tags": ["Files"],
+        "tags": [
+          "Files"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileListResponse"
+                  "type": "object",
+                  "properties": {
+                    "files": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/File"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "files": [

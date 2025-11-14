@@ -5,7 +5,9 @@
         "operationId": "updateEmailNotification",
         "summary": "PUT Update Notification",
         "description": "Update settings for a specific email notification.",
-        "tags": ["Email Notification"],
+        "tags": [
+          "Email Notification"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -28,7 +30,50 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateEmailNotificationRequest"
+                "type": "object",
+                "required": [
+                  "settings"
+                ],
+                "properties": {
+                  "settings": {
+                    "type": "object",
+                    "required": [
+                      "subject"
+                    ],
+                    "properties": {
+                      "active": {
+                        "type": "string",
+                        "enum": [
+                          "yes",
+                          "no"
+                        ],
+                        "description": "Whether the notification is active",
+                        "example": "yes"
+                      },
+                      "subject": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "description": "Email subject template (required, may contain smart codes)",
+                        "example": "New Sales On {{settings.store_name}}"
+                      },
+                      "is_default_body": {
+                        "type": "string",
+                        "enum": [
+                          "yes",
+                          "no"
+                        ],
+                        "description": "Whether using default email body",
+                        "example": "yes"
+                      },
+                      "email_body": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Custom email body (HTML allowed, required if is_default_body is 'no')",
+                        "example": ""
+                      }
+                    }
+                  }
+                }
               },
               "example": {
                 "settings": {
@@ -47,7 +92,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateEmailNotificationResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Notification updated successfully"
+                    }
+                  }
                 },
                 "example": {
                   "message": "Notification updated successfully"
@@ -60,7 +112,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Subject field is required."
+                    }
+                  }
                 },
                 "example": {
                   "message": "Subject field is required."
@@ -76,7 +135,9 @@
         "operationId": "saveEmailSettings",
         "summary": "POST Save Email Settings",
         "description": "Save global email notification settings (from name, from email, admin email, etc.).",
-        "tags": ["Email Notification"],
+        "tags": [
+          "Email Notification"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -87,7 +148,63 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SaveEmailSettingsRequest"
+                "type": "object",
+                "required": [
+                  "from_name",
+                  "from_email",
+                  "admin_email"
+                ],
+                "properties": {
+                  "from_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Default from name (required)",
+                    "example": "Hello"
+                  },
+                  "from_email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "description": "Default from email address (required)",
+                    "example": "hello@fluentcart.com"
+                  },
+                  "reply_to_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "nullable": true,
+                    "description": "Reply-to name",
+                    "example": ""
+                  },
+                  "reply_to_email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "nullable": true,
+                    "description": "Reply-to email address",
+                    "example": ""
+                  },
+                  "email_footer": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Email footer text (HTML allowed)",
+                    "example": ""
+                  },
+                  "show_email_footer": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "nullable": true,
+                    "description": "Whether to show email footer",
+                    "example": "yes"
+                  },
+                  "admin_email": {
+                    "type": "string",
+                    "description": "Admin email address (required)",
+                    "example": "hello@fluentcart.com"
+                  }
+                }
               },
               "example": {
                 "from_name": "Hello",
@@ -107,7 +224,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SaveEmailSettingsResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Email settings saved successfully"
+                    }
+                  }
                 },
                 "example": {
                   "message": "Email settings saved successfully"
@@ -120,7 +244,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Subject field is required."
+                    }
+                  }
                 },
                 "example": {
                   "message": "From Name field is required."
@@ -136,15 +267,22 @@
     "schemas": {
       "UpdateEmailNotificationRequest": {
         "type": "object",
-        "required": ["settings"],
+        "required": [
+          "settings"
+        ],
         "properties": {
           "settings": {
             "type": "object",
-            "required": ["subject"],
+            "required": [
+              "subject"
+            ],
             "properties": {
               "active": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Whether the notification is active",
                 "example": "yes"
               },
@@ -156,7 +294,10 @@
               },
               "is_default_body": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Whether using default email body",
                 "example": "yes"
               },
@@ -182,7 +323,11 @@
       },
       "SaveEmailSettingsRequest": {
         "type": "object",
-        "required": ["from_name", "from_email", "admin_email"],
+        "required": [
+          "from_name",
+          "from_email",
+          "admin_email"
+        ],
         "properties": {
           "from_name": {
             "type": "string",
@@ -220,7 +365,10 @@
           },
           "show_email_footer": {
             "type": "string",
-            "enum": ["yes", "no"],
+            "enum": [
+              "yes",
+              "no"
+            ],
             "nullable": true,
             "description": "Whether to show email footer",
             "example": "yes"

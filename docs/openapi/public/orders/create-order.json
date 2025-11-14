@@ -5,7 +5,9 @@
         "operationId": "createOrder",
         "summary": "POST Create Order",
         "description": "Create a new order with items and customer information. Note: Subscription orders are not supported via manual order creation.",
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -16,7 +18,474 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateOrderRequest"
+                "type": "object",
+                "required": [
+                  "customer_id",
+                  "order_items",
+                  "customer"
+                ],
+                "properties": {
+                  "customer_id": {
+                    "type": "integer",
+                    "description": "Customer ID (required)",
+                    "example": 63195
+                  },
+                  "order_items": {
+                    "type": "array",
+                    "description": "Array of order items (required)",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "post_id",
+                        "object_id",
+                        "quantity"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Order item ID (for updates)"
+                        },
+                        "order_id": {
+                          "type": "integer",
+                          "description": "Order ID (for updates)"
+                        },
+                        "post_id": {
+                          "type": "integer",
+                          "description": "Product post ID (required)",
+                          "example": 7529088
+                        },
+                        "variation_id": {
+                          "type": "integer",
+                          "description": "Variation ID (deprecated, use object_id)"
+                        },
+                        "object_id": {
+                          "type": "integer",
+                          "description": "Product variation ID (required)",
+                          "example": 59
+                        },
+                        "type": {
+                          "type": "string",
+                          "description": "Item type"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "description": "Quantity (required)",
+                          "example": 1
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 255,
+                          "description": "Item title"
+                        },
+                        "price": {
+                          "type": "number",
+                          "description": "Item price"
+                        },
+                        "unit_price": {
+                          "type": "number",
+                          "description": "Unit price",
+                          "example": 500
+                        },
+                        "item_price": {
+                          "type": "number",
+                          "description": "Item price",
+                          "example": 500
+                        },
+                        "item_cost": {
+                          "type": "number",
+                          "description": "Item cost",
+                          "example": 0
+                        },
+                        "item_total": {
+                          "type": "number",
+                          "description": "Item total",
+                          "example": 500
+                        },
+                        "line_total": {
+                          "type": "number",
+                          "description": "Line total",
+                          "example": 500
+                        },
+                        "tax_amount": {
+                          "type": "number",
+                          "description": "Tax amount",
+                          "example": 0
+                        },
+                        "discount_total": {
+                          "type": "number",
+                          "description": "Discount total",
+                          "example": 0
+                        },
+                        "shipping_charge": {
+                          "type": "number",
+                          "description": "Shipping charge",
+                          "example": 0
+                        },
+                        "total": {
+                          "type": "number",
+                          "description": "Total"
+                        },
+                        "cart_index": {
+                          "type": "integer",
+                          "description": "Cart index"
+                        },
+                        "rate": {
+                          "type": "number",
+                          "description": "Exchange rate"
+                        },
+                        "line_meta": {
+                          "type": "array",
+                          "description": "Line metadata"
+                        },
+                        "other_info": {
+                          "type": "object",
+                          "description": "Additional item information",
+                          "properties": {
+                            "payment_type": {
+                              "type": "string",
+                              "enum": [
+                                "onetime",
+                                "subscription"
+                              ],
+                              "example": "onetime"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "customer": {
+                    "type": "object",
+                    "description": "Customer information (required)",
+                    "required": [
+                      "id",
+                      "email",
+                      "first_name",
+                      "full_name"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Customer ID (required)",
+                        "example": 63195
+                      },
+                      "user_id": {
+                        "type": "integer",
+                        "description": "WordPress user ID"
+                      },
+                      "contact_id": {
+                        "type": "integer",
+                        "description": "Contact ID"
+                      },
+                      "email": {
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255,
+                        "description": "Customer email (required)",
+                        "example": "reachkamrul@gmail.com"
+                      },
+                      "first_name": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "description": "First name (required)",
+                        "example": "Robert"
+                      },
+                      "last_name": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "description": "Last name",
+                        "example": "Team"
+                      },
+                      "full_name": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "description": "Full name (required)",
+                        "example": "Robert Team"
+                      },
+                      "status": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "description": "Customer status"
+                      },
+                      "purchase_value": {
+                        "type": "number",
+                        "description": "Purchase value"
+                      },
+                      "purchase_count": {
+                        "type": "integer",
+                        "description": "Purchase count"
+                      },
+                      "country": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "description": "Country code"
+                      },
+                      "city": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "description": "City"
+                      },
+                      "state": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "description": "State"
+                      },
+                      "postcode": {
+                        "type": "string",
+                        "description": "Postal code"
+                      },
+                      "uuid": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "description": "Customer UUID"
+                      }
+                    }
+                  },
+                  "status": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "Order status",
+                    "example": "pending"
+                  },
+                  "invoice_no": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "Invoice number"
+                  },
+                  "fulfillment_type": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "enum": [
+                      "physical",
+                      "digital"
+                    ],
+                    "description": "Fulfillment type",
+                    "example": "physical"
+                  },
+                  "type": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "Order type"
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "Payment method",
+                    "example": "stripe"
+                  },
+                  "payment_method_title": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "Payment method title"
+                  },
+                  "payment_status": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "Payment status",
+                    "example": "pending"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "maxLength": 10,
+                    "description": "Currency code",
+                    "example": "USD"
+                  },
+                  "subtotal": {
+                    "type": "number",
+                    "description": "Subtotal in cents",
+                    "example": 500
+                  },
+                  "discount_tax": {
+                    "type": "number",
+                    "description": "Discount tax in cents"
+                  },
+                  "manual_discount_total": {
+                    "type": "number",
+                    "description": "Manual discount total in cents"
+                  },
+                  "coupon_discount_total": {
+                    "type": "number",
+                    "description": "Coupon discount total in cents"
+                  },
+                  "shipping_tax": {
+                    "type": "number",
+                    "description": "Shipping tax in cents"
+                  },
+                  "shipping_total": {
+                    "type": "number",
+                    "description": "Shipping total in cents",
+                    "example": 0
+                  },
+                  "tax_total": {
+                    "type": "number",
+                    "description": "Tax total in cents",
+                    "example": 0
+                  },
+                  "total_amount": {
+                    "type": "number",
+                    "description": "Total amount in cents",
+                    "example": 500
+                  },
+                  "rate": {
+                    "type": "number",
+                    "description": "Exchange rate",
+                    "example": 1.0
+                  },
+                  "note": {
+                    "type": "string",
+                    "maxLength": 5000,
+                    "description": "Order notes",
+                    "example": "Special delivery instructions"
+                  },
+                  "uuid": {
+                    "type": "string",
+                    "description": "Order UUID"
+                  },
+                  "ip_address": {
+                    "type": "string",
+                    "description": "Customer IP address"
+                  },
+                  "billing_address_id": {
+                    "type": "integer",
+                    "description": "Billing address ID"
+                  },
+                  "shipping_address_id": {
+                    "type": "integer",
+                    "description": "Shipping address ID"
+                  },
+                  "completed_at": {
+                    "type": "string",
+                    "description": "Completion timestamp"
+                  },
+                  "refunded_at": {
+                    "type": "string",
+                    "description": "Refund timestamp"
+                  },
+                  "discount": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Discount type"
+                      },
+                      "value": {
+                        "type": "number",
+                        "description": "Discount value"
+                      },
+                      "label": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "description": "Discount label"
+                      },
+                      "reason": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "description": "Discount reason"
+                      },
+                      "action": {
+                        "type": "string",
+                        "description": "Discount action"
+                      }
+                    }
+                  },
+                  "shipping": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Shipping type"
+                        },
+                        "rate_name": {
+                          "type": "string",
+                          "description": "Shipping rate name"
+                        },
+                        "custom_price": {
+                          "type": "number",
+                          "description": "Custom shipping price"
+                        }
+                      }
+                    }
+                  },
+                  "deletedItems": {
+                    "type": "array",
+                    "description": "Items to delete (for updates)"
+                  },
+                  "applied_coupon": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "coupon_id",
+                        "code",
+                        "discounted_amount",
+                        "stackable"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "order_id": {
+                          "type": "integer"
+                        },
+                        "coupon_id": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "code": {
+                          "type": "string",
+                          "maxLength": 100
+                        },
+                        "amount": {
+                          "type": "number"
+                        },
+                        "discounted_amount": {
+                          "type": "number"
+                        },
+                        "discount": {
+                          "type": "number"
+                        },
+                        "stackable": {
+                          "type": "integer"
+                        },
+                        "priority": {
+                          "type": "integer"
+                        },
+                        "max_uses": {
+                          "type": "integer"
+                        },
+                        "use_count": {
+                          "type": "integer"
+                        },
+                        "max_per_customer": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "min_purchase_amount": {
+                          "type": "number"
+                        },
+                        "max_discount_amount": {
+                          "type": "number"
+                        },
+                        "notes": {
+                          "type": "string",
+                          "maxLength": 100
+                        }
+                      }
+                    }
+                  },
+                  "trigger": {
+                    "type": "string",
+                    "description": "Trigger"
+                  },
+                  "user_tz": {
+                    "type": "string",
+                    "description": "User timezone"
+                  }
+                }
               },
               "example": {
                 "customer_id": 63195,
@@ -64,7 +533,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateOrderResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Order created successfully!"
+                    },
+                    "order_id": {
+                      "type": "integer",
+                      "description": "Created order ID",
+                      "example": 7536300
+                    }
+                  }
                 },
                 "example": {
                   "message": "Order created successfully!",
@@ -291,7 +772,11 @@
       },
       "CreateOrderRequest": {
         "type": "object",
-        "required": ["customer_id", "order_items", "customer"],
+        "required": [
+          "customer_id",
+          "order_items",
+          "customer"
+        ],
         "properties": {
           "customer_id": {
             "type": "integer",
@@ -304,7 +789,11 @@
             "minItems": 1,
             "items": {
               "type": "object",
-              "required": ["post_id", "object_id", "quantity"],
+              "required": [
+                "post_id",
+                "object_id",
+                "quantity"
+              ],
               "properties": {
                 "id": {
                   "type": "integer",
@@ -409,7 +898,10 @@
                   "properties": {
                     "payment_type": {
                       "type": "string",
-                      "enum": ["onetime", "subscription"],
+                      "enum": [
+                        "onetime",
+                        "subscription"
+                      ],
                       "example": "onetime"
                     }
                   }
@@ -420,7 +912,12 @@
           "customer": {
             "type": "object",
             "description": "Customer information (required)",
-            "required": ["id", "email", "first_name", "full_name"],
+            "required": [
+              "id",
+              "email",
+              "first_name",
+              "full_name"
+            ],
             "properties": {
               "id": {
                 "type": "integer",
@@ -513,7 +1010,10 @@
           "fulfillment_type": {
             "type": "string",
             "maxLength": 50,
-            "enum": ["physical", "digital"],
+            "enum": [
+              "physical",
+              "digital"
+            ],
             "description": "Fulfillment type",
             "example": "physical"
           },
@@ -671,7 +1171,12 @@
             "type": "array",
             "items": {
               "type": "object",
-              "required": ["coupon_id", "code", "discounted_amount", "stackable"],
+              "required": [
+                "coupon_id",
+                "code",
+                "discounted_amount",
+                "stackable"
+              ],
               "properties": {
                 "id": {
                   "type": "integer"
@@ -753,4 +1258,3 @@
     }
   }
 }
-

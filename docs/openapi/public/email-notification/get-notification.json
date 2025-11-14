@@ -5,7 +5,9 @@
         "operationId": "getEmailNotification",
         "summary": "GET Get Notification Settings",
         "description": "Retrieve settings and available shortcodes for email notifications.",
-        "tags": ["Email Notification"],
+        "tags": [
+          "Email Notification"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -29,7 +31,96 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EmailNotificationSettingsResponse"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "from_name": {
+                          "type": "string",
+                          "description": "Default from name",
+                          "example": "Hello"
+                        },
+                        "from_email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Default from email",
+                          "example": "hello@fluentcart.com"
+                        },
+                        "reply_to_name": {
+                          "type": "string",
+                          "description": "Reply-to name",
+                          "example": ""
+                        },
+                        "reply_to_email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Reply-to email",
+                          "example": ""
+                        },
+                        "email_footer": {
+                          "type": "string",
+                          "description": "Email footer text",
+                          "example": ""
+                        },
+                        "show_email_footer": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Whether to show email footer",
+                          "example": "yes"
+                        },
+                        "admin_email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Admin email address",
+                          "example": "hello@fluentcart.com"
+                        },
+                        "notification_config": {
+                          "type": "object",
+                          "description": "Notification-specific configurations",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "active": {
+                                "type": "string",
+                                "enum": [
+                                  "yes",
+                                  "no"
+                                ],
+                                "example": "no"
+                              },
+                              "subject": {
+                                "type": "string",
+                                "example": "Refund sent to {{order.customer.full_name}}"
+                              },
+                              "is_default_body": {
+                                "type": "string",
+                                "enum": [
+                                  "yes",
+                                  "no"
+                                ],
+                                "example": "yes"
+                              },
+                              "email_body": {
+                                "type": "string",
+                                "example": ""
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "shortcodes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ShortcodeGroup"
+                      },
+                      "description": "Available shortcode groups"
+                    }
+                  }
                 },
                 "example": {
                   "data": {
@@ -116,7 +207,10 @@
               },
               "show_email_footer": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Whether to show email footer",
                 "example": "yes"
               },
@@ -134,7 +228,10 @@
                   "properties": {
                     "active": {
                       "type": "string",
-                      "enum": ["yes", "no"],
+                      "enum": [
+                        "yes",
+                        "no"
+                      ],
                       "example": "no"
                     },
                     "subject": {
@@ -143,7 +240,10 @@
                     },
                     "is_default_body": {
                       "type": "string",
-                      "enum": ["yes", "no"],
+                      "enum": [
+                        "yes",
+                        "no"
+                      ],
                       "example": "yes"
                     },
                     "email_body": {

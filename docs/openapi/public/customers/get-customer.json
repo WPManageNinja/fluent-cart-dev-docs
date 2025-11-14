@@ -5,7 +5,9 @@
         "operationId": "getCustomer",
         "summary": "GET Get Customer Details",
         "description": "Retrieve detailed information about a specific customer.",
-        "tags": ["Customers"],
+        "tags": [
+          "Customers"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -51,7 +53,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CustomerDetailResponse"
+                  "type": "object",
+                  "properties": {
+                    "customer": {
+                      "$ref": "#/components/schemas/CustomerDetail"
+                    }
+                  }
                 },
                 "example": {
                   "customer": {
@@ -89,7 +96,7 @@
                       "last_name": "Team",
                       "full_name": "Robert Team"
                     },
-                    "user_link": "https://cart.junior.ninja/wp-admin/user-edit.php?user_id=5",
+                    "user_link": "https://YourWebsite.com/wp-admin/user-edit.php?user_id=5",
                     "labels": []
                   }
                 }
@@ -321,7 +328,7 @@
             "type": "string",
             "format": "uri",
             "description": "Link to WordPress user edit page",
-            "example": "https://cart.junior.ninja/wp-admin/user-edit.php?user_id=5"
+            "example": "https://YourWebsite.com/wp-admin/user-edit.php?user_id=5"
           }
         }
       },
@@ -348,4 +355,3 @@
     }
   }
 }
-

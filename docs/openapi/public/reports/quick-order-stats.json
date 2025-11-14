@@ -5,7 +5,9 @@
         "operationId": "getQuickOrderStats",
         "summary": "GET Get Quick Order Stats",
         "description": "Retrieve quick statistics about orders. Note: This endpoint may have issues in some installations.",
-        "tags": ["Reports"],
+        "tags": [
+          "Reports"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,11 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["-0 days", "this_month", "all_time"],
+              "enum": [
+                "-0 days",
+                "this_month",
+                "all_time"
+              ],
               "default": "-0 days"
             },
             "description": "Date range",
@@ -46,7 +52,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Class \"FluentCart\\App\\Modules\\ReportingModule\\Status\" not found"
+                    }
+                  }
                 },
                 "example": {
                   "message": "Class \"FluentCart\\App\\Modules\\ReportingModule\\Status\" not found"

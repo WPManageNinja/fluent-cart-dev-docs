@@ -5,7 +5,9 @@
         "operationId": "listCoupons",
         "summary": "GET List Coupons",
         "description": "Retrieve a paginated list of coupons with optional filtering and searching.",
-        "tags": ["Coupons"],
+        "tags": [
+          "Coupons"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -69,7 +71,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["ASC", "DESC"],
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
               "default": "DESC"
             },
             "description": "Sort direction",
@@ -82,7 +87,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CouponListResponse"
+                  "type": "object",
+                  "properties": {
+                    "coupons": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
                 },
                 "example": {
                   "coupons": {
@@ -121,12 +131,12 @@
                         "updated_at": "2025-10-22T06:24:52+00:00"
                       }
                     ],
-                    "first_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=1",
+                    "first_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=1",
                     "from": 1,
                     "last_page": 98,
-                    "last_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=98",
-                    "next_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=2",
-                    "path": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons",
+                    "last_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=98",
+                    "next_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=2",
+                    "path": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons",
                     "per_page": 2,
                     "prev_page_url": null,
                     "to": 2,
@@ -176,7 +186,12 @@
           },
           "type": {
             "type": "string",
-            "enum": ["fixed", "percentage", "free_shipping", "buy_x_get_y"],
+            "enum": [
+              "fixed",
+              "percentage",
+              "free_shipping",
+              "buy_x_get_y"
+            ],
             "description": "Coupon type",
             "example": "percentage"
           },
@@ -206,7 +221,10 @@
               },
               "apply_to_quantity": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Apply to quantity",
                 "example": "no"
               },
@@ -226,7 +244,10 @@
               },
               "apply_to_whole_cart": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Apply to whole cart",
                 "example": "yes"
               },
@@ -273,7 +294,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "expired", "disabled", "scheduled"],
+            "enum": [
+              "active",
+              "expired",
+              "disabled",
+              "scheduled"
+            ],
             "description": "Coupon status",
             "example": "active"
           },
@@ -284,13 +310,19 @@
           },
           "stackable": {
             "type": "string",
-            "enum": ["yes", "no"],
+            "enum": [
+              "yes",
+              "no"
+            ],
             "description": "Whether coupon is stackable",
             "example": "no"
           },
           "show_on_checkout": {
             "type": "string",
-            "enum": ["yes", "no"],
+            "enum": [
+              "yes",
+              "no"
+            ],
             "description": "Whether to show on checkout",
             "example": "no"
           },
@@ -337,7 +369,7 @@
           },
           "first_page_url": {
             "type": "string",
-            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=1"
+            "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=1"
           },
           "from": {
             "type": "integer",
@@ -349,16 +381,16 @@
           },
           "last_page_url": {
             "type": "string",
-            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=98"
+            "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=98"
           },
           "next_page_url": {
             "type": "string",
             "nullable": true,
-            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=2"
+            "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=2"
           },
           "path": {
             "type": "string",
-            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons"
+            "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons"
           },
           "per_page": {
             "type": "integer",

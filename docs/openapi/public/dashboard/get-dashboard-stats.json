@@ -5,7 +5,9 @@
         "operationId": "getDashboardStats",
         "summary": "GET Get Dashboard Stats",
         "description": "Retrieve dashboard statistics and widgets.",
-        "tags": ["Dashboard"],
+        "tags": [
+          "Dashboard"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DashboardStatsResponse"
+                  "type": "object",
+                  "properties": {
+                    "stats": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StatWidget"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "stats": [
@@ -25,26 +35,26 @@
                       "title": "Total Products",
                       "current_count": "54",
                       "icon": "Frame",
-                      "url": "https://cart.junior.ninja/wp-admin/admin.php?page=fluent-cart#/products/?active_view=all"
+                      "url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/products/?active_view=all"
                     },
                     {
                       "title": "Orders",
                       "current_count": "26",
                       "icon": "AllOrdersIcon",
-                      "url": "https://cart.junior.ninja/wp-admin/admin.php?page=fluent-cart#/orders"
+                      "url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/orders"
                     },
                     {
                       "title": "Revenue",
                       "current_count": "2340.5000",
                       "icon": "Currency",
-                      "url": "https://cart.junior.ninja/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
+                      "url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
                       "has_currency": true
                     },
                     {
                       "title": "Refund",
                       "current_count": "0.0000",
                       "icon": "Failed",
-                      "url": "https://cart.junior.ninja/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
+                      "url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
                       "has_currency": true
                     }
                   ]
@@ -91,7 +101,7 @@
             "type": "string",
             "format": "uri",
             "description": "URL to view details",
-            "example": "https://cart.junior.ninja/wp-admin/admin.php?page=fluent-cart#/products/?active_view=all"
+            "example": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/products/?active_view=all"
           },
           "has_currency": {
             "type": "boolean",

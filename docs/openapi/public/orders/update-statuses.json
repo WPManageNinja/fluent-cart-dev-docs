@@ -5,7 +5,9 @@
         "operationId": "updateOrderStatuses",
         "summary": "PUT Update Order Statuses",
         "description": "Update order statuses (payment status, shipping status, order status).",
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -79,7 +81,28 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateStatusesResponse"
+                  "type": "object",
+                  "description": "Response contains the updated order data",
+                  "properties": {
+                    "order": {
+                      "$ref": "#/components/schemas/Order"
+                    },
+                    "discount_meta": {
+                      "type": "string"
+                    },
+                    "shipping_meta": {
+                      "type": "string"
+                    },
+                    "order_settings": {
+                      "type": "array"
+                    },
+                    "selected_labels": {
+                      "type": "array"
+                    },
+                    "tax_id": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -272,4 +295,3 @@
     }
   }
 }
-

@@ -5,7 +5,9 @@
         "operationId": "getCoupon",
         "summary": "GET Get Coupon Details",
         "description": "Retrieve detailed information about a specific coupon including activities.",
-        "tags": ["Coupons"],
+        "tags": [
+          "Coupons"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -28,7 +30,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CouponDetailResponse"
+                  "type": "object",
+                  "properties": {
+                    "coupon": {
+                      "$ref": "#/components/schemas/CouponDetail"
+                    }
+                  }
                 },
                 "example": {
                   "coupon": {
@@ -147,7 +154,12 @@
           },
           "type": {
             "type": "string",
-            "enum": ["fixed", "percentage", "free_shipping", "buy_x_get_y"],
+            "enum": [
+              "fixed",
+              "percentage",
+              "free_shipping",
+              "buy_x_get_y"
+            ],
             "description": "Coupon type",
             "example": "percentage"
           },
@@ -177,7 +189,10 @@
               },
               "apply_to_quantity": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Apply to quantity",
                 "example": "no"
               },
@@ -197,7 +212,10 @@
               },
               "apply_to_whole_cart": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "description": "Apply to whole cart",
                 "example": "yes"
               },
@@ -244,7 +262,12 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "expired", "disabled", "scheduled"],
+            "enum": [
+              "active",
+              "expired",
+              "disabled",
+              "scheduled"
+            ],
             "description": "Coupon status",
             "example": "active"
           },
@@ -255,13 +278,19 @@
           },
           "stackable": {
             "type": "string",
-            "enum": ["yes", "no"],
+            "enum": [
+              "yes",
+              "no"
+            ],
             "description": "Whether coupon is stackable",
             "example": "no"
           },
           "show_on_checkout": {
             "type": "string",
-            "enum": ["yes", "no"],
+            "enum": [
+              "yes",
+              "no"
+            ],
             "description": "Whether to show on checkout",
             "example": "no"
           },

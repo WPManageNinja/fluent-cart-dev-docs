@@ -5,7 +5,9 @@
         "operationId": "uploadFile",
         "summary": "POST Upload File",
         "description": "Upload a new file to the storage system. The file name will be automatically prefixed with a timestamp to ensure uniqueness.",
-        "tags": ["Files"],
+        "tags": [
+          "Files"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -27,7 +29,45 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FileUploadResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "File Uploaded Successfully"
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Uploaded file path (with timestamp prefix)",
+                      "example": "product-image__fluent-cart__.1763112373.jpg"
+                    },
+                    "file": {
+                      "type": "object",
+                      "description": "File information",
+                      "properties": {
+                        "driver": {
+                          "type": "string",
+                          "description": "Storage driver used",
+                          "example": "local"
+                        },
+                        "size": {
+                          "type": "integer",
+                          "description": "File size in bytes",
+                          "example": 1024000
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "File name (with timestamp prefix)",
+                          "example": "product-image__fluent-cart__.1763112373.jpg"
+                        },
+                        "bucket": {
+                          "type": "string",
+                          "description": "Storage bucket (empty for local driver)",
+                          "example": ""
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "message": "File Uploaded Successfully",
@@ -47,7 +87,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Failed To Upload File"
+                    },
+                    "additional": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Additional error information",
+                      "example": "File is empty"
+                    }
+                  }
                 },
                 "examples": {
                   "validationError": {
@@ -73,7 +126,10 @@
     "schemas": {
       "UploadFileRequest": {
         "type": "object",
-        "required": ["file", "name"],
+        "required": [
+          "file",
+          "name"
+        ],
         "properties": {
           "file": {
             "type": "string",

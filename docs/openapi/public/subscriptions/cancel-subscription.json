@@ -5,7 +5,9 @@
         "operationId": "cancelSubscription",
         "summary": "PUT Cancel Subscription",
         "description": "Cancel a subscription. Requires a cancel reason.",
-        "tags": ["Subscriptions"],
+        "tags": [
+          "Subscriptions"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -36,7 +38,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CancelSubscriptionRequest"
+                "type": "object",
+                "required": [
+                  "cancel_reason"
+                ],
+                "properties": {
+                  "cancel_reason": {
+                    "type": "string",
+                    "description": "Cancellation reason (required)",
+                    "example": "Customer requested cancellation"
+                  }
+                }
               },
               "example": {
                 "cancel_reason": "Customer requested cancellation"
@@ -50,7 +62,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CancelSubscriptionResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Subscription has been cancelled successfully!"
+                    },
+                    "subscription": {
+                      "$ref": "#/components/schemas/Subscription"
+                    }
+                  }
                 },
                 "example": {
                   "message": "Subscription has been cancelled successfully!",
@@ -97,7 +119,9 @@
     "schemas": {
       "CancelSubscriptionRequest": {
         "type": "object",
-        "required": ["cancel_reason"],
+        "required": [
+          "cancel_reason"
+        ],
         "properties": {
           "cancel_reason": {
             "type": "string",

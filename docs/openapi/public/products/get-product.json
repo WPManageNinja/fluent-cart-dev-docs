@@ -5,7 +5,9 @@
         "operationId": "getProduct",
         "summary": "GET Get Product Details",
         "description": "Retrieve detailed information about a specific product.",
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -28,7 +30,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductResponse"
+                  "type": "object",
+                  "properties": {
+                    "product": {
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
                 },
                 "example": {
                   "product": {
@@ -44,9 +51,9 @@
                     "post_name": "modern-sweatshirt-06-06-2025-12-51-25",
                     "post_modified": "2025-11-11 10:40:11",
                     "post_modified_gmt": "2025-11-11 10:40:11",
-                    "guid": "https://cart.junior.ninja/?items=modern-sweatshirt-06-06-2025-12-51-25",
+                    "guid": "https://YourWebsite.com/?items=modern-sweatshirt-06-06-2025-12-51-25",
                     "post_type": "fluent-products",
-                    "thumbnail": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/placeholder.svg",
+                    "thumbnail": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/placeholder.svg",
                     "detail": {
                       "id": 13,
                       "post_id": 7529088,
@@ -144,7 +151,11 @@
           },
           "post_status": {
             "type": "string",
-            "enum": ["draft", "publish", "private"],
+            "enum": [
+              "draft",
+              "publish",
+              "private"
+            ],
             "description": "Post status",
             "example": "publish"
           },
@@ -177,7 +188,7 @@
             "type": "string",
             "format": "uri",
             "description": "Global unique identifier",
-            "example": "https://cart.junior.ninja/?items=modern-sweatshirt-06-06-2025-12-51-25"
+            "example": "https://YourWebsite.com/?items=modern-sweatshirt-06-06-2025-12-51-25"
           },
           "post_type": {
             "type": "string",
@@ -188,7 +199,7 @@
             "type": "string",
             "format": "uri",
             "description": "Thumbnail image URL",
-            "example": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/placeholder.svg"
+            "example": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/placeholder.svg"
           },
           "detail": {
             "$ref": "#/components/schemas/ProductDetail"
@@ -210,7 +221,10 @@
           },
           "fulfillment_type": {
             "type": "string",
-            "enum": ["digital", "physical"],
+            "enum": [
+              "digital",
+              "physical"
+            ],
             "description": "Fulfillment type",
             "example": "digital"
           },
@@ -246,7 +260,10 @@
           },
           "variation_type": {
             "type": "string",
-            "enum": ["simple", "simple_variations"],
+            "enum": [
+              "simple",
+              "simple_variations"
+            ],
             "description": "Variation type",
             "example": "simple_variations"
           },
@@ -266,12 +283,19 @@
               },
               "group_pricing_by": {
                 "type": "string",
-                "enum": ["payment_type", "repeat_interval", "none"],
+                "enum": [
+                  "payment_type",
+                  "repeat_interval",
+                  "none"
+                ],
                 "example": "payment_type"
               },
               "use_pricing_table": {
                 "type": "string",
-                "enum": ["yes", "no"],
+                "enum": [
+                  "yes",
+                  "no"
+                ],
                 "example": "no"
               },
               "tax_class": {
@@ -293,7 +317,7 @@
           "gallery_image": {
             "type": "object",
             "nullable": true,
-            "description": "Gallery images metadata"
+            "description": "Gallery images"
           },
           "created_at": {
             "type": "string",
@@ -311,11 +335,6 @@
             "type": "object",
             "nullable": true,
             "description": "Featured media"
-          },
-          "gallery_image": {
-            "type": "object",
-            "nullable": true,
-            "description": "Gallery images"
           },
           "variations": {
             "type": "array",
@@ -473,4 +492,3 @@
     }
   }
 }
-

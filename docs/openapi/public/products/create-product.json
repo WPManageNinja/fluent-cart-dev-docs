@@ -5,7 +5,9 @@
         "operationId": "createProduct",
         "summary": "POST Create Product",
         "description": "Create a new product.",
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -16,7 +18,75 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateProductRequest"
+                "type": "object",
+                "required": [
+                  "post_title",
+                  "detail"
+                ],
+                "properties": {
+                  "post_title": {
+                    "type": "string",
+                    "description": "Product title",
+                    "example": "Dynamic Product"
+                  },
+                  "post_status": {
+                    "type": "string",
+                    "enum": [
+                      "draft",
+                      "publish",
+                      "private"
+                    ],
+                    "default": "draft",
+                    "description": "Post status",
+                    "example": "draft"
+                  },
+                  "post_content": {
+                    "type": "string",
+                    "description": "Product description/content",
+                    "required": false
+                  },
+                  "post_excerpt": {
+                    "type": "string",
+                    "description": "Product excerpt",
+                    "required": false
+                  },
+                  "detail": {
+                    "type": "object",
+                    "required": [
+                      "fulfillment_type"
+                    ],
+                    "properties": {
+                      "fulfillment_type": {
+                        "type": "string",
+                        "enum": [
+                          "digital",
+                          "physical"
+                        ],
+                        "description": "Fulfillment type for the product",
+                        "example": "digital"
+                      },
+                      "variation_type": {
+                        "type": "string",
+                        "enum": [
+                          "simple",
+                          "simple_variations"
+                        ],
+                        "description": "Variation type",
+                        "required": false
+                      },
+                      "manage_stock": {
+                        "type": "string",
+                        "description": "Whether to manage stock",
+                        "required": false
+                      },
+                      "stock_availability": {
+                        "type": "string",
+                        "description": "Stock availability status",
+                        "required": false
+                      }
+                    }
+                  }
+                }
               },
               "example": {
                 "post_title": "Dynamic Product",
@@ -34,7 +104,78 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateProductResponse"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "ID": {
+                          "type": "integer",
+                          "description": "Created product ID",
+                          "example": 7529320
+                        },
+                        "variant": {
+                          "type": "object",
+                          "description": "Created product variant",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "description": "Variant ID"
+                            },
+                            "post_id": {
+                              "type": "integer",
+                              "description": "Product post ID"
+                            },
+                            "variation_title": {
+                              "type": "string",
+                              "description": "Variant title"
+                            },
+                            "item_price": {
+                              "type": "integer",
+                              "description": "Item price in cents"
+                            },
+                            "stock_status": {
+                              "type": "string",
+                              "description": "Stock status",
+                              "example": "in-stock"
+                            },
+                            "payment_type": {
+                              "type": "string",
+                              "description": "Payment type",
+                              "example": "onetime"
+                            }
+                          }
+                        },
+                        "product_details": {
+                          "type": "object",
+                          "description": "Product details",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "description": "Product detail ID"
+                            },
+                            "post_id": {
+                              "type": "integer",
+                              "description": "Product post ID"
+                            },
+                            "fulfillment_type": {
+                              "type": "string",
+                              "enum": [
+                                "digital",
+                                "physical"
+                              ],
+                              "description": "Fulfillment type"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Product has been created successfully"
+                    }
+                  }
                 },
                 "example": {
                   "data": {
@@ -80,7 +221,10 @@
     "schemas": {
       "CreateProductRequest": {
         "type": "object",
-        "required": ["post_title", "detail"],
+        "required": [
+          "post_title",
+          "detail"
+        ],
         "properties": {
           "post_title": {
             "type": "string",
@@ -89,7 +233,11 @@
           },
           "post_status": {
             "type": "string",
-            "enum": ["draft", "publish", "private"],
+            "enum": [
+              "draft",
+              "publish",
+              "private"
+            ],
             "default": "draft",
             "description": "Post status",
             "example": "draft"
@@ -111,17 +259,25 @@
       },
       "ProductDetailInput": {
         "type": "object",
-        "required": ["fulfillment_type"],
+        "required": [
+          "fulfillment_type"
+        ],
         "properties": {
           "fulfillment_type": {
             "type": "string",
-            "enum": ["digital", "physical"],
+            "enum": [
+              "digital",
+              "physical"
+            ],
             "description": "Fulfillment type for the product",
             "example": "digital"
           },
           "variation_type": {
             "type": "string",
-            "enum": ["simple", "simple_variations"],
+            "enum": [
+              "simple",
+              "simple_variations"
+            ],
             "description": "Variation type",
             "required": false
           },
@@ -194,7 +350,10 @@
                   },
                   "fulfillment_type": {
                     "type": "string",
-                    "enum": ["digital", "physical"],
+                    "enum": [
+                      "digital",
+                      "physical"
+                    ],
                     "description": "Fulfillment type"
                   }
                 }
@@ -211,4 +370,3 @@
     }
   }
 }
-

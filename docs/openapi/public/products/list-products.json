@@ -5,7 +5,9 @@
         "operationId": "listProducts",
         "summary": "GET List Products",
         "description": "Retrieve a paginated list of products with optional filtering and searching.",
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["simple", "advanced"],
+              "enum": [
+                "simple",
+                "advanced"
+              ],
               "default": "simple"
             },
             "description": "Product filter type",
@@ -60,7 +65,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["ASC", "DESC"],
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
               "default": "DESC"
             },
             "description": "Sort order",
@@ -94,7 +102,14 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["draft", "physical", "publish", "digital", "subscribable", "all"],
+              "enum": [
+                "draft",
+                "physical",
+                "publish",
+                "digital",
+                "subscribable",
+                "all"
+              ],
               "default": "all"
             },
             "description": "Current active view or context",
@@ -127,7 +142,78 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductListResponse"
+                  "type": "object",
+                  "properties": {
+                    "products": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer",
+                          "description": "Current page number",
+                          "example": 1
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Product"
+                          }
+                        },
+                        "first_page_url": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "URL to first page"
+                        },
+                        "from": {
+                          "type": "integer",
+                          "description": "Starting record number"
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "description": "Last page number"
+                        },
+                        "last_page_url": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "URL to last page"
+                        },
+                        "links": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PaginationLink"
+                          }
+                        },
+                        "next_page_url": {
+                          "type": "string",
+                          "format": "uri",
+                          "nullable": true,
+                          "description": "URL to next page"
+                        },
+                        "path": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "Base path"
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "description": "Items per page"
+                        },
+                        "prev_page_url": {
+                          "type": "string",
+                          "format": "uri",
+                          "nullable": true,
+                          "description": "URL to previous page"
+                        },
+                        "to": {
+                          "type": "integer",
+                          "description": "Ending record number"
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of records"
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "products": {
@@ -146,19 +232,19 @@
                         "post_name": "chatgptclaud-course",
                         "post_modified": "2025-10-31 04:55:15",
                         "post_modified_gmt": "2025-10-31 04:55:15",
-                        "guid": "https://cart.junior.ninja/items/chatgptclaud-course/",
+                        "guid": "https://YourWebsite.com/items/chatgptclaud-course/",
                         "post_type": "fluent-products",
-                        "view_url": "https://cart.junior.ninja/items/chatgptclaud-course/",
-                        "edit_url": "https://cart.junior.ninja/wp-admin/post.php?post=7529681&action=edit"
+                        "view_url": "https://YourWebsite.com/items/chatgptclaud-course/",
+                        "edit_url": "https://YourWebsite.com/wp-admin/post.php?post=7529681&action=edit"
                       }
                     ],
-                    "first_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/products/?page=1",
+                    "first_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/products/?page=1",
                     "from": 1,
                     "last_page": 27,
-                    "last_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/products/?page=27",
+                    "last_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/products/?page=27",
                     "links": [],
-                    "next_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/products/?page=2",
-                    "path": "https://cart.junior.ninja/wp-json/fluent-cart/v2/products",
+                    "next_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/products/?page=2",
+                    "path": "https://YourWebsite.com/wp-json/fluent-cart/v2/products",
                     "per_page": 2,
                     "prev_page_url": null,
                     "to": 2,
@@ -295,7 +381,7 @@
             "type": "string",
             "format": "uri",
             "description": "Global unique identifier",
-            "example": "https://cart.junior.ninja/items/chatgptclaud-course/"
+            "example": "https://YourWebsite.com/items/chatgptclaud-course/"
           },
           "post_content": {
             "type": "string",
@@ -314,7 +400,11 @@
           },
           "post_status": {
             "type": "string",
-            "enum": ["draft", "publish", "private"],
+            "enum": [
+              "draft",
+              "publish",
+              "private"
+            ],
             "description": "Post status",
             "example": "publish"
           },
@@ -362,7 +452,10 @@
           },
           "fulfillment_type": {
             "type": "string",
-            "enum": ["digital", "physical"],
+            "enum": [
+              "digital",
+              "physical"
+            ],
             "description": "Fulfillment type"
           },
           "min_price": {
@@ -375,7 +468,10 @@
           },
           "variation_type": {
             "type": "string",
-            "enum": ["simple", "simple_variations"],
+            "enum": [
+              "simple",
+              "simple_variations"
+            ],
             "description": "Variation type"
           },
           "stock_availability": {
@@ -435,4 +531,3 @@
     }
   }
 }
-

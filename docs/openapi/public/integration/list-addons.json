@@ -5,7 +5,9 @@
         "operationId": "listIntegrationAddons",
         "summary": "GET List Addons",
         "description": "Retrieve a list of available integration addons.",
-        "tags": ["Integration"],
+        "tags": [
+          "Integration"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AddonsResponse"
+                  "type": "object",
+                  "properties": {
+                    "addons": {
+                      "type": "object",
+                      "description": "Object of addons keyed by addon identifier",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/IntegrationAddon"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "addons": {
@@ -25,16 +36,23 @@
                       "installable": "fluent-crm",
                       "enabled": false,
                       "title": "FluentCRM",
-                      "logo": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
-                      "categories": ["crm", "core", "marketing"],
+                      "logo": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
+                      "categories": [
+                        "crm",
+                        "core",
+                        "marketing"
+                      ],
                       "description": "The most powerful and user-friendly email marketing automation plugin for WordPress. Send newsletters, marketing emails, customer onboard emails, Automations with FluentCart + FluentCRM integration."
                     },
                     "fluent-smtp": {
                       "installable": "fluent-smtp",
-                      "logo": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/integrations/fluent-smtp.svg",
+                      "logo": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluent-smtp.svg",
                       "enabled": false,
                       "title": "FluentSMTP",
-                      "categories": ["core", "marketing"],
+                      "categories": [
+                        "core",
+                        "marketing"
+                      ],
                       "description": "A free and open-source WordPress SMTP plugin to send emails via multiple SMTP providers. Ensure email deliverability for your WooCommerce and FluentCart emails with FluentSMTP."
                     }
                   }
@@ -82,7 +100,7 @@
             "type": "string",
             "format": "uri",
             "description": "Addon logo URL",
-            "example": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg"
+            "example": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg"
           },
           "categories": {
             "type": "array",
@@ -90,7 +108,11 @@
               "type": "string"
             },
             "description": "Addon categories",
-            "example": ["crm", "core", "marketing"]
+            "example": [
+              "crm",
+              "core",
+              "marketing"
+            ]
           },
           "description": {
             "type": "string",

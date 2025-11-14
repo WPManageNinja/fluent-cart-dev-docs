@@ -5,7 +5,9 @@
         "operationId": "getPermissions",
         "summary": "GET Get Permissions",
         "description": "Retrieve a list of available WordPress roles and the currently configured capability permissions.",
-        "tags": ["Roles & Permissions"],
+        "tags": [
+          "Roles & Permissions"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,26 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PermissionsResponse"
+                  "type": "object",
+                  "properties": {
+                    "roles": {
+                      "type": "object",
+                      "properties": {
+                        "capability": {
+                          "type": "boolean",
+                          "description": "Whether capability is enabled",
+                          "example": false
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/WordPressRole"
+                          },
+                          "description": "Array of available WordPress roles (excluding administrator and subscriber)"
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "roles": {

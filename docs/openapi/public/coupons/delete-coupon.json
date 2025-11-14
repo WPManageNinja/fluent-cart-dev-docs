@@ -5,7 +5,9 @@
         "operationId": "deleteCoupon",
         "summary": "DELETE Delete Coupon",
         "description": "Delete a coupon.",
-        "tags": ["Coupons"],
+        "tags": [
+          "Coupons"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -28,7 +30,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeleteCouponResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Coupon successfully deleted."
+                    },
+                    "data": {
+                      "type": "string",
+                      "description": "Empty string on success",
+                      "example": ""
+                    }
+                  }
                 },
                 "example": {
                   "message": "Coupon successfully deleted.",

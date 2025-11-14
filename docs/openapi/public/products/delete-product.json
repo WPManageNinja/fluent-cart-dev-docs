@@ -28,7 +28,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeleteProductResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Selected product and associated data has been deleted"
+                    },
+                    "data": {
+                      "type": "string",
+                      "description": "Response data (empty string on success)",
+                      "example": ""
+                    }
+                  }
                 },
                 "example": {
                   "message": "Selected product and associated data has been deleted",

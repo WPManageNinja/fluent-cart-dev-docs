@@ -5,7 +5,9 @@
         "operationId": "updateProductPricing",
         "summary": "POST Update Product Pricing",
         "description": "Update product pricing information.",
-        "tags": ["Products"],
+        "tags": [
+          "Products"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -27,7 +29,130 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateProductPricingRequest"
+                "type": "object",
+                "description": "Request body for updating product pricing. Uses ProductUpdateRequest validation rules.",
+                "properties": {
+                  "detail": {
+                    "type": "object",
+                    "description": "Product detail updates",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Product detail ID"
+                      },
+                      "min_price": {
+                        "type": "number",
+                        "description": "Minimum price in cents"
+                      },
+                      "max_price": {
+                        "type": "number",
+                        "description": "Maximum price in cents"
+                      },
+                      "variation_type": {
+                        "type": "string",
+                        "enum": [
+                          "simple",
+                          "simple_variations"
+                        ],
+                        "description": "Variation type (required if updating)"
+                      },
+                      "fulfillment_type": {
+                        "type": "string",
+                        "enum": [
+                          "digital",
+                          "physical"
+                        ],
+                        "description": "Fulfillment type"
+                      },
+                      "other_info": {
+                        "type": "object",
+                        "description": "Additional product information"
+                      }
+                    }
+                  },
+                  "variants": {
+                    "type": "array",
+                    "description": "Array of variant updates. Required if detail.variation_type is 'simple'.",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id",
+                        "post_id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Variant ID (required)"
+                        },
+                        "post_id": {
+                          "type": "integer",
+                          "description": "Product post ID (required)"
+                        },
+                        "variation_title": {
+                          "type": "string",
+                          "maxLength": 200,
+                          "description": "Variant title"
+                        },
+                        "item_price": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Variant price in cents"
+                        },
+                        "compare_price": {
+                          "type": "number",
+                          "description": "Compare price in cents"
+                        },
+                        "item_cost": {
+                          "type": "number",
+                          "description": "Item cost in cents"
+                        },
+                        "other_info": {
+                          "type": "object",
+                          "description": "Additional variant information"
+                        }
+                      }
+                    }
+                  },
+                  "post_title": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "description": "Product title"
+                  },
+                  "post_status": {
+                    "type": "string",
+                    "enum": [
+                      "draft",
+                      "publish",
+                      "private"
+                    ],
+                    "description": "Post status"
+                  },
+                  "post_content": {
+                    "type": "string",
+                    "description": "Product description"
+                  },
+                  "post_excerpt": {
+                    "type": "string",
+                    "description": "Product excerpt"
+                  },
+                  "gallery": {
+                    "type": "array",
+                    "description": "Gallery images",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Media ID"
+                        }
+                      }
+                    }
+                  },
+                  "product_terms": {
+                    "type": "object",
+                    "description": "Product taxonomy terms"
+                  }
+                }
               },
               "example": {
                 "detail": {
@@ -52,7 +177,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateProductPricingResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Product has been updated"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
+                    }
+                  }
                 },
                 "example": {
                   "message": "Product has been updated",
@@ -124,12 +259,18 @@
               },
               "variation_type": {
                 "type": "string",
-                "enum": ["simple", "simple_variations"],
+                "enum": [
+                  "simple",
+                  "simple_variations"
+                ],
                 "description": "Variation type (required if updating)"
               },
               "fulfillment_type": {
                 "type": "string",
-                "enum": ["digital", "physical"],
+                "enum": [
+                  "digital",
+                  "physical"
+                ],
                 "description": "Fulfillment type"
               },
               "other_info": {
@@ -143,7 +284,10 @@
             "description": "Array of variant updates. Required if detail.variation_type is 'simple'.",
             "items": {
               "type": "object",
-              "required": ["id", "post_id"],
+              "required": [
+                "id",
+                "post_id"
+              ],
               "properties": {
                 "id": {
                   "type": "integer",
@@ -185,7 +329,11 @@
           },
           "post_status": {
             "type": "string",
-            "enum": ["draft", "publish", "private"],
+            "enum": [
+              "draft",
+              "publish",
+              "private"
+            ],
             "description": "Post status"
           },
           "post_content": {
@@ -231,4 +379,3 @@
     }
   }
 }
-

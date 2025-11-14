@@ -5,7 +5,9 @@
         "operationId": "createTaxClass",
         "summary": "POST Create Tax Class",
         "description": "Create a new tax class.",
-        "tags": ["Tax"],
+        "tags": [
+          "Tax"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -16,12 +18,50 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateTaxClassRequest"
+                "type": "object",
+                "required": [
+                  "title"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Tax class title",
+                    "example": "Reduced Rate"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Tax class description",
+                    "required": false,
+                    "example": "Reduced tax rate for essential goods"
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of product category IDs",
+                    "required": false,
+                    "example": [
+                      1,
+                      2
+                    ]
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "description": "Display priority (default: 0)",
+                    "required": false,
+                    "default": 0,
+                    "example": 5
+                  }
+                }
               },
               "example": {
                 "title": "Reduced Rate",
                 "description": "Reduced tax rate for essential goods",
-                "categories": [1, 2],
+                "categories": [
+                  1,
+                  2
+                ],
                 "priority": 5
               }
             }
@@ -60,7 +100,9 @@
     "schemas": {
       "CreateTaxClassRequest": {
         "type": "object",
-        "required": ["title"],
+        "required": [
+          "title"
+        ],
         "properties": {
           "title": {
             "type": "string",
@@ -80,7 +122,10 @@
             },
             "description": "Array of product category IDs",
             "required": false,
-            "example": [1, 2]
+            "example": [
+              1,
+              2
+            ]
           },
           "priority": {
             "type": "integer",
@@ -94,4 +139,3 @@
     }
   }
 }
-

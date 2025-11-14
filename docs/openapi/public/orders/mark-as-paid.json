@@ -65,7 +65,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MarkAsPaidResponse"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Order has been marked as paid"
+                    }
+                  }
                 },
                 "example": {
                   "message": "Order has been marked as paid"

@@ -5,7 +5,9 @@
         "operationId": "getIntegrationGlobalSettings",
         "summary": "GET Get Global Settings",
         "description": "Retrieve global settings for integrations.",
-        "tags": ["Integration"],
+        "tags": [
+          "Integration"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GlobalSettingsResponse"
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "array",
+                      "description": "Global integration settings",
+                      "items": {
+                        "type": "object"
+                      },
+                      "example": []
+                    },
+                    "settings_key": {
+                      "type": "string",
+                      "description": "Settings key",
+                      "example": ""
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Response message",
+                      "example": "Sorry! No integration failed found with: "
+                    }
+                  }
                 },
                 "example": {
                   "settings": [],

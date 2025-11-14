@@ -5,7 +5,9 @@
         "operationId": "reactivateSubscription",
         "summary": "PUT Reactivate Subscription",
         "description": "Reactivate a cancelled subscription. Note: This feature is not available yet.",
-        "tags": ["Subscriptions"],
+        "tags": [
+          "Subscriptions"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -37,7 +39,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Not available yet"
+                    }
+                  }
                 },
                 "example": {
                   "message": "Not available yet"

@@ -5,7 +5,9 @@
         "operationId": "getReportsOverview",
         "summary": "GET Get Reports Overview",
         "description": "Retrieve a comprehensive overview report with key metrics.",
-        "tags": ["Reports"],
+        "tags": [
+          "Reports"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReportsOverviewResponse"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Report overview data",
+                      "properties": {
+                        "gross_revenue": {
+                          "type": "object",
+                          "description": "Gross revenue data grouped by period",
+                          "additionalProperties": {
+                            "$ref": "#/components/schemas/RevenuePeriod"
+                          }
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  }
                 },
                 "example": {
                   "data": {

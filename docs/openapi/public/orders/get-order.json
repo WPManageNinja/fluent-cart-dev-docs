@@ -5,7 +5,9 @@
         "operationId": "getOrder",
         "summary": "GET Get Order Details",
         "description": "Retrieve detailed information about a specific order.",
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -28,7 +30,41 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderDetailResponse"
+                  "type": "object",
+                  "properties": {
+                    "order": {
+                      "$ref": "#/components/schemas/OrderDetail"
+                    },
+                    "discount_meta": {
+                      "type": "string",
+                      "description": "Discount metadata",
+                      "example": ""
+                    },
+                    "shipping_meta": {
+                      "type": "string",
+                      "description": "Shipping metadata",
+                      "example": ""
+                    },
+                    "order_settings": {
+                      "type": "array",
+                      "description": "Order settings",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "selected_labels": {
+                      "type": "array",
+                      "description": "Selected order labels",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "tax_id": {
+                      "type": "string",
+                      "description": "Tax ID",
+                      "example": ""
+                    }
+                  }
                 },
                 "example": {
                   "order": {
@@ -699,7 +735,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["billing", "shipping"]
+            "enum": [
+              "billing",
+              "shipping"
+            ]
           },
           "name": {
             "type": "string"
@@ -754,4 +793,3 @@
     }
   }
 }
-

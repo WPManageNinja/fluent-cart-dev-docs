@@ -5,7 +5,9 @@
         "operationId": "refundOrder",
         "summary": "POST Refund Order",
         "description": "Process a refund for an order.",
-        "tags": ["Orders"],
+        "tags": [
+          "Orders"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -28,11 +30,16 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["refund_info"],
+                "required": [
+                  "refund_info"
+                ],
                 "properties": {
                   "refund_info": {
                     "type": "object",
-                    "required": ["transaction_id", "amount"],
+                    "required": [
+                      "transaction_id",
+                      "amount"
+                    ],
                     "description": "Refund information",
                     "properties": {
                       "transaction_id": {
@@ -70,7 +77,61 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RefundResponse"
+                  "type": "object",
+                  "properties": {
+                    "fluent_cart_refund": {
+                      "type": "object",
+                      "description": "FluentCart refund status",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "success",
+                            "failed"
+                          ],
+                          "example": "success"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Refund processed on FluentCart."
+                        }
+                      }
+                    },
+                    "gateway_refund": {
+                      "type": "object",
+                      "description": "Payment gateway refund status",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "success",
+                            "failed"
+                          ],
+                          "example": "success"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Refund processed on Stripe"
+                        }
+                      }
+                    },
+                    "subscription_cancel": {
+                      "type": "object",
+                      "description": "Subscription cancellation status (if cancelSubscription was true)",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "success",
+                            "failed"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "fluent_cart_refund": {
@@ -272,7 +333,10 @@
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["success", "failed"],
+                "enum": [
+                  "success",
+                  "failed"
+                ],
                 "example": "success"
               },
               "message": {
@@ -287,7 +351,10 @@
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["success", "failed"],
+                "enum": [
+                  "success",
+                  "failed"
+                ],
                 "example": "success"
               },
               "message": {
@@ -302,7 +369,10 @@
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["success", "failed"]
+                "enum": [
+                  "success",
+                  "failed"
+                ]
               },
               "message": {
                 "type": "string"
@@ -314,4 +384,3 @@
     }
   }
 }
-

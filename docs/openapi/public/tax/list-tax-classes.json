@@ -5,7 +5,9 @@
         "operationId": "listTaxClasses",
         "summary": "GET List Tax Classes",
         "description": "Retrieve all tax classes, sorted by priority.",
-        "tags": ["Tax"],
+        "tags": [
+          "Tax"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -17,7 +19,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaxClassListResponse"
+                  "type": "object",
+                  "properties": {
+                    "tax_classes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaxClass"
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "tax_classes": [
@@ -30,9 +40,17 @@
                       "updated_at": "2025-10-13T10:22:34+00:00",
                       "meta": {
                         "priority": 10,
-                        "categories": [2, 3, 4]
+                        "categories": [
+                          2,
+                          3,
+                          4
+                        ]
                       },
-                      "categories": [2, 3, 4]
+                      "categories": [
+                        2,
+                        3,
+                        4
+                      ]
                     }
                   ]
                 }
@@ -106,7 +124,11 @@
                   "type": "integer"
                 },
                 "description": "Product category IDs",
-                "example": [2, 3, 4]
+                "example": [
+                  2,
+                  3,
+                  4
+                ]
               }
             }
           },
@@ -116,7 +138,11 @@
               "type": "integer"
             },
             "description": "Product category IDs",
-            "example": [2, 3, 4]
+            "example": [
+              2,
+              3,
+              4
+            ]
           }
         }
       }

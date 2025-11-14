@@ -100,8 +100,6 @@ export default {
         const baseSpec = validSpecs.find(spec => spec.openapi) || validSpecs[0]
         const mergedSpec = {
           ...baseSpec,
-          // Preserve servers from base spec
-          servers: baseSpec.servers || [],
           paths: {},
           components: {
             ...baseSpec.components,
@@ -109,20 +107,23 @@ export default {
           }
         }
         
-        // Merge paths and schemas from all specs
+        // First merge all schemas, then merge paths (so $ref can resolve)
+        validSpecs.forEach(spec => {
+          if (spec.components?.schemas) {
+            Object.assign(mergedSpec.components.schemas, spec.components.schemas)
+          }
+        })
+        
+        // Then merge paths after all schemas are available
         validSpecs.forEach(spec => {
           if (spec.paths) {
-            // Merge paths, combining HTTP methods for the same path
             Object.keys(spec.paths).forEach(path => {
               if (!mergedSpec.paths[path]) {
                 mergedSpec.paths[path] = {}
               }
-              // Merge HTTP methods (get, post, put, delete, etc.)
+              // Merge HTTP methods for the same path
               Object.assign(mergedSpec.paths[path], spec.paths[path])
             })
-          }
-          if (spec.components?.schemas) {
-            Object.assign(mergedSpec.components.schemas, spec.components.schemas)
           }
         })
         

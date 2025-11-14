@@ -5,7 +5,9 @@
         "operationId": "listCustomers",
         "summary": "GET List Customers",
         "description": "Retrieve a paginated list of customers with optional filtering and searching.",
-        "tags": ["Customers"],
+        "tags": [
+          "Customers"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -69,7 +71,10 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["ASC", "DESC"],
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
               "default": "DESC"
             },
             "description": "Sort direction",
@@ -82,7 +87,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CustomerListResponse"
+                  "type": "object",
+                  "properties": {
+                    "customers": {
+                      "$ref": "#/components/schemas/CustomerPagination"
+                    }
+                  }
                 },
                 "example": {
                   "customers": {
@@ -125,13 +135,13 @@
                         "user_link": ""
                       }
                     ],
-                    "first_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/customers/?page=1",
+                    "first_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/customers/?page=1",
                     "from": 1,
                     "last_page": 25861,
-                    "last_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/customers/?page=25861",
+                    "last_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/customers/?page=25861",
                     "links": [],
-                    "next_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/customers/?page=2",
-                    "path": "https://cart.junior.ninja/wp-json/fluent-cart/v2/customers",
+                    "next_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/customers/?page=2",
+                    "path": "https://YourWebsite.com/wp-json/fluent-cart/v2/customers",
                     "per_page": 2,
                     "prev_page_url": null,
                     "to": 2,
@@ -422,4 +432,3 @@
     }
   }
 }
-

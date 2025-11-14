@@ -5,7 +5,9 @@
         "operationId": "getSubscription",
         "summary": "GET Get Subscription Details",
         "description": "Retrieve detailed information about a specific subscription including related orders and licenses.",
-        "tags": ["Subscriptions"],
+        "tags": [
+          "Subscriptions"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -28,7 +30,19 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionDetailResponse"
+                  "type": "object",
+                  "properties": {
+                    "subscription": {
+                      "$ref": "#/components/schemas/SubscriptionDetail"
+                    },
+                    "selected_labels": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "description": "Array of label IDs associated with the subscription"
+                    }
+                  }
                 },
                 "example": {
                   "subscription": {

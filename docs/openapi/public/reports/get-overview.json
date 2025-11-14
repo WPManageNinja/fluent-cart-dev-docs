@@ -11,65 +11,27 @@
             "ApplicationPasswords": []
           }
         ],
-        "parameters": [
-          {
-            "name": "params",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "object"
-            },
-            "description": "Report parameters object",
-            "style": "deepObject",
-            "explode": true
-          },
-          {
-            "name": "params[startDate]",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "description": "Start date for the report (ISO 8601 format)",
-            "example": "2024-01-01"
-          },
-          {
-            "name": "params[endDate]",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "description": "End date for the report (ISO 8601 format)",
-            "example": "2024-12-31"
-          },
-          {
-            "name": "params[groupKey]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": ["daily", "monthly", "yearly"]
-            },
-            "description": "Grouping key (auto-determined if not provided)",
-            "required": false
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "object",
-                      "description": "Report overview data"
+                  "$ref": "#/components/schemas/ReportsOverviewResponse"
+                },
+                "example": {
+                  "data": {
+                    "gross_revenue": {
+                      "2024-12": {
+                        "current": 10237083,
+                        "prev": 8502914,
+                        "yoy_growth": "20.39"
+                      },
+                      "2025-01": {
+                        "current": 9650355,
+                        "prev": 9750643,
+                        "yoy_growth": "-1.03"
+                      }
                     }
                   }
                 }
@@ -79,6 +41,48 @@
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "ReportsOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "Report overview data",
+            "properties": {
+              "gross_revenue": {
+                "type": "object",
+                "description": "Gross revenue data grouped by period",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/RevenuePeriod"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "RevenuePeriod": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "type": "integer",
+            "description": "Current period revenue in cents",
+            "example": 10237083
+          },
+          "prev": {
+            "type": "integer",
+            "description": "Previous period revenue in cents",
+            "example": 8502914
+          },
+          "yoy_growth": {
+            "type": "string",
+            "description": "Year-over-year growth percentage",
+            "example": "20.39"
+          }
+        }
+      }
+    }
   }
 }
-

@@ -11,17 +11,6 @@
             "ApplicationPasswords": []
           }
         ],
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Filter by status",
-            "required": false
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -29,6 +18,26 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AddonsResponse"
+                },
+                "example": {
+                  "addons": {
+                    "fluent-crm": {
+                      "installable": "fluent-crm",
+                      "enabled": false,
+                      "title": "FluentCRM",
+                      "logo": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
+                      "categories": ["crm", "core", "marketing"],
+                      "description": "The most powerful and user-friendly email marketing automation plugin for WordPress. Send newsletters, marketing emails, customer onboard emails, Automations with FluentCart + FluentCRM integration."
+                    },
+                    "fluent-smtp": {
+                      "installable": "fluent-smtp",
+                      "logo": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/integrations/fluent-smtp.svg",
+                      "enabled": false,
+                      "title": "FluentSMTP",
+                      "categories": ["core", "marketing"],
+                      "description": "A free and open-source WordPress SMTP plugin to send emails via multiple SMTP providers. Ensure email deliverability for your WooCommerce and FluentCart emails with FluentSMTP."
+                    }
+                  }
                 }
               }
             }
@@ -43,8 +52,9 @@
         "type": "object",
         "properties": {
           "addons": {
-            "type": "array",
-            "items": {
+            "type": "object",
+            "description": "Object of addons keyed by addon identifier",
+            "additionalProperties": {
               "$ref": "#/components/schemas/IntegrationAddon"
             }
           }
@@ -53,34 +63,42 @@
       "IntegrationAddon": {
         "type": "object",
         "properties": {
-          "key": {
+          "installable": {
             "type": "string",
-            "description": "Addon key/identifier",
-            "example": "mailchimp"
-          },
-          "title": {
-            "type": "string",
-            "description": "Addon title",
-            "example": "Mailchimp"
-          },
-          "description": {
-            "type": "string",
-            "description": "Addon description",
-            "example": "Email marketing integration"
+            "description": "Installable plugin slug",
+            "example": "fluent-crm"
           },
           "enabled": {
             "type": "boolean",
             "description": "Whether the addon is enabled",
-            "example": true
+            "example": false
           },
-          "installed": {
-            "type": "boolean",
-            "description": "Whether the addon is installed",
-            "example": true
+          "title": {
+            "type": "string",
+            "description": "Addon title",
+            "example": "FluentCRM"
+          },
+          "logo": {
+            "type": "string",
+            "format": "uri",
+            "description": "Addon logo URL",
+            "example": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Addon categories",
+            "example": ["crm", "core", "marketing"]
+          },
+          "description": {
+            "type": "string",
+            "description": "Addon description",
+            "example": "The most powerful and user-friendly email marketing automation plugin for WordPress."
           }
         }
       }
     }
   }
 }
-

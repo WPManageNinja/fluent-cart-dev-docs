@@ -83,6 +83,64 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SubscriptionListResponse"
+                },
+                "example": {
+                  "data": {
+                    "current_page": 1,
+                    "data": [
+                      {
+                        "id": 13468,
+                        "uuid": "a2dc92b860fc251e1b2681cbc003be26",
+                        "customer_id": "63203",
+                        "parent_order_id": "7536286",
+                        "product_id": "7529555",
+                        "item_name": "CodeStream SyncPro - Yearly Subscription",
+                        "quantity": "1",
+                        "variation_id": "259",
+                        "billing_interval": "yearly",
+                        "signup_fee": "0",
+                        "initial_tax_total": "0",
+                        "recurring_amount": "3900",
+                        "recurring_tax_total": "0",
+                        "recurring_total": "3900",
+                        "bill_times": "0",
+                        "bill_count": "1",
+                        "expire_at": null,
+                        "trial_ends_at": null,
+                        "canceled_at": null,
+                        "restored_at": null,
+                        "collection_method": "automatic",
+                        "next_billing_date": "2025-11-06 04:44:36",
+                        "trial_days": "14",
+                        "vendor_customer_id": "cus_THq4gZcHG4cyxO",
+                        "vendor_plan_id": null,
+                        "vendor_subscription_id": "sub_1SLGO8AED9YnSl2pmZUeuUdI",
+                        "status": "trialing",
+                        "original_plan": null,
+                        "vendor_response": null,
+                        "current_payment_method": "stripe",
+                        "config": {
+                          "currency": "USD",
+                          "is_trial_days_simulated": "no"
+                        },
+                        "created_at": "2025-10-23T04:44:34+00:00",
+                        "updated_at": "2025-10-23T04:44:42+00:00",
+                        "url": "https://dashboard.stripe.com/subscriptions/sub_1SLGO8AED9YnSl2pmZUeuUdI",
+                        "payment_info": "&#36;39.00  per year until cancel"
+                      }
+                    ],
+                    "first_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/subscriptions/?page=1",
+                    "from": 1,
+                    "last_page": 1,
+                    "last_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/subscriptions/?page=1",
+                    "next_page_url": null,
+                    "path": "https://cart.junior.ninja/wp-json/fluent-cart/v2/subscriptions",
+                    "per_page": 10,
+                    "prev_page_url": null,
+                    "to": 2,
+                    "total": 2,
+                    "links": []
+                  }
                 }
               }
             }
@@ -96,22 +154,8 @@
       "SubscriptionListResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
           "data": {
-            "type": "object",
-            "properties": {
-              "subscriptions": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Subscription"
-                }
-              },
-              "pagination": {
-                "$ref": "#/components/schemas/Pagination"
-              }
-            }
+            "$ref": "#/components/schemas/Pagination"
           }
         }
       },
@@ -121,104 +165,257 @@
           "id": {
             "type": "integer",
             "description": "Subscription ID",
-            "example": 1
+            "example": 13468
           },
           "uuid": {
             "type": "string",
             "description": "Subscription UUID",
-            "example": "sub_abc123"
+            "example": "a2dc92b860fc251e1b2681cbc003be26"
           },
           "customer_id": {
-            "type": "integer",
+            "type": "string",
             "description": "Customer ID",
-            "example": 123
+            "example": "63203"
+          },
+          "parent_order_id": {
+            "type": "string",
+            "description": "Parent order ID",
+            "example": "7536286"
           },
           "product_id": {
-            "type": "integer",
+            "type": "string",
             "description": "Product ID",
-            "example": 456
+            "example": "7529555"
+          },
+          "item_name": {
+            "type": "string",
+            "description": "Item name",
+            "example": "CodeStream SyncPro - Yearly Subscription"
+          },
+          "quantity": {
+            "type": "string",
+            "description": "Quantity",
+            "example": "1"
           },
           "variation_id": {
-            "type": "integer",
+            "type": "string",
             "description": "Variation ID",
-            "example": 789
+            "example": "259"
+          },
+          "billing_interval": {
+            "type": "string",
+            "description": "Billing interval (e.g., monthly, yearly)",
+            "example": "yearly"
+          },
+          "signup_fee": {
+            "type": "string",
+            "description": "Signup fee in cents",
+            "example": "0"
+          },
+          "initial_tax_total": {
+            "type": "string",
+            "description": "Initial tax total in cents",
+            "example": "0"
+          },
+          "recurring_amount": {
+            "type": "string",
+            "description": "Recurring amount in cents",
+            "example": "3900"
+          },
+          "recurring_tax_total": {
+            "type": "string",
+            "description": "Recurring tax total in cents",
+            "example": "0"
+          },
+          "recurring_total": {
+            "type": "string",
+            "description": "Recurring total in cents",
+            "example": "3900"
+          },
+          "bill_times": {
+            "type": "string",
+            "description": "Number of times to bill (0 = unlimited)",
+            "example": "0"
+          },
+          "bill_count": {
+            "type": "string",
+            "description": "Number of times billed",
+            "example": "1"
+          },
+          "expire_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Expiration date"
+          },
+          "trial_ends_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Trial end date"
+          },
+          "canceled_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Cancellation date"
+          },
+          "restored_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Restoration date"
+          },
+          "collection_method": {
+            "type": "string",
+            "description": "Collection method (e.g., automatic, manual)",
+            "example": "automatic"
+          },
+          "next_billing_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Next billing date",
+            "example": "2025-11-06 04:44:36"
+          },
+          "trial_days": {
+            "type": "string",
+            "description": "Trial days",
+            "example": "14"
+          },
+          "vendor_customer_id": {
+            "type": "string",
+            "description": "Vendor customer ID",
+            "example": "cus_THq4gZcHG4cyxO"
+          },
+          "vendor_plan_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Vendor plan ID"
+          },
+          "vendor_subscription_id": {
+            "type": "string",
+            "description": "Vendor subscription ID",
+            "example": "sub_1SLGO8AED9YnSl2pmZUeuUdI"
           },
           "status": {
             "type": "string",
-            "description": "Subscription status",
-            "example": "active"
+            "description": "Subscription status (e.g., active, trialing, canceled)",
+            "example": "trialing"
           },
-          "billing_cycle": {
+          "original_plan": {
             "type": "string",
-            "description": "Billing cycle",
-            "example": "monthly"
+            "nullable": true,
+            "description": "Original plan"
           },
-          "amount": {
-            "type": "integer",
-            "description": "Amount in cents",
-            "example": 2500
+          "vendor_response": {
+            "type": "string",
+            "nullable": true,
+            "description": "Vendor response"
+          },
+          "current_payment_method": {
+            "type": "string",
+            "description": "Current payment method",
+            "example": "stripe"
+          },
+          "config": {
+            "type": "object",
+            "description": "Subscription configuration",
+            "properties": {
+              "currency": {
+                "type": "string",
+                "example": "USD"
+              },
+              "is_trial_days_simulated": {
+                "type": "string",
+                "example": "no"
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2025-10-23T04:44:34+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-10-23T04:44:42+00:00"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Vendor subscription URL",
+            "example": "https://dashboard.stripe.com/subscriptions/sub_1SLGO8AED9YnSl2pmZUeuUdI"
+          },
+          "payment_info": {
+            "type": "string",
+            "description": "Formatted payment information",
+            "example": "&#36;39.00  per year until cancel"
+          },
+          "billingInfo": {
+            "type": "object",
+            "nullable": true,
+            "description": "Billing information",
+            "properties": {
+              "method": {
+                "type": "string",
+                "example": "stripe"
+              },
+              "type": {
+                "type": "string",
+                "example": "card"
+              },
+              "details": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "card"
+                  },
+                  "brand": {
+                    "type": "string",
+                    "example": "visa"
+                  },
+                  "last_4": {
+                    "type": "string",
+                    "example": "4242"
+                  },
+                  "exp_month": {
+                    "type": "string",
+                    "example": "4"
+                  },
+                  "exp_year": {
+                    "type": "string",
+                    "example": "2028"
+                  }
+                }
+              }
+            }
+          },
+          "overridden_status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Overridden status"
           },
           "currency": {
             "type": "string",
             "description": "Currency code",
             "example": "USD"
           },
-          "next_billing_date": {
+          "reactivate_url": {
             "type": "string",
-            "format": "date-time",
-            "description": "Next billing date",
-            "example": "2024-02-01T00:00:00Z"
+            "description": "Reactivate URL",
+            "example": ""
           },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2024-01-01T10:00:00Z"
-          },
-          "customer": {
-            "$ref": "#/components/schemas/Customer"
-          },
-          "product": {
-            "$ref": "#/components/schemas/Product"
-          }
-        }
-      },
-      "Customer": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 123
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "customer@example.com"
-          },
-          "first_name": {
-            "type": "string",
-            "example": "John"
-          },
-          "last_name": {
-            "type": "string",
-            "example": "Doe"
-          }
-        }
-      },
-      "Product": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 456
-          },
-          "title": {
-            "type": "string",
-            "example": "Premium Plan"
-          },
-          "sku": {
-            "type": "string",
-            "example": "PREMIUM-001"
+          "meta": {
+            "type": "array",
+            "nullable": true,
+            "description": "Subscription metadata",
+            "items": {
+              "type": "object"
+            }
           }
         }
       },
@@ -229,21 +426,74 @@
             "type": "integer",
             "example": 1
           },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subscription"
+            }
+          },
+          "first_page_url": {
+            "type": "string",
+            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/subscriptions/?page=1"
+          },
+          "from": {
+            "type": "integer",
+            "example": 1
+          },
+          "last_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "last_page_url": {
+            "type": "string",
+            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/subscriptions/?page=1"
+          },
+          "next_page_url": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "path": {
+            "type": "string",
+            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/subscriptions"
+          },
           "per_page": {
             "type": "integer",
             "example": 10
           },
+          "prev_page_url": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "to": {
+            "type": "integer",
+            "example": 2
+          },
           "total": {
             "type": "integer",
-            "example": 100
+            "example": 2
           },
-          "total_pages": {
-            "type": "integer",
-            "example": 10
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "label": {
+                  "type": "string"
+                },
+                "active": {
+                  "type": "boolean"
+                }
+              }
+            }
           }
         }
       }
     }
   }
 }
-

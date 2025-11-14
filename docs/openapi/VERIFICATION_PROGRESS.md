@@ -134,6 +134,70 @@ All 4 Customers endpoints verified and updated!
 ### Completed Coupons API ✅
 All 6 Coupons endpoints verified and updated!
 
+24. **GET /subscriptions** (list-subscriptions.json) - ✅ Verified and updated
+   - Updated response schema to match actual structure: {data: {...}} with Laravel pagination
+   - Updated Subscription schema with all actual fields from API response
+   - Added fields: id, uuid, customer_id, parent_order_id, product_id, item_name, quantity, variation_id, billing_interval, signup_fee, initial_tax_total, recurring_amount, recurring_tax_total, recurring_total, bill_times, bill_count, expire_at, trial_ends_at, canceled_at, restored_at, collection_method, next_billing_date, trial_days, vendor_customer_id, vendor_plan_id, vendor_subscription_id, status, original_plan, vendor_response, current_payment_method, config, created_at, updated_at, url, payment_info, billingInfo, overridden_status, currency, reactivate_url, meta
+
+25. **GET /subscriptions/{subscriptionOrderId}** (get-subscription.json) - ✅ Verified and updated
+   - Updated response schema to {subscription: {...}, selected_labels: [...]} format (not wrapped in success/data)
+   - Added related_orders array with Order schema
+   - Added licenses array with License schema
+   - Updated SubscriptionDetail to use allOf with Subscription base schema
+
+26. **GET /dashboard/stats** (get-dashboard-stats.json) - ✅ Verified and updated
+   - Updated response schema to {stats: [...]} format (not wrapped in success/data)
+   - Updated StatWidget schema with actual fields: title, current_count, icon, url, has_currency
+
+27. **GET /settings/store** (get-store-settings.json) - ✅ Verified and updated
+   - Updated response schema to {settings: {...}, fields: {...}} format
+   - Added all actual settings fields from API response
+   - Added store_logo, theme_setup, and other configuration fields
+
+28. **GET /settings/permissions** (get-permissions.json) - ✅ Verified and updated
+   - Updated response schema to {roles: {capability: boolean, roles: [...]}} format
+   - Updated WordPressRole schema with name and key fields
+
+29. **GET /shipping/zones** (list-shipping-zones.json) - ✅ Verified and updated
+   - Updated response schema to {shipping_zones: {...}} with Laravel pagination
+   - Updated ShippingZone schema with formatted_region field
+   - Added all pagination fields
+
+30. **GET /tax/classes** (list-tax-classes.json) - ✅ Verified and updated
+   - Updated response schema to {tax_classes: [...]} format (not wrapped in success/data)
+   - Updated TaxClass schema with meta object containing priority and categories
+   - Added categories array at root level
+
+31. **GET /integration/addons** (list-addons.json) - ✅ Verified and updated
+   - Updated response schema to {addons: {...}} format (object keyed by addon identifier, not array)
+   - Updated IntegrationAddon schema with installable, enabled, title, logo, categories, description fields
+
+32. **GET /reports/overview** (get-overview.json) - ✅ Verified and updated
+   - Updated response schema to {data: {...}} format
+   - Added RevenuePeriod schema for gross_revenue data structure
+   - Response contains period-keyed objects with current, prev, yoy_growth fields
+
+### Completed Subscriptions API ✅
+2/4 Subscriptions endpoints verified and updated! (list, get - cancel and reactivate pending)
+
+### Completed Dashboard API ✅
+1/1 Dashboard endpoints verified and updated!
+
+### Completed Settings API ✅
+2/2 Settings endpoints verified and updated! (get-store-settings, get-permissions)
+
+### Completed Shipping API ✅
+1/1 Shipping endpoints verified and updated! (list-shipping-zones)
+
+### Completed Tax API ✅
+1/1 Tax endpoints verified and updated! (list-tax-classes)
+
+### Completed Integration API ✅
+1/4 Integration endpoints verified and updated! (list-addons - others pending)
+
+### Completed Reports API ✅
+1/2 Reports endpoints verified and updated! (get-overview - quick-order-stats pending)
+
 ## Findings
 
 ### Response Structure Pattern

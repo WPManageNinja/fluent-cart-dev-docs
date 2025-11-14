@@ -18,6 +18,23 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TaxClassListResponse"
+                },
+                "example": {
+                  "tax_classes": [
+                    {
+                      "id": 7,
+                      "title": "BD Standered",
+                      "description": "",
+                      "slug": "bd-standered",
+                      "created_at": "2025-10-13T07:13:38+00:00",
+                      "updated_at": "2025-10-13T10:22:34+00:00",
+                      "meta": {
+                        "priority": 10,
+                        "categories": [2, 3, 4]
+                      },
+                      "categories": [2, 3, 4]
+                    }
+                  ]
                 }
               }
             }
@@ -31,18 +48,10 @@
       "TaxClassListResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "tax_classes": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/TaxClass"
-                }
-              }
+          "tax_classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxClass"
             }
           }
         }
@@ -53,22 +62,53 @@
           "id": {
             "type": "integer",
             "description": "Tax class ID",
-            "example": 1
+            "example": 7
           },
           "title": {
             "type": "string",
             "description": "Tax class title",
-            "example": "Standard"
+            "example": "BD Standered"
           },
           "slug": {
             "type": "string",
             "description": "Tax class slug",
-            "example": "standard"
+            "example": "bd-standered"
           },
           "description": {
             "type": "string",
             "description": "Tax class description",
-            "example": "Standard tax rate for most products"
+            "example": ""
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2025-10-13T07:13:38+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-10-13T10:22:34+00:00"
+          },
+          "meta": {
+            "type": "object",
+            "description": "Tax class metadata",
+            "properties": {
+              "priority": {
+                "type": "integer",
+                "description": "Display priority",
+                "example": 10
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Product category IDs",
+                "example": [2, 3, 4]
+              }
+            }
           },
           "categories": {
             "type": "array",
@@ -76,28 +116,10 @@
               "type": "integer"
             },
             "description": "Product category IDs",
-            "example": []
-          },
-          "priority": {
-            "type": "integer",
-            "description": "Display priority",
-            "example": 10
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2024-01-01 10:00:00"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp",
-            "example": "2024-01-01 10:00:00"
+            "example": [2, 3, 4]
           }
         }
       }
     }
   }
 }
-

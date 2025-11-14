@@ -17,10 +17,6 @@ All endpoints require authentication using WordPress Application Password or Coo
 
 ## Endpoints
 
-### Files
-
-- [List Files](/operations/list-files) - Retrieve a paginated list of uploaded files
-
 ### Orders
 
 - [List Orders](/operations/orders/list-orders) - Retrieve a paginated list of orders

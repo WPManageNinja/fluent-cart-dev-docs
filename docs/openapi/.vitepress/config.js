@@ -24,18 +24,11 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Operations',
+        text: 'Orders',
         items: [
           {
-            text: 'Files',
             items: [
-              { text: 'List Files', link: '/operations/list-files' }
-            ]
-          },
-          {
-            text: 'Orders',
-            items: [
-              { text: 'List Orders', link: '/operations/orders/list-orders' },
+              { text: 'List Orders (GET)', link: '/operations/orders/list-orders' },
               { text: 'Create Order', link: '/operations/orders/create-order' },
               { text: 'Get Order', link: '/operations/orders/get-order' },
               { text: 'Update Order', link: '/operations/orders/update-order' },

@@ -125,3 +125,16 @@ main.VPContent {
   width: 100% !important;
 }
 
+/* Hide "Powered by VitePress OpenAPI" footer */
+[class*="powered"],
+[class*="footer"][class*="openapi"],
+footer:has([class*="powered"]),
+footer:has([class*="openapi"]) {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+

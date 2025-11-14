@@ -9,9 +9,6 @@ hero:
     - theme: brand
       text: View API Reference
       link: /api
-    - theme: alt
-      text: View on GitHub
-      link: https://github.com/your-repo
 ---
 
 ## Features

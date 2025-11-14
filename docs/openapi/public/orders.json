@@ -3,9 +3,14 @@
     "/orders": {
       "get": {
         "operationId": "listOrders",
-        "summary": "List Orders",
+        "summary": "GET List Orders",
         "description": "Retrieve a paginated list of orders with optional filtering and searching.",
         "tags": ["Orders"],
+        "security": [
+          {
+            "wordpressAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "page",
@@ -126,9 +131,14 @@
       },
       "post": {
         "operationId": "createOrder",
-        "summary": "Create Order",
+        "summary": "POST Create Order",
         "description": "Create a new order with items and customer information. Note: Subscription orders are not supported via manual order creation.",
         "tags": ["Orders"],
+        "security": [
+          {
+            "wordpressAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -167,9 +177,14 @@
     "/orders/{order_id}": {
       "get": {
         "operationId": "getOrder",
-        "summary": "Get Order Details",
+        "summary": "GET Get Order Details",
         "description": "Retrieve detailed information about a specific order.",
         "tags": ["Orders"],
+        "security": [
+          {
+            "wordpressAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "order_id",
@@ -196,9 +211,14 @@
       },
       "post": {
         "operationId": "updateOrder",
-        "summary": "Update Order",
+        "summary": "POST Update Order",
         "description": "Update an existing order's information. Note: Subscription orders cannot be edited. Completed orders cannot have their status updated.",
         "tags": ["Orders"],
+        "security": [
+          {
+            "wordpressAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "order_id",
@@ -239,9 +259,14 @@
       },
       "delete": {
         "operationId": "deleteOrder",
-        "summary": "Delete Order",
+        "summary": "DELETE Delete Order",
         "description": "Delete an order.",
         "tags": ["Orders"],
+        "security": [
+          {
+            "wordpressAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "order_id",
@@ -282,9 +307,14 @@
     "/orders/{order}/mark-as-paid": {
       "post": {
         "operationId": "markOrderAsPaid",
-        "summary": "Mark Order as Paid",
+        "summary": "POST Mark Order as Paid",
         "description": "Mark an order as paid manually.",
         "tags": ["Orders"],
+        "security": [
+          {
+            "wordpressAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "order",
@@ -336,9 +366,14 @@
     "/orders/{order_id}/refund": {
       "post": {
         "operationId": "refundOrder",
-        "summary": "Refund Order",
+        "summary": "POST Refund Order",
         "description": "Process a refund for an order.",
         "tags": ["Orders"],
+        "security": [
+          {
+            "wordpressAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "order_id",
@@ -406,9 +441,14 @@
     "/orders/{order}/statuses": {
       "put": {
         "operationId": "updateOrderStatuses",
-        "summary": "Update Order Statuses",
+        "summary": "PUT Update Order Statuses",
         "description": "Update order statuses (payment status, shipping status, order status).",
         "tags": ["Orders"],
+        "security": [
+          {
+            "wordpressAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "order",

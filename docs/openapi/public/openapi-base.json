@@ -7,12 +7,8 @@
   },
   "servers": [
     {
-      "url": "https://yoursite.com/wp-json/fluent-cart/v2",
+      "url": "https://cart.junior.ninja/wp-json/fluent-cart/v2",
       "description": "Production server"
-    },
-    {
-      "url": "http://localhost/wp-json/fluent-cart/v2",
-      "description": "Local development server"
     }
   ],
   "paths": {},
@@ -43,9 +39,10 @@
     },
     "securitySchemes": {
       "wordpressAuth": {
-        "type": "http",
-        "scheme": "basic",
-        "description": "WordPress Application Password or Cookie authentication"
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Enter your WordPress username and application password in the format: username:application_password"
       }
     }
   },

@@ -28,15 +28,61 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Coupon deleted successfully"
-                    }
+                  "$ref": "#/components/schemas/DeleteCouponResponse"
+                },
+                "example": {
+                  "message": "Coupon successfully deleted.",
+                  "data": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - deletion failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "rest_invalid_param",
+                  "message": "Coupon deletion failed!",
+                  "data": {
+                    "status": 400
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - invalid coupon ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "rest_invalid_param",
+                  "message": "Please use a valid coupon ID!",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - coupon does not exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "rest_invalid_param",
+                  "message": "Coupon not found in database, failed to remove.",
+                  "data": {
+                    "status": 404
                   }
                 }
               }
@@ -45,6 +91,24 @@
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "DeleteCouponResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Coupon successfully deleted."
+          },
+          "data": {
+            "type": "string",
+            "description": "Empty string on success",
+            "example": ""
+          }
+        }
+      }
+    }
   }
 }
-

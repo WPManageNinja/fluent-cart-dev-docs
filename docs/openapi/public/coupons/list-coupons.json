@@ -83,6 +83,56 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CouponListResponse"
+                },
+                "example": {
+                  "coupons": {
+                    "current_page": 1,
+                    "data": [
+                      {
+                        "id": 196,
+                        "title": "BFCM SALE",
+                        "code": "BFCM25",
+                        "priority": "5",
+                        "type": "percentage",
+                        "conditions": {
+                          "max_uses": 0,
+                          "buy_quantity": null,
+                          "get_quantity": null,
+                          "max_per_customer": 0,
+                          "apply_to_quantity": "no",
+                          "excluded_products": [],
+                          "included_products": [],
+                          "apply_to_whole_cart": "yes",
+                          "excluded_categories": [],
+                          "included_categories": [],
+                          "max_discount_amount": 5000,
+                          "max_purchase_amount": 0,
+                          "min_purchase_amount": 0
+                        },
+                        "amount": "20",
+                        "use_count": null,
+                        "status": "active",
+                        "notes": "",
+                        "stackable": "no",
+                        "show_on_checkout": "no",
+                        "start_date": null,
+                        "end_date": null,
+                        "created_at": "2025-10-22T06:24:52+00:00",
+                        "updated_at": "2025-10-22T06:24:52+00:00"
+                      }
+                    ],
+                    "first_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=1",
+                    "from": 1,
+                    "last_page": 98,
+                    "last_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=98",
+                    "next_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=2",
+                    "path": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons",
+                    "per_page": 2,
+                    "prev_page_url": null,
+                    "to": 2,
+                    "total": 196,
+                    "links": []
+                  }
                 }
               }
             }
@@ -96,22 +146,8 @@
       "CouponListResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "coupons": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Coupon"
-                }
-              },
-              "pagination": {
-                "$ref": "#/components/schemas/Pagination"
-              }
-            }
+          "coupons": {
+            "$ref": "#/components/schemas/Pagination"
           }
         }
       },
@@ -121,71 +157,168 @@
           "id": {
             "type": "integer",
             "description": "Coupon ID",
-            "example": 1
+            "example": 196
+          },
+          "title": {
+            "type": "string",
+            "description": "Coupon title",
+            "example": "BFCM SALE"
           },
           "code": {
             "type": "string",
             "description": "Coupon code",
-            "example": "SAVE10"
+            "example": "BFCM25"
           },
-          "name": {
+          "priority": {
             "type": "string",
-            "description": "Coupon name",
-            "example": "10% Off Discount"
+            "description": "Coupon priority",
+            "example": "5"
           },
           "type": {
             "type": "string",
-            "enum": ["percentage", "fixed", "free_shipping"],
+            "enum": ["fixed", "percentage", "free_shipping", "buy_x_get_y"],
             "description": "Coupon type",
             "example": "percentage"
           },
-          "value": {
-            "type": "number",
-            "description": "Coupon value (percentage or fixed amount)",
-            "example": 10
+          "conditions": {
+            "type": "object",
+            "description": "Coupon conditions",
+            "properties": {
+              "max_uses": {
+                "type": "integer",
+                "description": "Maximum number of uses",
+                "example": 0
+              },
+              "buy_quantity": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Buy quantity (for buy_x_get_y type)"
+              },
+              "get_quantity": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Get quantity (for buy_x_get_y type)"
+              },
+              "max_per_customer": {
+                "type": "integer",
+                "description": "Maximum uses per customer",
+                "example": 0
+              },
+              "apply_to_quantity": {
+                "type": "string",
+                "enum": ["yes", "no"],
+                "description": "Apply to quantity",
+                "example": "no"
+              },
+              "excluded_products": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Excluded product IDs"
+              },
+              "included_products": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Included product IDs"
+              },
+              "apply_to_whole_cart": {
+                "type": "string",
+                "enum": ["yes", "no"],
+                "description": "Apply to whole cart",
+                "example": "yes"
+              },
+              "excluded_categories": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Excluded category IDs"
+              },
+              "included_categories": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Included category IDs"
+              },
+              "max_discount_amount": {
+                "type": "number",
+                "description": "Maximum discount amount in cents",
+                "example": 5000
+              },
+              "max_purchase_amount": {
+                "type": "number",
+                "description": "Maximum purchase amount in cents",
+                "example": 0
+              },
+              "min_purchase_amount": {
+                "type": "number",
+                "description": "Minimum purchase amount in cents",
+                "example": 0
+              }
+            }
+          },
+          "amount": {
+            "type": "string",
+            "description": "Coupon amount (percentage or fixed amount in cents)",
+            "example": "20"
+          },
+          "use_count": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Number of times used"
           },
           "status": {
             "type": "string",
+            "enum": ["active", "expired", "disabled", "scheduled"],
             "description": "Coupon status",
             "example": "active"
           },
-          "usage_limit": {
-            "type": "integer",
-            "description": "Usage limit",
-            "example": 100
-          },
-          "used_count": {
-            "type": "integer",
-            "description": "Number of times used",
-            "example": 25
-          },
-          "minimum_amount": {
-            "type": "integer",
-            "description": "Minimum amount in cents",
-            "example": 5000
-          },
-          "maximum_amount": {
-            "type": "integer",
-            "description": "Maximum amount in cents",
-            "example": 50000
-          },
-          "valid_from": {
+          "notes": {
             "type": "string",
-            "format": "date-time",
-            "description": "Valid from date",
-            "example": "2024-01-01T00:00:00Z"
+            "description": "Coupon notes",
+            "example": ""
           },
-          "valid_until": {
+          "stackable": {
             "type": "string",
+            "enum": ["yes", "no"],
+            "description": "Whether coupon is stackable",
+            "example": "no"
+          },
+          "show_on_checkout": {
+            "type": "string",
+            "enum": ["yes", "no"],
+            "description": "Whether to show on checkout",
+            "example": "no"
+          },
+          "start_date": {
+            "type": "string",
+            "nullable": true,
             "format": "date-time",
-            "description": "Valid until date",
-            "example": "2024-12-31T23:59:59Z"
+            "description": "Start date",
+            "example": null
+          },
+          "end_date": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "End date",
+            "example": null
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "description": "Creation timestamp",
-            "example": "2024-01-01T10:00:00Z"
+            "example": "2025-10-22T06:24:52+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-10-22T06:24:52+00:00"
           }
         }
       },
@@ -196,21 +329,74 @@
             "type": "integer",
             "example": 1
           },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Coupon"
+            }
+          },
+          "first_page_url": {
+            "type": "string",
+            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=1"
+          },
+          "from": {
+            "type": "integer",
+            "example": 1
+          },
+          "last_page": {
+            "type": "integer",
+            "example": 98
+          },
+          "last_page_url": {
+            "type": "string",
+            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=98"
+          },
+          "next_page_url": {
+            "type": "string",
+            "nullable": true,
+            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons/?page=2"
+          },
+          "path": {
+            "type": "string",
+            "example": "https://cart.junior.ninja/wp-json/fluent-cart/v2/coupons"
+          },
           "per_page": {
             "type": "integer",
-            "example": 10
+            "example": 2
+          },
+          "prev_page_url": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "to": {
+            "type": "integer",
+            "example": 2
           },
           "total": {
             "type": "integer",
-            "example": 50
+            "example": 196
           },
-          "total_pages": {
-            "type": "integer",
-            "example": 5
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "label": {
+                  "type": "string"
+                },
+                "active": {
+                  "type": "boolean"
+                }
+              }
+            }
           }
         }
       }
     }
   }
 }
-

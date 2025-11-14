@@ -98,8 +98,41 @@ All 5 Products endpoints verified and updated!
 ### Completed Customers API ✅
 All 4 Customers endpoints verified and updated!
 
-### In Progress 🔄
-18. **GET /coupons** (list-coupons.json) - Testing...
+18. **GET /coupons** (list-coupons.json) - ✅ Verified and updated
+   - Updated response schema to match actual structure: {coupons: {...}} with Laravel pagination
+   - Updated Coupon schema with all actual fields: id, title, code, priority, type, conditions (object), amount, use_count, status, notes, stackable, show_on_checkout, start_date, end_date, created_at, updated_at
+   - Added conditions object with all properties: max_uses, buy_quantity, get_quantity, max_per_customer, apply_to_quantity, excluded_products, included_products, apply_to_whole_cart, excluded_categories, included_categories, max_discount_amount, max_purchase_amount, min_purchase_amount
+
+19. **GET /coupons/{id}** (get-coupon.json) - ✅ Verified and updated
+   - Updated response schema to {coupon: {...}} format (not wrapped in success/data)
+   - Added activities array to CouponDetail schema
+   - Updated Activity schema with all fields from actual response
+
+20. **POST /coupons** (create-coupon.json) - ✅ Verified and updated
+   - Updated request schema to match CouponRequest validation rules
+   - Required fields: title, code, type, amount, status, stackable, show_on_checkout
+   - Type enum: fixed, percentage, free_shipping, buy_x_get_y
+   - Status enum: active, expired, disabled, scheduled
+   - Updated response to {message, data: coupon} format
+   - Added error responses for validation errors and duplicate codes
+
+21. **PUT /coupons/{id}** (update-coupon.json) - ✅ Verified and updated
+   - Updated request schema - all required fields must be provided (same as create)
+   - Updated response to {message, data: coupon} format
+   - Added error responses for validation errors, invalid ID, and not found
+
+22. **DELETE /coupons/{id}** (delete-coupon.json) - ✅ Verified and updated
+   - Updated response to {message, data: ""} format
+   - Added error responses for deletion failures, invalid ID, and not found
+
+23. **POST /coupons/apply** (apply-coupon.json) - ✅ Verified and updated
+   - Updated request schema to match FrontendRequests/CouponRequest validation rules
+   - Required fields: coupon_code, order_items
+   - Updated response to {applied_coupons: {...}, calculated_items: {...}} format (not wrapped in success/data)
+   - Added schemas for applied_coupons and calculated_items with all actual fields
+
+### Completed Coupons API ✅
+All 6 Coupons endpoints verified and updated!
 
 ## Findings
 

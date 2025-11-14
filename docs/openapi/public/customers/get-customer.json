@@ -47,11 +47,64 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Successful response. Returns detailed customer information.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CustomerDetailResponse"
+                },
+                "example": {
+                  "customer": {
+                    "id": 63195,
+                    "user_id": "5",
+                    "contact_id": "0",
+                    "email": "reachkamrul@gmail.com",
+                    "first_name": "Robert",
+                    "last_name": "Team",
+                    "status": null,
+                    "purchase_value": null,
+                    "purchase_count": "19",
+                    "ltv": "89788",
+                    "first_purchase_date": "2025-10-13 07:17:52",
+                    "last_purchase_date": "2025-11-12 11:40:06",
+                    "aov": "4725.68",
+                    "notes": "",
+                    "uuid": "78cb6de19c8d084d921c4bff0bcb3dbe",
+                    "country": "US",
+                    "city": "New York",
+                    "state": "NY",
+                    "postcode": "10022",
+                    "created_at": "2025-10-09T05:45:54+00:00",
+                    "updated_at": "2025-11-12T11:40:10+00:00",
+                    "selected_labels": [],
+                    "full_name": "Robert Team",
+                    "photo": "https://secure.gravatar.com/avatar/...",
+                    "country_name": "United States (US)",
+                    "formatted_address": {
+                      "country": "United States (US)",
+                      "state": "New York",
+                      "city": "New York",
+                      "postcode": "10022",
+                      "first_name": "Robert",
+                      "last_name": "Team",
+                      "full_name": "Robert Team"
+                    },
+                    "user_link": "https://cart.junior.ninja/wp-admin/user-edit.php?user_id=5",
+                    "labels": []
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "customer": null
                 }
               }
             }
@@ -65,89 +118,210 @@
       "CustomerDetailResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "customer": {
-                "$ref": "#/components/schemas/CustomerDetail"
-              }
-            }
+          "customer": {
+            "$ref": "#/components/schemas/CustomerDetail"
           }
         }
       },
       "CustomerDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Customer"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "selected_labels": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "Selected label IDs",
+                "example": []
+              },
+              "labels": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CustomerLabel"
+                },
+                "description": "Customer labels"
+              }
+            }
+          }
+        ]
+      },
+      "Customer": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
             "description": "Customer ID",
-            "example": 1
+            "example": 63195
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "WordPress user ID",
+            "example": "5"
+          },
+          "contact_id": {
+            "type": "string",
+            "description": "Contact ID",
+            "example": "0"
           },
           "email": {
             "type": "string",
             "format": "email",
             "description": "Customer email address",
-            "example": "customer@example.com"
+            "example": "reachkamrul@gmail.com"
           },
           "first_name": {
             "type": "string",
             "description": "Customer first name",
-            "example": "John"
+            "example": "Robert"
           },
           "last_name": {
             "type": "string",
             "description": "Customer last name",
-            "example": "Doe"
+            "example": "Team"
           },
           "full_name": {
             "type": "string",
             "description": "Customer full name",
-            "example": "John Doe"
+            "example": "Robert Team"
           },
           "status": {
             "type": "string",
+            "nullable": true,
             "description": "Customer status",
-            "example": "active"
+            "example": null
           },
-          "total_spent": {
-            "type": "integer",
-            "description": "Total amount spent in cents",
-            "example": 5000
+          "purchase_value": {
+            "type": "array",
+            "nullable": true,
+            "description": "Purchase value array",
+            "example": null
           },
-          "order_count": {
-            "type": "integer",
-            "description": "Number of orders",
-            "example": 3
+          "purchase_count": {
+            "type": "string",
+            "description": "Number of purchases",
+            "example": "19"
+          },
+          "ltv": {
+            "type": "string",
+            "description": "Lifetime value",
+            "example": "89788"
+          },
+          "first_purchase_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "First purchase date",
+            "example": "2025-10-13 07:17:52"
+          },
+          "last_purchase_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last purchase date",
+            "example": "2025-11-12 11:40:06"
+          },
+          "aov": {
+            "type": "string",
+            "nullable": true,
+            "description": "Average order value",
+            "example": "4725.68"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Customer notes",
+            "example": ""
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Customer UUID",
+            "example": "78cb6de19c8d084d921c4bff0bcb3dbe"
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "description": "Country code",
+            "example": "US"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "description": "City",
+            "example": "New York"
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "description": "State",
+            "example": "NY"
+          },
+          "postcode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Postal code",
+            "example": "10022"
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "description": "Creation timestamp",
-            "example": "2024-01-01T10:00:00Z"
+            "example": "2025-10-09T05:45:54+00:00"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
             "description": "Last update timestamp",
-            "example": "2024-01-15T14:30:00Z"
+            "example": "2025-11-12T11:40:10+00:00"
           },
-          "selected_labels": {
-            "type": "array",
-            "items": {
-              "type": "integer"
-            },
-            "description": "Selected label IDs",
-            "example": [1, 2, 3]
+          "photo": {
+            "type": "string",
+            "format": "uri",
+            "description": "Customer photo URL (Gravatar)",
+            "example": "https://secure.gravatar.com/avatar/..."
           },
-          "labels": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CustomerLabel"
-            },
-            "description": "Customer labels"
+          "country_name": {
+            "type": "string",
+            "description": "Country name",
+            "example": "United States (US)"
+          },
+          "formatted_address": {
+            "type": "object",
+            "description": "Formatted address object",
+            "properties": {
+              "country": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string",
+                "nullable": true
+              },
+              "city": {
+                "type": "string",
+                "nullable": true
+              },
+              "postcode": {
+                "type": "string",
+                "nullable": true
+              },
+              "first_name": {
+                "type": "string"
+              },
+              "last_name": {
+                "type": "string"
+              },
+              "full_name": {
+                "type": "string"
+              }
+            }
+          },
+          "user_link": {
+            "type": "string",
+            "format": "uri",
+            "description": "Link to WordPress user edit page",
+            "example": "https://cart.junior.ninja/wp-admin/user-edit.php?user_id=5"
           }
         }
       },

@@ -30,20 +30,68 @@
                 "$ref": "#/components/schemas/UpdateProductPricingRequest"
               },
               "example": {
-                "price": 3000,
-                "sale_price": 2500,
-                "sku": "SP-001-UPDATED"
+                "detail": {
+                  "min_price": 500,
+                  "max_price": 600
+                },
+                "variants": [
+                  {
+                    "id": 59,
+                    "post_id": 7529088,
+                    "item_price": 500,
+                    "compare_price": 600
+                  }
+                ]
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Product pricing updated successfully",
+            "description": "Product pricing updated successfully. Returns the updated product with variants.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductPricingResponse"
+                  "$ref": "#/components/schemas/UpdateProductPricingResponse"
+                },
+                "example": {
+                  "message": "Product has been updated",
+                  "data": {
+                    "ID": 7529088,
+                    "post_title": "Modern Sweatshirt",
+                    "post_status": "publish",
+                    "variants": [
+                      {
+                        "id": 59,
+                        "post_id": 7529088,
+                        "item_price": 500,
+                        "compare_price": 600,
+                        "variation_title": "Orange"
+                      }
+                    ],
+                    "detail": {
+                      "id": 13,
+                      "post_id": 7529088,
+                      "min_price": 500,
+                      "max_price": 600,
+                      "fulfillment_type": "physical"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error or variation info missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": 400,
+                  "message": "Variation info is not present",
+                  "data": ""
                 }
               }
             }
@@ -56,95 +104,127 @@
     "schemas": {
       "UpdateProductPricingRequest": {
         "type": "object",
+        "description": "Request body for updating product pricing. Uses ProductUpdateRequest validation rules.",
         "properties": {
-          "price": {
-            "type": "integer",
-            "description": "Product price in cents",
-            "example": 3000
-          },
-          "sale_price": {
-            "type": "integer",
-            "description": "Sale price in cents",
-            "example": 2500
-          },
-          "sku": {
-            "type": "string",
-            "description": "Product SKU",
-            "example": "SP-001-UPDATED"
-          },
           "detail": {
             "type": "object",
             "description": "Product detail updates",
             "properties": {
-              "min_price": {
+              "id": {
                 "type": "integer",
+                "description": "Product detail ID"
+              },
+              "min_price": {
+                "type": "number",
                 "description": "Minimum price in cents"
               },
               "max_price": {
-                "type": "integer",
+                "type": "number",
                 "description": "Maximum price in cents"
+              },
+              "variation_type": {
+                "type": "string",
+                "enum": ["simple", "simple_variations"],
+                "description": "Variation type (required if updating)"
+              },
+              "fulfillment_type": {
+                "type": "string",
+                "enum": ["digital", "physical"],
+                "description": "Fulfillment type"
+              },
+              "other_info": {
+                "type": "object",
+                "description": "Additional product information"
               }
             }
           },
           "variants": {
             "type": "array",
+            "description": "Array of variant updates. Required if detail.variation_type is 'simple'.",
+            "items": {
+              "type": "object",
+              "required": ["id", "post_id"],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Variant ID (required)"
+                },
+                "post_id": {
+                  "type": "integer",
+                  "description": "Product post ID (required)"
+                },
+                "variation_title": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "description": "Variant title"
+                },
+                "item_price": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Variant price in cents"
+                },
+                "compare_price": {
+                  "type": "number",
+                  "description": "Compare price in cents"
+                },
+                "item_cost": {
+                  "type": "number",
+                  "description": "Item cost in cents"
+                },
+                "other_info": {
+                  "type": "object",
+                  "description": "Additional variant information"
+                }
+              }
+            }
+          },
+          "post_title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Product title"
+          },
+          "post_status": {
+            "type": "string",
+            "enum": ["draft", "publish", "private"],
+            "description": "Post status"
+          },
+          "post_content": {
+            "type": "string",
+            "description": "Product description"
+          },
+          "post_excerpt": {
+            "type": "string",
+            "description": "Product excerpt"
+          },
+          "gallery": {
+            "type": "array",
+            "description": "Gallery images",
             "items": {
               "type": "object",
               "properties": {
                 "id": {
                   "type": "integer",
-                  "description": "Variant ID"
-                },
-                "item_price": {
-                  "type": "integer",
-                  "description": "Variant price in cents"
+                  "description": "Media ID"
                 }
               }
             }
+          },
+          "product_terms": {
+            "type": "object",
+            "description": "Product taxonomy terms"
           }
         }
       },
-      "ProductPricingResponse": {
+      "UpdateProductPricingResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Product has been updated"
           },
           "data": {
-            "type": "object",
-            "properties": {
-              "product": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "Product ID",
-                    "example": 1
-                  },
-                  "price": {
-                    "type": "integer",
-                    "description": "Product price in cents",
-                    "example": 3000
-                  },
-                  "sale_price": {
-                    "type": "integer",
-                    "description": "Sale price in cents",
-                    "example": 2500
-                  },
-                  "sku": {
-                    "type": "string",
-                    "description": "Product SKU",
-                    "example": "SP-001-UPDATED"
-                  },
-                  "updated_at": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Last update timestamp",
-                    "example": "2024-01-01T11:00:00Z"
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/schemas/Product"
           }
         }
       }

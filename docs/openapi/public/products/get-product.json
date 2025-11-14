@@ -24,11 +24,53 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Successful response. Returns detailed product information.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProductResponse"
+                },
+                "example": {
+                  "product": {
+                    "ID": 7529088,
+                    "post_date": "2025-11-11 10:40:11",
+                    "post_date_gmt": "2025-11-11 10:40:11",
+                    "post_content": "This modern sweatshirt is designed for individuals who value comfort without compromising on style.",
+                    "post_title": "Modern Sweatshirt",
+                    "post_excerpt": "A minimalistic yet stylish sweatshirt perfect for everyday wear.",
+                    "post_status": "publish",
+                    "comment_status": "closed",
+                    "ping_status": "closed",
+                    "post_name": "modern-sweatshirt-06-06-2025-12-51-25",
+                    "post_modified": "2025-11-11 10:40:11",
+                    "post_modified_gmt": "2025-11-11 10:40:11",
+                    "guid": "https://cart.junior.ninja/?items=modern-sweatshirt-06-06-2025-12-51-25",
+                    "post_type": "fluent-products",
+                    "thumbnail": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/placeholder.svg",
+                    "detail": {
+                      "id": 13,
+                      "post_id": 7529088,
+                      "fulfillment_type": "physical",
+                      "min_price": 500,
+                      "max_price": 590,
+                      "default_variation_id": "0",
+                      "default_media": null,
+                      "manage_stock": "1",
+                      "stock_availability": "in-stock",
+                      "variation_type": "simple_variations",
+                      "manage_downloadable": "0",
+                      "other_info": {
+                        "shipping_class": 6,
+                        "group_pricing_by": "payment_type",
+                        "use_pricing_table": "no"
+                      },
+                      "created_at": "2025-06-06T12:51:25+00:00",
+                      "updated_at": "2025-11-12T11:40:06+00:00",
+                      "featured_media": null,
+                      "formatted_min_price": "&#36;5.00",
+                      "formatted_max_price": "&#36;5.90"
+                    }
+                  }
                 }
               }
             }
@@ -62,16 +104,94 @@
       "ProductResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
+          "product": {
+            "$ref": "#/components/schemas/Product"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "description": "Product ID",
+            "example": 7529088
           },
-          "data": {
-            "type": "object",
-            "properties": {
-              "product": {
-                "$ref": "#/components/schemas/ProductDetail"
-              }
-            }
+          "post_date": {
+            "type": "string",
+            "description": "Post creation date",
+            "example": "2025-11-11 10:40:11"
+          },
+          "post_date_gmt": {
+            "type": "string",
+            "description": "Post creation date (GMT)",
+            "example": "2025-11-11 10:40:11"
+          },
+          "post_content": {
+            "type": "string",
+            "description": "Product description",
+            "example": "This modern sweatshirt is designed for individuals who value comfort without compromising on style."
+          },
+          "post_title": {
+            "type": "string",
+            "description": "Product title",
+            "example": "Modern Sweatshirt"
+          },
+          "post_excerpt": {
+            "type": "string",
+            "description": "Product excerpt",
+            "example": "A minimalistic yet stylish sweatshirt perfect for everyday wear."
+          },
+          "post_status": {
+            "type": "string",
+            "enum": ["draft", "publish", "private"],
+            "description": "Post status",
+            "example": "publish"
+          },
+          "comment_status": {
+            "type": "string",
+            "description": "Comment status",
+            "example": "closed"
+          },
+          "ping_status": {
+            "type": "string",
+            "description": "Ping status",
+            "example": "closed"
+          },
+          "post_name": {
+            "type": "string",
+            "description": "Post slug",
+            "example": "modern-sweatshirt-06-06-2025-12-51-25"
+          },
+          "post_modified": {
+            "type": "string",
+            "description": "Post last modified date",
+            "example": "2025-11-11 10:40:11"
+          },
+          "post_modified_gmt": {
+            "type": "string",
+            "description": "Post last modified date (GMT)",
+            "example": "2025-11-11 10:40:11"
+          },
+          "guid": {
+            "type": "string",
+            "format": "uri",
+            "description": "Global unique identifier",
+            "example": "https://cart.junior.ninja/?items=modern-sweatshirt-06-06-2025-12-51-25"
+          },
+          "post_type": {
+            "type": "string",
+            "description": "Post type",
+            "example": "fluent-products"
+          },
+          "thumbnail": {
+            "type": "string",
+            "format": "uri",
+            "description": "Thumbnail image URL",
+            "example": "https://cart.junior.ninja/wp-content/plugins/fluent-cart/assets/images/placeholder.svg"
+          },
+          "detail": {
+            "$ref": "#/components/schemas/ProductDetail"
           }
         }
       },
@@ -139,15 +259,41 @@
             "type": "object",
             "description": "Additional product information",
             "properties": {
+              "shipping_class": {
+                "type": "integer",
+                "description": "Shipping class ID",
+                "example": 6
+              },
               "group_pricing_by": {
                 "type": "string",
-                "example": "repeat_interval"
+                "enum": ["payment_type", "repeat_interval", "none"],
+                "example": "payment_type"
               },
               "use_pricing_table": {
                 "type": "string",
-                "example": "yes"
+                "enum": ["yes", "no"],
+                "example": "no"
+              },
+              "tax_class": {
+                "type": "integer",
+                "description": "Tax class ID"
               }
             }
+          },
+          "formatted_min_price": {
+            "type": "string",
+            "description": "Formatted minimum price",
+            "example": "&#36;5.00"
+          },
+          "formatted_max_price": {
+            "type": "string",
+            "description": "Formatted maximum price",
+            "example": "&#36;5.90"
+          },
+          "gallery_image": {
+            "type": "object",
+            "nullable": true,
+            "description": "Gallery images metadata"
           },
           "created_at": {
             "type": "string",

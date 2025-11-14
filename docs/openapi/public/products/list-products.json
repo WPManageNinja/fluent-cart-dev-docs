@@ -134,15 +134,35 @@
                     "current_page": 1,
                     "data": [
                       {
-                        "ID": 74,
-                        "post_title": "Zipper Hoodie",
+                        "ID": 7529681,
+                        "post_date": "2025-10-31 04:55:15",
+                        "post_date_gmt": "2025-10-31 04:55:15",
+                        "post_content": "",
+                        "post_title": "ChatGPT+Claud Course",
+                        "post_excerpt": "",
                         "post_status": "publish",
-                        "post_type": "fluent-products"
+                        "comment_status": "closed",
+                        "ping_status": "closed",
+                        "post_name": "chatgptclaud-course",
+                        "post_modified": "2025-10-31 04:55:15",
+                        "post_modified_gmt": "2025-10-31 04:55:15",
+                        "guid": "https://cart.junior.ninja/items/chatgptclaud-course/",
+                        "post_type": "fluent-products",
+                        "view_url": "https://cart.junior.ninja/items/chatgptclaud-course/",
+                        "edit_url": "https://cart.junior.ninja/wp-admin/post.php?post=7529681&action=edit"
                       }
                     ],
-                    "per_page": 10,
-                    "total": 100,
-                    "last_page": 10
+                    "first_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/products/?page=1",
+                    "from": 1,
+                    "last_page": 27,
+                    "last_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/products/?page=27",
+                    "links": [],
+                    "next_page_url": "https://cart.junior.ninja/wp-json/fluent-cart/v2/products/?page=2",
+                    "path": "https://cart.junior.ninja/wp-json/fluent-cart/v2/products",
+                    "per_page": 2,
+                    "prev_page_url": null,
+                    "to": 2,
+                    "total": 54
                   }
                 }
               }
@@ -243,15 +263,39 @@
           },
           "post_date": {
             "type": "string",
-            "format": "date-time",
             "description": "Post creation date",
-            "example": "2025-09-24 05:12:35"
+            "example": "2025-10-31 04:55:15"
           },
           "post_date_gmt": {
             "type": "string",
-            "format": "date-time",
             "description": "Post creation date (GMT)",
-            "example": "2025-09-24 05:12:35"
+            "example": "2025-10-31 04:55:15"
+          },
+          "post_modified": {
+            "type": "string",
+            "description": "Post last modified date",
+            "example": "2025-10-31 04:55:15"
+          },
+          "post_modified_gmt": {
+            "type": "string",
+            "description": "Post last modified date (GMT)",
+            "example": "2025-10-31 04:55:15"
+          },
+          "comment_status": {
+            "type": "string",
+            "description": "Comment status",
+            "example": "closed"
+          },
+          "ping_status": {
+            "type": "string",
+            "description": "Ping status",
+            "example": "closed"
+          },
+          "guid": {
+            "type": "string",
+            "format": "uri",
+            "description": "Global unique identifier",
+            "example": "https://cart.junior.ninja/items/chatgptclaud-course/"
           },
           "post_content": {
             "type": "string",

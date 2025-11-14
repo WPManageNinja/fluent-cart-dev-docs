@@ -28,30 +28,58 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "payment_status": {
-                    "type": "string",
-                    "example": "paid"
+                  "statuses": {
+                    "type": "object",
+                    "description": "Statuses to update",
+                    "properties": {
+                      "payment_status": {
+                        "type": "string",
+                        "description": "Payment status",
+                        "example": "paid"
+                      },
+                      "shipping_status": {
+                        "type": "string",
+                        "description": "Shipping status",
+                        "example": "shipped"
+                      },
+                      "status": {
+                        "type": "string",
+                        "description": "Order status (note: field name is 'status', not 'order_status')",
+                        "example": "processing"
+                      }
+                    }
                   },
-                  "shipping_status": {
-                    "type": "string",
-                    "example": "shipped"
+                  "manage_stock": {
+                    "type": "boolean",
+                    "description": "Whether to manage stock",
+                    "example": true
                   },
-                  "order_status": {
+                  "action": {
                     "type": "string",
-                    "example": "processing"
+                    "description": "Action to perform",
+                    "example": "update"
                   }
                 }
+              },
+              "example": {
+                "statuses": {
+                  "payment_status": "paid",
+                  "shipping_status": "shipped",
+                  "status": "processing"
+                },
+                "manage_stock": true,
+                "action": "update"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Order statuses updated successfully",
+            "description": "Order statuses updated successfully. Returns the updated order data.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResponse"
+                  "$ref": "#/components/schemas/UpdateStatusesResponse"
                 }
               }
             }
@@ -217,19 +245,27 @@
           }
         }
       },
-      "OrderResponse": {
+      "UpdateStatusesResponse": {
         "type": "object",
+        "description": "Response contains the updated order data",
         "properties": {
-          "success": {
-            "type": "boolean"
+          "order": {
+            "$ref": "#/components/schemas/Order"
           },
-          "data": {
-            "type": "object",
-            "properties": {
-              "order": {
-                "$ref": "#/components/schemas/Order"
-              }
-            }
+          "discount_meta": {
+            "type": "string"
+          },
+          "shipping_meta": {
+            "type": "string"
+          },
+          "order_settings": {
+            "type": "array"
+          },
+          "selected_labels": {
+            "type": "array"
+          },
+          "tax_id": {
+            "type": "string"
           }
         }
       }

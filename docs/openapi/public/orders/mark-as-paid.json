@@ -30,17 +30,31 @@
                 "properties": {
                   "payment_method": {
                     "type": "string",
+                    "description": "Payment method",
                     "example": "manual"
                   },
-                  "transaction_id": {
+                  "vendor_charge_id": {
                     "type": "string",
+                    "description": "Vendor charge/transaction ID",
                     "example": "manual_123"
                   },
-                  "note": {
+                  "transaction_type": {
                     "type": "string",
+                    "description": "Transaction type",
+                    "example": "charge"
+                  },
+                  "mark_paid_note": {
+                    "type": "string",
+                    "description": "Note for marking as paid",
                     "example": "Manual payment confirmation"
                   }
                 }
+              },
+              "example": {
+                "payment_method": "manual",
+                "vendor_charge_id": "manual_123",
+                "transaction_type": "charge",
+                "mark_paid_note": "Manual payment confirmation"
               }
             }
           }
@@ -51,7 +65,40 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderResponse"
+                  "$ref": "#/components/schemas/MarkAsPaidResponse"
+                },
+                "example": {
+                  "message": "Order has been marked as paid"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Order cannot be marked as paid (already paid or canceled)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "alreadyPaid": {
+                    "value": {
+                      "code": "rest_invalid_param",
+                      "message": "Order has already been paid",
+                      "data": {
+                        "status": 423
+                      }
+                    }
+                  },
+                  "canceled": {
+                    "value": {
+                      "code": "rest_invalid_param",
+                      "message": "Unable to mark paid for canceled order",
+                      "data": {
+                        "status": 423
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -217,19 +264,13 @@
           }
         }
       },
-      "OrderResponse": {
+      "MarkAsPaidResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "order": {
-                "$ref": "#/components/schemas/Order"
-              }
-            }
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Order has been marked as paid"
           }
         }
       }

@@ -39,9 +39,35 @@
                 "example": {
                   "data": {
                     "ID": 7529320,
-                    "product_details": null
+                    "variant": {
+                      "id": 1,
+                      "post_id": 7529320,
+                      "variation_title": "Dynamic Product",
+                      "item_price": 0,
+                      "stock_status": "in-stock",
+                      "payment_type": "onetime"
+                    },
+                    "product_details": {
+                      "id": 1,
+                      "post_id": 7529320,
+                      "fulfillment_type": "digital"
+                    }
                   },
                   "message": "Product has been created successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error or creation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": 400,
+                  "message": "Product creation failed!"
                 }
               }
             }
@@ -122,10 +148,56 @@
                 "description": "Created product ID",
                 "example": 7529320
               },
+              "variant": {
+                "type": "object",
+                "description": "Created product variant",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "Variant ID"
+                  },
+                  "post_id": {
+                    "type": "integer",
+                    "description": "Product post ID"
+                  },
+                  "variation_title": {
+                    "type": "string",
+                    "description": "Variant title"
+                  },
+                  "item_price": {
+                    "type": "integer",
+                    "description": "Item price in cents"
+                  },
+                  "stock_status": {
+                    "type": "string",
+                    "description": "Stock status",
+                    "example": "in-stock"
+                  },
+                  "payment_type": {
+                    "type": "string",
+                    "description": "Payment type",
+                    "example": "onetime"
+                  }
+                }
+              },
               "product_details": {
                 "type": "object",
-                "nullable": true,
-                "description": "Product details (may be null initially)"
+                "description": "Product details",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "Product detail ID"
+                  },
+                  "post_id": {
+                    "type": "integer",
+                    "description": "Product post ID"
+                  },
+                  "fulfillment_type": {
+                    "type": "string",
+                    "enum": ["digital", "physical"],
+                    "description": "Fulfillment type"
+                  }
+                }
               }
             }
           },

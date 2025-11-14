@@ -46,6 +46,61 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CustomerResponse"
+                },
+                "example": {
+                  "message": "Customer updated successfully!",
+                  "data": {
+                    "id": 63195,
+                    "email": "customer@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe Updated",
+                    "full_name": "John Doe Updated",
+                    "status": "active",
+                    "city": "New York",
+                    "notes": "Updated notes",
+                    "updated_at": "2025-11-13T07:30:00+00:00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error, customer not found, or update failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "notFound": {
+                    "value": {
+                      "code": 400,
+                      "message": "Customer not found, please reload the page and try again!",
+                      "data": ""
+                    }
+                  },
+                  "updateFailed": {
+                    "value": {
+                      "code": 400,
+                      "message": "Customer update failed.",
+                      "data": ""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Failed to update WordPress user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": 423,
+                  "message": "Failed to update user.",
+                  "data": ""
                 }
               }
             }
@@ -112,20 +167,13 @@
       "CustomerResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "customer": {
-                "$ref": "#/components/schemas/Customer"
-              }
-            }
-          },
           "message": {
             "type": "string",
+            "description": "Success message",
             "example": "Customer updated successfully!"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Customer"
           }
         }
       },
@@ -135,7 +183,18 @@
           "id": {
             "type": "integer",
             "description": "Customer ID",
-            "example": 1
+            "example": 63195
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "WordPress user ID",
+            "example": "5"
+          },
+          "contact_id": {
+            "type": "string",
+            "description": "Contact ID",
+            "example": "0"
           },
           "email": {
             "type": "string",
@@ -160,14 +219,81 @@
           },
           "status": {
             "type": "string",
+            "nullable": true,
             "description": "Customer status",
             "example": "active"
+          },
+          "purchase_value": {
+            "type": "array",
+            "nullable": true,
+            "description": "Purchase value array"
+          },
+          "purchase_count": {
+            "type": "string",
+            "description": "Number of purchases"
+          },
+          "ltv": {
+            "type": "string",
+            "description": "Lifetime value"
+          },
+          "first_purchase_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "First purchase date"
+          },
+          "last_purchase_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last purchase date"
+          },
+          "aov": {
+            "type": "string",
+            "nullable": true,
+            "description": "Average order value"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Customer notes",
+            "example": "Updated notes"
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Customer UUID"
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "description": "Country code",
+            "example": "US"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "description": "City",
+            "example": "New York"
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "description": "State",
+            "example": "NY"
+          },
+          "postcode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Postal code",
+            "example": "10001"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
             "description": "Last update timestamp",
-            "example": "2024-01-01T11:00:00Z"
+            "example": "2025-11-13T07:30:00+00:00"
           }
         }
       }

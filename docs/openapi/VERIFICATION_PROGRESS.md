@@ -196,7 +196,89 @@ All 6 Coupons endpoints verified and updated!
 1/4 Integration endpoints verified and updated! (list-addons - others pending)
 
 ### Completed Reports API ✅
-1/2 Reports endpoints verified and updated! (get-overview - quick-order-stats pending)
+2/2 Reports endpoints verified and updated! (get-overview, quick-order-stats - note: quick-order-stats may have issues in some installations)
+
+33. **PUT /orders/{order}/subscriptions/{subscription}/cancel** (cancel-subscription.json) - ✅ Verified and updated
+   - Updated request to require cancel_reason field
+   - Updated response to {message, subscription} format (not wrapped in success/data)
+   - Added error responses for missing reason and not found
+
+34. **PUT /orders/{order}/subscriptions/{subscription}/reactivate** (reactivate-subscription.json) - ✅ Verified and updated
+   - Updated to reflect that this endpoint returns "Not available yet" error
+   - Documented as not available
+
+35. **GET /integration/global-settings** (get-global-settings.json) - ✅ Verified and updated
+   - Updated response schema to {settings: [], settings_key: "", message: "..."} format
+   - Response indicates no integration settings found
+
+36. **GET /integration/global-feeds** (get-global-feeds.json) - ✅ Verified and updated
+   - Updated response schema to {feeds: [], available_integrations: {...}, all_module_config_url: "..."} format
+   - Added AvailableIntegration schema with all fields: priority, title, description, category, disable_global_settings, config_url, logo, enabled, scopes, installable, delay_on_product_action, delay_on_global_action
+
+37. **GET /reports/quick-order-stats** (quick-order-stats.json) - ✅ Verified and updated
+   - Updated to note that endpoint may have issues (returns class not found error)
+   - Added 500 error response for class not found
+
+38. **GET /files** (list-files.json) - ✅ Verified and updated
+   - Updated response schema to {files: [...]} format (not wrapped in success/data)
+   - Updated File schema with actual fields: name, size, driver, bucket
+
+39. **GET /email-notification** (list-notifications.json) - ✅ Verified and updated
+   - Updated response schema to {data: {...}} format (object keyed by notification name, not array)
+   - Updated EmailNotification schema with all actual fields: event, title, description, recipient, smartcode_groups, template_path, is_async, pre_header, settings, name
+   - Added settings object with active, subject, is_default_body, email_body
+
+40. **GET /email-notification/get-settings** (get-notification.json) - ✅ Verified and updated
+   - Updated endpoint path to /email-notification/get-settings (not /email-notification/{notification})
+   - Updated response schema to {data: {...}, shortcodes: [...]} format
+   - Added ShortcodeGroup schema for available shortcodes
+   - Response includes from_name, from_email, reply_to_name, reply_to_email, email_footer, show_email_footer, admin_email, notification_config
+
+### Completed Subscriptions API ✅
+4/4 Subscriptions endpoints verified and updated! (list, get, cancel, reactivate)
+
+### Completed Integration API ✅
+3/4 Integration endpoints verified and updated! (list-addons, get-global-settings, get-global-feeds - set-global-settings pending)
+
+### Completed Files API ✅
+1/2 Files endpoints verified and updated! (list-files - upload-file pending)
+
+### Completed Email Notification API ✅
+3/3 Email Notification endpoints verified and updated! (list-notifications, get-notification, update-notification, save-settings)
+
+41. **POST /integration/global-settings** (set-global-settings.json) - ✅ Verified and updated
+   - Updated request schema to require integration_name and integration (JSON string)
+   - Added optional integration_id for updates
+   - Updated response to {message, integration_id, integration_name, created, feedData} format (not wrapped in success/data)
+   - Added error responses for validation errors and not found
+
+42. **POST /files/upload** (upload-file.json) - ✅ Verified and updated
+   - Updated request schema - name is required (max 160 chars), file is required (binary)
+   - Updated response to {message, path, file: {driver, size, name, bucket}} format (not wrapped in success/data)
+   - File name is automatically prefixed with timestamp for uniqueness
+   - Added error responses for validation errors and empty file
+
+43. **PUT /email-notification/{notification}** (update-notification.json) - ✅ Verified and updated
+   - Updated request schema to require settings object with subject (required)
+   - Settings fields: active, subject, is_default_body, email_body
+   - Updated response to {message} format (wrapped in success/data via sendSuccess)
+   - Added error response for validation errors
+
+44. **POST /email-notification/save-settings** (update-notification.json) - ✅ Verified and updated
+   - Added new endpoint for saving global email settings
+   - Required fields: from_name, from_email, admin_email
+   - Optional fields: reply_to_name, reply_to_email, email_footer, show_email_footer
+   - Updated response to {message} format (wrapped in success/data via sendSuccess)
+   - Added error response for validation errors
+
+### Completed Integration API ✅
+4/4 Integration endpoints verified and updated! (list-addons, get-global-settings, set-global-settings, get-global-feeds)
+
+### Completed Files API ✅
+2/2 Files endpoints verified and updated! (list-files, upload-file)
+
+### Completed Email Notification API ✅
+3/3 Email Notification endpoints verified and updated! (list-notifications, get-notification, update-notification, save-settings)
 
 ## Findings
 

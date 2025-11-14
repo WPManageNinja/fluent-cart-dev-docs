@@ -4,7 +4,7 @@
       "put": {
         "operationId": "cancelSubscription",
         "summary": "PUT Cancel Subscription",
-        "description": "Cancel a subscription.",
+        "description": "Cancel a subscription. Requires a cancel reason.",
         "tags": ["Subscriptions"],
         "security": [
           {
@@ -32,14 +32,14 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CancelSubscriptionRequest"
               },
               "example": {
-                "reason": "Customer requested cancellation",
-                "cancel_immediately": false
+                "cancel_reason": "Customer requested cancellation"
               }
             }
           }
@@ -50,7 +50,41 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
+                  "$ref": "#/components/schemas/CancelSubscriptionResponse"
+                },
+                "example": {
+                  "message": "Subscription has been cancelled successfully!",
+                  "subscription": {
+                    "id": 13468,
+                    "status": "cancelled",
+                    "canceled_at": "2025-11-14T10:00:00+00:00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - cancel reason required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Please select cancel reason!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Subscription not found!"
                 }
               }
             }
@@ -63,32 +97,25 @@
     "schemas": {
       "CancelSubscriptionRequest": {
         "type": "object",
+        "required": ["cancel_reason"],
         "properties": {
-          "reason": {
+          "cancel_reason": {
             "type": "string",
-            "description": "Cancellation reason",
+            "description": "Cancellation reason (required)",
             "example": "Customer requested cancellation"
-          },
-          "cancel_immediately": {
-            "type": "boolean",
-            "description": "Whether to cancel immediately",
-            "default": false
           }
         }
       },
-      "SubscriptionResponse": {
+      "CancelSubscriptionResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Subscription has been cancelled successfully!"
           },
-          "data": {
-            "type": "object",
-            "properties": {
-              "subscription": {
-                "$ref": "#/components/schemas/Subscription"
-              }
-            }
+          "subscription": {
+            "$ref": "#/components/schemas/Subscription"
           }
         }
       },
@@ -98,27 +125,21 @@
           "id": {
             "type": "integer",
             "description": "Subscription ID",
-            "example": 1
+            "example": 13468
           },
           "status": {
             "type": "string",
             "description": "Subscription status",
             "example": "cancelled"
           },
-          "cancelled_at": {
+          "canceled_at": {
             "type": "string",
             "format": "date-time",
             "description": "Cancellation timestamp",
-            "example": "2024-01-15T14:30:00Z"
-          },
-          "cancellation_reason": {
-            "type": "string",
-            "description": "Cancellation reason",
-            "example": "Customer requested cancellation"
+            "example": "2025-11-14T10:00:00+00:00"
           }
         }
       }
     }
   }
 }
-

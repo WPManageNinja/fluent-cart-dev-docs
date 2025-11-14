@@ -19,7 +19,8 @@
             "schema": {
               "type": "string"
             },
-            "description": "Notification name/identifier"
+            "description": "Notification name/identifier",
+            "example": "order_paid_admin"
           }
         ],
         "requestBody": {
@@ -31,11 +32,10 @@
               },
               "example": {
                 "settings": {
-                  "active": true,
-                  "subject": "Order #{{order_id}}",
-                  "content": "Thank you for your order...",
-                  "from_name": "My Store",
-                  "from_email": "store@example.com"
+                  "active": "yes",
+                  "subject": "New Sales On {{settings.store_name}}",
+                  "is_default_body": "yes",
+                  "email_body": ""
                 }
               }
             }
@@ -47,21 +47,83 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "message": {
-                          "type": "string",
-                          "example": "Notification updated successfully"
-                        }
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/UpdateEmailNotificationResponse"
+                },
+                "example": {
+                  "message": "Notification updated successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Subject field is required."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/email-notification/save-settings": {
+      "post": {
+        "operationId": "saveEmailSettings",
+        "summary": "POST Save Email Settings",
+        "description": "Save global email notification settings (from name, from email, admin email, etc.).",
+        "tags": ["Email Notification"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveEmailSettingsRequest"
+              },
+              "example": {
+                "from_name": "Hello",
+                "from_email": "hello@fluentcart.com",
+                "reply_to_name": "",
+                "reply_to_email": "",
+                "email_footer": "",
+                "show_email_footer": "yes",
+                "admin_email": "hello@fluentcart.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveEmailSettingsResponse"
+                },
+                "example": {
+                  "message": "Email settings saved successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "From Name field is required."
                 }
               }
             }
@@ -78,34 +140,118 @@
         "properties": {
           "settings": {
             "type": "object",
-            "description": "Notification settings object",
+            "required": ["subject"],
             "properties": {
               "active": {
-                "type": "boolean",
-                "description": "Whether the notification is active"
+                "type": "string",
+                "enum": ["yes", "no"],
+                "description": "Whether the notification is active",
+                "example": "yes"
               },
               "subject": {
                 "type": "string",
-                "description": "Email subject template"
+                "maxLength": 255,
+                "description": "Email subject template (required, may contain smart codes)",
+                "example": "New Sales On {{settings.store_name}}"
               },
-              "content": {
+              "is_default_body": {
                 "type": "string",
-                "description": "Email content template"
+                "enum": ["yes", "no"],
+                "description": "Whether using default email body",
+                "example": "yes"
               },
-              "from_name": {
+              "email_body": {
                 "type": "string",
-                "description": "From name"
-              },
-              "from_email": {
-                "type": "string",
-                "format": "email",
-                "description": "From email address"
+                "nullable": true,
+                "description": "Custom email body (HTML allowed, required if is_default_body is 'no')",
+                "example": ""
               }
             }
+          }
+        }
+      },
+      "UpdateEmailNotificationResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Notification updated successfully"
+          }
+        }
+      },
+      "SaveEmailSettingsRequest": {
+        "type": "object",
+        "required": ["from_name", "from_email", "admin_email"],
+        "properties": {
+          "from_name": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Default from name (required)",
+            "example": "Hello"
+          },
+          "from_email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 255,
+            "description": "Default from email address (required)",
+            "example": "hello@fluentcart.com"
+          },
+          "reply_to_name": {
+            "type": "string",
+            "maxLength": 255,
+            "nullable": true,
+            "description": "Reply-to name",
+            "example": ""
+          },
+          "reply_to_email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 255,
+            "nullable": true,
+            "description": "Reply-to email address",
+            "example": ""
+          },
+          "email_footer": {
+            "type": "string",
+            "nullable": true,
+            "description": "Email footer text (HTML allowed)",
+            "example": ""
+          },
+          "show_email_footer": {
+            "type": "string",
+            "enum": ["yes", "no"],
+            "nullable": true,
+            "description": "Whether to show email footer",
+            "example": "yes"
+          },
+          "admin_email": {
+            "type": "string",
+            "description": "Admin email address (required)",
+            "example": "hello@fluentcart.com"
+          }
+        }
+      },
+      "SaveEmailSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Email settings saved successfully"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Subject field is required."
           }
         }
       }
     }
   }
 }
-

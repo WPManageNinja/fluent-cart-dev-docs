@@ -4,7 +4,7 @@
       "get": {
         "operationId": "getQuickOrderStats",
         "summary": "GET Get Quick Order Stats",
-        "description": "Retrieve quick statistics about orders.",
+        "description": "Retrieve quick statistics about orders. Note: This endpoint may have issues in some installations.",
         "tags": ["Reports"],
         "security": [
           {
@@ -32,9 +32,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
                     "data": {
                       "type": "object",
                       "description": "Quick order statistics"
@@ -43,10 +40,36 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Internal server error - class not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Class \"FluentCart\\App\\Modules\\ReportingModule\\Status\" not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Class \"FluentCart\\App\\Modules\\ReportingModule\\Status\" not found"
           }
         }
       }
     }
   }
 }
-

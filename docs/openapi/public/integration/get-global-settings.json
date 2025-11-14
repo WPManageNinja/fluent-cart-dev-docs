@@ -17,23 +17,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "settings": {
-                      "type": "object",
-                      "description": "Global integration settings",
-                      "properties": {
-                        "enabled": {
-                          "type": "boolean",
-                          "example": true
-                        },
-                        "default_provider": {
-                          "type": "string",
-                          "example": "mailchimp"
-                        }
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/GlobalSettingsResponse"
+                },
+                "example": {
+                  "settings": [],
+                  "settings_key": "",
+                  "message": "Sorry! No integration failed found with: "
                 }
               }
             }
@@ -41,6 +30,32 @@
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "GlobalSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "array",
+            "description": "Global integration settings",
+            "items": {
+              "type": "object"
+            },
+            "example": []
+          },
+          "settings_key": {
+            "type": "string",
+            "description": "Settings key",
+            "example": ""
+          },
+          "message": {
+            "type": "string",
+            "description": "Response message",
+            "example": "Sorry! No integration failed found with: "
+          }
+        }
+      }
+    }
   }
 }
-

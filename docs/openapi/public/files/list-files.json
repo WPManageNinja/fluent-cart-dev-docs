@@ -4,95 +4,36 @@
       "get": {
         "operationId": "listFiles",
         "summary": "GET List Files",
-        "description": "Retrieve a paginated list of uploaded files.",
+        "description": "Retrieve a list of uploaded files.",
         "tags": ["Files"],
         "security": [
           {
             "ApplicationPasswords": []
           }
         ],
-        "parameters": [
-          {
-            "name": "driver",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "default": "local"
-            },
-            "description": "Storage driver to filter by",
-            "required": false
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "minimum": 1
-            },
-            "description": "Page number",
-            "example": 1
-          },
-          {
-            "name": "per_page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "minimum": 1,
-              "maximum": 100
-            },
-            "description": "Items per page (max 100)",
-            "example": 10
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Search query",
-            "required": false
-          },
-          {
-            "name": "filters",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "json"
-            },
-            "description": "Filter options as JSON string",
-            "required": false
-          },
-          {
-            "name": "order_by",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "default": "id"
-            },
-            "description": "Sort field",
-            "example": "id"
-          },
-          {
-            "name": "order_type",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": ["ASC", "DESC"],
-              "default": "DESC"
-            },
-            "description": "Sort direction",
-            "example": "DESC"
-          }
-        ],
         "responses": {
           "200": {
-            "description": "Successful response. Returns a paginated list of files.",
+            "description": "Successful response. Returns a list of files.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FileListResponse"
+                },
+                "example": {
+                  "files": [
+                    {
+                      "name": "10000-assets.png.zip__fluent-cart__.1761039177.zip",
+                      "size": 1345778,
+                      "driver": "local",
+                      "bucket": ""
+                    },
+                    {
+                      "name": "2000-assets.png.zip__fluent-cart__.1761039120.zip",
+                      "size": 1354215,
+                      "driver": "local",
+                      "bucket": ""
+                    }
+                  ]
                 }
               }
             }
@@ -106,21 +47,10 @@
       "FileListResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "files": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/File"
-                }
-              },
-              "pagination": {
-                "$ref": "#/components/schemas/Pagination"
-              }
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/File"
             }
           }
         }
@@ -128,83 +58,28 @@
       "File": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "description": "File ID",
-            "example": 1
-          },
           "name": {
             "type": "string",
             "description": "File name",
-            "example": "product-image.jpg"
+            "example": "10000-assets.png.zip__fluent-cart__.1761039177.zip"
           },
-          "original_name": {
-            "type": "string",
-            "description": "Original file name",
-            "example": "product-image.jpg"
-          },
-          "file_path": {
-            "type": "string",
-            "description": "File path",
-            "example": "/uploads/2024/01/product-image.jpg"
-          },
-          "file_url": {
-            "type": "string",
-            "format": "uri",
-            "description": "File URL",
-            "example": "https://yoursite.com/wp-content/uploads/2024/01/product-image.jpg"
-          },
-          "file_size": {
+          "size": {
             "type": "integer",
             "description": "File size in bytes",
-            "example": 1024000
+            "example": 1345778
           },
-          "file_type": {
-            "type": "string",
-            "description": "File MIME type",
-            "example": "image/jpeg"
-          },
-          "storage_driver": {
+          "driver": {
             "type": "string",
             "description": "Storage driver",
             "example": "local"
           },
-          "created_at": {
+          "bucket": {
             "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2024-01-01T10:00:00Z"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp",
-            "example": "2024-01-01T10:00:00Z"
-          }
-        }
-      },
-      "Pagination": {
-        "type": "object",
-        "properties": {
-          "current_page": {
-            "type": "integer",
-            "example": 1
-          },
-          "per_page": {
-            "type": "integer",
-            "example": 10
-          },
-          "total": {
-            "type": "integer",
-            "example": 100
-          },
-          "total_pages": {
-            "type": "integer",
-            "example": 10
+            "description": "Storage bucket (empty for local driver)",
+            "example": ""
           }
         }
       }
     }
   }
 }
-

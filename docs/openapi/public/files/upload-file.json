@@ -4,7 +4,7 @@
       "post": {
         "operationId": "uploadFile",
         "summary": "POST Upload File",
-        "description": "Upload a new file to the storage system.",
+        "description": "Upload a new file to the storage system. The file name will be automatically prefixed with a timestamp to ensure uniqueness.",
         "tags": ["Files"],
         "security": [
           {
@@ -16,31 +16,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "object",
-                "required": ["file", "name"],
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "The file to upload"
-                  },
-                  "name": {
-                    "type": "string",
-                    "maxLength": 160,
-                    "description": "Custom file name (max 160 characters)",
-                    "example": "product-image"
-                  },
-                  "driver": {
-                    "type": "string",
-                    "description": "Storage driver to use (optional, default: local)",
-                    "example": "local"
-                  },
-                  "bucket": {
-                    "type": "string",
-                    "description": "Bucket/folder name (optional)",
-                    "example": "products"
-                  }
-                }
+                "$ref": "#/components/schemas/UploadFileRequest"
               }
             }
           }
@@ -52,6 +28,39 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FileUploadResponse"
+                },
+                "example": {
+                  "message": "File Uploaded Successfully",
+                  "path": "product-image__fluent-cart__.1763112373.jpg",
+                  "file": {
+                    "driver": "local",
+                    "size": 1024000,
+                    "name": "product-image__fluent-cart__.1763112373.jpg",
+                    "bucket": ""
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error or file empty",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "validationError": {
+                    "value": {
+                      "message": "Name field is required"
+                    }
+                  },
+                  "fileEmpty": {
+                    "value": {
+                      "message": "Failed To Upload File",
+                      "additional": "File is empty"
+                    }
+                  }
                 }
               }
             }
@@ -62,75 +71,90 @@
   },
   "components": {
     "schemas": {
+      "UploadFileRequest": {
+        "type": "object",
+        "required": ["file", "name"],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "The file to upload (required)"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160,
+            "description": "Custom file name without extension (required, max 160 characters). The extension will be automatically added from the uploaded file.",
+            "example": "product-image"
+          },
+          "driver": {
+            "type": "string",
+            "description": "Storage driver to use (optional, default: local)",
+            "example": "local"
+          },
+          "bucket": {
+            "type": "string",
+            "description": "Bucket/folder name (optional, for cloud storage drivers)",
+            "example": "products"
+          }
+        }
+      },
       "FileUploadResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean"
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "File Uploaded Successfully"
           },
-          "data": {
+          "path": {
+            "type": "string",
+            "description": "Uploaded file path (with timestamp prefix)",
+            "example": "product-image__fluent-cart__.1763112373.jpg"
+          },
+          "file": {
             "type": "object",
+            "description": "File information",
             "properties": {
-              "file": {
-                "$ref": "#/components/schemas/File"
+              "driver": {
+                "type": "string",
+                "description": "Storage driver used",
+                "example": "local"
+              },
+              "size": {
+                "type": "integer",
+                "description": "File size in bytes",
+                "example": 1024000
+              },
+              "name": {
+                "type": "string",
+                "description": "File name (with timestamp prefix)",
+                "example": "product-image__fluent-cart__.1763112373.jpg"
+              },
+              "bucket": {
+                "type": "string",
+                "description": "Storage bucket (empty for local driver)",
+                "example": ""
               }
             }
           }
         }
       },
-      "File": {
+      "Error": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "description": "File ID",
-            "example": 1
-          },
-          "name": {
+          "message": {
             "type": "string",
-            "description": "File name",
-            "example": "uploaded-file.jpg"
+            "description": "Error message",
+            "example": "Failed To Upload File"
           },
-          "original_name": {
+          "additional": {
             "type": "string",
-            "description": "Original file name",
-            "example": "product-image.jpg"
-          },
-          "file_path": {
-            "type": "string",
-            "description": "File path",
-            "example": "/uploads/2024/01/uploaded-file.jpg"
-          },
-          "file_url": {
-            "type": "string",
-            "format": "uri",
-            "description": "File URL",
-            "example": "https://yoursite.com/wp-content/uploads/2024/01/uploaded-file.jpg"
-          },
-          "file_size": {
-            "type": "integer",
-            "description": "File size in bytes",
-            "example": 1024000
-          },
-          "file_type": {
-            "type": "string",
-            "description": "File MIME type",
-            "example": "image/jpeg"
-          },
-          "storage_driver": {
-            "type": "string",
-            "description": "Storage driver",
-            "example": "local"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2024-01-01T10:00:00Z"
+            "nullable": true,
+            "description": "Additional error information",
+            "example": "File is empty"
           }
         }
       }
     }
   }
 }
-

@@ -4,7 +4,7 @@
       "put": {
         "operationId": "reactivateSubscription",
         "summary": "PUT Reactivate Subscription",
-        "description": "Reactivate a cancelled subscription.",
+        "description": "Reactivate a cancelled subscription. Note: This feature is not available yet.",
         "tags": ["Subscriptions"],
         "security": [
           {
@@ -31,25 +31,16 @@
             "description": "Subscription ID"
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReactivateSubscriptionRequest"
-              },
-              "example": {
-                "reactivation_date": "2024-02-01T00:00:00Z"
-              }
-            }
-          }
-        },
         "responses": {
-          "200": {
-            "description": "Subscription reactivated successfully",
+          "400": {
+            "description": "Not available",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubscriptionResponse"
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Not available yet"
                 }
               }
             }
@@ -60,61 +51,16 @@
   },
   "components": {
     "schemas": {
-      "ReactivateSubscriptionRequest": {
+      "Error": {
         "type": "object",
         "properties": {
-          "reactivation_date": {
+          "message": {
             "type": "string",
-            "format": "date-time",
-            "description": "Reactivation date",
-            "example": "2024-02-01T00:00:00Z"
-          }
-        }
-      },
-      "SubscriptionResponse": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "data": {
-            "type": "object",
-            "properties": {
-              "subscription": {
-                "$ref": "#/components/schemas/Subscription"
-              }
-            }
-          }
-        }
-      },
-      "Subscription": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Subscription ID",
-            "example": 1
-          },
-          "status": {
-            "type": "string",
-            "description": "Subscription status",
-            "example": "active"
-          },
-          "reactivated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Reactivation timestamp",
-            "example": "2024-01-15T14:30:00Z"
-          },
-          "next_billing_date": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Next billing date",
-            "example": "2024-02-01T00:00:00Z"
+            "description": "Error message",
+            "example": "Not available yet"
           }
         }
       }
     }
   }
 }
-

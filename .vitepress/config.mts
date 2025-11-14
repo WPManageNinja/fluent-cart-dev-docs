@@ -120,10 +120,9 @@ export default defineConfig({
             ]
           },
           {
-            text: 'OpenAPI',
+            text: 'API',
             items: [
-              { text: 'API Reference', link: '/openapi/api' },
-              { text: 'Introduction', link: '/openapi/' }
+              { text: 'API Reference', link: '/openapi/operations/orders/list-orders' },
             ]
           },
           // {
@@ -293,13 +292,6 @@ export default defineConfig({
         }
       ],
       '/openapi/': [
-        {
-          text: 'Getting Started',
-          items: [
-            { text: 'Introduction', link: '/openapi/' },
-            { text: 'API Reference', link: '/openapi/api' }
-          ]
-        },
         {
           text: 'Orders',
           items: [

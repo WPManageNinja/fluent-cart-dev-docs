@@ -24,9 +24,9 @@ features:
   - title: Developer Hooks
     details: Comprehensive documentation of action hooks, filter hooks, and event system for extending FluentCart functionality.
     link: /hooks/actions/
-  - title: REST API (coming soon)
+  - title: REST API
     details: Complete REST API documentation including authentication, core endpoints, and FluentCart Pro API for all e-commerce operations.
-    link: /
+    link: /openapi/operations/orders/list-orders
   - title: Payment Methods (coming soon)
     details: Payment gateway architecture, supported gateways, and custom gateway development guide for payment processing.
     link: /

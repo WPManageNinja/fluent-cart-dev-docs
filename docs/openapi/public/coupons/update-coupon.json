@@ -1,0 +1,164 @@
+{
+  "paths": {
+    "/coupons/{id}": {
+      "put": {
+        "operationId": "updateCoupon",
+        "summary": "PUT Update Coupon",
+        "description": "Update an existing coupon.",
+        "tags": ["Coupons"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Coupon ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCouponRequest"
+              },
+              "example": {
+                "name": "Updated 10% Off Discount",
+                "value": 15,
+                "usage_limit": 150,
+                "status": "active"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Coupon updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CouponResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateCouponRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Coupon name",
+            "required": false,
+            "example": "Updated 10% Off Discount"
+          },
+          "value": {
+            "type": "number",
+            "description": "Coupon value",
+            "required": false,
+            "example": 15
+          },
+          "usage_limit": {
+            "type": "integer",
+            "description": "Usage limit",
+            "required": false,
+            "example": 150
+          },
+          "status": {
+            "type": "string",
+            "description": "Coupon status",
+            "required": false,
+            "example": "active"
+          },
+          "minimum_amount": {
+            "type": "integer",
+            "description": "Minimum amount in cents",
+            "required": false
+          },
+          "maximum_amount": {
+            "type": "integer",
+            "description": "Maximum amount in cents",
+            "required": false
+          },
+          "valid_from": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Valid from date",
+            "required": false
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Valid until date",
+            "required": false
+          }
+        }
+      },
+      "CouponResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "coupon": {
+                "$ref": "#/components/schemas/Coupon"
+              }
+            }
+          }
+        }
+      },
+      "Coupon": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Coupon ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Coupon name",
+            "example": "Updated 10% Off Discount"
+          },
+          "value": {
+            "type": "number",
+            "description": "Coupon value",
+            "example": 15
+          },
+          "usage_limit": {
+            "type": "integer",
+            "description": "Usage limit",
+            "example": 150
+          },
+          "status": {
+            "type": "string",
+            "description": "Coupon status",
+            "example": "active"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2024-01-01T11:00:00Z"
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,156 @@
+{
+  "paths": {
+    "/coupons/apply": {
+      "post": {
+        "operationId": "applyCoupon",
+        "summary": "POST Apply Coupon",
+        "description": "Apply a coupon to an order or cart.",
+        "tags": ["Coupons"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyCouponRequest"
+              },
+              "example": {
+                "coupon_code": "SAVE10",
+                "order_id": 1,
+                "customer_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Coupon applied successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplyCouponResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApplyCouponRequest": {
+        "type": "object",
+        "required": ["coupon_code"],
+        "properties": {
+          "coupon_code": {
+            "type": "string",
+            "description": "Coupon code to apply",
+            "example": "SAVE10"
+          },
+          "order_id": {
+            "type": "integer",
+            "description": "Order ID",
+            "required": false
+          },
+          "cart_items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "integer"
+                },
+                "variation_id": {
+                  "type": "integer"
+                },
+                "quantity": {
+                  "type": "integer"
+                },
+                "price": {
+                  "type": "integer"
+                }
+              }
+            },
+            "description": "Cart items",
+            "required": false
+          },
+          "customer_id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "required": false
+          }
+        }
+      },
+      "ApplyCouponResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "coupon": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                }
+              },
+              "discount": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "description": "Discount amount in cents"
+                  },
+                  "percentage": {
+                    "type": "number",
+                    "description": "Discount percentage"
+                  },
+                  "applied_to": {
+                    "type": "string",
+                    "description": "What the discount was applied to"
+                  }
+                }
+              },
+              "order": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "subtotal": {
+                    "type": "integer"
+                  },
+                  "discount": {
+                    "type": "integer"
+                  },
+                  "total": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

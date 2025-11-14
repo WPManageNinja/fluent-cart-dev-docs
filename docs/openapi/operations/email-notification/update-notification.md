@@ -1,0 +1,7 @@
+---
+title: Update Notification
+description: "Update settings for a specific email notification."
+outline: false
+---
+<OAOperation operationId="updateEmailNotification" />
+

@@ -1,0 +1,77 @@
+{
+  "paths": {
+    "/email-notification/": {
+      "get": {
+        "operationId": "listEmailNotifications",
+        "summary": "GET List Notifications",
+        "description": "Retrieve all available email notifications.",
+        "tags": ["Email Notification"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailNotificationsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmailNotificationsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailNotification"
+            }
+          }
+        }
+      },
+      "EmailNotification": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Notification name/identifier",
+            "example": "order_placed"
+          },
+          "title": {
+            "type": "string",
+            "description": "Notification title",
+            "example": "Order Placed"
+          },
+          "description": {
+            "type": "string",
+            "description": "Notification description",
+            "example": "Sent when an order is placed"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the notification is active",
+            "example": true
+          },
+          "settings": {
+            "type": "object",
+            "description": "Notification settings"
+          }
+        }
+      }
+    }
+  }
+}
+

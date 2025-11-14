@@ -1,0 +1,107 @@
+{
+  "paths": {
+    "/email-notification/{notification}": {
+      "get": {
+        "operationId": "getEmailNotification",
+        "summary": "GET Get Notification Details",
+        "description": "Retrieve details for a specific email notification.",
+        "tags": ["Email Notification"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notification",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Notification name/identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailNotificationDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmailNotificationDetailResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "order_placed"
+              },
+              "title": {
+                "type": "string",
+                "example": "Order Placed"
+              },
+              "description": {
+                "type": "string",
+                "example": "Sent when an order is placed"
+              },
+              "active": {
+                "type": "boolean",
+                "example": true
+              },
+              "settings": {
+                "type": "object",
+                "properties": {
+                  "subject": {
+                    "type": "string",
+                    "example": "Order #{{order_id}}"
+                  },
+                  "content": {
+                    "type": "string",
+                    "example": "Thank you for your order..."
+                  }
+                }
+              }
+            }
+          },
+          "shortcodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Shortcode"
+            },
+            "description": "Available shortcodes for this notification"
+          }
+        }
+      },
+      "Shortcode": {
+        "type": "object",
+        "properties": {
+          "shortcode": {
+            "type": "string",
+            "example": "[order_id]"
+          },
+          "description": {
+            "type": "string",
+            "example": "Order ID"
+          }
+        }
+      }
+    }
+  }
+}
+

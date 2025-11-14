@@ -1,0 +1,64 @@
+{
+  "paths": {
+    "/integration/global-settings": {
+      "post": {
+        "operationId": "setIntegrationGlobalSettings",
+        "summary": "POST Set Global Settings",
+        "description": "Update global settings for integrations.",
+        "tags": ["Integration"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Global integration settings. Structure depends on the integration settings.",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "default_provider": {
+                    "type": "string",
+                    "example": "mailchimp"
+                  }
+                }
+              },
+              "example": {
+                "enabled": true,
+                "default_provider": "mailchimp"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Global settings saved successfully"
+                    },
+                    "settings": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

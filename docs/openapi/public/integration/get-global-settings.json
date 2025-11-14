@@ -1,0 +1,46 @@
+{
+  "paths": {
+    "/integration/global-settings": {
+      "get": {
+        "operationId": "getIntegrationGlobalSettings",
+        "summary": "GET Get Global Settings",
+        "description": "Retrieve global settings for integrations.",
+        "tags": ["Integration"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "description": "Global integration settings",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "default_provider": {
+                          "type": "string",
+                          "example": "mailchimp"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

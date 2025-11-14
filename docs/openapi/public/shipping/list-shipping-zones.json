@@ -1,0 +1,142 @@
+{
+  "paths": {
+    "/shipping/zones": {
+      "get": {
+        "operationId": "listShippingZones",
+        "summary": "GET List Shipping Zones",
+        "description": "Retrieve a paginated list of all shipping zones.",
+        "tags": ["Shipping"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term for filtering zones",
+            "required": false
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of items per page",
+            "required": false
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Page number",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns a paginated list of shipping zones.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingZoneListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShippingZoneListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "shipping_zones": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ShippingZone"
+                    }
+                  },
+                  "total": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "example": 10
+                  },
+                  "current_page": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "last_page": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ShippingZone": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Shipping zone ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Shipping zone name",
+            "example": "United States"
+          },
+          "region": {
+            "type": "string",
+            "description": "Region code",
+            "example": "US"
+          },
+          "order": {
+            "type": "integer",
+            "description": "Display order",
+            "example": 0
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01 10:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2024-01-01 10:00:00"
+          }
+        }
+      }
+    }
+  }
+}
+

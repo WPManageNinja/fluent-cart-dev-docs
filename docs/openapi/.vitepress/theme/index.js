@@ -11,6 +11,7 @@ export default {
       // List of spec files to load and merge
       const specFiles = [
         '/fluentcart-base.json',
+        // Orders
         '/orders/list-orders.json',
         '/orders/create-order.json',
         '/orders/get-order.json',
@@ -19,11 +20,61 @@ export default {
         '/orders/mark-as-paid.json',
         '/orders/refund-order.json',
         '/orders/update-statuses.json',
+        // Products
         '/products/list-products.json',
         '/products/create-product.json',
         '/products/get-product.json',
         '/products/update-product-pricing.json',
-        '/products/delete-product.json'
+        '/products/delete-product.json',
+        // Customers
+        '/customers/list-customers.json',
+        '/customers/create-customer.json',
+        '/customers/get-customer.json',
+        '/customers/update-customer.json',
+        // Coupons
+        '/coupons/list-coupons.json',
+        '/coupons/create-coupon.json',
+        '/coupons/get-coupon.json',
+        '/coupons/update-coupon.json',
+        '/coupons/delete-coupon.json',
+        '/coupons/apply-coupon.json',
+        // Subscriptions
+        '/subscriptions/list-subscriptions.json',
+        '/subscriptions/get-subscription.json',
+        '/subscriptions/cancel-subscription.json',
+        '/subscriptions/reactivate-subscription.json',
+        // Tax
+        '/tax/list-tax-classes.json',
+        '/tax/create-tax-class.json',
+        // Shipping
+        '/shipping/list-shipping-zones.json',
+        // Settings
+        '/settings/get-store-settings.json',
+        '/settings/save-store-settings.json',
+        // Reports
+        '/reports/get-overview.json',
+        '/reports/quick-order-stats.json',
+        // Files
+        '/files/list-files.json',
+        '/files/upload-file.json',
+        // Dashboard
+        '/dashboard/get-dashboard-stats.json',
+        // Roles & Permissions
+        '/roles-permissions/get-permissions.json',
+        '/roles-permissions/save-permissions.json',
+        // Integration
+        '/integration/list-addons.json',
+        '/integration/get-global-settings.json',
+        '/integration/set-global-settings.json',
+        '/integration/get-global-feeds.json',
+        // Licensing
+        '/licensing/get-license-chart.json',
+        '/licensing/get-license-pie-chart.json',
+        '/licensing/get-license-summary.json',
+        // Email Notification
+        '/email-notification/list-notifications.json',
+        '/email-notification/get-notification.json',
+        '/email-notification/update-notification.json'
       ]
       
       // Fetch all spec files

@@ -1,0 +1,124 @@
+{
+  "paths": {
+    "/orders/{order}/subscriptions/{subscription}/cancel": {
+      "put": {
+        "operationId": "cancelSubscription",
+        "summary": "PUT Cancel Subscription",
+        "description": "Cancel a subscription.",
+        "tags": ["Subscriptions"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          },
+          {
+            "name": "subscription",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Subscription ID"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelSubscriptionRequest"
+              },
+              "example": {
+                "reason": "Customer requested cancellation",
+                "cancel_immediately": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CancelSubscriptionRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Cancellation reason",
+            "example": "Customer requested cancellation"
+          },
+          "cancel_immediately": {
+            "type": "boolean",
+            "description": "Whether to cancel immediately",
+            "default": false
+          }
+        }
+      },
+      "SubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "subscription": {
+                "$ref": "#/components/schemas/Subscription"
+              }
+            }
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Subscription ID",
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Subscription status",
+            "example": "cancelled"
+          },
+          "cancelled_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Cancellation timestamp",
+            "example": "2024-01-15T14:30:00Z"
+          },
+          "cancellation_reason": {
+            "type": "string",
+            "description": "Cancellation reason",
+            "example": "Customer requested cancellation"
+          }
+        }
+      }
+    }
+  }
+}
+

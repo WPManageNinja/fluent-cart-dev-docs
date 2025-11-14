@@ -1,0 +1,249 @@
+{
+  "paths": {
+    "/subscriptions": {
+      "get": {
+        "operationId": "listSubscriptions",
+        "summary": "GET List Subscriptions",
+        "description": "Retrieve a paginated list of subscriptions with optional filtering and searching.",
+        "tags": ["Subscriptions"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "Page number",
+            "example": 1
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Items per page (max 100)",
+            "example": 10
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query",
+            "required": false
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "json"
+            },
+            "description": "Filter options as JSON string",
+            "required": false
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "id"
+            },
+            "description": "Sort field",
+            "example": "id"
+          },
+          {
+            "name": "order_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            },
+            "description": "Sort direction",
+            "example": "DESC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns a paginated list of subscriptions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SubscriptionListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "subscriptions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/Pagination"
+              }
+            }
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Subscription ID",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Subscription UUID",
+            "example": "sub_abc123"
+          },
+          "customer_id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "example": 123
+          },
+          "product_id": {
+            "type": "integer",
+            "description": "Product ID",
+            "example": 456
+          },
+          "variation_id": {
+            "type": "integer",
+            "description": "Variation ID",
+            "example": 789
+          },
+          "status": {
+            "type": "string",
+            "description": "Subscription status",
+            "example": "active"
+          },
+          "billing_cycle": {
+            "type": "string",
+            "description": "Billing cycle",
+            "example": "monthly"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount in cents",
+            "example": 2500
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code",
+            "example": "USD"
+          },
+          "next_billing_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Next billing date",
+            "example": "2024-02-01T00:00:00Z"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T10:00:00Z"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "product": {
+            "$ref": "#/components/schemas/Product"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 123
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "customer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 456
+          },
+          "title": {
+            "type": "string",
+            "example": "Premium Plan"
+          },
+          "sku": {
+            "type": "string",
+            "example": "PREMIUM-001"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "example": 10
+          },
+          "total": {
+            "type": "integer",
+            "example": 100
+          },
+          "total_pages": {
+            "type": "integer",
+            "example": 10
+          }
+        }
+      }
+    }
+  }
+}
+

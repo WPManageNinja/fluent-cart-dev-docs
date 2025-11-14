@@ -1,0 +1,111 @@
+{
+  "paths": {
+    "/email-notification/{notification}": {
+      "put": {
+        "operationId": "updateEmailNotification",
+        "summary": "PUT Update Notification",
+        "description": "Update settings for a specific email notification.",
+        "tags": ["Email Notification"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notification",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Notification name/identifier"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEmailNotificationRequest"
+              },
+              "example": {
+                "settings": {
+                  "active": true,
+                  "subject": "Order #{{order_id}}",
+                  "content": "Thank you for your order...",
+                  "from_name": "My Store",
+                  "from_email": "store@example.com"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Notification updated successfully"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateEmailNotificationRequest": {
+        "type": "object",
+        "required": ["settings"],
+        "properties": {
+          "settings": {
+            "type": "object",
+            "description": "Notification settings object",
+            "properties": {
+              "active": {
+                "type": "boolean",
+                "description": "Whether the notification is active"
+              },
+              "subject": {
+                "type": "string",
+                "description": "Email subject template"
+              },
+              "content": {
+                "type": "string",
+                "description": "Email content template"
+              },
+              "from_name": {
+                "type": "string",
+                "description": "From name"
+              },
+              "from_email": {
+                "type": "string",
+                "format": "email",
+                "description": "From email address"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

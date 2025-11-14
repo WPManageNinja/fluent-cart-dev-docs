@@ -1,0 +1,86 @@
+{
+  "paths": {
+    "/dashboard/stats": {
+      "get": {
+        "operationId": "getDashboardStats",
+        "summary": "GET Get Dashboard Stats",
+        "description": "Retrieve dashboard statistics and widgets.",
+        "tags": ["Dashboard"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params",
+            "in": "query",
+            "schema": {
+              "type": "object"
+            },
+            "description": "Optional parameters for filtering stats",
+            "required": false,
+            "style": "deepObject",
+            "explode": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardStatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DashboardStatsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "stats": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/StatWidget"
+                }
+              }
+            }
+          }
+        }
+      },
+      "StatWidget": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Stat widget title",
+            "example": "Total Revenue"
+          },
+          "value": {
+            "type": "string",
+            "description": "Stat value",
+            "example": "10000.00"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code",
+            "example": "USD"
+          }
+        }
+      }
+    }
+  }
+}
+

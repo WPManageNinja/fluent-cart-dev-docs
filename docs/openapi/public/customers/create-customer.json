@@ -1,0 +1,179 @@
+{
+  "paths": {
+    "/customers": {
+      "post": {
+        "operationId": "createCustomer",
+        "summary": "POST Create Customer",
+        "description": "Create a new customer. The system will automatically split the full_name into first_name and last_name.",
+        "tags": ["Customers"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomerRequest"
+              },
+              "example": {
+                "email": "newcustomer@example.com",
+                "full_name": "Jane Smith",
+                "city": "New York",
+                "status": "active",
+                "country": "US",
+                "state": "NY",
+                "postcode": "10001",
+                "wp_user": "yes"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateCustomerRequest": {
+        "type": "object",
+        "required": ["email", "full_name"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Customer email address (must be unique)",
+            "example": "newcustomer@example.com"
+          },
+          "full_name": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Customer's full name (max 255 characters)",
+            "example": "Jane Smith"
+          },
+          "city": {
+            "type": "string",
+            "description": "Customer's city",
+            "required": false
+          },
+          "status": {
+            "type": "string",
+            "description": "Customer status",
+            "required": false
+          },
+          "notes": {
+            "type": "string",
+            "description": "Customer notes",
+            "required": false
+          },
+          "country": {
+            "type": "string",
+            "description": "Customer's country",
+            "required": false
+          },
+          "state": {
+            "type": "string",
+            "description": "Customer's state",
+            "required": false
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Customer's postal code",
+            "required": false
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "WordPress user ID to attach",
+            "required": false
+          },
+          "wp_user": {
+            "type": "string",
+            "description": "Set to 'yes' to create WordPress user if email matches existing user",
+            "required": false
+          }
+        }
+      },
+      "CustomerResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "customer": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            }
+          },
+          "message": {
+            "type": "string",
+            "example": "Customer created successfully!"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "example": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Customer email address",
+            "example": "newcustomer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Customer first name",
+            "example": "Jane"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Customer last name",
+            "example": "Smith"
+          },
+          "full_name": {
+            "type": "string",
+            "description": "Customer full name",
+            "example": "Jane Smith"
+          },
+          "city": {
+            "type": "string",
+            "description": "Customer's city",
+            "example": "New York"
+          },
+          "status": {
+            "type": "string",
+            "description": "Customer status",
+            "example": "active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T10:00:00Z"
+          }
+        }
+      }
+    }
+  }
+}
+

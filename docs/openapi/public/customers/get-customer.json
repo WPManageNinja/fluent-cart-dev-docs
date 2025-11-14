@@ -1,0 +1,177 @@
+{
+  "paths": {
+    "/customers/{customerId}": {
+      "get": {
+        "operationId": "getCustomer",
+        "summary": "GET Get Customer Details",
+        "description": "Retrieve detailed information about a specific customer.",
+        "tags": ["Customers"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Customer ID"
+          },
+          {
+            "name": "with[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Related data to include (e.g., orders, addresses)",
+            "required": false,
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "params.customer_only",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Set to 'yes' to return only customer data without labels",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CustomerDetailResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "customer": {
+                "$ref": "#/components/schemas/CustomerDetail"
+              }
+            }
+          }
+        }
+      },
+      "CustomerDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "example": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Customer email address",
+            "example": "customer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Customer first name",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Customer last name",
+            "example": "Doe"
+          },
+          "full_name": {
+            "type": "string",
+            "description": "Customer full name",
+            "example": "John Doe"
+          },
+          "status": {
+            "type": "string",
+            "description": "Customer status",
+            "example": "active"
+          },
+          "total_spent": {
+            "type": "integer",
+            "description": "Total amount spent in cents",
+            "example": 5000
+          },
+          "order_count": {
+            "type": "integer",
+            "description": "Number of orders",
+            "example": 3
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T10:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2024-01-15T14:30:00Z"
+          },
+          "selected_labels": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Selected label IDs",
+            "example": [1, 2, 3]
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerLabel"
+            },
+            "description": "Customer labels"
+          }
+        }
+      },
+      "CustomerLabel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Label ID",
+            "example": 1
+          },
+          "label_id": {
+            "type": "integer",
+            "description": "Label ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Label name",
+            "example": "VIP"
+          }
+        }
+      }
+    }
+  }
+}
+

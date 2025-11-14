@@ -1,0 +1,177 @@
+{
+  "paths": {
+    "/customers/{customerId}": {
+      "put": {
+        "operationId": "updateCustomer",
+        "summary": "PUT Update Customer",
+        "description": "Update an existing customer's information.",
+        "tags": ["Customers"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Customer ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerRequest"
+              },
+              "example": {
+                "email": "customer@example.com",
+                "full_name": "John Doe Updated",
+                "status": "active",
+                "notes": "Updated notes",
+                "city": "New York"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateCustomerRequest": {
+        "type": "object",
+        "required": ["email", "full_name"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Customer email address (must be unique if changed)",
+            "example": "customer@example.com"
+          },
+          "full_name": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Customer's full name (max 255 characters)",
+            "example": "John Doe Updated"
+          },
+          "city": {
+            "type": "string",
+            "description": "Customer's city",
+            "required": false
+          },
+          "status": {
+            "type": "string",
+            "description": "Customer status",
+            "required": false
+          },
+          "notes": {
+            "type": "string",
+            "description": "Customer notes",
+            "required": false
+          },
+          "country": {
+            "type": "string",
+            "description": "Customer's country",
+            "required": false
+          },
+          "state": {
+            "type": "string",
+            "description": "Customer's state",
+            "required": false
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Customer's postal code",
+            "required": false
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "WordPress user ID to attach",
+            "required": false
+          }
+        }
+      },
+      "CustomerResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "customer": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            }
+          },
+          "message": {
+            "type": "string",
+            "example": "Customer updated successfully!"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "example": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Customer email address",
+            "example": "customer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Customer first name",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Customer last name",
+            "example": "Doe Updated"
+          },
+          "full_name": {
+            "type": "string",
+            "description": "Customer full name",
+            "example": "John Doe Updated"
+          },
+          "status": {
+            "type": "string",
+            "description": "Customer status",
+            "example": "active"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2024-01-01T11:00:00Z"
+          }
+        }
+      }
+    }
+  }
+}
+

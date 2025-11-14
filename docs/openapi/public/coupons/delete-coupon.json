@@ -1,0 +1,50 @@
+{
+  "paths": {
+    "/coupons/{id}": {
+      "delete": {
+        "operationId": "deleteCoupon",
+        "summary": "DELETE Delete Coupon",
+        "description": "Delete a coupon.",
+        "tags": ["Coupons"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Coupon ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Coupon deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Coupon deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

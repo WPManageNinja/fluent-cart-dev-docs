@@ -1,0 +1,220 @@
+{
+  "paths": {
+    "/subscriptions/{subscriptionOrderId}": {
+      "get": {
+        "operationId": "getSubscription",
+        "summary": "GET Get Subscription Details",
+        "description": "Retrieve detailed information about a specific subscription.",
+        "tags": ["Subscriptions"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscriptionOrderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Subscription Order ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SubscriptionDetailResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "subscription": {
+                "$ref": "#/components/schemas/SubscriptionDetail"
+              }
+            }
+          }
+        }
+      },
+      "SubscriptionDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Subscription ID",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Subscription UUID",
+            "example": "sub_abc123"
+          },
+          "customer_id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "example": 123
+          },
+          "product_id": {
+            "type": "integer",
+            "description": "Product ID",
+            "example": 456
+          },
+          "variation_id": {
+            "type": "integer",
+            "description": "Variation ID",
+            "example": 789
+          },
+          "status": {
+            "type": "string",
+            "description": "Subscription status",
+            "example": "active"
+          },
+          "billing_cycle": {
+            "type": "string",
+            "description": "Billing cycle",
+            "example": "monthly"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount in cents",
+            "example": 2500
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code",
+            "example": "USD"
+          },
+          "next_billing_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Next billing date",
+            "example": "2024-02-01T00:00:00Z"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T10:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2024-01-15T14:30:00Z"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "product": {
+            "$ref": "#/components/schemas/Product"
+          },
+          "order": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "payment_status": {
+                "type": "string"
+              }
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 123
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "customer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 456
+          },
+          "title": {
+            "type": "string",
+            "example": "Premium Plan"
+          },
+          "sku": {
+            "type": "string",
+            "example": "PREMIUM-001"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Transaction ID",
+            "example": 1
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount in cents",
+            "example": 2500
+          },
+          "status": {
+            "type": "string",
+            "description": "Transaction status",
+            "example": "succeeded"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T10:00:00Z"
+          }
+        }
+      }
+    }
+  }
+}
+

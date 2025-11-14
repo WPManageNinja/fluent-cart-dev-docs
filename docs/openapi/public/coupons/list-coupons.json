@@ -1,0 +1,216 @@
+{
+  "paths": {
+    "/coupons": {
+      "get": {
+        "operationId": "listCoupons",
+        "summary": "GET List Coupons",
+        "description": "Retrieve a paginated list of coupons with optional filtering and searching.",
+        "tags": ["Coupons"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "Page number",
+            "example": 1
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Items per page (max 100)",
+            "example": 10
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query",
+            "required": false
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "json"
+            },
+            "description": "Filter options as JSON string",
+            "required": false
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "id"
+            },
+            "description": "Sort field",
+            "example": "id"
+          },
+          {
+            "name": "order_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            },
+            "description": "Sort direction",
+            "example": "DESC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns a paginated list of coupons.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CouponListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CouponListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "coupons": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Coupon"
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/Pagination"
+              }
+            }
+          }
+        }
+      },
+      "Coupon": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Coupon ID",
+            "example": 1
+          },
+          "code": {
+            "type": "string",
+            "description": "Coupon code",
+            "example": "SAVE10"
+          },
+          "name": {
+            "type": "string",
+            "description": "Coupon name",
+            "example": "10% Off Discount"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["percentage", "fixed", "free_shipping"],
+            "description": "Coupon type",
+            "example": "percentage"
+          },
+          "value": {
+            "type": "number",
+            "description": "Coupon value (percentage or fixed amount)",
+            "example": 10
+          },
+          "status": {
+            "type": "string",
+            "description": "Coupon status",
+            "example": "active"
+          },
+          "usage_limit": {
+            "type": "integer",
+            "description": "Usage limit",
+            "example": 100
+          },
+          "used_count": {
+            "type": "integer",
+            "description": "Number of times used",
+            "example": 25
+          },
+          "minimum_amount": {
+            "type": "integer",
+            "description": "Minimum amount in cents",
+            "example": 5000
+          },
+          "maximum_amount": {
+            "type": "integer",
+            "description": "Maximum amount in cents",
+            "example": 50000
+          },
+          "valid_from": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Valid from date",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Valid until date",
+            "example": "2024-12-31T23:59:59Z"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T10:00:00Z"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "example": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "example": 10
+          },
+          "total": {
+            "type": "integer",
+            "example": 50
+          },
+          "total_pages": {
+            "type": "integer",
+            "example": 5
+          }
+        }
+      }
+    }
+  }
+}
+

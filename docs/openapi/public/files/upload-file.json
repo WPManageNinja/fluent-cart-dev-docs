@@ -1,0 +1,136 @@
+{
+  "paths": {
+    "/files/upload": {
+      "post": {
+        "operationId": "uploadFile",
+        "summary": "POST Upload File",
+        "description": "Upload a new file to the storage system.",
+        "tags": ["Files"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file", "name"],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The file to upload"
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 160,
+                    "description": "Custom file name (max 160 characters)",
+                    "example": "product-image"
+                  },
+                  "driver": {
+                    "type": "string",
+                    "description": "Storage driver to use (optional, default: local)",
+                    "example": "local"
+                  },
+                  "bucket": {
+                    "type": "string",
+                    "description": "Bucket/folder name (optional)",
+                    "example": "products"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileUploadResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FileUploadResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "$ref": "#/components/schemas/File"
+              }
+            }
+          }
+        }
+      },
+      "File": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "File ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "File name",
+            "example": "uploaded-file.jpg"
+          },
+          "original_name": {
+            "type": "string",
+            "description": "Original file name",
+            "example": "product-image.jpg"
+          },
+          "file_path": {
+            "type": "string",
+            "description": "File path",
+            "example": "/uploads/2024/01/uploaded-file.jpg"
+          },
+          "file_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "File URL",
+            "example": "https://yoursite.com/wp-content/uploads/2024/01/uploaded-file.jpg"
+          },
+          "file_size": {
+            "type": "integer",
+            "description": "File size in bytes",
+            "example": 1024000
+          },
+          "file_type": {
+            "type": "string",
+            "description": "File MIME type",
+            "example": "image/jpeg"
+          },
+          "storage_driver": {
+            "type": "string",
+            "description": "Storage driver",
+            "example": "local"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T10:00:00Z"
+          }
+        }
+      }
+    }
+  }
+}
+

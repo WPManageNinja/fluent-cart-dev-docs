@@ -1,0 +1,103 @@
+{
+  "paths": {
+    "/tax/classes": {
+      "get": {
+        "operationId": "listTaxClasses",
+        "summary": "GET List Tax Classes",
+        "description": "Retrieve all tax classes, sorted by priority.",
+        "tags": ["Tax"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns all tax classes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxClassListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TaxClassListResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "tax_classes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TaxClass"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TaxClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Tax class ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Tax class title",
+            "example": "Standard"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Tax class slug",
+            "example": "standard"
+          },
+          "description": {
+            "type": "string",
+            "description": "Tax class description",
+            "example": "Standard tax rate for most products"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Product category IDs",
+            "example": []
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Display priority",
+            "example": 10
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01 10:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2024-01-01 10:00:00"
+          }
+        }
+      }
+    }
+  }
+}
+

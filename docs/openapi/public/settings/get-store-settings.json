@@ -1,0 +1,85 @@
+{
+  "paths": {
+    "/settings/store": {
+      "get": {
+        "operationId": "getStoreSettings",
+        "summary": "GET Get Store Settings",
+        "description": "Retrieve store settings for a specific settings tab.",
+        "tags": ["Settings"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "settings_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Settings tab name to retrieve",
+            "example": "general"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreSettingsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "StoreSettingsResponse": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "object",
+            "description": "Store settings object",
+            "properties": {
+              "store_name": {
+                "type": "string",
+                "example": "My Store"
+              },
+              "store_email": {
+                "type": "string",
+                "format": "email",
+                "example": "store@example.com"
+              },
+              "store_logo": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "fields": {
+            "type": "object",
+            "description": "Settings fields schema"
+          }
+        }
+      }
+    }
+  }
+}
+

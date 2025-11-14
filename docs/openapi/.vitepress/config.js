@@ -53,6 +53,159 @@ export default defineConfig({
             ]
           }
         ]
+      },
+      {
+        text: 'Customers',
+        items: [
+          {
+            items: [
+              { text: 'List Customers (GET)', link: '/operations/customers/list-customers' },
+              { text: 'Create Customer', link: '/operations/customers/create-customer' },
+              { text: 'Get Customer', link: '/operations/customers/get-customer' },
+              { text: 'Update Customer', link: '/operations/customers/update-customer' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Coupons',
+        items: [
+          {
+            items: [
+              { text: 'List Coupons (GET)', link: '/operations/coupons/list-coupons' },
+              { text: 'Create Coupon', link: '/operations/coupons/create-coupon' },
+              { text: 'Get Coupon', link: '/operations/coupons/get-coupon' },
+              { text: 'Update Coupon', link: '/operations/coupons/update-coupon' },
+              { text: 'Delete Coupon', link: '/operations/coupons/delete-coupon' },
+              { text: 'Apply Coupon', link: '/operations/coupons/apply-coupon' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Subscriptions',
+        items: [
+          {
+            items: [
+              { text: 'List Subscriptions (GET)', link: '/operations/subscriptions/list-subscriptions' },
+              { text: 'Get Subscription', link: '/operations/subscriptions/get-subscription' },
+              { text: 'Cancel Subscription', link: '/operations/subscriptions/cancel-subscription' },
+              { text: 'Reactivate Subscription', link: '/operations/subscriptions/reactivate-subscription' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Tax',
+        items: [
+          {
+            items: [
+              { text: 'List Tax Classes (GET)', link: '/operations/tax/list-tax-classes' },
+              { text: 'Create Tax Class', link: '/operations/tax/create-tax-class' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Shipping',
+        items: [
+          {
+            items: [
+              { text: 'List Shipping Zones (GET)', link: '/operations/shipping/list-shipping-zones' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Settings',
+        items: [
+          {
+            items: [
+              { text: 'Get Store Settings (GET)', link: '/operations/settings/get-store-settings' },
+              { text: 'Save Store Settings', link: '/operations/settings/save-store-settings' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Reports',
+        items: [
+          {
+            items: [
+              { text: 'Get Reports Overview (GET)', link: '/operations/reports/get-overview' },
+              { text: 'Get Quick Order Stats (GET)', link: '/operations/reports/quick-order-stats' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Files',
+        items: [
+          {
+            items: [
+              { text: 'List Files (GET)', link: '/operations/files/list-files' },
+              { text: 'Upload File', link: '/operations/files/upload-file' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Dashboard',
+        items: [
+          {
+            items: [
+              { text: 'Get Dashboard Stats (GET)', link: '/operations/dashboard/get-dashboard-stats' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Roles & Permissions',
+        items: [
+          {
+            items: [
+              { text: 'Get Permissions (GET)', link: '/operations/roles-permissions/get-permissions' },
+              { text: 'Save Permissions', link: '/operations/roles-permissions/save-permissions' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Integration',
+        items: [
+          {
+            items: [
+              { text: 'List Addons (GET)', link: '/operations/integration/list-addons' },
+              { text: 'Get Global Settings (GET)', link: '/operations/integration/get-global-settings' },
+              { text: 'Set Global Settings', link: '/operations/integration/set-global-settings' },
+              { text: 'Get Global Feeds (GET)', link: '/operations/integration/get-global-feeds' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Licensing',
+        items: [
+          {
+            items: [
+              { text: 'Get License Line Chart (GET)', link: '/operations/licensing/get-license-chart' },
+              { text: 'Get License Pie Chart (GET)', link: '/operations/licensing/get-license-pie-chart' },
+              { text: 'Get License Summary (GET)', link: '/operations/licensing/get-license-summary' }
+            ]
+          }
+        ]
+      },
+      {
+        text: 'Email Notification',
+        items: [
+          {
+            items: [
+              { text: 'List Notifications (GET)', link: '/operations/email-notification/list-notifications' },
+              { text: 'Get Notification Details (GET)', link: '/operations/email-notification/get-notification' },
+              { text: 'Update Notification', link: '/operations/email-notification/update-notification' }
+            ]
+          }
+        ]
       }
     ],
     

@@ -1,0 +1,80 @@
+{
+  "paths": {
+    "/integration/global-feeds": {
+      "get": {
+        "operationId": "getIntegrationGlobalFeeds",
+        "summary": "GET Get Global Feeds",
+        "description": "Retrieve all global integration feeds.",
+        "tags": ["Integration"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "feeds": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IntegrationFeed"
+                      }
+                    },
+                    "available_integrations": {
+                      "type": "object",
+                      "description": "Available integrations"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IntegrationFeed": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Feed ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Feed name",
+            "example": "Main Mailchimp Feed"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the feed is enabled",
+            "example": true
+          },
+          "provider": {
+            "type": "string",
+            "description": "Integration provider",
+            "example": "mailchimp"
+          },
+          "feed": {
+            "type": "object",
+            "description": "Feed configuration"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Feed scope",
+            "example": "global"
+          }
+        }
+      }
+    }
+  }
+}
+

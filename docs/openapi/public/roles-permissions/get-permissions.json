@@ -1,0 +1,74 @@
+{
+  "paths": {
+    "/settings/permissions": {
+      "get": {
+        "operationId": "getPermissions",
+        "summary": "GET Get Permissions",
+        "description": "Retrieve a list of available WordPress roles and the currently configured capability permissions.",
+        "tags": ["Roles & Permissions"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PermissionsResponse": {
+        "type": "object",
+        "properties": {
+          "roles": {
+            "type": "object",
+            "properties": {
+              "capability": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Array of WordPress role keys that currently have FluentCart access",
+                "example": ["editor", "author"]
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WordPressRole"
+                },
+                "description": "Array of available WordPress roles (excluding administrator and subscriber)"
+              }
+            }
+          }
+        }
+      },
+      "WordPressRole": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name of the role",
+            "example": "Editor"
+          },
+          "key": {
+            "type": "string",
+            "description": "WordPress role key/identifier",
+            "example": "editor"
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,92 @@
+{
+  "paths": {
+    "/settings/permissions": {
+      "post": {
+        "operationId": "savePermissions",
+        "summary": "POST Save Permissions",
+        "description": "Update which WordPress roles have access to FluentCart.",
+        "tags": ["Roles & Permissions"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavePermissionsRequest"
+              },
+              "example": {
+                "capability": ["editor", "author"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permissions updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully updated the role(s)."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User doesn't have manage_options capability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Sorry, You can not update permissions. Only administrators can update permissions"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SavePermissionsRequest": {
+        "type": "object",
+        "required": ["capability"],
+        "properties": {
+          "capability": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of WordPress role keys that should have FluentCart access",
+            "example": ["editor", "author"]
+          }
+        }
+      }
+    }
+  }
+}
+

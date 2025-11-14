@@ -1,0 +1,86 @@
+{
+  "paths": {
+    "/integration/addons": {
+      "get": {
+        "operationId": "listIntegrationAddons",
+        "summary": "GET List Addons",
+        "description": "Retrieve a list of available integration addons.",
+        "tags": ["Integration"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by status",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddonsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddonsResponse": {
+        "type": "object",
+        "properties": {
+          "addons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegrationAddon"
+            }
+          }
+        }
+      },
+      "IntegrationAddon": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Addon key/identifier",
+            "example": "mailchimp"
+          },
+          "title": {
+            "type": "string",
+            "description": "Addon title",
+            "example": "Mailchimp"
+          },
+          "description": {
+            "type": "string",
+            "description": "Addon description",
+            "example": "Email marketing integration"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the addon is enabled",
+            "example": true
+          },
+          "installed": {
+            "type": "boolean",
+            "description": "Whether the addon is installed",
+            "example": true
+          }
+        }
+      }
+    }
+  }
+}
+

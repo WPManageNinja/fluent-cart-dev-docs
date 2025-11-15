@@ -29,8 +29,6 @@ All endpoints require authentication and appropriate permissions:
 
 Retrieve a paginated list of orders with optional filtering and searching.
 
-**Permission Required**: `orders/view`
-
 #### Parameters
 
 | Parameter | Type | Description | Default |
@@ -100,7 +98,7 @@ Retrieve a paginated list of orders with optional filtering and searching.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/orders?page=1&per_page=20&search=john" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/orders?page=1&per_page=20&search=john" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -108,9 +106,7 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/orders?page=1&per_page=
 
 **POST** `/orders`
 
-Create a new order with items and customer information. Note: Subscription orders are not supported via manual order creation.
-
-**Permission Required**: `orders/create`
+Create a new order with items and customer information.
 
 #### Request Body
 
@@ -170,7 +166,7 @@ Create a new order with items and customer information. Note: Subscription order
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/orders" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -188,17 +184,15 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders" \
 
 ### Get Order Details
 
-**GET** `/orders/{order_id}`
+**GET** `/orders/{id}`
 
 Retrieve detailed information about a specific order.
-
-**Permission Required**: `orders/view`
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `order_id` | integer | Order ID (route parameter) |
+| `id` | integer | Order ID |
 
 #### Response
 
@@ -252,23 +246,21 @@ Retrieve detailed information about a specific order.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/orders/1" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/orders/1" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
 ### Update Order
 
-**POST** `/orders/{order_id}`
+**PUT** `/orders/{id}`
 
-Update an existing order's information. Note: Subscription orders cannot be edited. Completed orders cannot have their status updated.
-
-**Permission Required**: `orders/manage`
+Update an existing order's information.
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `order_id` | integer | Order ID (route parameter) |
+| `id` | integer | Order ID |
 
 #### Request Body
 
@@ -303,7 +295,7 @@ Update an existing order's information. Note: Subscription orders cannot be edit
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/orders/1" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -314,17 +306,15 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1" \
 
 ### Delete Order
 
-**DELETE** `/orders/{order_id}`
+**DELETE** `/orders/{id}`
 
-Delete an order.
-
-**Permission Required**: `orders/delete`
+Delete an order (soft delete).
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `order_id` | integer | Order ID (route parameter) |
+| `id` | integer | Order ID |
 
 #### Response
 
@@ -338,23 +328,21 @@ Delete an order.
 #### Example Request
 
 ```bash
-curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/orders/1" \
+curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v1/orders/1" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
 ### Mark Order as Paid
 
-**POST** `/orders/{order}/mark-as-paid`
+**POST** `/orders/{id}/mark-as-paid`
 
 Mark an order as paid manually.
-
-**Permission Required**: `orders/manage`
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `order` | integer | Order ID (route parameter) |
+| `id` | integer | Order ID |
 
 #### Request Body
 
@@ -384,7 +372,7 @@ Mark an order as paid manually.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/mark-as-paid" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/mark-as-paid" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -393,51 +381,17 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/mark-as-paid"
   }'
 ```
 
-### Generate Missing Licenses
-
-**POST** `/orders/{order}/generate-missing-licenses`
-
-Generate missing licenses for an order.
-
-**Permission Required**: `orders/manage`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `order` | integer | Order ID (route parameter) |
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "message": "Licenses generated successfully"
-  }
-}
-```
-
-#### Example Request
-
-```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/generate-missing-licenses" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
 ### Refund Order
 
-**POST** `/orders/{order_id}/refund`
+**POST** `/orders/{id}/refund`
 
 Process a refund for an order.
 
-**Permission Required**: `orders/can_refund`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `order_id` | integer | Order ID (route parameter) |
+| `id` | integer | Order ID |
 
 #### Request Body
 
@@ -470,7 +424,7 @@ Process a refund for an order.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/refund" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/refund" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -481,17 +435,15 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/refund" \
 
 ### Update Order Statuses
 
-**PUT** `/orders/{order}/statuses`
+**PUT** `/orders/{id}/statuses`
 
 Update order statuses (payment status, shipping status, order status).
-
-**Permission Required**: `orders/manage_statuses`
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `order` | integer | Order ID (route parameter) |
+| `id` | integer | Order ID |
 
 #### Request Body
 
@@ -523,7 +475,7 @@ Update order statuses (payment status, shipping status, order status).
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/statuses" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/statuses" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -534,17 +486,15 @@ curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/statuses" \
 
 ### Change Order Customer
 
-**POST** `/orders/{order_id}/change-customer`
+**POST** `/orders/{id}/change-customer`
 
 Change the customer associated with an order.
-
-**Permission Required**: `orders/manage`
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `order_id` | integer | Order ID (route parameter) |
+| `id` | integer | Order ID |
 
 #### Request Body
 
@@ -572,7 +522,7 @@ Change the customer associated with an order.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/change-customer" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/change-customer" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -582,17 +532,15 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/change-custom
 
 ### Create and Change Customer
 
-**POST** `/orders/{order_id}/create-and-change-customer`
+**POST** `/orders/{id}/create-and-change-customer`
 
 Create a new customer and associate them with the order.
-
-**Permission Required**: `orders/manage`
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `order_id` | integer | Order ID (route parameter) |
+| `id` | integer | Order ID |
 
 #### Request Body
 
@@ -628,47 +576,13 @@ Create a new customer and associate them with the order.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/create-and-change-customer" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/create-and-change-customer" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "newcustomer@example.com",
-    "full_name": "Jane Smith"
-  }'
-```
-
-### Update Order Address ID
-
-**POST** `/orders/{order_id}/update-address-id`
-
-Update the address ID associated with an order.
-
-**Permission Required**: `orders/manage`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `order_id` | integer | Order ID (route parameter) |
-
-#### Request Body
-
-```json
-{
-  "address_id": 123,
-  "address_type": "billing"
-}
-```
-
-#### Example Request
-
-```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/update-address-id" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "address_id": 123,
-    "address_type": "billing"
+    "first_name": "Jane",
+    "last_name": "Smith"
   }'
 ```
 
@@ -677,8 +591,6 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/update-addres
 **POST** `/orders/do-bulk-action`
 
 Perform bulk actions on multiple orders.
-
-**Permission Required**: `orders/manage`
 
 #### Request Body
 
@@ -727,7 +639,7 @@ Perform bulk actions on multiple orders.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/do-bulk-action" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/orders/do-bulk-action" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -791,7 +703,7 @@ Calculate shipping costs for an order.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/calculate-shipping" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/orders/calculate-shipping" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -815,8 +727,6 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/calculate-shipp
 **GET** `/orders/shipping_methods`
 
 Get available shipping methods.
-
-**Permission Required**: `orders/manage`
 
 #### Response
 
@@ -847,471 +757,64 @@ Get available shipping methods.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/orders/shipping_methods" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/orders/shipping_methods" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
-### Update Order Address
+## Error Handling
 
-**PUT** `/orders/{order}/address/{id}`
+### Common Error Codes
 
-Update an order address.
+| Code | Description |
+|------|-------------|
+| `order_not_found` | Order with specified ID not found |
+| `invalid_customer` | Customer ID is invalid |
+| `invalid_product` | Product ID is invalid |
+| `insufficient_permissions` | User lacks required permissions |
+| `validation_error` | Request data validation failed |
+| `payment_failed` | Payment processing failed |
+| `refund_failed` | Refund processing failed |
 
-**Permission Required**: `orders/manage`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `order` | integer | Order ID (route parameter) |
-| `id` | integer | Address ID (route parameter) |
-
-#### Example Request
-
-```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/address/5" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "address_1": "123 Updated St",
-    "city": "New York"
-  }'
-```
-
-### Create Custom Order
-
-**POST** `/orders/{order}/create-custom`
-
-Create a custom order.
-
-**Permission Required**: `orders/create`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `order` | integer | Order ID (route parameter) |
-
-#### Example Request
-
-```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/create-custom" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "custom_data": "value"
-  }'
-```
-
-### Get Order Transactions
-
-**GET** `/orders/{order}/transactions`
-
-Get transactions for a specific order.
-
-**Permission Required**: `orders/view`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `order` | integer | Order ID (route parameter) |
-
-#### Example Request
-
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/transactions" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
-### Get Transaction Details
-
-**GET** `/orders/{id}/transactions/{transaction_id}`
-
-Get details of a specific transaction.
-
-**Permission Required**: `orders/view`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | integer | Order ID (route parameter) |
-| `transaction_id` | integer | Transaction ID (route parameter) |
-
-#### Example Request
-
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/transactions/123" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
-### Update Transaction Status
-
-**PUT** `/orders/{order}/transactions/{transaction}/status`
-
-Update the status of a transaction.
-
-**Permission Required**: `orders/manage`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `order` | integer | Order ID (route parameter) |
-| `transaction` | integer | Transaction ID (route parameter) |
-
-#### Request Body
+### Error Response Example
 
 ```json
 {
-  "status": "completed"
-}
-```
-
-#### Example Request
-
-```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/transactions/123/status" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "status": "completed"
-  }'
-```
-
-### Accept Dispute
-
-**POST** `/orders/{order}/transactions/{transaction_id}/accept-dispute/`
-
-Accept a dispute for a transaction.
-
-**Permission Required**: `orders/view`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `order` | integer | Order ID (route parameter) |
-| `transaction_id` | integer | Transaction ID (route parameter) |
-
-#### Example Request
-
-```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/transactions/123/accept-dispute/" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
----
-
-## Notes
-
-### Attach Note to Order
-
-Attach or update a note on an order.
-
-**Endpoint:** `POST /notes/attach`
-
-**Permission Required**: `AdminPolicy`
-
-#### Request Body
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `order_id` | int | Yes | Order ID |
-| `note` | string | Yes | Note text content |
-
-```json
-{
-  "order_id": 123,
-  "note": "Customer requested expedited shipping. Contacted via email."
-}
-```
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "message": "Order Note Updated successfully."
+  "success": false,
+  "error": {
+    "code": "order_not_found",
+    "message": "Order with ID 999 not found"
   }
 }
 ```
 
-#### Example Request
+## Rate Limiting
 
-```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/notes/attach" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "order_id": 123,
-    "note": "Customer requested expedited shipping."
-  }'
-```
+- **List operations**: 100 requests per hour
+- **Create operations**: 50 requests per hour
+- **Update operations**: 200 requests per hour
+- **Delete operations**: 20 requests per hour
 
----
+## Related Documentation
 
-## Activity
+- [Customers API](./customers) - Customer management endpoints
+- [Products API](./products) - Product management endpoints
+- [Subscriptions API](./subscriptions) - Subscription management endpoints
+- [Database Models](/database/models) - Order data models
+- [Developer Hooks](/hooks/) - Order-related hooks
 
-### List Activities
+## Next Steps
 
-Retrieve a paginated list of activity logs.
+Continue with order management:
 
-**Endpoint:** `GET /activity/`
+1. **[Customers API](./customers)** - Manage customer data
+2. **[Products API](./products)** - Manage product catalog
+3. **[Subscriptions API](./subscriptions)** - Manage recurring orders
+4. **[Authentication Guide](./authentication)** - API authentication
 
-**Permission Required**: `AdminPolicy`
+## Previous/Next Navigation
 
-#### Query Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `search` | string | No | Search term for filtering activities |
-| `per_page` | int | No | Number of items per page (default: 10) |
-| `page` | int | No | Page number (default: 1) |
-| `log_type` | string | No | Filter by log type |
-| `module_name` | string | No | Filter by module name |
-| `module_id` | int | No | Filter by module ID |
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "activities": {
-      "data": [
-        {
-          "id": 1,
-          "title": "Order Created",
-          "description": "Order #1234 was created",
-          "log_type": "info",
-          "module_name": "order",
-          "module_id": 1234,
-          "read_status": "unread",
-          "created_at": "2024-01-01 10:00:00"
-        }
-      ],
-      "total": 100,
-      "per_page": 10,
-      "current_page": 1,
-      "last_page": 10
-    }
-  }
-}
-```
-
-#### Example Request
-
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/activity/?per_page=20&page=1" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
-### Delete Activity
-
-Delete a specific activity log entry.
-
-**Endpoint:** `DELETE /activity/{id}`
-
-**Permission Required**: `AdminPolicy`
-
-#### Route Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `id` | int | Yes | Activity ID (route parameter) |
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "message": "Activity Deleted Successfully"
-  }
-}
-```
-
-#### Example Request
-
-```bash
-curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/activity/1" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
-### Mark Activity as Read/Unread
-
-Update the read status of an activity log entry.
-
-**Endpoint:** `PUT /activity/{id}/mark-read`
-
-**Permission Required**: `AdminPolicy`
-
-#### Route Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `id` | int | Yes | Activity ID (route parameter) |
-
-#### Request Body
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `status` | string | Yes | Status: `'read'` or `'unread'` |
-
-```json
-{
-  "status": "read"
-}
-```
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "message": "Activity Marked as Read"
-  }
-}
-```
-
-#### Example Request
-
-```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/activity/1/mark-read" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "status": "read"
-  }'
-```
-
----
-
-## Templates
-
-### Get Print Templates
-
-Retrieve all available print templates.
-
-**Endpoint:** `GET /templates/print-templates`
-
-**Permission Required**: `AdminPolicy`
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "templates": [
-      {
-        "key": "invoice_template",
-        "title": "Invoice Template",
-        "content": "<html>...</html>"
-      },
-      {
-        "key": "packing_slip",
-        "title": "Packing Slip Template",
-        "content": "<html>...</html>"
-      },
-      {
-        "key": "delivery_slip",
-        "title": "Delivery Slip Template",
-        "content": "<html>...</html>"
-      },
-      {
-        "key": "shipping_slip",
-        "title": "Shipping Slip Template",
-        "content": "<html>...</html>"
-      },
-      {
-        "key": "dispatch_slip",
-        "title": "Dispatch Slip Template",
-        "content": "<html>...</html>"
-      }
-    ]
-  }
-}
-```
-
-#### Example Request
-
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/templates/print-templates" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
-### Save Print Templates
-
-Update print template content.
-
-**Endpoint:** `PUT /templates/print-templates`
-
-**Permission Required**: `AdminPolicy`
-
-#### Request Body
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `templates` | array | Yes | Array of template objects |
-
-Each template object should contain:
-- `key` (string, required): Template key identifier
-- `content` (string, required): HTML content of the template
-
-```json
-{
-  "templates": [
-    {
-      "key": "invoice_template",
-      "content": "<html><body><h1>Invoice</h1>...</body></html>"
-    },
-    {
-      "key": "packing_slip",
-      "content": "<html><body><h1>Packing Slip</h1>...</body></html>"
-    }
-  ]
-}
-```
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "message": "Template saved successfully"
-  }
-}
-```
-
-#### Example Request
-
-```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/templates/print-templates" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "templates": [
-      {
-        "key": "invoice_template",
-        "content": "<html><body><h1>Invoice</h1></body></html>"
-      }
-    ]
-  }'
-```
-
-#### Available Template Keys
-
-- `invoice_template` - Invoice template
-- `packing_slip` - Packing slip template
-- `delivery_slip` - Delivery slip template
-- `shipping_slip` - Shipping slip template
-- `dispatch_slip` - Dispatch slip template
+- **Previous**: [API Overview](./) - FluentCart REST API
+- **Next**: [Customers API](./customers) - Customer management endpoints
 
 ---
 

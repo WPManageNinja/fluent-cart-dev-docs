@@ -1,11 +1,11 @@
 ---
-title: Roles & Permissions API
-description: FluentCart Roles & Permissions API for managing WordPress role access to FluentCart.
+title: Roles & Permissions API (Pro)
+description: FluentCart Pro Roles & Permissions API for user role and permission management.
 ---
 
-# Roles & Permissions API
+# Roles & Permissions API (Pro)
 
-The Roles & Permissions API allows you to manage which WordPress user roles have access to FluentCart. This API is used to configure which roles can access FluentCart features and capabilities.
+The Roles & Permissions API allows you to manage user roles and capabilities within FluentCart Pro, enabling fine-grained access control for shop managers and other personnel.
 
 ## Base URL
 
@@ -17,217 +17,523 @@ All Roles & Permissions API endpoints are prefixed with the same base URL as the
 
 ## Authentication
 
-All Roles & Permissions API endpoints require:
-- **Policy**: `StoreSettingsPolicy`
-- **Permission**: `is_super_admin` (WordPress administrator with `manage_options` capability)
+All Roles & Permissions API endpoints require authentication with the `manage_fluent_cart_settings` capability.
+
+## Role Management
+
+### 1. Get All Roles
+
+Retrieve a list of all available FluentCart roles.
+
+- **Endpoint:** `GET /wp-json/fluent-cart/v2/roles`
+- **Authentication:** Requires `RolePolicy` permission.
+- **Parameters:** None
+
+**Example Request:**
+
+```bash
+curl -X GET "http://localhost/wp-json/fluent-cart/v2/roles" \
+-H "Authorization: Basic [YOUR_BASE64_ENCODED_CREDENTIALS]"
+```
+
+### 2. Get Role Managers
+
+Retrieve a list of users who can manage roles.
+
+- **Endpoint:** `GET /wp-json/fluent-cart/v2/roles/managers`
+- **Authentication:** Requires `RolePolicy` permission.
+- **Parameters:** None
+
+### 3. Get User List
+
+Retrieve a list of users for role assignment.
+
+- **Endpoint:** `GET /wp-json/fluent-cart/v2/roles/user-list`
+- **Authentication:** Requires `RolePolicy` permission.
+- **Parameters:** None
+
+### 4. Create Role
+
+Create a new custom role.
+
+- **Endpoint:** `POST /wp-json/fluent-cart/v2/roles`
+- **Authentication:** Requires `RolePolicy` permission.
+- **Parameters:**
+  - `title` (string, required): Role title
+  - `description` (string, optional): Role description
+  - `capabilities` (array, required): Array of capabilities
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost/wp-json/fluent-cart/v2/roles" \
+-H "Authorization: Basic [YOUR_BASE64_ENCODED_CREDENTIALS]" \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "Product Manager",
+  "description": "Manages products and inventory",
+  "capabilities": ["products/view", "products/manage"]
+}'
+```
+
+### 5. Get Role Details
+
+Retrieve details for a specific role.
+
+- **Endpoint:** `GET /wp-json/fluent-cart/v2/roles/{key}`
+- **Authentication:** Requires `RolePolicy` permission.
+- **Parameters:**
+  - `key` (string, required): Role key/identifier
+
+### 6. Update Role
+
+Update an existing role.
+
+- **Endpoint:** `POST /wp-json/fluent-cart/v2/roles/{key}`
+- **Authentication:** Requires `RolePolicy` permission.
+- **Parameters:**
+  - `key` (string, required): Role key/identifier
+  - `title` (string, optional): Role title
+  - `description` (string, optional): Role description
+  - `capabilities` (array, optional): Array of capabilities
+
+### 7. Delete Role
+
+Delete a custom role.
+
+- **Endpoint:** `DELETE /wp-json/fluent-cart/v2/roles/{key}`
+- **Authentication:** Requires `RolePolicy` permission.
+- **Parameters:**
+  - `key` (string, required): Role key/identifier
+
+**Example Response:**
+
+```json
+{
+  "message": "Roles retrieved successfully",
+  "roles": [
+    {
+      "title": "Shop Manager",
+      "description": "Manages all aspects of the shop, including products, orders, and customers."
+    },
+    {
+      "title": "Product Manager",
+      "description": "Manages products and inventory."
+    },
+    {
+      "title": "Order Manager",
+      "description": "Manages customer orders and fulfillment."
+    }
+  ]
+}
+```
+
+### 2. Assign Role to User
+
+Assign a specific FluentCart role to a user.
+
+- **Endpoint:** `POST /wp-json/fluent-cart/v2/roles`
+- **Authentication:** Requires `manage_fluent_cart_settings` capability.
+- **Parameters:**
+  - `user_id` (int, required): The ID of the user.
+  - `role_key` (string, required): The key of the role to assign (e.g., `shop_manager`, `product_manager`).
+
+**Example Request:**
+
+```bash
+curl -X POST "http://localhost/wp-json/fluent-cart/v2/roles" \
+-H "Content-Type: application/json" \
+-H "Authorization: Basic [YOUR_BASE64_ENCODED_CREDENTIALS]" \
+-d '{
+  "user_id": 1,
+  "role_key": "shop_manager"
+}'
+```
+
+**Example Response (Success):**
+
+```json
+{
+  "message": "Role synced successfully",
+  "is_updated": true
+}
+```
+
+**Example Response (Error - User Not Found):**
+
+```json
+{
+  "message": "User not found",
+  "errors": [
+    {
+      "code": 404,
+      "message": "User not found"
+    }
+  ]
+}
+```
+
+### 3. Remove Role from User
+
+Remove a specific FluentCart role from a user.
+
+- **Endpoint:** `DELETE /wp-json/fluent-cart/v2/roles/{key}`
+- **Authentication:** Requires `manage_fluent_cart_settings` capability.
+- **Parameters:**
+  - `key` (string, required): The key of the role to remove.
+  - `user_id` (int, required): The ID of the user.
+
+**Example Request:**
+
+```bash
+curl -X DELETE "http://localhost/wp-json/fluent-cart/v2/roles/shop_manager" \
+-H "Content-Type: application/json" \
+-H "Authorization: Basic [YOUR_BASE64_ENCODED_CREDENTIALS]" \
+-d '{
+  "user_id": 1
+}'
+```
+
+**Example Response (Success):**
+
+```json
+{
+  "message": "Role deleted successfully"
+}
+```
+
+### 4. Get Users with Shop Role (Managers)
+
+Retrieve a list of users who have a shop management role.
+
+- **Endpoint:** `GET /wp-json/fluent-cart/v2/roles/managers`
+- **Authentication:** Requires `manage_fluent_cart_settings` capability.
+- **Parameters:** None
+
+**Example Request:**
+
+```bash
+curl -X GET "http://localhost/wp-json/fluent-cart/v2/roles/managers" \
+-H "Authorization: Basic [YOUR_BASE64_ENCODED_CREDENTIALS]"
+```
+
+**Example Response:**
+
+```json
+{
+  "message": "Managers retrieved successfully",
+  "managers": [
+    {
+      "ID": 1,
+      "display_name": "Admin User",
+      "user_email": "admin@example.com"
+    },
+    {
+      "ID": 5,
+      "display_name": "Shop Manager John",
+      "user_email": "john@example.com"
+    }
+  ]
+}
+```
+
+### 5. Get User List (for Role Assignment)
+
+Retrieve a paginated list of users, optionally filtered by search terms or IDs, excluding those with admin roles. This is useful for selecting users to assign roles to.
+
+- **Endpoint:** `GET /wp-json/fluent-cart/v2/roles/user-list`
+- **Authentication:** Requires `manage_fluent_cart_settings` capability.
+- **Parameters:**
+  - `search` (string, optional): Search term for display name or email.
+  - `user_ids` (array|string, optional): Comma-separated list of user IDs.
+  - `per_page` (int, optional): Number of users per page (default: 10).
+  - `page` (int, optional): Current page number (default: 1).
+
+**Example Request (Search by email):**
+
+```bash
+curl -X GET "http://localhost/wp-json/fluent-cart/v2/roles/user-list?search=john@example.com" \
+-H "Authorization: Basic [YOUR_BASE64_ENCODED_CREDENTIALS]"
+```
+
+**Example Response:**
+
+```json
+{
+  "message": "Users retrieved successfully",
+  "users": {
+    "data": [
+      {
+        "ID": 5,
+        "name": "John Doe",
+        "email": "john@example.com"
+      }
+    ],
+    "total": 1,
+    "per_page": 10,
+    "current_page": 1,
+    "last_page": 1
+  }
+}
+```
 
 ## Permission Management
 
-### Get Permissions
+### Available Roles
 
-Retrieve a list of available WordPress roles and the currently configured capability permissions.
+#### Shop Manager
+- **Capabilities:** Full access to all FluentCart features
+- **Description:** Manages all aspects of the shop, including products, orders, and customers.
 
-**Endpoint:** `GET /settings/permissions`
+#### Product Manager
+- **Capabilities:** Product management, inventory control
+- **Description:** Manages products and inventory.
 
-**Permission Required**: `is_super_admin`
+#### Order Manager
+- **Capabilities:** Order management, customer service
+- **Description:** Manages customer orders and fulfillment.
 
-**Parameters:** None
+#### Customer Service
+- **Capabilities:** Customer support, order assistance
+- **Description:** Provides customer support and order assistance.
 
-#### Response
+### Role Assignment
 
-```json
-{
-  "roles": {
-    "capability": [
-      "editor",
-      "author"
-    ],
-    "roles": [
-      {
-        "name": "Editor",
-        "key": "editor"
-      },
-      {
-        "name": "Author",
-        "key": "author"
-      },
-      {
-        "name": "Contributor",
-        "key": "contributor"
-      }
-    ]
-  }
+```php
+use FluentCart\App\Services\Permission\PermissionManager;
+
+// Assign role to user
+$isUpdated = PermissionManager::attachRole($userId, $roleKey);
+
+if ($isUpdated instanceof \WP_Error) {
+    echo "Error: " . $isUpdated->get_error_message();
+} else {
+    echo "Role assigned successfully";
+}
+
+// Remove role from user
+$isUpdated = PermissionManager::detachRole($userId, $roleKey);
+
+if ($isUpdated instanceof \WP_Error) {
+    echo "Error: " . $isUpdated->get_error_message();
+} else {
+    echo "Role removed successfully";
 }
 ```
 
-#### Response Fields
+### Get Users with Shop Roles
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `roles.capability` | array | Array of WordPress role keys that currently have FluentCart access |
-| `roles.roles` | array | Array of available WordPress roles (excluding `administrator` and `subscriber`) |
-| `roles.roles[].name` | string | Display name of the role |
-| `roles.roles[].key` | string | WordPress role key/identifier |
+```php
+// Get all users with shop management roles
+$managers = PermissionManager::getUsersWithShopRole();
 
-**Note**: The `administrator` role is excluded from the list as administrators always have full access. The `subscriber` role is also excluded.
-
-#### Example Request
-
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/settings/permissions" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
+foreach ($managers as $manager) {
+    echo "Manager: " . $manager->display_name . " (" . $manager->user_email . ")\n";
+}
 ```
 
-#### Example Request (JavaScript)
+## Role Hooks and Filters
 
-```javascript
-const response = await fetch('https://yoursite.com/wp-json/fluent-cart/v2/settings/permissions', {
-    headers: {
-        'Authorization': 'Basic ' + btoa('username:application_password')
+### Role Assignment Hooks
+
+```php
+// Before role assignment
+add_action('fluent_cart/role/before_assign', function($userId, $roleKey) {
+    // Custom validation before assigning role
+    if ($this->userHasConflictingRole($userId, $roleKey)) {
+        return new \WP_Error('conflicting_role', 'User already has a conflicting role');
     }
+}, 10, 2);
+
+// After role assignment
+add_action('fluent_cart/role/assigned', function($userId, $roleKey) {
+    // Update user capabilities
+    update_user_capabilities($userId, $roleKey);
+    
+    // Send role assignment notification
+    wp_mail(
+        get_userdata($userId)->user_email,
+        'Role Assigned',
+        "You have been assigned the role: {$roleKey}"
+    );
+    
+    // Log role assignment
+    error_log("Role assigned: {$roleKey} to user {$userId}");
+}, 10, 2);
+
+// Before role removal
+add_action('fluent_cart/role/before_remove', function($userId, $roleKey) {
+    // Check if user has pending tasks
+    if ($this->userHasPendingTasks($userId)) {
+        return new \WP_Error('pending_tasks', 'User has pending tasks that must be completed first');
+    }
+}, 10, 2);
+
+// After role removal
+add_action('fluent_cart/role/removed', function($userId, $roleKey) {
+    // Remove user capabilities
+    remove_user_capabilities($userId, $roleKey);
+    
+    // Log role removal
+    error_log("Role removed: {$roleKey} from user {$userId}");
+    
+    // Notify administrators
+    wp_mail(
+        get_option('admin_email'),
+        'Role Removed',
+        "Role {$roleKey} has been removed from user {$userId}"
+    );
+}, 10, 2);
+```
+
+### Role Filters
+
+```php
+// Modify available roles
+add_filter('fluent_cart/roles/available', function($roles) {
+    // Add custom role
+    $roles['custom_manager'] = [
+        'title' => 'Custom Manager',
+        'description' => 'Custom management role with specific capabilities',
+        'capabilities' => ['custom_capability_1', 'custom_capability_2']
+    ];
+    
+    return $roles;
 });
 
-const data = await response.json();
-console.log(data.roles);
+// Modify role capabilities
+add_filter('fluent_cart/role/capabilities', function($capabilities, $roleKey) {
+    if ($roleKey === 'shop_manager') {
+        // Add custom capability to shop manager
+        $capabilities[] = 'custom_shop_capability';
+    }
+    
+    return $capabilities;
+}, 10, 2);
+
+// Modify user list for role assignment
+add_filter('fluent_cart/roles/user_list', function($users, $args) {
+    // Filter out users who shouldn't be assigned roles
+    return $users->filter(function($user) {
+        return !$this->userIsExcluded($user->ID);
+    });
+}, 10, 2);
 ```
 
-### Save Permissions
+## Custom Role Development
 
-Update which WordPress roles have access to FluentCart.
+### Creating Custom Roles
 
-**Endpoint:** `POST /settings/permissions`
-
-**Permission Required**: `is_super_admin`
-
-#### Request Body
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `capability` | array | Yes | Array of WordPress role keys that should have FluentCart access |
-
-```json
-{
-  "capability": ["editor", "author"]
-}
-```
-
-#### Response
-
-**Success Response** (200):
-
-```json
-{
-  "message": "Successfully updated the role(s)."
-}
-```
-
-**Error Response** (403):
-
-If the user doesn't have `manage_options` capability:
-
-```json
-{
-  "success": false,
-  "data": {
-    "message": "Sorry, You can not update permissions. Only administrators can update permissions"
-  }
-}
-```
-
-#### Example Request
-
-```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/settings/permissions" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "capability": ["editor", "author"]
-  }'
-```
-
-#### Example Request (JavaScript)
-
-```javascript
-const response = await fetch('https://yoursite.com/wp-json/fluent-cart/v2/settings/permissions', {
-    method: 'POST',
-    headers: {
-        'Authorization': 'Basic ' + btoa('username:application_password'),
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        capability: ['editor', 'author']
-    })
+```php
+// Register custom role
+add_action('fluent_cart/roles/register', function() {
+    $customRole = new CustomRole();
+    $customRole->register();
 });
 
-const data = await response.json();
+class CustomRole
+{
+    public function register()
+    {
+        // Define custom role
+        $roleData = [
+            'title' => 'Custom Manager',
+            'description' => 'Custom management role with specific capabilities',
+            'capabilities' => [
+                'manage_products',
+                'view_orders',
+                'custom_capability'
+            ]
+        ];
+        
+        // Register role with PermissionManager
+        PermissionManager::registerRole('custom_manager', $roleData);
+    }
+}
 ```
 
-## How It Works
+### Custom Role Capabilities
 
-The Permissions API manages which WordPress user roles can access FluentCart:
+```php
+// Add custom capabilities
+add_action('fluent_cart/roles/capabilities', function($capabilities) {
+    $capabilities['custom_capability'] = [
+        'title' => 'Custom Capability',
+        'description' => 'Allows access to custom functionality'
+    ];
+    
+    return $capabilities;
+});
 
-1. **WordPress Roles**: FluentCart uses existing WordPress user roles (Editor, Author, Contributor, etc.)
-2. **Role Selection**: Administrators can select which WordPress roles should have access to FluentCart
-3. **Capability Storage**: Selected roles are stored in the `_fluent_cart_admin_permissions` option
-4. **Access Control**: Users with selected roles can access FluentCart features based on their assigned permissions
+// Check custom capability
+add_filter('fluent_cart/user/can', function($can, $capability, $userId) {
+    if ($capability === 'custom_capability') {
+        return $this->userHasCustomCapability($userId);
+    }
+    
+    return $can;
+}, 10, 3);
+```
 
-## FluentCart Internal Roles
+## Error Handling
 
-FluentCart also has internal role management through `PermissionManager` (used in FluentCart Pro), which provides fine-grained permissions like:
-- `super_admin` - Full access to all FluentCart features
-- `manager` - Access to most features except sensitive settings
-- Custom roles with specific capability sets
+### Common Error Responses
 
-These internal roles are separate from WordPress roles and are managed through user meta (`_fluent_cart_admin_role`).
+#### User Not Found
+```json
+{
+  "message": "User not found",
+  "errors": [
+    {
+      "code": 404,
+      "message": "User not found"
+    }
+  ]
+}
+```
 
-## Available Permissions
+#### Invalid Role
+```json
+{
+  "message": "Invalid role",
+  "errors": [
+    {
+      "code": 400,
+      "message": "Invalid role"
+    }
+  ]
+}
+```
 
-FluentCart uses a permission-based system for fine-grained access control. Common permissions include:
+#### Permission Denied
+```json
+{
+  "message": "Permission denied",
+  "errors": [
+    {
+      "code": 403,
+      "message": "Permission denied"
+    }
+  ]
+}
+```
 
-### Order Permissions
-- `orders/view` - View orders
-- `orders/create` - Create orders
-- `orders/manage` - Update orders
-- `orders/delete` - Delete orders
-- `orders/manage_statuses` - Change order statuses
-- `orders/can_refund` - Process refunds
-- `orders/export` - Export orders
+#### Role Already Assigned
+```json
+{
+  "message": "Role already assigned",
+  "errors": [
+    {
+      "code": 409,
+      "message": "Role already assigned"
+    }
+  ]
+}
+```
 
-### Product Permissions
-- `products/view` - View products
-- `products/create` - Create products
-- `products/edit` - Update products
-- `products/delete` - Delete products
-- `products/manage` - Full product management
+---
 
-### Customer Permissions
-- `customers/view` - View customers
-- `customers/manage` - Update customers
-- `customers/delete` - Delete customers
-
-### Coupon Permissions
-- `coupons/view` - View coupons
-- `coupons/manage` - Create/update coupons
-- `coupons/delete` - Delete coupons
-
-### Store Permissions
-- `store/settings` - Manage store settings
-- `is_super_admin` - Super admin access (full system access)
-
-### Other Permissions
-- `subscriptions/view` - View subscriptions
-- `subscriptions/manage` - Manage subscriptions
-- `subscriptions/delete` - Delete subscriptions
-- `licenses/view` - View licenses
-- `licenses/manage` - Manage licenses
-- `licenses/delete` - Delete licenses
-- `reports/view` - View reports
-- `reports/export` - Export reports
-- `integrations/view` - View integrations
-- `integrations/manage` - Manage integrations
-- `integrations/delete` - Delete integrations
-- `labels/view` - View labels
-- `labels/manage` - Manage labels
-- `dashboard_stats/view` - View dashboard statistics
-
-For more information about permissions, see the [Authentication API documentation](./authentication).
+**Related Documentation:**
+- [Licensing API](./licensing) - Software license management
+- [Order Bump API](./order-bump) - Promotional features
+- [REST API Overview](../api/) - General API information

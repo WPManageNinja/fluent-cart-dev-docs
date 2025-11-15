@@ -44,9 +44,9 @@ add_action('fluent_cart/order_created', function($data) {
 ```
 </details>
 
-### <code> order_paid </code>
+### <code> order_paid_done </code>
 <details>
-<summary><code>fluent_cart/order_paid</code> &mdash; Fired when an order is paid</summary>
+<summary><code>fluent_cart/order_paid_done</code> &mdash; Fired when an order is paid (Subscription on one-time)</summary>
 
 **When it runs:**
 This action is fired when an order's payment status changes to 'paid', after payment processing is complete.
@@ -73,7 +73,7 @@ This action is fired when an order's payment status changes to 'paid', after pay
 
 **Usage:**
 ```php
-add_action('fluent_cart/order_paid', function($data) {
+add_action('fluent_cart/order_paid_done', function($data) {
     $order = $data['order'];
     // Grant access to membership
     update_user_meta($order->customer_id, 'membership_active', true);

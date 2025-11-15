@@ -29,8 +29,6 @@ All endpoints require authentication and appropriate permissions:
 
 Retrieve a paginated list of customers with optional filtering and searching.
 
-**Permission Required**: `customers/view`
-
 #### Parameters
 
 | Parameter | Type | Description | Default |
@@ -86,7 +84,7 @@ Retrieve a paginated list of customers with optional filtering and searching.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers?page=1&per_page=20&search=john" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/customers?page=1&per_page=20&search=john" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -94,38 +92,21 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers?page=1&per_pa
 
 **POST** `/customers`
 
-Create a new customer. The system will automatically split the `full_name` into `first_name` and `last_name`.
-
-**Permission Required**: `customers/manage`
+Create a new customer.
 
 #### Request Body
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `email` | string | Yes | Customer email address (must be unique) |
-| `full_name` | string | Yes | Customer's full name (max 255 characters) |
-| `city` | string | No | Customer's city |
-| `status` | string | No | Customer status |
-| `notes` | string | No | Customer notes |
-| `country` | string | No | Customer's country |
-| `state` | string | No | Customer's state |
-| `postcode` | string | No | Customer's postal code |
-| `user_id` | integer | No | WordPress user ID to attach |
-| `wp_user` | string | No | Set to "yes" to create WordPress user if email matches existing user |
-
-#### Request Body Example
 
 ```json
 {
   "email": "newcustomer@example.com",
-  "full_name": "Jane Smith",
-  "city": "New York",
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "phone": "+1234567890",
   "status": "active",
-  "notes": "VIP customer",
-  "country": "US",
-  "state": "NY",
-  "postcode": "10001",
-  "wp_user": "yes"
+  "additional_info": {
+    "company": "Example Corp",
+    "notes": "VIP customer"
+  }
 }
 ```
 
@@ -140,26 +121,24 @@ Create a new customer. The system will automatically split the `full_name` into 
       "email": "newcustomer@example.com",
       "first_name": "Jane",
       "last_name": "Smith",
-      "full_name": "Jane Smith",
-      "city": "New York",
+      "phone": "+1234567890",
       "status": "active",
       "created_at": "2024-01-01T10:00:00Z"
     }
-  },
-  "message": "Customer created successfully!"
+  }
 }
 ```
 
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customers" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "newcustomer@example.com",
-    "full_name": "Jane Smith",
-    "city": "New York"
+    "first_name": "Jane",
+    "last_name": "Smith"
   }'
 ```
 
@@ -169,15 +148,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers" \
 
 Retrieve detailed information about a specific customer.
 
-**Permission Required**: `customers/view`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
-| `with` | array | Optional. Related data to include (e.g., `["orders", "addresses"]`) |
-| `params.customer_only` | string | Optional. Set to "yes" to return only customer data without labels |
+| `customerId` | integer | Customer ID |
 
 #### Response
 
@@ -190,18 +165,24 @@ Retrieve detailed information about a specific customer.
       "email": "customer@example.com",
       "first_name": "John",
       "last_name": "Doe",
-      "full_name": "John Doe",
+      "phone": "+1234567890",
       "status": "active",
       "total_spent": 5000,
       "order_count": 3,
       "created_at": "2024-01-01T10:00:00Z",
       "updated_at": "2024-01-15T14:30:00Z",
-      "selected_labels": [1, 2, 3],
-      "labels": [
+      "addresses": [
         {
           "id": 1,
-          "label_id": 1,
-          "name": "VIP"
+          "type": "billing",
+          "first_name": "John",
+          "last_name": "Doe",
+          "address_1": "123 Main St",
+          "city": "New York",
+          "state": "NY",
+          "postcode": "10001",
+          "country": "US",
+          "is_primary": true
         }
       ]
     }
@@ -212,7 +193,7 @@ Retrieve detailed information about a specific customer.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/1?with[]=orders&with[]=addresses" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/customers/1" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -222,37 +203,20 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/1?with[]=orde
 
 Update an existing customer's information.
 
-**Permission Required**: `customers/manage`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
+| `customerId` | integer | Customer ID |
 
 #### Request Body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `email` | string | Yes | Customer email address (must be unique if changed) |
-| `full_name` | string | Yes | Customer's full name (max 255 characters) |
-| `city` | string | No | Customer's city |
-| `status` | string | No | Customer status |
-| `notes` | string | No | Customer notes |
-| `country` | string | No | Customer's country |
-| `state` | string | No | Customer's state |
-| `postcode` | string | No | Customer's postal code |
-| `user_id` | integer | No | WordPress user ID to attach |
-
-#### Request Body Example
-
 ```json
 {
-  "email": "customer@example.com",
-  "full_name": "John Doe Updated",
-  "status": "active",
-  "notes": "Updated notes",
-  "city": "New York"
+  "first_name": "John",
+  "last_name": "Doe",
+  "phone": "+1234567890",
+  "status": "active"
 }
 ```
 
@@ -264,28 +228,26 @@ Update an existing customer's information.
   "data": {
     "customer": {
       "id": 1,
-      "email": "customer@example.com",
       "first_name": "John",
-      "last_name": "Doe Updated",
-      "full_name": "John Doe Updated",
+      "last_name": "Doe",
+      "phone": "+1234567890",
       "status": "active",
       "updated_at": "2024-01-01T11:00:00Z"
     }
-  },
-  "message": "Customer updated successfully!"
+  }
 }
 ```
 
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/customers/1" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/customers/1" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "customer@example.com",
-    "full_name": "John Doe Updated",
-    "status": "active"
+    "first_name": "John",
+    "last_name": "Doe",
+    "phone": "+1234567890"
   }'
 ```
 
@@ -333,7 +295,7 @@ Update customer's additional information.
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/additional-info" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/additional-info" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -346,15 +308,13 @@ curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/additional-
 
 **GET** `/customers/get-stats/{customer}`
 
-Get statistics widgets for a specific customer. Returns filtered widgets that can be customized via the `fluent_cart/widgets/single_customer` filter.
-
-**Permission Required**: `customers/view`
+Get statistics for a specific customer.
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customer` | integer | Customer ID (route parameter) |
+| `customer` | integer | Customer ID |
 
 #### Response
 
@@ -362,22 +322,13 @@ Get statistics widgets for a specific customer. Returns filtered widgets that ca
 {
   "success": true,
   "data": {
-    "widgets": [
-      {
-        "title": "Total Spent",
-        "value": 5000,
-        "currency": "USD"
-      },
-      {
-        "title": "Order Count",
-        "value": 3
-      },
-      {
-        "title": "Average Order Value",
-        "value": 1667,
-        "currency": "USD"
-      }
-    ]
+    "stats": {
+      "total_spent": 5000,
+      "order_count": 3,
+      "average_order_value": 1667,
+      "last_order_date": "2024-01-15T14:30:00Z",
+      "first_order_date": "2024-01-01T10:00:00Z"
+    }
   }
 }
 ```
@@ -385,30 +336,29 @@ Get statistics widgets for a specific customer. Returns filtered widgets that ca
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/get-stats/1" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/customers/get-stats/1" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
-### Get Customer Orders (Simple)
+### Get Customer Orders
 
-**GET** `/customers/{customerId}/order`
+**GET** `/customers/{customerId}/orders`
 
-Get customer orders in a simplified format.
-
-**Permission Required**: `customers/view`
+Get all orders for a specific customer.
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
+| `customerId` | integer | Customer ID |
 
 #### Response
 
 ```json
 {
+  "success": true,
   "data": {
-    "data": [
+    "orders": [
       {
         "id": 1,
         "status": "completed",
@@ -416,6 +366,14 @@ Get customer orders in a simplified format.
         "total_amount": 2500,
         "currency": "USD",
         "created_at": "2024-01-01T10:00:00Z"
+      },
+      {
+        "id": 2,
+        "status": "processing",
+        "payment_status": "paid",
+        "total_amount": 2500,
+        "currency": "USD",
+        "created_at": "2024-01-15T14:30:00Z"
       }
     ]
   }
@@ -425,65 +383,7 @@ Get customer orders in a simplified format.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/order" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
-### Get Customer Orders (Paginated)
-
-**GET** `/customers/{customerId}/orders`
-
-Get paginated orders for a specific customer with filtering support.
-
-**Permission Required**: `customers/view`
-
-#### Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
-| `page` | integer | Page number (default: 1) |
-| `per_page` | integer | Items per page (default: 10) |
-| `search` | string | Search query |
-| `filters` | object | Filter options |
-| `order_by` | string | Sort field (default: id) |
-| `order_type` | string | Sort direction: ASC or DESC (default: DESC) |
-
-#### Response
-
-```json
-{
-  "orders": [
-    {
-      "id": 1,
-      "status": "completed",
-      "payment_status": "paid",
-      "total_amount": 2500,
-      "currency": "USD",
-      "created_at": "2024-01-01T10:00:00Z"
-    },
-    {
-      "id": 2,
-      "status": "processing",
-      "payment_status": "paid",
-      "total_amount": 2500,
-      "currency": "USD",
-      "created_at": "2024-01-15T14:30:00Z"
-    }
-  ],
-  "pagination": {
-    "current_page": 1,
-    "per_page": 10,
-    "total": 2,
-    "total_pages": 1
-  }
-}
-```
-
-#### Example Request
-
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/orders?page=1&per_page=20" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/orders" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -491,60 +391,54 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/orders?page
 
 **GET** `/customers/{customerId}/address`
 
-Get all addresses for a specific customer. Optionally filter by address type.
-
-**Permission Required**: `customers/view`
+Get all addresses for a specific customer.
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
-| `type` | string | Optional. Filter by address type: "billing" or "shipping" |
+| `customerId` | integer | Customer ID |
 
 #### Response
 
 ```json
 {
-  "addresses": [
-    {
-      "id": 1,
-      "type": "billing",
-      "name": "John Doe",
-      "email": "customer@example.com",
-      "address_1": "123 Main St",
-      "address_2": "",
-      "city": "New York",
-      "state": "NY",
-      "postcode": "10001",
-      "country": "US",
-      "phone": "+1234567890",
-      "is_primary": true,
-      "label": "Home"
-    },
-    {
-      "id": 2,
-      "type": "shipping",
-      "name": "John Doe",
-      "email": "customer@example.com",
-      "address_1": "456 Oak Ave",
-      "address_2": "",
-      "city": "Brooklyn",
-      "state": "NY",
-      "postcode": "11201",
-      "country": "US",
-      "phone": "+1234567890",
-      "is_primary": false,
-      "label": "Work"
-    }
-  ]
+  "success": true,
+  "data": {
+    "addresses": [
+      {
+        "id": 1,
+        "type": "billing",
+        "first_name": "John",
+        "last_name": "Doe",
+        "address_1": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "postcode": "10001",
+        "country": "US",
+        "is_primary": true
+      },
+      {
+        "id": 2,
+        "type": "shipping",
+        "first_name": "John",
+        "last_name": "Doe",
+        "address_1": "456 Oak Ave",
+        "city": "Brooklyn",
+        "state": "NY",
+        "postcode": "11201",
+        "country": "US",
+        "is_primary": false
+      }
+    ]
+  }
 }
 ```
 
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address?type=billing" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/address" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -554,50 +448,24 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address?typ
 
 Update customer's address information.
 
-**Permission Required**: `customers/manage`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
+| `customerId` | integer | Customer ID |
 
 #### Request Body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | integer | Yes | Address ID to update |
-| `name` | string | Yes | Full name (max 255 characters) |
-| `email` | string | Yes | Email address |
-| `address_1` | string | Yes | Street address line 1 |
-| `address_2` | string | No | Street address line 2 |
-| `city` | string | Yes | City (max 255 characters) |
-| `state` | string | No | State/province |
-| `postcode` | string | No | Postal code |
-| `country` | string | Yes | Country code |
-| `phone` | string | No | Phone number |
-| `type` | string | No | Address type: "billing" or "shipping" |
-| `label` | string | No | Address label (max 15 characters) |
-| `is_primary` | integer | No | Set to 1 for primary address |
-| `order_id` | integer | No | Associated order ID |
-
-#### Request Body Example
-
 ```json
 {
-  "id": 1,
-  "name": "John Doe",
-  "email": "customer@example.com",
+  "address_id": 1,
+  "first_name": "John",
+  "last_name": "Doe",
   "address_1": "123 Updated St",
-  "address_2": "Apt 4B",
   "city": "New York",
   "state": "NY",
   "postcode": "10001",
-  "country": "US",
-  "phone": "+1234567890",
-  "type": "billing",
-  "label": "Home",
-  "is_primary": 1
+  "country": "US"
 }
 ```
 
@@ -609,8 +477,8 @@ Update customer's address information.
   "data": {
     "address": {
       "id": 1,
-      "name": "John Doe",
-      "email": "customer@example.com",
+      "first_name": "John",
+      "last_name": "Doe",
       "address_1": "123 Updated St",
       "city": "New York",
       "state": "NY",
@@ -618,24 +486,20 @@ Update customer's address information.
       "country": "US",
       "updated_at": "2024-01-01T11:00:00Z"
     }
-  },
-  "message": "Address updated successfully!"
+  }
 }
 ```
 
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/address" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
-    "id": 1,
-    "name": "John Doe",
-    "email": "customer@example.com",
+    "address_id": 1,
     "address_1": "123 Updated St",
-    "city": "New York",
-    "country": "US"
+    "city": "New York"
   }'
 ```
 
@@ -645,48 +509,24 @@ curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address" \
 
 Create a new address for a customer.
 
-**Permission Required**: `customers/manage`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
+| `customerId` | integer | Customer ID |
 
 #### Request Body
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Full name (max 255 characters) |
-| `email` | string | Yes | Email address |
-| `address_1` | string | Yes | Street address line 1 |
-| `address_2` | string | No | Street address line 2 |
-| `city` | string | Yes | City (max 255 characters) |
-| `state` | string | No | State/province (required for some countries) |
-| `postcode` | string | No | Postal code (required for some countries) |
-| `country` | string | Yes | Country code |
-| `phone` | string | No | Phone number |
-| `type` | string | No | Address type: "billing" or "shipping" |
-| `label` | string | No | Address label (max 15 characters) |
-| `is_primary` | integer | No | Set to 1 for primary address (default: 0) |
-| `order_id` | integer | No | Associated order ID |
-
-#### Request Body Example
 
 ```json
 {
   "type": "shipping",
-  "name": "John Doe",
-  "email": "customer@example.com",
+  "first_name": "John",
+  "last_name": "Doe",
   "address_1": "789 New St",
-  "address_2": "",
   "city": "Queens",
   "state": "NY",
   "postcode": "11301",
-  "country": "US",
-  "phone": "+1234567890",
-  "label": "Work",
-  "is_primary": 0
+  "country": "US"
 }
 ```
 
@@ -699,8 +539,8 @@ Create a new address for a customer.
     "address": {
       "id": 3,
       "type": "shipping",
-      "name": "John Doe",
-      "email": "customer@example.com",
+      "first_name": "John",
+      "last_name": "Doe",
       "address_1": "789 New St",
       "city": "Queens",
       "state": "NY",
@@ -708,21 +548,20 @@ Create a new address for a customer.
       "country": "US",
       "created_at": "2024-01-01T11:00:00Z"
     }
-  },
-  "message": "Address created successfully!"
+  }
 }
 ```
 
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/address" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
     "type": "shipping",
-    "name": "John Doe",
-    "email": "customer@example.com",
+    "first_name": "John",
+    "last_name": "Doe",
     "address_1": "789 New St",
     "city": "Queens",
     "state": "NY",
@@ -737,21 +576,17 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address" \
 
 Delete a customer's address.
 
-**Permission Required**: `customers/delete`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
+| `customerId` | integer | Customer ID |
 
 #### Request Body
 
 ```json
 {
-  "address": {
-    "id": 2
-  }
+  "address_id": 2
 }
 ```
 
@@ -760,22 +595,18 @@ Delete a customer's address.
 ```json
 {
   "success": true,
-  "data": {
-    "message": "Address deleted successfully"
-  }
+  "message": "Address deleted successfully"
 }
 ```
 
 #### Example Request
 
 ```bash
-curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address" \
+curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/address" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
-    "address": {
-      "id": 2
-    }
+    "address_id": 2
   }'
 ```
 
@@ -785,27 +616,17 @@ curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address"
 
 Set an address as the primary address for a customer.
 
-**Permission Required**: `customers/manage`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
+| `customerId` | integer | Customer ID |
 
 #### Request Body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `addressId` | integer | Yes | Address ID to set as primary |
-| `type` | string | Yes | Address type: "billing" or "shipping" |
-
-#### Request Body Example
-
 ```json
 {
-  "addressId": 2,
-  "type": "billing"
+  "address_id": 2
 }
 ```
 
@@ -818,23 +639,20 @@ Set an address as the primary address for a customer.
     "address": {
       "id": 2,
       "is_primary": true,
-      "type": "billing",
       "updated_at": "2024-01-01T11:00:00Z"
     }
-  },
-  "message": "Primary address updated successfully!"
+  }
 }
 ```
 
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/address/make-primary" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/address/make-primary" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
-    "addressId": 2,
-    "type": "billing"
+    "address_id": 2
   }'
 ```
 
@@ -871,7 +689,7 @@ Get WordPress users that can be attached to customers.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/attachable-user" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/customers/attachable-user" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -879,23 +697,15 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customers/attachable-us
 
 **POST** `/customers/{customerId}/attachable-user`
 
-Attach a WordPress user to a customer. The customer must not already have a user attached.
-
-**Permission Required**: `customers/manage`
+Attach a WordPress user to a customer.
 
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
+| `customerId` | integer | Customer ID |
 
 #### Request Body
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `user_id` | integer | Yes | WordPress user ID to attach |
-
-#### Request Body Example
 
 ```json
 {
@@ -909,18 +719,11 @@ Attach a WordPress user to a customer. The customer must not already have a user
 {
   "success": true,
   "data": {
-    "message": "User attached successfully"
-  }
-}
-```
-
-#### Error Response (if customer already has user)
-
-```json
-{
-  "success": false,
-  "data": {
-    "message": "Can not attach user"
+    "customer": {
+      "id": 1,
+      "user_id": 1,
+      "updated_at": "2024-01-01T11:00:00Z"
+    }
   }
 }
 ```
@@ -928,7 +731,7 @@ Attach a WordPress user to a customer. The customer must not already have a user
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/attachable-user" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/attachable-user" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -942,13 +745,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/attachable
 
 Detach a WordPress user from a customer.
 
-**Permission Required**: `customers/manage`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `customerId` | integer | Customer ID (route parameter) |
+| `customerId` | integer | Customer ID |
 
 #### Response
 
@@ -956,7 +757,11 @@ Detach a WordPress user from a customer.
 {
   "success": true,
   "data": {
-    "message": "User detached successfully"
+    "customer": {
+      "id": 1,
+      "user_id": null,
+      "updated_at": "2024-01-01T11:00:00Z"
+    }
   }
 }
 ```
@@ -964,7 +769,7 @@ Detach a WordPress user from a customer.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/detach-user" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customers/1/detach-user" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -974,11 +779,7 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/1/detach-use
 
 Perform bulk actions on multiple customers.
 
-**Permission Required**: `customers/manage`
-
 #### Request Body
-
-The request body structure depends on the action type. Common structure:
 
 ```json
 {
@@ -992,11 +793,9 @@ The request body structure depends on the action type. Common structure:
 
 #### Available Actions
 
-The available actions are determined by the `CustomerResource::manageCustomer()` method. Common actions include:
-
 - `update_status` - Update status of multiple customers
 - `delete` - Delete multiple customers
-- Other actions as implemented in the resource
+- `export` - Export multiple customers
 
 #### Response
 
@@ -1027,7 +826,7 @@ The available actions are determined by the `CustomerResource::manageCustomer()`
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/do-bulk-action" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customers/do-bulk-action" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1039,236 +838,58 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customers/do-bulk-acti
   }'
 ```
 
----
+## Error Handling
 
-## Address Info
+### Common Error Codes
 
-### Get Countries Options
+| Code | Description |
+|------|-------------|
+| `customer_not_found` | Customer with specified ID not found |
+| `invalid_email` | Email address is invalid or already exists |
+| `invalid_user` | WordPress user ID is invalid |
+| `insufficient_permissions` | User lacks required permissions |
+| `validation_error` | Request data validation failed |
+| `address_not_found` | Address with specified ID not found |
 
-Retrieve a list of all available countries as options.
-
-**Endpoint:** `GET /address-info/countries`
-
-**Permission Required**: `CustomerPolicy`
-
-#### Response
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "value": "US",
-      "label": "United States"
-    },
-    {
-      "value": "CA",
-      "label": "Canada"
-    },
-    {
-      "value": "GB",
-      "label": "United Kingdom"
-    }
-  ]
-}
-```
-
-#### Example Request
-
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/address-info/countries" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
-### Get Country Info
-
-Retrieve detailed information about a specific country including states/provinces and address locale.
-
-**Endpoint:** `GET /address-info/get-country-info`
-
-**Permission Required**: `CustomerPolicy`
-
-#### Query Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `country_code` | string | Yes* | ISO country code (required if timezone not provided) |
-| `timezone` | string | Yes* | Timezone (required if country_code not provided, used to guess country) |
-
-#### Response
+### Error Response Example
 
 ```json
 {
-  "success": true,
-  "data": {
-    "country_code": "US",
-    "country_name": "United States",
-    "states": [
-      {
-        "value": "AL",
-        "label": "Alabama"
-      },
-      {
-        "value": "AK",
-        "label": "Alaska"
-      },
-      {
-        "value": "CA",
-        "label": "California"
-      }
-    ],
-    "address_locale": {
-      "format": "{{first_name}} {{last_name}}\n{{address_line_1}}\n{{city}}, {{state}} {{postal_code}}\n{{country}}"
-    }
+  "success": false,
+  "error": {
+    "code": "customer_not_found",
+    "message": "Customer with ID 999 not found"
   }
 }
 ```
 
-#### Example Request
+## Rate Limiting
 
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/address-info/get-country-info?country_code=US" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
+- **List operations**: 100 requests per hour
+- **Create operations**: 50 requests per hour
+- **Update operations**: 200 requests per hour
+- **Delete operations**: 20 requests per hour
 
----
+## Related Documentation
 
-## Labels
+- [Orders API](./orders) - Order management endpoints
+- [Products API](./products) - Product management endpoints
+- [Database Models](/database/models) - Customer data models
+- [Developer Hooks](/hooks/) - Customer-related hooks
 
-### List Labels
+## Next Steps
 
-Retrieve all available labels.
+Continue with customer management:
 
-**Endpoint:** `GET /labels/`
+1. **[Orders API](./orders)** - Manage customer orders
+2. **[Products API](./products)** - Manage product catalog
+3. **[Database Models](/database/models)** - Understand customer data structure
+4. **[Developer Hooks](/hooks/)** - Customer-related hooks
 
-**Permission Required**: `labels/view`
+## Previous/Next Navigation
 
-##### Response
-
-```json
-{
-  "labels": [
-    {
-      "id": 1,
-      "value": "VIP Customer",
-      "color": "#FF5733",
-      "created_at": "2024-01-01 10:00:00",
-      "updated_at": "2024-01-01 10:00:00"
-    },
-    {
-      "id": 2,
-      "value": "High Priority",
-      "color": "#33FF57",
-      "created_at": "2024-01-01 10:00:00",
-      "updated_at": "2024-01-01 10:00:00"
-    }
-  ]
-}
-```
-
-##### Example Request
-
-```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/labels/" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
-```
-
-#### Create Label
-
-Create a new label.
-
-**Endpoint:** `POST /labels/`
-
-**Permission Required**: `labels/manage`
-
-##### Request Body
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `value` | string | Yes | Label text/value |
-| `color` | string | No | Label color (hex code) |
-
-```json
-{
-  "value": "New Customer",
-  "color": "#3366FF"
-}
-```
-
-##### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": 3,
-    "value": "New Customer",
-    "color": "#3366FF",
-    "created_at": "2024-01-15 11:30:00",
-    "updated_at": "2024-01-15 11:30:00"
-  }
-}
-```
-
-##### Example Request
-
-```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/labels/" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "value": "New Customer",
-    "color": "#3366FF"
-  }'
-```
-
-#### Update Label Selections
-
-Update which labels are assigned to a specific entity (order, customer, etc.).
-
-**Endpoint:** `POST /labels/update-selections`
-
-**Permission Required**: `labels/manage`
-
-##### Request Body
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `bind_to_type` | string | Yes | Model type (e.g., `'Order'`, `'Customer'`) |
-| `bind_to_id` | int | Yes | Entity ID to attach labels to |
-| `selectedLabels` | array | Yes | Array of label IDs to assign |
-
-```json
-{
-  "bind_to_type": "Order",
-  "bind_to_id": 123,
-  "selectedLabels": [1, 2, 3]
-}
-```
-
-##### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "message": "Labels Updated Successfully"
-  }
-}
-```
-
-##### Example Request
-
-```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/labels/update-selections" \
-  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "bind_to_type": "Order",
-    "bind_to_id": 123,
-    "selectedLabels": [1, 2]
-  }'
-```
+- **Previous**: [Orders API](./orders) - Order management endpoints
+- **Next**: [Products API](./products) - Product management endpoints
 
 ---
 

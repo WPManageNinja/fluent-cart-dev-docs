@@ -983,5 +983,4 @@ add_action('fluent_cart/storage/file_deleted', function($filePath, $driver) {
 ---
 
 **Next Steps:**
-- [Pro Modules](./pro-modules) - Advanced Pro features
-- [Modules Overview](../modules) - Back to modules overview
+- [Modules Overview](./index) - Back to modules overview

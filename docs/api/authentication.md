@@ -193,45 +193,25 @@ if ($user->can('super_admin')) {
 - `POST /settings/store` - Update store settings
 - `GET /settings/payment-methods` - Payment method settings
 
-#### 7. StoreSensitivePolicy
+#### 7. PublicPolicy
 
-**Purpose**: Store sensitive data access  
-**Usage**: Email notifications, file management, tax settings, checkout fields
-
-**Endpoints Protected**:
-- `GET /email-notification/*` - Email notification settings
-- `GET /files/*` - File management
-- `POST /tax/*` - Tax settings
-- `GET /checkout-fields/*` - Checkout field management
-
-#### 8. PublicPolicy
-
-**Purpose**: Public access (no authentication required)  
-**Usage**: Public product catalog, cart operations, checkout, user login
+**Purpose**: Public access permissions  
+**Usage**: Public product catalog, cart operations, checkout
 
 **Endpoints Protected**:
 - `GET /public/products` - Public product catalog
 - `GET /cart/add_item` - Add to cart
 - `POST /checkout/place-order` - Place order
-- `POST /user/login` - User login
 
-#### 9. CustomerFrontendPolicy
+#### 8. CustomerFrontendPolicy
 
-**Purpose**: Customer frontend access (requires logged-in user)  
-**Usage**: Customer profile, orders, subscriptions, customer addresses
-
-**Verification**: Checks if user is logged in (`is_user_logged_in()`)
+**Purpose**: Customer frontend access  
+**Usage**: Customer profile, orders, subscriptions
 
 **Endpoints Protected**:
 - `GET /customer-profile/` - Customer profile
 - `GET /customer-profile/orders` - Customer orders
 - `GET /customer-profile/subscriptions` - Customer subscriptions
-- `GET /customers/{customerId}` - Get customer details
-- `PUT /customers/{customerId}` - Update customer details
-- `GET /customers/{customerId}/orders` - Get customer orders
-- `PUT /customers/{customerId}/address` - Update customer address
-- `POST /customers/add-address` - Create customer address
-- `DELETE /customers/{customerId}/address` - Delete customer address
 
 ### Permission System
 
@@ -253,8 +233,8 @@ Permissions follow a hierarchical structure:
 #### Special Permissions
 
 - `super_admin` - Full system access
-- `is_super_admin` - Super admin check (used by AdminPolicy)
-- `is_supper_admin` - Alternative super admin check (typo in codebase, may exist in some legacy code)
+- `is_super_admin` - Super admin check
+- `is_supper_admin` - Alternative super admin check (typo in codebase)
 
 ### Policy Implementation
 
@@ -309,101 +289,156 @@ $router->get('/orders', [OrderController::class, 'index'])
 
 **POST** `/user/login`
 
-Authenticate a user for frontend access. This endpoint requires a WordPress nonce for security.
-
-**Policy**: `PublicPolicy` (no authentication required to access this endpoint)
-
-#### Headers
-
-| Header | Type | Required | Description |
-|--------|------|----------|-------------|
-| `X-WP-Nonce` | string | Yes | WordPress REST API nonce for security verification |
-| `Content-Type` | string | Yes | Must be `application/json` |
+Authenticate a user for frontend access.
 
 #### Request Body
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `user_login` | string | Yes | User email address or username |
-| `password` | string | Yes | User password |
-| `remember_me` | boolean/string | No | Set to `true` or `"on"` to remember the user session |
-
 ```json
 {
-  "user_login": "user@example.com",
-  "password": "user_password",
-  "remember_me": false
+  "username": "user@example.com",
+  "password": "user_password"
 }
 ```
 
 #### Response
 
-**Success Response** (200):
-
 ```json
 {
   "success": true,
   "data": {
-    "message": "Login successful",
-    "redirect_url": "https://yoursite.com/customer-profile/#/profile"
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "display_name": "John Doe"
+    },
+    "auth_cookie": "wordpress_logged_in_abc123"
   }
 }
 ```
-
-**Error Response** (400/401):
-
-```json
-{
-  "success": false,
-  "data": {
-    "message": "Invalid credentials",
-    "code": "login_failed"
-  }
-}
-```
-
-#### Error Codes
-
-| Code | Description |
-|------|-------------|
-| `invalid_nonce` | Invalid or missing X-WP-Nonce header |
-| `missing_login` | User login (email/username) is required |
-| `missing_password` | Password is required |
-| `login_failed` | Invalid credentials provided |
 
 #### Example Request
 
 ```bash
 curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/user/login" \
   -H "Content-Type: application/json" \
-  -H "X-WP-Nonce: your_wp_nonce_here" \
   -d '{
-    "user_login": "user@example.com",
-    "password": "user_password",
-    "remember_me": false
+    "username": "user@example.com",
+    "password": "user_password"
   }'
 ```
 
-#### Example Request (JavaScript)
+## Error Handling
 
-```javascript
-const response = await fetch('https://yoursite.com/wp-json/fluent-cart/v2/user/login', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': wpApiSettings.nonce // WordPress nonce from wp_localize_script
-    },
-    body: JSON.stringify({
-        user_login: 'user@example.com',
-        password: 'user_password',
-        remember_me: false
-    })
-});
+### Authentication Errors
 
-const data = await response.json();
+| Code | Description |
+|------|-------------|
+| `authentication_required` | No authentication provided |
+| `authentication_failed` | Invalid credentials |
+| `authentication_expired` | Token/session expired |
+| `insufficient_permissions` | User lacks required permissions |
+| `policy_violation` | Policy check failed |
+
+### Error Response Examples
+
+#### Authentication Required
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "authentication_required",
+    "message": "Authentication is required to access this endpoint"
+  }
+}
 ```
 
-**Note**: The register endpoint (`POST /user/register`) is currently commented out in the routes and not available.
+#### Insufficient Permissions
 
+```json
+{
+  "success": false,
+  "error": {
+    "code": "insufficient_permissions",
+    "message": "You do not have permission to perform this action"
+  }
+}
+```
 
+## Security Best Practices
+
+### 1. Use Application Passwords
+
+- **Never** use WordPress admin passwords in API calls
+- Create dedicated application passwords for each integration
+- Rotate application passwords regularly
+
+### 2. HTTPS Only
+
+- Always use HTTPS for API calls
+- Never send credentials over unencrypted connections
+
+### 3. Permission Principle
+
+- Grant minimum required permissions
+- Use specific permissions rather than broad access
+- Regularly audit user permissions
+
+### 4. Rate Limiting
+
+- Implement rate limiting on your API calls
+- Respect FluentCart's rate limits
+- Use exponential backoff for retries
+
+### 5. Error Handling
+
+- Handle authentication errors gracefully
+- Don't expose sensitive information in error messages
+- Log authentication failures for monitoring
+
+## Testing Authentication
+
+### Test Credentials
+
+```bash
+# Test with valid credentials
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/orders" \
+  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
+
+# Test with invalid credentials
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/orders" \
+  -H "Authorization: Basic aW52YWxpZDppbnZhbGlk"
+```
+
+### Permission Testing
+
+```bash
+# Test with insufficient permissions
+curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/orders/1" \
+  -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
+```
+
+## Related Documentation
+
+- [Orders API](./orders) - Order management endpoints
+- [Customers API](./customers) - Customer management endpoints
+- [Products API](./products) - Product management endpoints
+- [Subscriptions API](./subscriptions) - Subscription management endpoints
+- [Database Models](/database/models) - User and permission data models
+
+## Next Steps
+
+Continue with API development:
+
+1. **[Orders API](./orders)** - Start with order management
+2. **[Customers API](./customers)** - Customer management
+3. **[Products API](./products)** - Product catalog
+4. **[Subscriptions API](./subscriptions)** - Subscription management
+
+## Previous/Next Navigation
+
+- **Previous**: [Subscriptions API](./subscriptions) - Subscription management endpoints
+- **Next**: [Orders API](./orders) - Order management endpoints
+
+---
 

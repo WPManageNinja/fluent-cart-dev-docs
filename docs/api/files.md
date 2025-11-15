@@ -29,13 +29,10 @@ All endpoints require authentication and appropriate permissions:
 
 Retrieve a paginated list of uploaded files.
 
-**Policy**: `StoreSensitivePolicy`
-
 #### Parameters
 
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
-| `driver` | string | Storage driver to filter by | local |
 | `page` | integer | Page number | 1 |
 | `per_page` | integer | Items per page (max 100) | 10 |
 | `search` | string | Search query | - |
@@ -97,15 +94,13 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/files?page=1&per_page=2
 
 Upload a new file to the storage system.
 
-**Policy**: `StoreSensitivePolicy`
-
 #### Request Body
 
 **Multipart Form Data**:
-- `file` - The file to upload (required)
-- `name` - Custom file name (required, max 160 characters)
-- `driver` - Storage driver to use (optional, default: local)
-- `bucket` - Bucket/folder name (optional)
+- `file` - The file to upload
+- `storage_driver` - Storage driver to use (optional)
+- `folder` - Folder path (optional)
+- `public` - Whether file should be public (optional)
 
 #### Response
 
@@ -134,9 +129,8 @@ Upload a new file to the storage system.
 curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/files/upload" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -F "file=@/path/to/file.jpg" \
-  -F "name=product-image" \
-  -F "driver=local" \
-  -F "bucket=products"
+  -F "storage_driver=local" \
+  -F "folder=products"
 ```
 
 #### JavaScript Example
@@ -144,9 +138,8 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/files/upload" \
 ```javascript
 const formData = new FormData();
 formData.append('file', fileInput.files[0]);
-formData.append('name', 'product-image');
-formData.append('driver', 'local');
-formData.append('bucket', 'products');
+formData.append('storage_driver', 'local');
+formData.append('folder', 'products');
 
 const response = await fetch('https://yoursite.com/wp-json/fluent-cart/v2/files/upload', {
     method: 'POST',
@@ -165,29 +158,32 @@ const result = await response.json();
 
 Get list of available file buckets/storage locations.
 
-**Policy**: `StoreSensitivePolicy`
-
-#### Parameters
-
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|---------|
-| `driver` | string | Storage driver to get buckets for | - |
-
 #### Response
 
 ```json
 {
-  "default_bucket": "local",
-  "buckets": [
-    {
-      "label": "local",
-      "value": "local"
-    },
-    {
-      "label": "s3-bucket",
-      "value": "s3-bucket"
-    }
-  ]
+  "success": true,
+  "data": {
+    "buckets": [
+      {
+        "name": "local",
+        "type": "local",
+        "path": "/wp-content/uploads/",
+        "url": "https://yoursite.com/wp-content/uploads/",
+        "available_space": 1073741824,
+        "used_space": 536870912
+      },
+      {
+        "name": "s3-bucket",
+        "type": "s3",
+        "region": "us-east-1",
+        "bucket": "my-fluentcart-files",
+        "url": "https://s3.amazonaws.com/my-fluentcart-files/",
+        "available_space": 1073741824000,
+        "used_space": 107374182400
+      }
+    ]
+  }
 }
 ```
 
@@ -204,23 +200,12 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/files/bucket-list" \
 
 Delete a file from storage.
 
-**Policy**: `StoreSensitivePolicy`
-
 #### Request Body
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `file_path` | string | Yes | Path to the file to delete |
-| `driver` | string | Yes | Storage driver name |
-| `bucket` | string | No | Bucket/folder name (for cloud storage) |
-
-#### Request Body Example
 
 ```json
 {
-  "file_path": "/uploads/2024/01/product-image.jpg",
-  "driver": "local",
-  "bucket": "products"
+  "file_id": 1,
+  "file_path": "/uploads/2024/01/product-image.jpg"
 }
 ```
 
@@ -240,8 +225,8 @@ curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/files/delete" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
-    "file_path": "/uploads/2024/01/product-image.jpg",
-    "driver": "local"
+    "file_id": 1,
+    "file_path": "/uploads/2024/01/product-image.jpg"
   }'
 ```
 
@@ -249,14 +234,13 @@ curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/files/delete" \
 
 **POST** `/upload-editor-file`
 
-Upload a file for use in rich text editors. Currently supports image files only.
-
-**Policy**: `AdminPolicy`
+Upload a file for use in rich text editors.
 
 #### Request Body
 
 **Multipart Form Data**:
-- `file` - The image file to upload (required)
+- `file` - The file to upload
+- `editor_type` - Type of editor (optional)
 
 #### Response
 
@@ -280,7 +264,8 @@ Upload a file for use in rich text editors. Currently supports image files only.
 ```bash
 curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/upload-editor-file" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
-  -F "file=@/path/to/editor-file.jpg"
+  -F "file=@/path/to/editor-file.jpg" \
+  -F "editor_type=tinymce"
 ```
 
 ## Product Downloadable Files
@@ -291,15 +276,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/upload-editor-file" \
 
 Sync downloadable files for a product.
 
-**Permission Required**: `products/edit`
-
-**Note**: This endpoint is part of the Products API. See [Products API](./products) for more details.
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `postId` | integer | Product ID (route parameter) |
+| `postId` | integer | Product ID |
 
 #### Request Body
 
@@ -366,15 +347,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/products/1/sync-downlo
 
 Update a downloadable file.
 
-**Permission Required**: `products/edit`
-
-**Note**: This endpoint is part of the Products API. See [Products API](./products) for more details.
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `downloadableId` | integer | Downloadable file ID (route parameter) |
+| `downloadableId` | integer | Downloadable file ID |
 
 #### Request Body
 
@@ -422,15 +399,11 @@ curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/products/1/update" \
 
 Delete a downloadable file.
 
-**Permission Required**: `products/delete`
-
-**Note**: This endpoint is part of the Products API. See [Products API](./products) for more details.
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `downloadableId` | integer | Downloadable file ID (route parameter) |
+| `downloadableId` | integer | Downloadable file ID |
 
 #### Response
 
@@ -454,15 +427,11 @@ curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/products/1/delete" \
 
 Get a secure download URL for a downloadable file.
 
-**Permission Required**: `products/view`
-
-**Note**: This endpoint is part of the Products API. See [Products API](./products) for more details.
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `downloadableId` | integer | Downloadable file ID (route parameter) |
+| `downloadableId` | integer | Downloadable file ID |
 
 #### Response
 
@@ -561,4 +530,80 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/products/getDownloadabl
 }
 ```
 
+## Error Handling
+
+### Common Error Codes
+
+| Code | Description |
+|------|-------------|
+| `file_not_found` | File with specified ID not found |
+| `file_upload_failed` | File upload failed |
+| `file_too_large` | File exceeds size limit |
+| `invalid_file_type` | File type not allowed |
+| `storage_driver_error` | Storage driver error occurred |
+| `insufficient_permissions` | User lacks required permissions |
+| `validation_error` | Request data validation failed |
+| `download_limit_exceeded` | Download limit exceeded |
+| `download_expired` | Download link has expired |
+
+### Error Response Example
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "file_too_large",
+    "message": "File size exceeds maximum allowed size of 10MB"
+  }
+}
+```
+
+## Rate Limiting
+
+- **List operations**: 100 requests per hour
+- **Upload operations**: 50 requests per hour
+- **Delete operations**: 20 requests per hour
+- **Download operations**: 1000 requests per hour
+
+## Security Considerations
+
+### File Upload Security
+
+1. **File Type Validation**: Only allow specific file types
+2. **File Size Limits**: Enforce maximum file sizes
+3. **Virus Scanning**: Scan uploaded files for malware
+4. **Secure Storage**: Use secure storage drivers
+5. **Access Control**: Implement proper access controls
+
+### Download Security
+
+1. **Secure URLs**: Generate time-limited download URLs
+2. **Access Control**: Verify user permissions
+3. **Download Limits**: Enforce download limits
+4. **Expiry Dates**: Set download expiry dates
+5. **Audit Logging**: Log all download activities
+
+## Related Documentation
+
+- [Products API](./products) - Product management endpoints
+- [Orders API](./orders) - Order management endpoints
+- [Storage Drivers](/modules/storage) - Storage driver configuration
+- [Database Models](/database/models) - File data models
+- [Developer Hooks](/hooks/) - File-related hooks
+
+## Next Steps
+
+Continue with file management:
+
+1. **[Products API](./products)** - Manage product files
+2. **[Orders API](./orders)** - Handle order downloads
+3. **[Storage Drivers](/modules/storage)** - Configure storage systems
+4. **[Database Models](/database/models)** - Understand file data structure
+
+## Previous/Next Navigation
+
+- **Previous**: [Coupons API](./coupons) - Coupon management endpoints
+- **Next**: [Products API](./products) - Product management endpoints
+
+---
 

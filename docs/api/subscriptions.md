@@ -29,8 +29,6 @@ All endpoints require authentication and appropriate permissions:
 
 Retrieve a paginated list of subscriptions with optional filtering and searching.
 
-**Note**: This endpoint may be part of FluentCart Pro. Check your subscription management routes.
-
 #### Parameters
 
 | Parameter | Type | Description | Default |
@@ -99,7 +97,7 @@ Retrieve a paginated list of subscriptions with optional filtering and searching
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/subscriptions?page=1&per_page=20&search=premium" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/subscriptions?page=1&per_page=20&search=premium" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -109,13 +107,11 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/subscriptions?page=1&pe
 
 Retrieve detailed information about a specific subscription.
 
-**Note**: This endpoint may be part of FluentCart Pro. Check your subscription management routes.
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subscriptionOrderId` | integer | Subscription Order ID (route parameter) |
+| `subscriptionOrderId` | integer | Subscription Order ID |
 
 #### Response
 
@@ -168,7 +164,7 @@ Retrieve detailed information about a specific subscription.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/subscriptions/1" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/subscriptions/1" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -213,7 +209,7 @@ Cancel a subscription.
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/subscriptions/1/cancel" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/subscriptions/1/cancel" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -253,7 +249,7 @@ Fetch subscription data from payment gateway.
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/subscriptions/1/fetch" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/subscriptions/1/fetch" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -297,7 +293,7 @@ Reactivate a cancelled subscription.
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/subscriptions/1/reactivate" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/subscriptions/1/reactivate" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -346,7 +342,7 @@ Pause a subscription.
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/subscriptions/1/pause" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/subscriptions/1/pause" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -387,7 +383,7 @@ Resume a paused subscription.
 #### Example Request
 
 ```bash
-curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/subscriptions/1/resume" \
+curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v1/orders/1/subscriptions/1/resume" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -398,8 +394,6 @@ curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/orders/1/subscriptions/
 **GET** `/customer-profile/subscriptions`
 
 Get all subscriptions for the authenticated customer.
-
-**Policy**: `CustomerFrontendPolicy` - Requires user to be logged in
 
 #### Response
 
@@ -432,7 +426,7 @@ Get all subscriptions for the authenticated customer.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscriptions" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/customer-profile/subscriptions" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -442,13 +436,11 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscr
 
 Get detailed information about a specific customer subscription.
 
-**Policy**: `CustomerFrontendPolicy` - Requires user to be logged in and own the subscription
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subscription_uuid` | string | Subscription UUID (route parameter, alphanumeric with dashes) |
+| `subscription_uuid` | string | Subscription UUID |
 
 #### Response
 
@@ -488,7 +480,7 @@ Get detailed information about a specific customer subscription.
 #### Example Request
 
 ```bash
-curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscriptions/sub_abc123" \
+curl -X GET "https://yoursite.com/wp-json/fluent-cart/v1/customer-profile/subscriptions/sub_abc123" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ="
 ```
 
@@ -498,13 +490,11 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscr
 
 Update the payment method for a subscription.
 
-**Policy**: `CustomerFrontendPolicy` - Requires user to be logged in and own the subscription
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subscription_uuid` | string | Subscription UUID (route parameter, alphanumeric with dashes) |
+| `subscription_uuid` | string | Subscription UUID |
 
 #### Request Body
 
@@ -533,7 +523,7 @@ Update the payment method for a subscription.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscriptions/sub_abc123/update-payment-method" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customer-profile/subscriptions/sub_abc123/update-payment-method" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -548,13 +538,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subsc
 
 Get or create a subscription plan.
 
-**Policy**: `CustomerFrontendPolicy` - Requires user to be logged in and own the subscription
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subscription_uuid` | string | Subscription UUID (route parameter, alphanumeric with dashes) |
+| `subscription_uuid` | string | Subscription UUID |
 
 #### Request Body
 
@@ -585,7 +573,7 @@ Get or create a subscription plan.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscriptions/sub_abc123/get-or-create-plan" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customer-profile/subscriptions/sub_abc123/get-or-create-plan" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -601,13 +589,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subsc
 
 Switch the payment method for a subscription.
 
-**Policy**: `CustomerFrontendPolicy` - Requires user to be logged in and own the subscription
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subscription_uuid` | string | Subscription UUID (route parameter, alphanumeric with dashes) |
+| `subscription_uuid` | string | Subscription UUID |
 
 #### Request Body
 
@@ -636,7 +622,7 @@ Switch the payment method for a subscription.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscriptions/sub_abc123/switch-payment-method" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customer-profile/subscriptions/sub_abc123/switch-payment-method" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -651,13 +637,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subsc
 
 Confirm a subscription payment method switch.
 
-**Policy**: `CustomerFrontendPolicy` - Requires user to be logged in and own the subscription
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subscription_uuid` | string | Subscription UUID (route parameter, alphanumeric with dashes) |
+| `subscription_uuid` | string | Subscription UUID |
 
 #### Request Body
 
@@ -686,7 +670,7 @@ Confirm a subscription payment method switch.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscriptions/sub_abc123/confirm-subscription-switch" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customer-profile/subscriptions/sub_abc123/confirm-subscription-switch" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -700,13 +684,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subsc
 
 Confirm a subscription reactivation.
 
-**Policy**: `CustomerFrontendPolicy` - Requires user to be logged in and own the subscription
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subscription_uuid` | string | Subscription UUID (route parameter, alphanumeric with dashes) |
+| `subscription_uuid` | string | Subscription UUID |
 
 #### Request Body
 
@@ -735,7 +717,7 @@ Confirm a subscription reactivation.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscriptions/sub_abc123/confirm-subscription-reactivation" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customer-profile/subscriptions/sub_abc123/confirm-subscription-reactivation" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -749,13 +731,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subsc
 
 Cancel auto-renewal for a subscription.
 
-**Policy**: `CustomerFrontendPolicy` - Requires user to be logged in and own the subscription
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subscription_uuid` | string | Subscription UUID (route parameter, alphanumeric with dashes) |
+| `subscription_uuid` | string | Subscription UUID |
 
 #### Request Body
 
@@ -786,7 +766,7 @@ Cancel auto-renewal for a subscription.
 #### Example Request
 
 ```bash
-curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subscriptions/sub_abc123/cancel-auto-renew" \
+curl -X POST "https://yoursite.com/wp-json/fluent-cart/v1/customer-profile/subscriptions/sub_abc123/cancel-auto-renew" \
   -H "Authorization: Basic dXNlcm5hbWU6YXBwbGljYXRpb25fcGFzc3dvcmQ=" \
   -H "Content-Type: application/json" \
   -d '{
@@ -795,4 +775,59 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/customer-profile/subsc
   }'
 ```
 
+## Error Handling
+
+### Common Error Codes
+
+| Code | Description |
+|------|-------------|
+| `subscription_not_found` | Subscription with specified ID not found |
+| `invalid_subscription_status` | Subscription status does not allow this operation |
+| `payment_method_invalid` | Payment method is invalid or expired |
+| `insufficient_permissions` | User lacks required permissions |
+| `validation_error` | Request data validation failed |
+| `gateway_error` | Payment gateway error occurred |
+
+### Error Response Example
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "subscription_not_found",
+    "message": "Subscription with ID 999 not found"
+  }
+}
+```
+
+## Rate Limiting
+
+- **List operations**: 100 requests per hour
+- **Create operations**: 50 requests per hour
+- **Update operations**: 200 requests per hour
+- **Cancel operations**: 20 requests per hour
+
+## Related Documentation
+
+- [Orders API](./orders) - Order management endpoints
+- [Customers API](./customers) - Customer management endpoints
+- [Products API](./products) - Product management endpoints
+- [Database Models](/database/models) - Subscription data models
+- [Developer Hooks](/hooks/) - Subscription-related hooks
+
+## Next Steps
+
+Continue with subscription management:
+
+1. **[Orders API](./orders)** - Manage subscription orders
+2. **[Customers API](./customers)** - Manage customer data
+3. **[Products API](./products)** - Manage subscription products
+4. **[Database Models](/database/models)** - Understand subscription data structure
+
+## Previous/Next Navigation
+
+- **Previous**: [Products API](./products) - Product management endpoints
+- **Next**: [Authentication Guide](./authentication) - API authentication
+
+---
 

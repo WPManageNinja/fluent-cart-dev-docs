@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "FluentCart"
   text: "Developer Documentation"
-  tagline: "Complete developer guide for FluentCart e-commerce plugin development and customization"
+  tagline: "Complete developer guide for FluentCart e-commerce plugin development and customization<br/><small style='color: #dba718ff; font-style: italic;'>We are updating the docs gradually, feel free to take a look</small>"
   actions:
     - theme: brand
       text: Get Started
@@ -27,9 +27,9 @@ features:
   - title: REST API (coming soon)
     details: Complete REST API documentation including authentication, core endpoints, and FluentCart Pro API for all e-commerce operations.
     link: /
-  - title: Payment Methods (coming soon)
-    details: Payment gateway architecture, supported gateways, and custom gateway development guide for payment processing.
-    link: /
+  - title: Payment Gateway Integration
+    details: Complete guide for third-party developers to integrate custom payment methods with FluentCart.
+    link: /payment-methods-integration/
 #   - title: Shipping Module
 #     details: Shipping zones, methods, rate calculations, and custom shipping method development for delivery management.
 #     link: /modules/shipping

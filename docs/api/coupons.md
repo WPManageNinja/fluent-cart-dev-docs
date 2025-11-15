@@ -29,8 +29,6 @@ All endpoints require authentication and appropriate permissions:
 
 Retrieve a paginated list of coupons with optional filtering and searching.
 
-**Permission Required**: `coupons/view`
-
 #### Parameters
 
 | Parameter | Type | Description | Default |
@@ -97,9 +95,7 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/coupons?page=1&per_page
 
 **GET** `/coupons/listCoupons`
 
-Alternative endpoint for listing coupons with different permissions. This endpoint can be used by users with order management permissions.
-
-**Permission Required**: `orders/create`, `orders/manage`, or `coupons/view`
+Alternative endpoint for listing coupons with different permissions.
 
 #### Response
 
@@ -133,8 +129,6 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/coupons/listCoupons" \
 **POST** `/coupons`
 
 Create a new discount coupon.
-
-**Permission Required**: `coupons/manage`
 
 #### Request Body
 
@@ -205,13 +199,11 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/coupons" \
 
 Retrieve detailed information about a specific coupon.
 
-**Permission Required**: `coupons/view`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `id` | integer | Coupon ID (route parameter) |
+| `id` | integer | Coupon ID |
 
 #### Response
 
@@ -273,13 +265,11 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/coupons/1" \
 
 Update an existing coupon.
 
-**Permission Required**: `coupons/manage`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `id` | integer | Coupon ID (route parameter) |
+| `id` | integer | Coupon ID |
 
 #### Request Body
 
@@ -328,13 +318,11 @@ curl -X PUT "https://yoursite.com/wp-json/fluent-cart/v2/coupons/1" \
 
 Delete a coupon.
 
-**Permission Required**: `coupons/delete`
-
 #### Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `id` | integer | Coupon ID (route parameter) |
+| `id` | integer | Coupon ID |
 
 #### Response
 
@@ -357,8 +345,6 @@ curl -X DELETE "https://yoursite.com/wp-json/fluent-cart/v2/coupons/1" \
 **POST** `/coupons/apply`
 
 Apply a coupon to an order or cart.
-
-**Permission Required**: `orders/create` or `orders/manage`
 
 #### Request Body
 
@@ -424,8 +410,6 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/coupons/apply" \
 
 Cancel/remove a coupon from an order.
 
-**Permission Required**: `orders/create` or `orders/manage`
-
 #### Request Body
 
 ```json
@@ -468,8 +452,6 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/coupons/cancel" \
 **POST** `/coupons/re-apply`
 
 Re-apply a coupon to an order.
-
-**Permission Required**: `orders/create` or `orders/manage`
 
 #### Request Body
 
@@ -523,8 +505,6 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/coupons/re-apply" \
 **POST** `/coupons/checkProductEligibility`
 
 Check if a product is eligible for a coupon.
-
-**Permission Required**: `orders/create` or `orders/manage`
 
 #### Request Body
 
@@ -585,8 +565,6 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/coupons/checkProductEl
 
 Get global coupon settings and configuration.
 
-**Permission Required**: `coupons/view`
-
 #### Response
 
 ```json
@@ -620,8 +598,6 @@ curl -X GET "https://yoursite.com/wp-json/fluent-cart/v2/coupons/getSettings" \
 **POST** `/coupons/storeCouponSettings`
 
 Update global coupon settings.
-
-**Permission Required**: `coupons/manage`
 
 #### Request Body
 
@@ -753,4 +729,64 @@ curl -X POST "https://yoursite.com/wp-json/fluent-cart/v2/coupons/storeCouponSet
 }
 ```
 
+## Error Handling
+
+### Common Error Codes
+
+| Code | Description |
+|------|-------------|
+| `coupon_not_found` | Coupon with specified code not found |
+| `coupon_expired` | Coupon has expired |
+| `coupon_inactive` | Coupon is not active |
+| `coupon_usage_limit_reached` | Coupon usage limit exceeded |
+| `coupon_minimum_amount_not_met` | Order amount below minimum requirement |
+| `coupon_maximum_amount_exceeded` | Order amount exceeds maximum limit |
+| `coupon_product_not_eligible` | Product not eligible for coupon |
+| `coupon_customer_not_eligible` | Customer not eligible for coupon |
+| `insufficient_permissions` | User lacks required permissions |
+| `validation_error` | Request data validation failed |
+
+### Error Response Example
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "coupon_not_found",
+    "message": "Coupon with code 'INVALID' not found"
+  }
+}
+```
+
+## Rate Limiting
+
+- **List operations**: 100 requests per hour
+- **Create operations**: 50 requests per hour
+- **Update operations**: 200 requests per hour
+- **Delete operations**: 20 requests per hour
+- **Apply operations**: 1000 requests per hour
+
+## Related Documentation
+
+- [Orders API](./orders) - Order management endpoints
+- [Customers API](./customers) - Customer management endpoints
+- [Products API](./products) - Product management endpoints
+- [Database Models](/database/models) - Coupon data models
+- [Developer Hooks](/hooks/) - Coupon-related hooks
+
+## Next Steps
+
+Continue with coupon management:
+
+1. **[Orders API](./orders)** - Apply coupons to orders
+2. **[Customers API](./customers)** - Customer-specific coupon restrictions
+3. **[Products API](./products)** - Product-specific coupon eligibility
+4. **[Database Models](/database/models)** - Understand coupon data structure
+
+## Previous/Next Navigation
+
+- **Previous**: [Authentication Guide](./authentication) - API authentication
+- **Next**: [Orders API](./orders) - Order management endpoints
+
+---
 

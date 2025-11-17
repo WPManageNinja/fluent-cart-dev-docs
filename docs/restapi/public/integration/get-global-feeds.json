@@ -1,0 +1,179 @@
+{
+  "paths": {
+    "/integration/global-feeds": {
+      "get": {
+        "operationId": "getIntegrationGlobalFeeds",
+        "summary": "GET Get Global Feeds",
+        "description": "Retrieve all global integration feeds and available integrations.",
+        "tags": [
+          "Integration"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "feeds": {
+                      "type": "array",
+                      "description": "Array of integration feeds",
+                      "items": {
+                        "type": "object"
+                      },
+                      "example": []
+                    },
+                    "available_integrations": {
+                      "type": "object",
+                      "description": "Available integrations keyed by integration identifier",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/AvailableIntegration"
+                      }
+                    },
+                    "all_module_config_url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL to all module configuration",
+                      "example": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                    }
+                  }
+                },
+                "example": {
+                  "feeds": [],
+                  "available_integrations": {
+                    "webhook": {
+                      "priority": 10,
+                      "title": "Webhook",
+                      "description": "Send data anywhere via webhook",
+                      "category": "crm",
+                      "disable_global_settings": true,
+                      "config_url": "",
+                      "logo": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/webhook.svg",
+                      "enabled": true,
+                      "scopes": [
+                        "global",
+                        "product"
+                      ],
+                      "installable": "",
+                      "delay_on_product_action": true,
+                      "delay_on_global_action": true
+                    }
+                  },
+                  "all_module_config_url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GlobalFeedsResponse": {
+        "type": "object",
+        "properties": {
+          "feeds": {
+            "type": "array",
+            "description": "Array of integration feeds",
+            "items": {
+              "type": "object"
+            },
+            "example": []
+          },
+          "available_integrations": {
+            "type": "object",
+            "description": "Available integrations keyed by integration identifier",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AvailableIntegration"
+            }
+          },
+          "all_module_config_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to all module configuration",
+            "example": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+          }
+        }
+      },
+      "AvailableIntegration": {
+        "type": "object",
+        "properties": {
+          "priority": {
+            "type": "integer",
+            "description": "Display priority",
+            "example": 10
+          },
+          "title": {
+            "type": "string",
+            "description": "Integration title",
+            "example": "Webhook"
+          },
+          "description": {
+            "type": "string",
+            "description": "Integration description",
+            "example": "Send data anywhere via webhook"
+          },
+          "category": {
+            "type": "string",
+            "description": "Integration category",
+            "example": "crm"
+          },
+          "disable_global_settings": {
+            "type": "boolean",
+            "description": "Whether global settings are disabled",
+            "example": true
+          },
+          "config_url": {
+            "type": "string",
+            "description": "Configuration URL",
+            "example": ""
+          },
+          "logo": {
+            "type": "string",
+            "format": "uri",
+            "description": "Integration logo URL",
+            "example": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/webhook.svg"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether the integration is enabled",
+            "example": true
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Integration scopes",
+            "example": [
+              "global",
+              "product"
+            ]
+          },
+          "installable": {
+            "type": "string",
+            "description": "Installable plugin slug",
+            "example": ""
+          },
+          "delay_on_product_action": {
+            "type": "boolean",
+            "description": "Whether to delay on product action",
+            "example": true
+          },
+          "delay_on_global_action": {
+            "type": "boolean",
+            "description": "Whether to delay on global action",
+            "example": true
+          }
+        }
+      }
+    }
+  }
+}

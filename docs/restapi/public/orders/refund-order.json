@@ -1,0 +1,386 @@
+{
+  "paths": {
+    "/orders/{order_id}/refund": {
+      "post": {
+        "operationId": "refundOrder",
+        "summary": "POST Refund Order",
+        "description": "Process a refund for an order.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "refund_info"
+                ],
+                "properties": {
+                  "refund_info": {
+                    "type": "object",
+                    "required": [
+                      "transaction_id",
+                      "amount"
+                    ],
+                    "description": "Refund information",
+                    "properties": {
+                      "transaction_id": {
+                        "type": "integer",
+                        "description": "Transaction ID to refund (required)",
+                        "example": 129237
+                      },
+                      "amount": {
+                        "type": "number",
+                        "description": "Refund amount (required)",
+                        "example": 2500
+                      },
+                      "cancelSubscription": {
+                        "type": "string",
+                        "description": "Whether to cancel subscription (true/false)",
+                        "example": "false"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "refund_info": {
+                  "transaction_id": 129237,
+                  "amount": 2500,
+                  "cancelSubscription": "false"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refund processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fluent_cart_refund": {
+                      "type": "object",
+                      "description": "FluentCart refund status",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "success",
+                            "failed"
+                          ],
+                          "example": "success"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Refund processed on FluentCart."
+                        }
+                      }
+                    },
+                    "gateway_refund": {
+                      "type": "object",
+                      "description": "Payment gateway refund status",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "success",
+                            "failed"
+                          ],
+                          "example": "success"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Refund processed on Stripe"
+                        }
+                      }
+                    },
+                    "subscription_cancel": {
+                      "type": "object",
+                      "description": "Subscription cancellation status (if cancelSubscription was true)",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "success",
+                            "failed"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "fluent_cart_refund": {
+                    "status": "success",
+                    "message": "Refund processed on FluentCart."
+                  },
+                  "gateway_refund": {
+                    "status": "success",
+                    "message": "Refund processed on Stripe"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - order cannot be refunded or validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "rest_invalid_param",
+                  "message": "Order can not be refunded.",
+                  "data": {
+                    "status": 400
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Order ID",
+            "example": 1
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Unique order identifier",
+            "example": "abc123"
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status",
+            "example": "completed"
+          },
+          "payment_status": {
+            "type": "string",
+            "description": "Payment status",
+            "example": "paid"
+          },
+          "customer_id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "example": 123
+          },
+          "total_amount": {
+            "type": "integer",
+            "description": "Total amount in cents",
+            "example": 5000
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code",
+            "example": "USD"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Order creation timestamp",
+            "example": "2024-01-01T10:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Order last update timestamp",
+            "example": "2024-01-01T11:00:00Z"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "order_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          }
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "product_id": {
+            "type": "integer",
+            "example": 456
+          },
+          "variation_id": {
+            "type": "integer",
+            "example": 789
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price in cents",
+            "example": 2500
+          },
+          "product": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              },
+              "sku": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 123
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "customer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "payment_method": {
+            "type": "string",
+            "example": "stripe"
+          },
+          "status": {
+            "type": "string",
+            "example": "succeeded"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount in cents",
+            "example": 5000
+          },
+          "transaction_id": {
+            "type": "string",
+            "example": "txn_123456"
+          }
+        }
+      },
+      "RefundResponse": {
+        "type": "object",
+        "properties": {
+          "fluent_cart_refund": {
+            "type": "object",
+            "description": "FluentCart refund status",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "success",
+                  "failed"
+                ],
+                "example": "success"
+              },
+              "message": {
+                "type": "string",
+                "example": "Refund processed on FluentCart."
+              }
+            }
+          },
+          "gateway_refund": {
+            "type": "object",
+            "description": "Payment gateway refund status",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "success",
+                  "failed"
+                ],
+                "example": "success"
+              },
+              "message": {
+                "type": "string",
+                "example": "Refund processed on Stripe"
+              }
+            }
+          },
+          "subscription_cancel": {
+            "type": "object",
+            "description": "Subscription cancellation status (if cancelSubscription was true)",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "success",
+                  "failed"
+                ]
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "paths": {
+    "/settings/store": {
+      "post": {
+        "operationId": "saveStoreSettings",
+        "summary": "POST Save Store Settings",
+        "description": "Update store settings.",
+        "tags": ["Settings"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Settings fields to update. Structure depends on the settings tab being updated.",
+                "properties": {
+                  "store_name": {
+                    "type": "string",
+                    "example": "My Updated Store"
+                  },
+                  "store_email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "newemail@example.com"
+                  },
+                  "store_logo": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "title": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "store_name": "My Updated Store",
+                "store_email": "newemail@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Settings saved successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

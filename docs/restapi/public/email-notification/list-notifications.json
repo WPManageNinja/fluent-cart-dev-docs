@@ -1,0 +1,180 @@
+{
+  "paths": {
+    "/email-notification": {
+      "get": {
+        "operationId": "listEmailNotifications",
+        "summary": "GET List Notifications",
+        "description": "Retrieve all available email notifications.",
+        "tags": [
+          "Email Notification"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Email notifications keyed by notification name",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/EmailNotification"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "order_paid_admin": {
+                      "event": "order_paid_done",
+                      "title": "Send mail to admin after New Order Paid",
+                      "description": "This email will be sent to the admin after an order is placed.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "order.paid.admin",
+                      "is_async": false,
+                      "pre_header": "You got a new order on your shop. Congratulations! Checkout all the details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
+                      "settings": {
+                        "active": "yes",
+                        "subject": "New Sales On {{settings.store_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "order_paid_admin"
+                    },
+                    "order_paid_customer": {
+                      "event": "order_paid",
+                      "title": "Purchase receipt to customer",
+                      "description": "This email will be sent to the customer after an order is placed.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "order.paid.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Purchase Receipt #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "order_paid_customer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EmailNotificationsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "Email notifications keyed by notification name",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/EmailNotification"
+            }
+          }
+        }
+      },
+      "EmailNotification": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "Event that triggers the notification",
+            "example": "order_paid_done"
+          },
+          "title": {
+            "type": "string",
+            "description": "Notification title",
+            "example": "Send mail to admin after New Order Paid"
+          },
+          "description": {
+            "type": "string",
+            "description": "Notification description",
+            "example": "This email will be sent to the admin after an order is placed."
+          },
+          "recipient": {
+            "type": "string",
+            "description": "Recipient type (admin, customer, etc.)",
+            "example": "admin"
+          },
+          "smartcode_groups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Smart code groups available for this notification",
+            "example": []
+          },
+          "template_path": {
+            "type": "string",
+            "description": "Template path",
+            "example": "order.paid.admin"
+          },
+          "is_async": {
+            "type": "boolean",
+            "description": "Whether the notification is sent asynchronously",
+            "example": false
+          },
+          "pre_header": {
+            "type": "string",
+            "nullable": true,
+            "description": "Email pre-header text"
+          },
+          "settings": {
+            "type": "object",
+            "description": "Notification settings",
+            "properties": {
+              "active": {
+                "type": "string",
+                "enum": [
+                  "yes",
+                  "no"
+                ],
+                "description": "Whether the notification is active",
+                "example": "yes"
+              },
+              "subject": {
+                "type": "string",
+                "description": "Email subject (may contain smart codes)",
+                "example": "New Sales On {{settings.store_name}}"
+              },
+              "is_default_body": {
+                "type": "string",
+                "enum": [
+                  "yes",
+                  "no"
+                ],
+                "description": "Whether using default email body",
+                "example": "yes"
+              },
+              "email_body": {
+                "type": "string",
+                "description": "Custom email body (empty if using default)",
+                "example": ""
+              }
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Notification name/identifier",
+            "example": "order_paid_admin"
+          }
+        }
+      }
+    }
+  }
+}

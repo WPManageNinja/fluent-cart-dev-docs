@@ -1,0 +1,106 @@
+{
+  "paths": {
+    "/reports/overview": {
+      "get": {
+        "operationId": "getReportsOverview",
+        "summary": "GET Get Reports Overview",
+        "description": "Retrieve a comprehensive overview report with key metrics.",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Report overview data",
+                      "properties": {
+                        "gross_revenue": {
+                          "type": "object",
+                          "description": "Gross revenue data grouped by period",
+                          "additionalProperties": {
+                            "$ref": "#/components/schemas/RevenuePeriod"
+                          }
+                        }
+                      },
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "gross_revenue": {
+                      "2024-12": {
+                        "current": 10237083,
+                        "prev": 8502914,
+                        "yoy_growth": "20.39"
+                      },
+                      "2025-01": {
+                        "current": 9650355,
+                        "prev": 9750643,
+                        "yoy_growth": "-1.03"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ReportsOverviewResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "description": "Report overview data",
+            "properties": {
+              "gross_revenue": {
+                "type": "object",
+                "description": "Gross revenue data grouped by period",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/RevenuePeriod"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "RevenuePeriod": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "type": "integer",
+            "description": "Current period revenue in cents",
+            "example": 10237083
+          },
+          "prev": {
+            "type": "integer",
+            "description": "Previous period revenue in cents",
+            "example": 8502914
+          },
+          "yoy_growth": {
+            "type": "string",
+            "description": "Year-over-year growth percentage",
+            "example": "20.39"
+          }
+        }
+      }
+    }
+  }
+}

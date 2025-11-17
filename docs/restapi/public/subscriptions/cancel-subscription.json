@@ -1,0 +1,169 @@
+{
+  "paths": {
+    "/orders/{order}/subscriptions/{subscription}/cancel": {
+      "put": {
+        "operationId": "cancelSubscription",
+        "summary": "PUT Cancel Subscription",
+        "description": "Cancel a subscription. Requires a cancel reason.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          },
+          {
+            "name": "subscription",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Subscription ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cancel_reason"
+                ],
+                "properties": {
+                  "cancel_reason": {
+                    "type": "string",
+                    "description": "Cancellation reason (required)",
+                    "example": "Customer requested cancellation"
+                  }
+                }
+              },
+              "example": {
+                "cancel_reason": "Customer requested cancellation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Subscription has been cancelled successfully!"
+                    },
+                    "subscription": {
+                      "$ref": "#/components/schemas/Subscription"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Subscription has been cancelled successfully!",
+                  "subscription": {
+                    "id": 13468,
+                    "status": "cancelled",
+                    "canceled_at": "2025-11-14T10:00:00+00:00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - cancel reason required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Please select cancel reason!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Subscription not found!"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CancelSubscriptionRequest": {
+        "type": "object",
+        "required": [
+          "cancel_reason"
+        ],
+        "properties": {
+          "cancel_reason": {
+            "type": "string",
+            "description": "Cancellation reason (required)",
+            "example": "Customer requested cancellation"
+          }
+        }
+      },
+      "CancelSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Subscription has been cancelled successfully!"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/Subscription"
+          }
+        }
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Subscription ID",
+            "example": 13468
+          },
+          "status": {
+            "type": "string",
+            "description": "Subscription status",
+            "example": "cancelled"
+          },
+          "canceled_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Cancellation timestamp",
+            "example": "2025-11-14T10:00:00+00:00"
+          }
+        }
+      }
+    }
+  }
+}

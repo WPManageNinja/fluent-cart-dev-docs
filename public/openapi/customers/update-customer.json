@@ -1,0 +1,370 @@
+{
+  "paths": {
+    "/customers/{customerId}": {
+      "put": {
+        "operationId": "updateCustomer",
+        "summary": "PUT Update Customer",
+        "description": "Update an existing customer's information.",
+        "tags": [
+          "Customers"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Customer ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "full_name"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Customer email address (must be unique if changed)",
+                    "example": "customer@example.com"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Customer's full name (max 255 characters)",
+                    "example": "John Doe Updated"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Customer's city",
+                    "required": false
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Customer status",
+                    "required": false
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Customer notes",
+                    "required": false
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Customer's country",
+                    "required": false
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Customer's state",
+                    "required": false
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Customer's postal code",
+                    "required": false
+                  },
+                  "user_id": {
+                    "type": "integer",
+                    "description": "WordPress user ID to attach",
+                    "required": false
+                  }
+                }
+              },
+              "example": {
+                "email": "customer@example.com",
+                "full_name": "John Doe Updated",
+                "status": "active",
+                "notes": "Updated notes",
+                "city": "New York"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "Customer updated successfully!"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Customer"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Customer updated successfully!",
+                  "data": {
+                    "id": 63195,
+                    "email": "customer@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe Updated",
+                    "full_name": "John Doe Updated",
+                    "status": "active",
+                    "city": "New York",
+                    "notes": "Updated notes",
+                    "updated_at": "2025-11-13T07:30:00+00:00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - validation error, customer not found, or update failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "notFound": {
+                    "value": {
+                      "code": 400,
+                      "message": "Customer not found, please reload the page and try again!",
+                      "data": ""
+                    }
+                  },
+                  "updateFailed": {
+                    "value": {
+                      "code": 400,
+                      "message": "Customer update failed.",
+                      "data": ""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Failed to update WordPress user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": 423,
+                  "message": "Failed to update user.",
+                  "data": ""
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateCustomerRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "full_name"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Customer email address (must be unique if changed)",
+            "example": "customer@example.com"
+          },
+          "full_name": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Customer's full name (max 255 characters)",
+            "example": "John Doe Updated"
+          },
+          "city": {
+            "type": "string",
+            "description": "Customer's city",
+            "required": false
+          },
+          "status": {
+            "type": "string",
+            "description": "Customer status",
+            "required": false
+          },
+          "notes": {
+            "type": "string",
+            "description": "Customer notes",
+            "required": false
+          },
+          "country": {
+            "type": "string",
+            "description": "Customer's country",
+            "required": false
+          },
+          "state": {
+            "type": "string",
+            "description": "Customer's state",
+            "required": false
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Customer's postal code",
+            "required": false
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "WordPress user ID to attach",
+            "required": false
+          }
+        }
+      },
+      "CustomerResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message",
+            "example": "Customer updated successfully!"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Customer"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Customer ID",
+            "example": 63195
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "WordPress user ID",
+            "example": "5"
+          },
+          "contact_id": {
+            "type": "string",
+            "description": "Contact ID",
+            "example": "0"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Customer email address",
+            "example": "customer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Customer first name",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Customer last name",
+            "example": "Doe Updated"
+          },
+          "full_name": {
+            "type": "string",
+            "description": "Customer full name",
+            "example": "John Doe Updated"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Customer status",
+            "example": "active"
+          },
+          "purchase_value": {
+            "type": "array",
+            "nullable": true,
+            "description": "Purchase value array"
+          },
+          "purchase_count": {
+            "type": "string",
+            "description": "Number of purchases"
+          },
+          "ltv": {
+            "type": "string",
+            "description": "Lifetime value"
+          },
+          "first_purchase_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "First purchase date"
+          },
+          "last_purchase_date": {
+            "type": "string",
+            "nullable": true,
+            "description": "Last purchase date"
+          },
+          "aov": {
+            "type": "string",
+            "nullable": true,
+            "description": "Average order value"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Customer notes",
+            "example": "Updated notes"
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Customer UUID"
+          },
+          "country": {
+            "type": "string",
+            "nullable": true,
+            "description": "Country code",
+            "example": "US"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "description": "City",
+            "example": "New York"
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "description": "State",
+            "example": "NY"
+          },
+          "postcode": {
+            "type": "string",
+            "nullable": true,
+            "description": "Postal code",
+            "example": "10001"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-11-13T07:30:00+00:00"
+          }
+        }
+      }
+    }
+  }
+}

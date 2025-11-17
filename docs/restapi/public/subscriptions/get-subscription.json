@@ -1,0 +1,564 @@
+{
+  "paths": {
+    "/subscriptions/{subscriptionOrderId}": {
+      "get": {
+        "operationId": "getSubscription",
+        "summary": "GET Get Subscription Details",
+        "description": "Retrieve detailed information about a specific subscription including related orders and licenses.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscriptionOrderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Subscription Order ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "subscription": {
+                      "$ref": "#/components/schemas/SubscriptionDetail"
+                    },
+                    "selected_labels": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer"
+                      },
+                      "description": "Array of label IDs associated with the subscription"
+                    }
+                  }
+                },
+                "example": {
+                  "subscription": {
+                    "id": 13468,
+                    "uuid": "a2dc92b860fc251e1b2681cbc003be26",
+                    "customer_id": "63203",
+                    "parent_order_id": "7536286",
+                    "product_id": "7529555",
+                    "item_name": "CodeStream SyncPro - Yearly Subscription",
+                    "quantity": "1",
+                    "variation_id": "259",
+                    "billing_interval": "yearly",
+                    "signup_fee": "0",
+                    "initial_tax_total": "0",
+                    "recurring_amount": "3900",
+                    "recurring_tax_total": "0",
+                    "recurring_total": "3900",
+                    "bill_times": "0",
+                    "bill_count": "1",
+                    "expire_at": null,
+                    "trial_ends_at": null,
+                    "canceled_at": null,
+                    "restored_at": null,
+                    "collection_method": "automatic",
+                    "next_billing_date": "2025-11-06 04:44:36",
+                    "trial_days": "14",
+                    "vendor_customer_id": "cus_THq4gZcHG4cyxO",
+                    "vendor_plan_id": null,
+                    "vendor_subscription_id": "sub_1SLGO8AED9YnSl2pmZUeuUdI",
+                    "status": "trialing",
+                    "original_plan": null,
+                    "vendor_response": null,
+                    "current_payment_method": "stripe",
+                    "config": {
+                      "currency": "USD",
+                      "is_trial_days_simulated": "no"
+                    },
+                    "created_at": "2025-10-23T04:44:34+00:00",
+                    "updated_at": "2025-10-23T04:44:42+00:00",
+                    "related_orders": [
+                      {
+                        "id": 7536286,
+                        "status": "completed",
+                        "parent_id": "0",
+                        "receipt_number": "163756",
+                        "invoice_no": "INV-163756",
+                        "fulfillment_type": "digital",
+                        "type": "subscription",
+                        "mode": "test",
+                        "shipping_status": "",
+                        "customer_id": "63203",
+                        "payment_method": "stripe",
+                        "payment_method_type": "",
+                        "payment_status": "paid",
+                        "currency": "USD",
+                        "subtotal": 0,
+                        "total_amount": 0,
+                        "total_paid": "0",
+                        "total_refund": "0",
+                        "rate": "1.0000",
+                        "tax_behavior": "1",
+                        "note": "",
+                        "ip_address": "115.127.217.90",
+                        "completed_at": "2025-10-23 04:44:42",
+                        "refunded_at": null,
+                        "uuid": "3b481575543e6ca2ca56dcc6a5e0e49c",
+                        "config": {
+                          "user_tz": "Asia/Dhaka",
+                          "create_account_after_paid": "yes"
+                        },
+                        "created_at": "2025-10-23T04:44:34+00:00",
+                        "updated_at": "2025-10-23T04:44:42+00:00"
+                      }
+                    ],
+                    "licenses": []
+                  },
+                  "selected_labels": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SubscriptionDetailResponse": {
+        "type": "object",
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/SubscriptionDetail"
+          },
+          "selected_labels": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Array of label IDs associated with the subscription"
+          }
+        }
+      },
+      "SubscriptionDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Subscription"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "related_orders": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "description": "Related orders for this subscription"
+              },
+              "licenses": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/License"
+                },
+                "description": "Licenses associated with this subscription"
+              },
+              "customer": {
+                "$ref": "#/components/schemas/Customer"
+              },
+              "labels": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "description": "Labels associated with the subscription"
+              }
+            }
+          }
+        ]
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Subscription ID",
+            "example": 13468
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Subscription UUID",
+            "example": "a2dc92b860fc251e1b2681cbc003be26"
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Customer ID",
+            "example": "63203"
+          },
+          "parent_order_id": {
+            "type": "string",
+            "description": "Parent order ID",
+            "example": "7536286"
+          },
+          "product_id": {
+            "type": "string",
+            "description": "Product ID",
+            "example": "7529555"
+          },
+          "item_name": {
+            "type": "string",
+            "description": "Item name",
+            "example": "CodeStream SyncPro - Yearly Subscription"
+          },
+          "quantity": {
+            "type": "string",
+            "description": "Quantity",
+            "example": "1"
+          },
+          "variation_id": {
+            "type": "string",
+            "description": "Variation ID",
+            "example": "259"
+          },
+          "billing_interval": {
+            "type": "string",
+            "description": "Billing interval (e.g., monthly, yearly)",
+            "example": "yearly"
+          },
+          "signup_fee": {
+            "type": "string",
+            "description": "Signup fee in cents",
+            "example": "0"
+          },
+          "initial_tax_total": {
+            "type": "string",
+            "description": "Initial tax total in cents",
+            "example": "0"
+          },
+          "recurring_amount": {
+            "type": "string",
+            "description": "Recurring amount in cents",
+            "example": "3900"
+          },
+          "recurring_tax_total": {
+            "type": "string",
+            "description": "Recurring tax total in cents",
+            "example": "0"
+          },
+          "recurring_total": {
+            "type": "string",
+            "description": "Recurring total in cents",
+            "example": "3900"
+          },
+          "bill_times": {
+            "type": "string",
+            "description": "Number of times to bill (0 = unlimited)",
+            "example": "0"
+          },
+          "bill_count": {
+            "type": "string",
+            "description": "Number of times billed",
+            "example": "1"
+          },
+          "expire_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Expiration date"
+          },
+          "trial_ends_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Trial end date"
+          },
+          "canceled_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Cancellation date"
+          },
+          "restored_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Restoration date"
+          },
+          "collection_method": {
+            "type": "string",
+            "description": "Collection method (e.g., automatic, manual)",
+            "example": "automatic"
+          },
+          "next_billing_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Next billing date",
+            "example": "2025-11-06 04:44:36"
+          },
+          "trial_days": {
+            "type": "string",
+            "description": "Trial days",
+            "example": "14"
+          },
+          "vendor_customer_id": {
+            "type": "string",
+            "description": "Vendor customer ID",
+            "example": "cus_THq4gZcHG4cyxO"
+          },
+          "vendor_plan_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Vendor plan ID"
+          },
+          "vendor_subscription_id": {
+            "type": "string",
+            "description": "Vendor subscription ID",
+            "example": "sub_1SLGO8AED9YnSl2pmZUeuUdI"
+          },
+          "status": {
+            "type": "string",
+            "description": "Subscription status (e.g., active, trialing, canceled)",
+            "example": "trialing"
+          },
+          "original_plan": {
+            "type": "string",
+            "nullable": true,
+            "description": "Original plan"
+          },
+          "vendor_response": {
+            "type": "string",
+            "nullable": true,
+            "description": "Vendor response"
+          },
+          "current_payment_method": {
+            "type": "string",
+            "description": "Current payment method",
+            "example": "stripe"
+          },
+          "config": {
+            "type": "object",
+            "description": "Subscription configuration",
+            "properties": {
+              "currency": {
+                "type": "string",
+                "example": "USD"
+              },
+              "is_trial_days_simulated": {
+                "type": "string",
+                "example": "no"
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2025-10-23T04:44:34+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-10-23T04:44:42+00:00"
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 7536286
+          },
+          "status": {
+            "type": "string",
+            "example": "completed"
+          },
+          "parent_id": {
+            "type": "string",
+            "example": "0"
+          },
+          "receipt_number": {
+            "type": "string",
+            "example": "163756"
+          },
+          "invoice_no": {
+            "type": "string",
+            "example": "INV-163756"
+          },
+          "fulfillment_type": {
+            "type": "string",
+            "example": "digital"
+          },
+          "type": {
+            "type": "string",
+            "example": "subscription"
+          },
+          "mode": {
+            "type": "string",
+            "example": "test"
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "63203"
+          },
+          "payment_method": {
+            "type": "string",
+            "example": "stripe"
+          },
+          "payment_status": {
+            "type": "string",
+            "example": "paid"
+          },
+          "currency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "subtotal": {
+            "type": "integer",
+            "example": 0
+          },
+          "total_amount": {
+            "type": "integer",
+            "example": 0
+          },
+          "total_paid": {
+            "type": "string",
+            "example": "0"
+          },
+          "total_refund": {
+            "type": "string",
+            "example": "0"
+          },
+          "rate": {
+            "type": "string",
+            "example": "1.0000"
+          },
+          "tax_behavior": {
+            "type": "string",
+            "example": "1"
+          },
+          "note": {
+            "type": "string",
+            "example": ""
+          },
+          "ip_address": {
+            "type": "string",
+            "example": "115.127.217.90"
+          },
+          "completed_at": {
+            "type": "string",
+            "example": "2025-10-23 04:44:42"
+          },
+          "refunded_at": {
+            "type": "string",
+            "nullable": true
+          },
+          "uuid": {
+            "type": "string",
+            "example": "3b481575543e6ca2ca56dcc6a5e0e49c"
+          },
+          "config": {
+            "type": "object",
+            "properties": {
+              "user_tz": {
+                "type": "string",
+                "example": "Asia/Dhaka"
+              },
+              "create_account_after_paid": {
+                "type": "string",
+                "example": "yes"
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-10-23T04:44:34+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-10-23T04:44:42+00:00"
+          }
+        }
+      },
+      "License": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "License ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "License status"
+          },
+          "limit": {
+            "type": "string",
+            "description": "License limit"
+          },
+          "activation_count": {
+            "type": "string",
+            "description": "Activation count"
+          },
+          "license_key": {
+            "type": "string",
+            "description": "License key"
+          },
+          "product_id": {
+            "type": "string",
+            "description": "Product ID"
+          },
+          "variation_id": {
+            "type": "string",
+            "description": "Variation ID"
+          },
+          "order_id": {
+            "type": "string",
+            "description": "Order ID"
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Customer ID"
+          },
+          "subscription_id": {
+            "type": "string",
+            "description": "Subscription ID"
+          },
+          "expiration_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Expiration date"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 123
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "customer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe"
+          }
+        }
+      }
+    }
+  }
+}

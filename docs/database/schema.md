@@ -9,9 +9,9 @@ FluentCart uses custom database tables to store all the e-commerce data. Here ar
 
 ### Core Entity Relationships
 
-::: tip 🔍 Interactive ER Diagram
+:::: tip 🔍 Interactive ER Diagram
 Click on the diagram below to zoom in for better readability. The diagram shows the relationships between all FluentCart database tables.
-:::
+::::
 
 <div class="diagram-container">
 

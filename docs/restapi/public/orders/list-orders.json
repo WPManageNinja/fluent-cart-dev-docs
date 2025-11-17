@@ -1,0 +1,661 @@
+{
+  "paths": {
+    "/orders": {
+      "get": {
+        "operationId": "listOrders",
+        "summary": "GET List Orders",
+        "description": "Retrieve a paginated list of orders with optional filtering and searching.",
+        "tags": ["Orders"],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "Page number for pagination",
+            "example": 1
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Number of items to return per page (max 100)",
+            "example": 10
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query to filter orders",
+            "required": false
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by order status",
+            "required": false
+          },
+          {
+            "name": "payment_status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by payment status",
+            "required": false
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by customer ID",
+            "required": false
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "id"
+            },
+            "description": "Sort field",
+            "example": "id"
+          },
+          {
+            "name": "order_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            },
+            "description": "Sort direction",
+            "example": "DESC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns a paginated list of orders.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "orders": {
+                      "type": "object",
+                      "description": "Laravel paginated response",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer",
+                          "description": "Current page number",
+                          "example": 1
+                        },
+                        "data": {
+                          "type": "array",
+                          "description": "Array of orders",
+                          "items": {
+                            "$ref": "#/components/schemas/Order"
+                          }
+                        },
+                        "first_page_url": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "URL to first page",
+                          "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=1"
+                        },
+                        "from": {
+                          "type": "integer",
+                          "description": "Starting record number",
+                          "example": 1
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "description": "Last page number",
+                          "example": 59176
+                        },
+                        "last_page_url": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "URL to last page",
+                          "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=59176"
+                        },
+                        "links": {
+                          "type": "array",
+                          "description": "Pagination links",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string",
+                                "nullable": true,
+                                "format": "uri"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "active": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        },
+                        "next_page_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uri",
+                          "description": "URL to next page"
+                        },
+                        "path": {
+                          "type": "string",
+                          "format": "uri",
+                          "description": "Base path for pagination",
+                          "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/"
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "description": "Items per page",
+                          "example": 10
+                        },
+                        "prev_page_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uri",
+                          "description": "URL to previous page"
+                        },
+                        "to": {
+                          "type": "integer",
+                          "description": "Ending record number",
+                          "example": 10
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of records",
+                          "example": 591759
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "orders": {
+                    "current_page": 1,
+                    "data": [
+                      {
+                        "id": 7536300,
+                        "status": "processing",
+                        "parent_id": "0",
+                        "receipt_number": "163762",
+                        "invoice_no": "INV-163762",
+                        "fulfillment_type": "physical",
+                        "type": "payment",
+                        "mode": "test",
+                        "shipping_status": "unshipped",
+                        "customer_id": "63195",
+                        "payment_method": "stripe",
+                        "payment_method_type": "",
+                        "payment_status": "paid",
+                        "payment_method_title": "",
+                        "currency": "USD",
+                        "subtotal": 500,
+                        "discount_tax": 0,
+                        "manual_discount_total": 0,
+                        "coupon_discount_total": 0,
+                        "shipping_tax": 0,
+                        "shipping_total": 11200,
+                        "tax_total": 0,
+                        "total_amount": 11700,
+                        "total_paid": "11700",
+                        "total_refund": "0",
+                        "rate": "1.0000",
+                        "tax_behavior": "1",
+                        "note": "",
+                        "ip_address": "150.228.135.225",
+                        "completed_at": null,
+                        "refunded_at": null,
+                        "uuid": "f19e07f3bfe28124d5c6a3e2ed548d2f",
+                        "config": {
+                          "user_tz": "Asia/Dhaka",
+                          "create_account_after_paid": "yes"
+                        },
+                        "created_at": "2025-11-12T11:40:06+00:00",
+                        "updated_at": "2025-11-12T11:40:10+00:00"
+                      }
+                    ],
+                    "first_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                    "from": 1,
+                    "last_page": 59176,
+                    "last_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=59176",
+                    "links": [
+                      {
+                        "url": null,
+                        "label": "pagination.previous",
+                        "active": false
+                      },
+                      {
+                        "url": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                        "label": "1",
+                        "active": true
+                      }
+                    ],
+                    "next_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                    "path": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/",
+                    "per_page": 10,
+                    "prev_page_url": null,
+                    "to": 10,
+                    "total": 591759
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Order ID",
+            "example": 7536300
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status (e.g., processing, completed, on-hold, canceled)",
+            "example": "processing"
+          },
+          "parent_id": {
+            "type": "string",
+            "description": "Parent order ID if this is a child order",
+            "example": "0"
+          },
+          "receipt_number": {
+            "type": "string",
+            "description": "Receipt number",
+            "example": "163762"
+          },
+          "invoice_no": {
+            "type": "string",
+            "description": "Invoice number",
+            "example": "INV-163762"
+          },
+          "fulfillment_type": {
+            "type": "string",
+            "description": "Fulfillment type (physical, digital)",
+            "example": "physical"
+          },
+          "type": {
+            "type": "string",
+            "description": "Order type (payment, subscription)",
+            "example": "payment"
+          },
+          "mode": {
+            "type": "string",
+            "description": "Order mode (test, live)",
+            "example": "test"
+          },
+          "shipping_status": {
+            "type": "string",
+            "description": "Shipping status",
+            "example": "unshipped"
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Customer ID",
+            "example": "63195"
+          },
+          "payment_method": {
+            "type": "string",
+            "description": "Payment method (e.g., stripe, paypal)",
+            "example": "stripe"
+          },
+          "payment_method_type": {
+            "type": "string",
+            "description": "Payment method type",
+            "example": ""
+          },
+          "payment_status": {
+            "type": "string",
+            "description": "Payment status (paid, pending, failed, refunded)",
+            "example": "paid"
+          },
+          "payment_method_title": {
+            "type": "string",
+            "description": "Payment method display title",
+            "example": ""
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code",
+            "example": "USD"
+          },
+          "subtotal": {
+            "type": "integer",
+            "description": "Subtotal in cents",
+            "example": 500
+          },
+          "discount_tax": {
+            "type": "integer",
+            "description": "Discount tax in cents",
+            "example": 0
+          },
+          "manual_discount_total": {
+            "type": "integer",
+            "description": "Manual discount total in cents",
+            "example": 0
+          },
+          "coupon_discount_total": {
+            "type": "integer",
+            "description": "Coupon discount total in cents",
+            "example": 0
+          },
+          "shipping_tax": {
+            "type": "integer",
+            "description": "Shipping tax in cents",
+            "example": 0
+          },
+          "shipping_total": {
+            "type": "integer",
+            "description": "Shipping total in cents",
+            "example": 11200
+          },
+          "tax_total": {
+            "type": "integer",
+            "description": "Tax total in cents",
+            "example": 0
+          },
+          "total_amount": {
+            "type": "integer",
+            "description": "Total amount in cents",
+            "example": 11700
+          },
+          "total_paid": {
+            "type": "string",
+            "description": "Total paid amount in cents",
+            "example": "11700"
+          },
+          "total_refund": {
+            "type": "string",
+            "description": "Total refunded amount in cents",
+            "example": "0"
+          },
+          "rate": {
+            "type": "string",
+            "description": "Exchange rate",
+            "example": "1.0000"
+          },
+          "tax_behavior": {
+            "type": "string",
+            "description": "Tax behavior",
+            "example": "1"
+          },
+          "note": {
+            "type": "string",
+            "description": "Order notes",
+            "example": ""
+          },
+          "ip_address": {
+            "type": "string",
+            "description": "Customer IP address",
+            "example": "150.228.135.225"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Order completion timestamp",
+            "example": null
+          },
+          "refunded_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Order refund timestamp",
+            "example": null
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Unique order identifier",
+            "example": "f19e07f3bfe28124d5c6a3e2ed548d2f"
+          },
+          "config": {
+            "type": "object",
+            "description": "Order configuration",
+            "properties": {
+              "user_tz": {
+                "type": "string",
+                "example": "Asia/Dhaka"
+              },
+              "create_account_after_paid": {
+                "type": "string",
+                "example": "yes"
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Order creation timestamp",
+            "example": "2025-11-12T11:40:06+00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Order last update timestamp",
+            "example": "2025-11-12T11:40:10+00:00"
+          }
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "product_id": {
+            "type": "integer",
+            "example": 456
+          },
+          "variation_id": {
+            "type": "integer",
+            "example": 789
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 2
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price in cents",
+            "example": 2500
+          },
+          "product": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              },
+              "sku": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 123
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "customer@example.com"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "payment_method": {
+            "type": "string",
+            "example": "stripe"
+          },
+          "status": {
+            "type": "string",
+            "example": "succeeded"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount in cents",
+            "example": 5000
+          },
+          "transaction_id": {
+            "type": "string",
+            "example": "txn_123456"
+          }
+        }
+      },
+      "OrderListResponse": {
+        "type": "object",
+        "properties": {
+          "orders": {
+            "type": "object",
+            "description": "Laravel paginated response",
+            "properties": {
+              "current_page": {
+                "type": "integer",
+                "description": "Current page number",
+                "example": 1
+              },
+              "data": {
+                "type": "array",
+                "description": "Array of orders",
+                "items": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              },
+              "first_page_url": {
+                "type": "string",
+                "format": "uri",
+                "description": "URL to first page",
+                "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=1"
+              },
+              "from": {
+                "type": "integer",
+                "description": "Starting record number",
+                "example": 1
+              },
+              "last_page": {
+                "type": "integer",
+                "description": "Last page number",
+                "example": 59176
+              },
+              "last_page_url": {
+                "type": "string",
+                "format": "uri",
+                "description": "URL to last page",
+                "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=59176"
+              },
+              "links": {
+                "type": "array",
+                "description": "Pagination links",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "nullable": true,
+                      "format": "uri"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "active": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              },
+              "next_page_url": {
+                "type": "string",
+                "nullable": true,
+                "format": "uri",
+                "description": "URL to next page"
+              },
+              "path": {
+                "type": "string",
+                "format": "uri",
+                "description": "Base path for pagination",
+                "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/"
+              },
+              "per_page": {
+                "type": "integer",
+                "description": "Items per page",
+                "example": 10
+              },
+              "prev_page_url": {
+                "type": "string",
+                "nullable": true,
+                "format": "uri",
+                "description": "URL to previous page"
+              },
+              "to": {
+                "type": "integer",
+                "description": "Ending record number",
+                "example": 10
+              },
+              "total": {
+                "type": "integer",
+                "description": "Total number of records",
+                "example": 591759
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

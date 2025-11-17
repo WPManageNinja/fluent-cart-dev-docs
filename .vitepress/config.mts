@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { defineConfig } from 'vitepress'
 import { copyFileSync, mkdirSync, readdirSync, statSync, existsSync } from 'fs'
 import { join, dirname } from 'path'

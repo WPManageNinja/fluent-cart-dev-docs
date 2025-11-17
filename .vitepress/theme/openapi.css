@@ -143,7 +143,7 @@ main.VPContent {
 
 /* Ensure OAOperation component is full width at top */
 .VPDoc .content > :first-child {
-  width: 100% !important;
+  /* width: 100% !important; */
   max-width: 100% !important;
 }
 

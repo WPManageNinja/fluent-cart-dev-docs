@@ -205,15 +205,84 @@ export default {
           await loadOpenAPISpec()
         }
       }
+
+      // Add mermaid diagram zoom functionality
+      let currentZoomedElement: HTMLElement | null = null
+
+      const handleMermaidClick = function(this: HTMLElement, event: MouseEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+
+        console.log('Mermaid clicked:', this)
+
+        if (this.classList.contains('zoomed')) {
+          this.classList.remove('zoomed')
+          currentZoomedElement = null
+          document.body.style.overflow = ''
+          this.style.cursor = 'zoom-in'
+          this.title = 'Click to zoom'
+        } else {
+          if (currentZoomedElement) {
+            currentZoomedElement.classList.remove('zoomed')
+            currentZoomedElement.style.cursor = 'zoom-in'
+            currentZoomedElement.title = 'Click to zoom'
+          }
+          this.classList.add('zoomed')
+          currentZoomedElement = this
+          document.body.style.overflow = 'hidden'
+          this.style.cursor = 'zoom-out'
+          this.title = 'Click to close'
+        }
+      }
+
+      const setupMermaidZoom = () => {
+        setTimeout(() => {
+          const mermaidElements = document.querySelectorAll('.mermaid, .mermaid-container, [class*="mermaid"]')
+          mermaidElements.forEach((element) => {
+            const htmlElement = element as HTMLElement
+
+            if (htmlElement.dataset.zoomEnabled) return
+            htmlElement.dataset.zoomEnabled = 'true'
+
+            htmlElement.addEventListener('click', handleMermaidClick)
+            htmlElement.style.cursor = 'zoom-in'
+            htmlElement.title = 'Click to zoom'
+          })
+        }, 500)
+      }
+
+      const handleKeydown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape' && currentZoomedElement) {
+          currentZoomedElement.classList.remove('zoomed')
+          currentZoomedElement.style.cursor = 'zoom-in'
+          currentZoomedElement.title = 'Click to zoom'
+          currentZoomedElement = null
+          document.body.style.overflow = ''
+        }
+      }
+
+      document.addEventListener('keydown', handleKeydown)
+
+      window.addEventListener('mermaidRendered', (event: any) => {
+        const element = event.detail.element as HTMLElement
+        if (element && !element.dataset.zoomEnabled) {
+          element.dataset.zoomEnabled = 'true'
+          element.addEventListener('click', handleMermaidClick)
+          element.style.cursor = 'zoom-in'
+          element.title = 'Click to zoom'
+        }
+      })
       
       // Load immediately on page load (before components mount)
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
           loadSpecIfNeeded()
+          setupMermaidZoom()
         })
       } else {
         // Page already loaded, load spec immediately
         loadSpecIfNeeded()
+        setupMermaidZoom()
       }
       
       // Also reload on route changes
@@ -224,17 +293,20 @@ export default {
             await originalOnAfterRouteChanged(to)
           }
           await loadSpecIfNeeded()
+          setupMermaidZoom()
         }
       }
       
       // Also watch for navigation events
       window.addEventListener('popstate', () => {
         loadSpecIfNeeded()
+        setupMermaidZoom()
       })
       
       // Watch for hash changes (SPA navigation)
       window.addEventListener('hashchange', () => {
         loadSpecIfNeeded()
+        setupMermaidZoom()
       })
       
       // Add OpenAPI-specific enhancements (playground instructions, server URL input, etc.)
@@ -429,6 +501,9 @@ export default {
             
         return originalFetch.apply(this, args)
       }
+
+      setupMermaidZoom()
+      setTimeout(setupMermaidZoom, 2000)
     }
   }
-}
+} satisfies Theme

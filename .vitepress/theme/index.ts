@@ -51,18 +51,6 @@ export default {
     // Always register OpenAPI theme components (needed for OAOperation and OASpec components)
     theme.enhanceApp({ app, router, siteData })
     
-    // Initialize OpenAPI with empty spec first to prevent errors on page reload
-    if (typeof window !== 'undefined') {
-      useOpenapi({ 
-        spec: {
-          openapi: '3.0.0',
-          info: { title: 'FluentCart API', version: '1.0.0' },
-          paths: {},
-          components: { schemas: {} }
-        }
-      })
-    }
-    
     // OpenAPI integration - load spec data for OpenAPI pages
     // This needs to run on client side only
     if (typeof window !== 'undefined') {
@@ -203,9 +191,15 @@ export default {
       const loadSpecIfNeeded = async () => {
         const currentPath = window.location.pathname
         if (currentPath.includes('/openapi/')) {
-          // Wait for spec to load before allowing page to render
           await loadOpenAPISpec()
         }
+      }
+      
+      // Check if we're on an OpenAPI page right now and load spec immediately
+      const isOpenAPIPage = window.location.pathname.includes('/openapi/')
+      if (isOpenAPIPage) {
+        // Load spec immediately before any components render
+        await loadOpenAPISpec()
       }
 
       // Add mermaid diagram zoom functionality
@@ -275,41 +269,20 @@ export default {
         }
       })
       
-      // Load immediately on page load (before components mount)
+      // Setup mermaid zoom on page load
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-          loadSpecIfNeeded()
-          setupMermaidZoom()
-        })
+        document.addEventListener('DOMContentLoaded', setupMermaidZoom)
       } else {
-        // Page already loaded, load spec immediately
-        loadSpecIfNeeded()
         setupMermaidZoom()
       }
       
-      // Also reload on route changes
+      // Reload spec on route changes
       if (router) {
-        const originalOnAfterRouteChanged = router.onAfterRouteChanged
         router.onAfterRouteChanged = async (to: string) => {
-          if (originalOnAfterRouteChanged) {
-            await originalOnAfterRouteChanged(to)
-          }
           await loadSpecIfNeeded()
           setupMermaidZoom()
         }
       }
-      
-      // Also watch for navigation events
-      window.addEventListener('popstate', () => {
-        loadSpecIfNeeded()
-        setupMermaidZoom()
-      })
-      
-      // Watch for hash changes (SPA navigation)
-      window.addEventListener('hashchange', () => {
-        loadSpecIfNeeded()
-        setupMermaidZoom()
-      })
       
       // Add OpenAPI-specific enhancements (playground instructions, server URL input, etc.)
       // This code is similar to the OpenAPI theme but adapted for the parent theme

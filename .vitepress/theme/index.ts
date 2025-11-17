@@ -51,15 +51,15 @@ export default {
     // Always register OpenAPI theme components (needed for OAOperation and OASpec components)
     theme.enhanceApp({ app, router, siteData })
     
-    // Initialize OpenAPI with an empty spec immediately to prevent "getOperation is not a function" errors
-    // This ensures all methods exist even before the real spec is loaded
+    // Initialize OpenAPI with an empty spec IMMEDIATELY to prevent errors during SSR
+    // This ensures methods exist during server-side rendering
     useOpenapi({
       spec: {
         openapi: '3.0.0',
         info: {
           title: 'FluentCart API',
           version: '1.0.0',
-          description: 'Loading...'
+          description: 'Loading API documentation...'
         },
         paths: {},
         components: {
@@ -71,13 +71,25 @@ export default {
     // OpenAPI integration - load spec data for OpenAPI pages
     // This needs to run on client side only
     if (typeof window !== 'undefined') {
+      // Variable to track if spec is loaded
+      let specLoaded = false
+      
       // Load spec data for any OpenAPI page
       const loadOpenAPISpec = async () => {
+        if (specLoaded) return // Don't reload if already loaded
+        
+        // Show loading indicator on REST API pages
+        const isRestAPIPage = window.location.pathname.includes('/restapi/')
+        if (isRestAPIPage) {
+          toggleLoadingIndicator(true)
+        }
+        
         try {
           // Fetch the auto-generated manifest file that lists all JSON specs
           const manifestResponse = await fetch('/openapi/public/manifest.json')
           if (!manifestResponse.ok) {
             console.error('Failed to load OpenAPI manifest')
+            toggleLoadingIndicator(false)
             return
           }
           
@@ -144,9 +156,57 @@ export default {
             useOpenapi({ 
               spec: mergedSpec, 
             })
+            specLoaded = true
+            console.log('✓ OpenAPI spec loaded successfully')
+            
+            // Hide loading indicator
+            toggleLoadingIndicator(false)
           }
         } catch (error) {
           console.error('Error loading OpenAPI spec:', error)
+          specLoaded = true // Mark as attempted even if failed
+          toggleLoadingIndicator(false)
+        }
+      }
+      
+      // Function to show/hide loading indicator
+      const toggleLoadingIndicator = (show: boolean) => {
+        let loadingIndicator = document.getElementById('openapi-loading-indicator')
+        
+        if (show && !loadingIndicator) {
+          const contentContainer = document.querySelector('.vp-doc') || document.querySelector('main')
+          if (contentContainer) {
+            loadingIndicator = document.createElement('div')
+            loadingIndicator.id = 'openapi-loading-indicator'
+            loadingIndicator.innerHTML = `
+              <div style="
+                padding: 40px 20px;
+                text-align: center;
+                color: var(--vp-c-text-2);
+                font-size: 0.9rem;
+              ">
+                <div style="
+                  display: inline-block;
+                  width: 24px;
+                  height: 24px;
+                  border: 3px solid var(--vp-c-divider);
+                  border-top-color: var(--vp-c-brand-1);
+                  border-radius: 50%;
+                  animation: spin 0.8s linear infinite;
+                  margin-bottom: 12px;
+                "></div>
+                <div>Loading API documentation...</div>
+                <style>
+                  @keyframes spin {
+                    to { transform: rotate(360deg); }
+                  }
+                </style>
+              </div>
+            `
+            contentContainer.prepend(loadingIndicator)
+          }
+        } else if (!show && loadingIndicator) {
+          loadingIndicator.remove()
         }
       }
       
@@ -204,12 +264,10 @@ export default {
         toggleProgressNotice()
       }
       
-      // Check if we're on a REST API page right now and load spec immediately
-      const isRestAPIPage = window.location.pathname.includes('/restapi/')
-      if (isRestAPIPage) {
-        // Load spec immediately before any components render
-        await loadOpenAPISpec()
-      }
+      // CRITICAL: Start loading OpenAPI spec IMMEDIATELY (fire-and-forget)
+      // Don't await to avoid blocking app startup, but start loading ASAP
+      // The spec will be ready by the time user interacts with the page
+      loadOpenAPISpec() // No await - starts immediately in parallel
       
       // Add progress notice with multiple attempts to ensure DOM is ready
       setTimeout(toggleProgressNotice, 100)

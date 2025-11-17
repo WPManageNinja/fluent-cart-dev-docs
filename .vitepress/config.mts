@@ -137,7 +137,7 @@ export default defineConfig({
               { text: 'Filter Hooks', link: '/hooks/filters' }
             ]
           },
-          { text: 'Rest API', link: '/restapi/operations/orders/list-orders' },
+          { text: 'Rest API', link: '/restapi/' },
           {
             text: 'Tutorials',
             items: [
@@ -313,6 +313,12 @@ export default defineConfig({
         }
       ],
       '/restapi/': [
+        {
+          text: 'Getting Started',
+          items: [
+            { text: 'API Overview', link: '/restapi/' }
+          ]
+        },
         {
           text: 'Orders',
           items: [

@@ -192,6 +192,10 @@ html:not(.dark) .VPSidebarItem badge[type="tip"] {
     border: 1px solid rgba(34, 197, 94, 0.28);
 }
 
+input#Authorization {
+  margin-top: 10px;
+}
+
 html:not(.dark) .VPSidebarItem badge[type="warning"] {
     background-color: rgba(59, 130, 246, 0.14);
     color: #1e3a8a;

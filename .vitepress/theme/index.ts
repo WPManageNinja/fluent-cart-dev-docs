@@ -1,3 +1,5 @@
+/// <reference path="../../env.d.ts" />
+
 import DefaultTheme from 'vitepress/theme'
 import { h } from 'vue'
 import type { Theme } from 'vitepress'
@@ -412,6 +414,14 @@ export default {
 
                   input.addEventListener('input', updateServerUrl)
                   input.addEventListener('change', updateServerUrl)
+                }
+
+                const authInputField = authSection.querySelector('input[placeholder="Authorization"], input[aria-label="Authorization"]') as HTMLInputElement | null
+                if (authInputField) {
+                  authInputField.placeholder = 'username:application_password'
+                  if (authInputField.value?.trim() === 'Authorization') {
+                    authInputField.value = ''
+                  }
                 }
               }
             }

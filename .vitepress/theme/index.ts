@@ -230,6 +230,12 @@ export default {
         }
       }
       
+      // LocalStorage keys for persisting API credentials
+      const STORAGE_KEYS = {
+        SERVER_URL: 'fluentcart_api_server_url',
+        AUTH_CREDENTIALS: 'fluentcart_api_auth_credentials'
+      }
+      
       // Add OpenAPI-specific enhancements (playground instructions, server URL input, etc.)
       // This code is similar to the OpenAPI theme but adapted for the parent theme
       // Add server URL input and playground instructions
@@ -265,11 +271,22 @@ export default {
               
               const instructionsHtml = `
                 <div data-playground-instructions style="margin-bottom: 20px; padding: 16px; background: ${PLAYGROUND_INSTRUCTIONS.style.backgroundColor}; border: 1px solid ${PLAYGROUND_INSTRUCTIONS.style.borderColor}; border-radius: 6px;">
-                  <div style="font-weight: 600; font-size: 0.95rem; color: ${PLAYGROUND_INSTRUCTIONS.style.titleColor}; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                    ${PLAYGROUND_INSTRUCTIONS.title}
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                    <div style="font-weight: 600; font-size: 0.95rem; color: ${PLAYGROUND_INSTRUCTIONS.style.titleColor}; display: flex; align-items: center; gap: 8px;">
+                      ${PLAYGROUND_INSTRUCTIONS.title}
+                    </div>
+                    <button 
+                      data-clear-credentials 
+                      style="padding: 4px 12px; font-size: 0.75rem; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); border-radius: 4px; cursor: pointer; color: var(--vp-c-text-2); transition: all 0.2s;"
+                      onmouseover="this.style.background='var(--vp-c-bg)'; this.style.borderColor='var(--vp-c-brand-1)'; this.style.color='var(--vp-c-brand-1)'"
+                      onmouseout="this.style.background='var(--vp-c-bg-soft)'; this.style.borderColor='var(--vp-c-divider)'; this.style.color='var(--vp-c-text-2)'"
+                      title="Clear saved Server URL and credentials from browser storage"
+                    >
+                      🗑️ Clear Browser Credentials
+                    </button>
                   </div>
                   <p style="margin: 0 0 12px 0; color: ${PLAYGROUND_INSTRUCTIONS.style.textColor}; font-size: 0.875rem; line-height: 1.5;">
-                    ${PLAYGROUND_INSTRUCTIONS.description}
+                    ${PLAYGROUND_INSTRUCTIONS.description} <strong>Your credentials are saved in your browser</strong> and will persist across pages.
                   </p>
                   <ol style="margin: 0 0 12px 20px; color: ${PLAYGROUND_INSTRUCTIONS.style.textColor}; font-size: 0.875rem; line-height: 1.6;">
                     ${instructionItems}
@@ -319,18 +336,55 @@ export default {
                   contentArea.appendChild(instructionsElement)
                   contentArea.appendChild(serverUrlElement)
                 }
+                
+                // Add clear credentials button functionality
+                const clearButton = instructionsElement.querySelector('[data-clear-credentials]') as HTMLButtonElement | null
+                if (clearButton) {
+                  clearButton.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to clear saved Server URL and credentials?')) {
+                      localStorage.removeItem(STORAGE_KEYS.SERVER_URL)
+                      localStorage.removeItem(STORAGE_KEYS.AUTH_CREDENTIALS)
+                      
+                      // Reset to defaults
+                      const serverInput = serverUrlElement.querySelector('[data-server-url-input]') as HTMLInputElement | null
+                      const serverDisplay = serverUrlElement.querySelector('[data-server-url-display]') as HTMLElement | null
+                      const authInput = authSection.querySelector('input[placeholder="username:application_password"]') as HTMLInputElement | null
+                      
+                      if (serverInput) serverInput.value = 'YourWebsite.com'
+                      if (serverDisplay) serverDisplay.textContent = 'https://YourWebsite.com/wp-json/fluent-cart/v2'
+                      if (authInput) authInput.value = ''
+                      window.__customServerUrl = undefined
+                      
+                      alert('✓ Saved data cleared successfully!')
+                    }
+                  })
+                }
 
                 const input = serverUrlElement.querySelector('[data-server-url-input]') as HTMLInputElement | null
                 const display = serverUrlElement.querySelector('[data-server-url-display]') as HTMLElement | null
                 
                 if (input && display) {
+                  // Load saved server URL from localStorage
+                  const savedServerUrl = localStorage.getItem(STORAGE_KEYS.SERVER_URL)
+                  if (savedServerUrl && savedServerUrl !== 'YourWebsite.com') {
+                    input.value = savedServerUrl
+                  }
+                  
                   const updateServerUrl = () => {
                     const website = input.value.trim() || 'YourWebsite.com'
                     const fullUrl = `https://${website}/wp-json/fluent-cart/v2`
                     display.textContent = fullUrl
                     window.__customServerUrl = fullUrl
+                    
+                    // Save to localStorage
+                    if (website && website !== 'YourWebsite.com') {
+                      localStorage.setItem(STORAGE_KEYS.SERVER_URL, website)
+                    }
                   }
 
+                  // Initialize with saved value
+                  updateServerUrl()
+                  
                   input.addEventListener('input', updateServerUrl)
                   input.addEventListener('change', updateServerUrl)
                 }
@@ -341,6 +395,25 @@ export default {
                   if (authInputField.value?.trim() === 'Authorization') {
                     authInputField.value = ''
                   }
+                  
+                  // Load saved auth credentials from localStorage
+                  const savedAuthCredentials = localStorage.getItem(STORAGE_KEYS.AUTH_CREDENTIALS)
+                  if (savedAuthCredentials) {
+                    authInputField.value = savedAuthCredentials
+                  }
+                  
+                  // Save auth credentials to localStorage on change
+                  const saveAuthCredentials = () => {
+                    const authValue = authInputField.value.trim()
+                    if (authValue) {
+                      localStorage.setItem(STORAGE_KEYS.AUTH_CREDENTIALS, authValue)
+                    } else {
+                      localStorage.removeItem(STORAGE_KEYS.AUTH_CREDENTIALS)
+                    }
+                  }
+                  
+                  authInputField.addEventListener('input', saveAuthCredentials)
+                  authInputField.addEventListener('change', saveAuthCredentials)
                 }
               }
             }

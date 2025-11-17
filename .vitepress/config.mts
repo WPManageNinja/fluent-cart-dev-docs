@@ -1,8 +1,8 @@
 /// <reference types="node" />
 
 import { defineConfig } from 'vitepress'
-import { copyFileSync, mkdirSync, readdirSync, statSync, existsSync } from 'fs'
-import { join, dirname } from 'path'
+import { copyFileSync, mkdirSync, readdirSync, statSync, existsSync, writeFileSync } from 'fs'
+import { join, dirname, relative } from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -37,8 +37,11 @@ export default defineConfig({
             return
           }
           
-          // Recursive copy function
-          const copyRecursive = (src: string, dest: string) => {
+          // Array to store all discovered JSON file paths
+          const jsonFiles: string[] = []
+          
+          // Recursive copy function that also collects file paths
+          const copyRecursive = (src: string, dest: string, baseDir: string) => {
             if (!existsSync(src)) return
             
             const stats = statSync(src)
@@ -49,7 +52,7 @@ export default defineConfig({
               const files = readdirSync(src)
               files.forEach(file => {
                 if (file === 'README.md') return
-                copyRecursive(join(src, file), join(dest, file))
+                copyRecursive(join(src, file), join(dest, file), baseDir)
               })
             } else {
               if (!src.endsWith('.json')) return
@@ -59,11 +62,24 @@ export default defineConfig({
                 mkdirSync(destDir, { recursive: true })
               }
               copyFileSync(src, dest)
+              
+              // Calculate relative path from sourceDir for the manifest
+              const relativePath = relative(baseDir, src).replace(/\\/g, '/')
+              jsonFiles.push(`/openapi/public/${relativePath}`)
             }
           }
           
-          copyRecursive(sourceDir, targetDir)
-          console.log('✓ OpenAPI JSON files copied to build output')
+          copyRecursive(sourceDir, targetDir, sourceDir)
+          
+          // Generate manifest.json with list of all JSON files
+          const manifestPath = join(targetDir, 'manifest.json')
+          const manifest = {
+            files: jsonFiles,
+            generated: new Date().toISOString()
+          }
+          writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
+          
+          console.log(`✓ OpenAPI: Copied ${jsonFiles.length} JSON files and generated manifest`)
         }
       }
     ]
@@ -499,8 +515,11 @@ export default defineConfig({
     console.log('Source:', sourceDir)
     console.log('Target:', targetDir)
     
-    // Recursive copy function
-    const copyRecursive = (src: string, dest: string) => {
+    // Array to store all discovered JSON file paths
+    const jsonFiles: string[] = []
+    
+    // Recursive copy function that also collects file paths
+    const copyRecursive = (src: string, dest: string, baseDir: string) => {
       if (!existsSync(src)) {
         console.warn('Source does not exist:', src)
         return
@@ -515,7 +534,7 @@ export default defineConfig({
         files.forEach(file => {
           // Skip README.md files
           if (file === 'README.md') return
-          copyRecursive(join(src, file), join(dest, file))
+          copyRecursive(join(src, file), join(dest, file), baseDir)
         })
       } else {
         // Only copy JSON files
@@ -526,15 +545,29 @@ export default defineConfig({
           mkdirSync(destDir, { recursive: true })
         }
         copyFileSync(src, dest)
+        
+        // Calculate relative path from sourceDir for the manifest
+        const relativePath = relative(baseDir, src).replace(/\\/g, '/')
+        jsonFiles.push(`/openapi/public/${relativePath}`)
       }
     }
     
     // Copy OpenAPI public files to build output
     if (existsSync(sourceDir)) {
-      copyRecursive(sourceDir, targetDir)
-      console.log('✓ OpenAPI JSON files copied via buildEnd hook')
+      copyRecursive(sourceDir, targetDir, sourceDir)
+      
+      // Generate manifest.json with list of all JSON files
+      const manifestPath = join(targetDir, 'manifest.json')
+      const manifest = {
+        files: jsonFiles,
+        generated: new Date().toISOString()
+      }
+      writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
+      
+      console.log(`✓ OpenAPI: Copied ${jsonFiles.length} JSON files and generated manifest via buildEnd`)
     } else {
       console.error('✗ Source directory does not exist:', sourceDir)
     }
   }
 })
+

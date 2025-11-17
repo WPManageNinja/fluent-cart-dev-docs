@@ -57,77 +57,22 @@ export default {
       // Load spec data for any OpenAPI page
       const loadOpenAPISpec = async () => {
         try {
-          // List of spec files to load and merge
-          // Files are in public/openapi/ directory, so paths are /openapi/public/...
-          const specFiles = [
-            '/openapi/public/fluentcart-base.json',
-            // Orders
-            '/openapi/public/orders/list-orders.json',
-            '/openapi/public/orders/create-order.json',
-            '/openapi/public/orders/get-order.json',
-            '/openapi/public/orders/update-order.json',
-            '/openapi/public/orders/delete-order.json',
-            '/openapi/public/orders/mark-as-paid.json',
-            '/openapi/public/orders/refund-order.json',
-            '/openapi/public/orders/update-statuses.json',
-            // Products
-            '/openapi/public/products/list-products.json',
-            '/openapi/public/products/create-product.json',
-            '/openapi/public/products/get-product.json',
-            '/openapi/public/products/update-product-pricing.json',
-            '/openapi/public/products/delete-product.json',
-            // Customers
-            '/openapi/public/customers/list-customers.json',
-            '/openapi/public/customers/create-customer.json',
-            '/openapi/public/customers/get-customer.json',
-            '/openapi/public/customers/update-customer.json',
-            // Coupons
-            '/openapi/public/coupons/list-coupons.json',
-            '/openapi/public/coupons/create-coupon.json',
-            '/openapi/public/coupons/get-coupon.json',
-            '/openapi/public/coupons/update-coupon.json',
-            '/openapi/public/coupons/delete-coupon.json',
-            '/openapi/public/coupons/apply-coupon.json',
-            // Subscriptions
-            '/openapi/public/subscriptions/list-subscriptions.json',
-            '/openapi/public/subscriptions/get-subscription.json',
-            '/openapi/public/subscriptions/cancel-subscription.json',
-            '/openapi/public/subscriptions/reactivate-subscription.json',
-            // Tax
-            '/openapi/public/tax/list-tax-classes.json',
-            '/openapi/public/tax/create-tax-class.json',
-            // Shipping
-            '/openapi/public/shipping/list-shipping-zones.json',
-            // Settings
-            '/openapi/public/settings/get-store-settings.json',
-            '/openapi/public/settings/save-store-settings.json',
-            // Reports
-            '/openapi/public/reports/get-overview.json',
-            '/openapi/public/reports/quick-order-stats.json',
-            // Files
-            '/openapi/public/files/list-files.json',
-            '/openapi/public/files/upload-file.json',
-            // Dashboard
-            '/openapi/public/dashboard/get-dashboard-stats.json',
-            // Roles & Permissions
-            '/openapi/public/roles-permissions/get-permissions.json',
-            '/openapi/public/roles-permissions/save-permissions.json',
-            // Integration
-            '/openapi/public/integration/list-addons.json',
-            '/openapi/public/integration/get-global-settings.json',
-            '/openapi/public/integration/set-global-settings.json',
-            '/openapi/public/integration/get-global-feeds.json',
-            // Licensing
-            '/openapi/public/licensing/get-license-chart.json',
-            '/openapi/public/licensing/get-license-pie-chart.json',
-            '/openapi/public/licensing/get-license-summary.json',
-            // Email Notification
-            '/openapi/public/email-notification/list-notifications.json',
-            '/openapi/public/email-notification/get-notification.json',
-            '/openapi/public/email-notification/update-notification.json'
-          ]
+          // Fetch the auto-generated manifest file that lists all JSON specs
+          const manifestResponse = await fetch('/openapi/public/manifest.json')
+          if (!manifestResponse.ok) {
+            console.error('Failed to load OpenAPI manifest')
+            return
+          }
           
-          // Fetch all spec files
+          const manifest = await manifestResponse.json()
+          const specFiles: string[] = manifest.files || []
+          
+          if (specFiles.length === 0) {
+            console.warn('No OpenAPI spec files found in manifest')
+            return
+          }
+          
+          // Fetch all spec files listed in the manifest
           const specs = await Promise.all(
             specFiles.map(async (file) => {
               try {
@@ -137,6 +82,7 @@ export default {
                 }
                 return null
               } catch (error) {
+                console.warn(`Failed to load ${file}:`, error)
                 return null
               }
             })

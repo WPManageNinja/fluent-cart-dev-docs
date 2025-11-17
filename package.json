@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "devDependencies": {
     "@types/node": "^22.7.5",
     "mermaid": "^10.6.1",
@@ -6,8 +7,9 @@
     "vitepress-openapi": "^0.1.10"
   },
   "scripts": {
-    "docs:dev": "vitepress dev",
-    "docs:build": "vitepress build",
+    "generate:manifest": "node generate-manifest.js",
+    "docs:dev": "npm run generate:manifest && vitepress dev",
+    "docs:build": "npm run generate:manifest && vitepress build",
     "docs:preview": "vitepress preview"
   },
   "packageManager": "yarn@4.11.0"

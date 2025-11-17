@@ -133,29 +133,46 @@ export default {
         }
       }
       
-      // Function to toggle aside visibility based on route
-      const toggleAsideVisibility = () => {
+      // Function to add simple "Documentation in Progress" notice on REST API pages
+      const toggleProgressNotice = () => {
         const currentPath = window.location.pathname
         const isRestAPIPage = currentPath.includes('/restapi/')
         
-        let style = document.getElementById('restapi-hide-aside') as HTMLStyleElement | null
+        // Look for existing notice
+        let existingNotice = document.getElementById('restapi-progress-notice')
         
         if (isRestAPIPage) {
-          // Add style if it doesn't exist
-          if (!style) {
-            style = document.createElement('style')
-            style.id = 'restapi-hide-aside'
-            style.textContent = `
-              .aside {
-                display: none !important;
-              }
-            `
-            document.head.appendChild(style)
+          // Add notice if it doesn't exist
+          if (!existingNotice) {
+            // Find the main content container
+            const contentContainer = document.querySelector('.vp-doc') || document.querySelector('.content')
+            
+            if (contentContainer) {
+              // Create simple one-liner notice
+              const notice = document.createElement('div')
+              notice.id = 'restapi-progress-notice'
+              notice.innerHTML = `
+                <p style="
+                  padding: 8px 12px;
+                  margin: 0 0 20px 0;
+                  background: #fef3c7;
+                  border-left: 3px solid #f59e0b;
+                  color: #92400e;
+                  font-size: 0.875rem;
+                  border-radius: 4px;
+                ">
+                  📝 <em>Documentation in progress - some sections may be incomplete or subject to change.</em>
+                </p>
+              `
+              
+              // Insert at the beginning of content
+              contentContainer.insertBefore(notice, contentContainer.firstChild)
+            }
           }
         } else {
-          // Remove style if it exists (when not on REST API pages)
-          if (style) {
-            style.remove()
+          // Remove notice if it exists (when not on REST API pages)
+          if (existingNotice) {
+            existingNotice.remove()
           }
         }
       }
@@ -166,8 +183,8 @@ export default {
         if (currentPath.includes('/restapi/')) {
           await loadOpenAPISpec()
         }
-        // Update aside visibility on route change
-        toggleAsideVisibility()
+        // Update progress notice on route change
+        toggleProgressNotice()
       }
       
       // Check if we're on a REST API page right now and load spec immediately
@@ -177,8 +194,11 @@ export default {
         await loadOpenAPISpec()
       }
       
-      // Initialize aside visibility on page load
-      toggleAsideVisibility()
+      // Add progress notice with multiple attempts to ensure DOM is ready
+      setTimeout(toggleProgressNotice, 100)
+      setTimeout(toggleProgressNotice, 300)
+      setTimeout(toggleProgressNotice, 500)
+      setTimeout(toggleProgressNotice, 1000)
 
       // Add mermaid diagram zoom functionality
       let currentZoomedElement: HTMLElement | null = null

@@ -133,20 +133,52 @@ export default {
         }
       }
       
-      // Load spec when on OpenAPI pages - ensure it loads before components render
-      const loadSpecIfNeeded = async () => {
+      // Function to toggle aside visibility based on route
+      const toggleAsideVisibility = () => {
         const currentPath = window.location.pathname
-        if (currentPath.includes('/openapi/')) {
-          await loadOpenAPISpec()
+        const isRestAPIPage = currentPath.includes('/restapi/')
+        
+        let style = document.getElementById('restapi-hide-aside') as HTMLStyleElement | null
+        
+        if (isRestAPIPage) {
+          // Add style if it doesn't exist
+          if (!style) {
+            style = document.createElement('style')
+            style.id = 'restapi-hide-aside'
+            style.textContent = `
+              .aside {
+                display: none !important;
+              }
+            `
+            document.head.appendChild(style)
+          }
+        } else {
+          // Remove style if it exists (when not on REST API pages)
+          if (style) {
+            style.remove()
+          }
         }
       }
       
-      // Check if we're on an OpenAPI page right now and load spec immediately
-      const isOpenAPIPage = window.location.pathname.includes('/openapi/')
-      if (isOpenAPIPage) {
+      // Load spec when on REST API pages - ensure it loads before components render
+      const loadSpecIfNeeded = async () => {
+        const currentPath = window.location.pathname
+        if (currentPath.includes('/restapi/')) {
+          await loadOpenAPISpec()
+        }
+        // Update aside visibility on route change
+        toggleAsideVisibility()
+      }
+      
+      // Check if we're on a REST API page right now and load spec immediately
+      const isRestAPIPage = window.location.pathname.includes('/restapi/')
+      if (isRestAPIPage) {
         // Load spec immediately before any components render
         await loadOpenAPISpec()
       }
+      
+      // Initialize aside visibility on page load
+      toggleAsideVisibility()
 
       // Add mermaid diagram zoom functionality
       let currentZoomedElement: HTMLElement | null = null

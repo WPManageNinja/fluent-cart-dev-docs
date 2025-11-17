@@ -140,7 +140,7 @@ export default defineConfig({
           {
             text: 'API',
             items: [
-              { text: 'API Reference', link: '/openapi/operations/orders/list-orders' },
+              { text: 'API Reference', link: '/restapi/operations/orders/list-orders' },
             ]
           },
           // {
@@ -309,129 +309,129 @@ export default defineConfig({
           ]
         }
       ],
-      '/openapi/': [
+      '/restapi/': [
         {
           text: 'Orders',
           items: [
-            { text: 'List Orders <badge type="tip">GET</badge>', link: '/openapi/operations/orders/list-orders' },
-            { text: 'Create Order <badge type="warning">POST</badge>', link: '/openapi/operations/orders/create-order' },
-            { text: 'Get Order <badge type="tip">GET</badge>', link: '/openapi/operations/orders/get-order' },
-            { text: 'Update Order <badge type="warning">POST</badge>', link: '/openapi/operations/orders/update-order' },
-            { text: 'Delete Order <badge type="danger">DELETE</badge>', link: '/openapi/operations/orders/delete-order' },
-            { text: 'Mark as Paid <badge type="warning">POST</badge>', link: '/openapi/operations/orders/mark-as-paid' },
-            { text: 'Refund Order <badge type="warning">POST</badge>', link: '/openapi/operations/orders/refund-order' },
-            { text: 'Update Statuses <badge type="info">PUT</badge>', link: '/openapi/operations/orders/update-statuses' }
+            { text: 'List Orders <badge type="tip">GET</badge>', link: '/restapi/operations/orders/list-orders' },
+            { text: 'Create Order <badge type="warning">POST</badge>', link: '/restapi/operations/orders/create-order' },
+            { text: 'Get Order <badge type="tip">GET</badge>', link: '/restapi/operations/orders/get-order' },
+            { text: 'Update Order <badge type="warning">POST</badge>', link: '/restapi/operations/orders/update-order' },
+            { text: 'Delete Order <badge type="danger">DELETE</badge>', link: '/restapi/operations/orders/delete-order' },
+            { text: 'Mark as Paid <badge type="warning">POST</badge>', link: '/restapi/operations/orders/mark-as-paid' },
+            { text: 'Refund Order <badge type="warning">POST</badge>', link: '/restapi/operations/orders/refund-order' },
+            { text: 'Update Statuses <badge type="info">PUT</badge>', link: '/restapi/operations/orders/update-statuses' }
           ]
         },
         {
           text: 'Products',
           items: [
-            { text: 'List Products <badge type="tip">GET</badge>', link: '/openapi/operations/products/list-products' },
-            { text: 'Create Product <badge type="warning">POST</badge>', link: '/openapi/operations/products/create-product' },
-            { text: 'Get Product <badge type="tip">GET</badge>', link: '/openapi/operations/products/get-product' },
-            { text: 'Update Product Pricing <badge type="warning">POST</badge>', link: '/openapi/operations/products/update-product-pricing' },
-            { text: 'Delete Product <badge type="danger">DELETE</badge>', link: '/openapi/operations/products/delete-product' }
+            { text: 'List Products <badge type="tip">GET</badge>', link: '/restapi/operations/products/list-products' },
+            { text: 'Create Product <badge type="warning">POST</badge>', link: '/restapi/operations/products/create-product' },
+            { text: 'Get Product <badge type="tip">GET</badge>', link: '/restapi/operations/products/get-product' },
+            { text: 'Update Product Pricing <badge type="warning">POST</badge>', link: '/restapi/operations/products/update-product-pricing' },
+            { text: 'Delete Product <badge type="danger">DELETE</badge>', link: '/restapi/operations/products/delete-product' }
           ]
         },
         {
           text: 'Customers',
           items: [
-            { text: 'List Customers <badge type="tip">GET</badge>', link: '/openapi/operations/customers/list-customers' },
-            { text: 'Create Customer <badge type="warning">POST</badge>', link: '/openapi/operations/customers/create-customer' },
-            { text: 'Get Customer <badge type="tip">GET</badge>', link: '/openapi/operations/customers/get-customer' },
-            { text: 'Update Customer <badge type="info">PUT</badge>', link: '/openapi/operations/customers/update-customer' }
+            { text: 'List Customers <badge type="tip">GET</badge>', link: '/restapi/operations/customers/list-customers' },
+            { text: 'Create Customer <badge type="warning">POST</badge>', link: '/restapi/operations/customers/create-customer' },
+            { text: 'Get Customer <badge type="tip">GET</badge>', link: '/restapi/operations/customers/get-customer' },
+            { text: 'Update Customer <badge type="info">PUT</badge>', link: '/restapi/operations/customers/update-customer' }
           ]
         },
         {
           text: 'Coupons',
           items: [
-            { text: 'List Coupons <badge type="tip">GET</badge>', link: '/openapi/operations/coupons/list-coupons' },
-            { text: 'Create Coupon <badge type="warning">POST</badge>', link: '/openapi/operations/coupons/create-coupon' },
-            { text: 'Get Coupon <badge type="tip">GET</badge>', link: '/openapi/operations/coupons/get-coupon' },
-            { text: 'Update Coupon <badge type="info">PUT</badge>', link: '/openapi/operations/coupons/update-coupon' },
-            { text: 'Delete Coupon <badge type="danger">DELETE</badge>', link: '/openapi/operations/coupons/delete-coupon' },
-            { text: 'Apply Coupon <badge type="warning">POST</badge>', link: '/openapi/operations/coupons/apply-coupon' }
+            { text: 'List Coupons <badge type="tip">GET</badge>', link: '/restapi/operations/coupons/list-coupons' },
+            { text: 'Create Coupon <badge type="warning">POST</badge>', link: '/restapi/operations/coupons/create-coupon' },
+            { text: 'Get Coupon <badge type="tip">GET</badge>', link: '/restapi/operations/coupons/get-coupon' },
+            { text: 'Update Coupon <badge type="info">PUT</badge>', link: '/restapi/operations/coupons/update-coupon' },
+            { text: 'Delete Coupon <badge type="danger">DELETE</badge>', link: '/restapi/operations/coupons/delete-coupon' },
+            { text: 'Apply Coupon <badge type="warning">POST</badge>', link: '/restapi/operations/coupons/apply-coupon' }
           ]
         },
         {
           text: 'Subscriptions',
           items: [
-            { text: 'List Subscriptions <badge type="tip">GET</badge>', link: '/openapi/operations/subscriptions/list-subscriptions' },
-            { text: 'Get Subscription <badge type="tip">GET</badge>', link: '/openapi/operations/subscriptions/get-subscription' },
-            { text: 'Cancel Subscription <badge type="info">PUT</badge>', link: '/openapi/operations/subscriptions/cancel-subscription' },
-            { text: 'Reactivate Subscription <badge type="info">PUT</badge>', link: '/openapi/operations/subscriptions/reactivate-subscription' }
+            { text: 'List Subscriptions <badge type="tip">GET</badge>', link: '/restapi/operations/subscriptions/list-subscriptions' },
+            { text: 'Get Subscription <badge type="tip">GET</badge>', link: '/restapi/operations/subscriptions/get-subscription' },
+            { text: 'Cancel Subscription <badge type="info">PUT</badge>', link: '/restapi/operations/subscriptions/cancel-subscription' },
+            { text: 'Reactivate Subscription <badge type="info">PUT</badge>', link: '/restapi/operations/subscriptions/reactivate-subscription' }
           ]
         },
         {
           text: 'Tax',
           items: [
-            { text: 'List Tax Classes <badge type="tip">GET</badge>', link: '/openapi/operations/tax/list-tax-classes' },
-            { text: 'Create Tax Class <badge type="warning">POST</badge>', link: '/openapi/operations/tax/create-tax-class' }
+            { text: 'List Tax Classes <badge type="tip">GET</badge>', link: '/restapi/operations/tax/list-tax-classes' },
+            { text: 'Create Tax Class <badge type="warning">POST</badge>', link: '/restapi/operations/tax/create-tax-class' }
           ]
         },
         {
           text: 'Shipping',
           items: [
-            { text: 'List Shipping Zones <badge type="tip">GET</badge>', link: '/openapi/operations/shipping/list-shipping-zones' }
+            { text: 'List Shipping Zones <badge type="tip">GET</badge>', link: '/restapi/operations/shipping/list-shipping-zones' }
           ]
         },
         {
           text: 'Settings',
           items: [
-            { text: 'Get Store Settings <badge type="tip">GET</badge>', link: '/openapi/operations/settings/get-store-settings' },
-            { text: 'Save Store Settings <badge type="warning">POST</badge>', link: '/openapi/operations/settings/save-store-settings' }
+            { text: 'Get Store Settings <badge type="tip">GET</badge>', link: '/restapi/operations/settings/get-store-settings' },
+            { text: 'Save Store Settings <badge type="warning">POST</badge>', link: '/restapi/operations/settings/save-store-settings' }
           ]
         },
         {
           text: 'Reports',
           items: [
-            { text: 'Get Reports Overview <badge type="tip">GET</badge>', link: '/openapi/operations/reports/get-overview' },
-            { text: 'Get Quick Order Stats <badge type="tip">GET</badge>', link: '/openapi/operations/reports/quick-order-stats' }
+            { text: 'Get Reports Overview <badge type="tip">GET</badge>', link: '/restapi/operations/reports/get-overview' },
+            { text: 'Get Quick Order Stats <badge type="tip">GET</badge>', link: '/restapi/operations/reports/quick-order-stats' }
           ]
         },
         {
           text: 'Files',
           items: [
-            { text: 'List Files <badge type="tip">GET</badge>', link: '/openapi/operations/files/list-files' },
-            { text: 'Upload File <badge type="warning">POST</badge>', link: '/openapi/operations/files/upload-file' }
+            { text: 'List Files <badge type="tip">GET</badge>', link: '/restapi/operations/files/list-files' },
+            { text: 'Upload File <badge type="warning">POST</badge>', link: '/restapi/operations/files/upload-file' }
           ]
         },
         {
           text: 'Dashboard',
           items: [
-            { text: 'Get Dashboard Stats <badge type="tip">GET</badge>', link: '/openapi/operations/dashboard/get-dashboard-stats' }
+            { text: 'Get Dashboard Stats <badge type="tip">GET</badge>', link: '/restapi/operations/dashboard/get-dashboard-stats' }
           ]
         },
         {
           text: 'Roles & Permissions',
           items: [
-            { text: 'Get Permissions <badge type="tip">GET</badge>', link: '/openapi/operations/roles-permissions/get-permissions' },
-            { text: 'Save Permissions <badge type="warning">POST</badge>', link: '/openapi/operations/roles-permissions/save-permissions' }
+            { text: 'Get Permissions <badge type="tip">GET</badge>', link: '/restapi/operations/roles-permissions/get-permissions' },
+            { text: 'Save Permissions <badge type="warning">POST</badge>', link: '/restapi/operations/roles-permissions/save-permissions' }
           ]
         },
         {
           text: 'Integration',
           items: [
-            { text: 'List Addons <badge type="tip">GET</badge>', link: '/openapi/operations/integration/list-addons' },
-            { text: 'Get Global Settings <badge type="tip">GET</badge>', link: '/openapi/operations/integration/get-global-settings' },
-            { text: 'Set Global Settings <badge type="warning">POST</badge>', link: '/openapi/operations/integration/set-global-settings' },
-            { text: 'Get Global Feeds <badge type="tip">GET</badge>', link: '/openapi/operations/integration/get-global-feeds' }
+            { text: 'List Addons <badge type="tip">GET</badge>', link: '/restapi/operations/integration/list-addons' },
+            { text: 'Get Global Settings <badge type="tip">GET</badge>', link: '/restapi/operations/integration/get-global-settings' },
+            { text: 'Set Global Settings <badge type="warning">POST</badge>', link: '/restapi/operations/integration/set-global-settings' },
+            { text: 'Get Global Feeds <badge type="tip">GET</badge>', link: '/restapi/operations/integration/get-global-feeds' }
           ]
         },
         {
           text: 'Licensing',
           items: [
-            { text: 'Get License Line Chart <badge type="tip">GET</badge>', link: '/openapi/operations/licensing/get-license-chart' },
-            { text: 'Get License Pie Chart <badge type="tip">GET</badge>', link: '/openapi/operations/licensing/get-license-pie-chart' },
-            { text: 'Get License Summary <badge type="tip">GET</badge>', link: '/openapi/operations/licensing/get-license-summary' }
+            { text: 'Get License Line Chart <badge type="tip">GET</badge>', link: '/restapi/operations/licensing/get-license-chart' },
+            { text: 'Get License Pie Chart <badge type="tip">GET</badge>', link: '/restapi/operations/licensing/get-license-pie-chart' },
+            { text: 'Get License Summary <badge type="tip">GET</badge>', link: '/restapi/operations/licensing/get-license-summary' }
           ]
         },
         {
           text: 'Email Notification',
           items: [
-            { text: 'List Notifications <badge type="tip">GET</badge>', link: '/openapi/operations/email-notification/list-notifications' },
-            { text: 'Get Notification Details <badge type="tip">GET</badge>', link: '/openapi/operations/email-notification/get-notification' },
-            { text: 'Update Notification <badge type="info">PUT</badge>', link: '/openapi/operations/email-notification/update-notification' }
+            { text: 'List Notifications <badge type="tip">GET</badge>', link: '/restapi/operations/email-notification/list-notifications' },
+            { text: 'Get Notification Details <badge type="tip">GET</badge>', link: '/restapi/operations/email-notification/get-notification' },
+            { text: 'Update Notification <badge type="info">PUT</badge>', link: '/restapi/operations/email-notification/update-notification' }
           ]
         }
       ],

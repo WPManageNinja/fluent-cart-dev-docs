@@ -51,6 +51,23 @@ export default {
     // Always register OpenAPI theme components (needed for OAOperation and OASpec components)
     theme.enhanceApp({ app, router, siteData })
     
+    // Initialize OpenAPI with an empty spec immediately to prevent "getOperation is not a function" errors
+    // This ensures all methods exist even before the real spec is loaded
+    useOpenapi({
+      spec: {
+        openapi: '3.0.0',
+        info: {
+          title: 'FluentCart API',
+          version: '1.0.0',
+          description: 'Loading...'
+        },
+        paths: {},
+        components: {
+          schemas: {}
+        }
+      }
+    })
+    
     // OpenAPI integration - load spec data for OpenAPI pages
     // This needs to run on client side only
     if (typeof window !== 'undefined') {

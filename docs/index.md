@@ -26,7 +26,7 @@ features:
     link: /hooks/actions/
   - title: REST API
     details: Complete REST API documentation including authentication, core endpoints, and FluentCart Pro API for all e-commerce operations.
-    link: /openapi/operations/orders/list-orders
+    link: /restapi/operations/orders/list-orders
   - title: Payment Methods (coming soon)
     details: Payment gateway architecture, supported gateways, and custom gateway development guide for payment processing.
     link: /

@@ -137,12 +137,8 @@ export default defineConfig({
               { text: 'Filter Hooks', link: '/hooks/filters' }
             ]
           },
-          {
-            text: 'API',
-            items: [
-              { text: 'API Reference', link: '/restapi/operations/orders/list-orders' },
-            ]
-          },
+          { text: 'Rest API', link: '/restapi/operations/orders/list-orders' },
+          
           // {
           //   text: 'REST API',
           //   items: [

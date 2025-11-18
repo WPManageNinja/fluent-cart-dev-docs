@@ -36,7 +36,7 @@
                       "installable": "fluent-crm",
                       "enabled": false,
                       "title": "FluentCRM",
-                      "logo": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
+                      "logo": "https://yourfluentcart.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
                       "categories": [
                         "crm",
                         "core",
@@ -46,7 +46,7 @@
                     },
                     "fluent-smtp": {
                       "installable": "fluent-smtp",
-                      "logo": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluent-smtp.svg",
+                      "logo": "https://yourfluentcart.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluent-smtp.svg",
                       "enabled": false,
                       "title": "FluentSMTP",
                       "categories": [
@@ -100,7 +100,7 @@
             "type": "string",
             "format": "uri",
             "description": "Addon logo URL",
-            "example": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg"
+            "example": "https://yourfluentcart.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg"
           },
           "categories": {
             "type": "array",

@@ -11,7 +11,7 @@
       "description": "Your WordPress website",
       "variables": {
         "website": {
-          "default": "YourWebsite.com",
+          "default": "yourfluentcart.com",
           "description": "Your WordPress website domain (without https://)"
         }
       }

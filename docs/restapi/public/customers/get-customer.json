@@ -96,7 +96,7 @@
                       "last_name": "Team",
                       "full_name": "Robert Team"
                     },
-                    "user_link": "https://YourWebsite.com/wp-admin/user-edit.php?user_id=5",
+                    "user_link": "https://yourfluentcart.com/wp-admin/user-edit.php?user_id=5",
                     "labels": []
                   }
                 }
@@ -328,7 +328,7 @@
             "type": "string",
             "format": "uri",
             "description": "Link to WordPress user edit page",
-            "example": "https://YourWebsite.com/wp-admin/user-edit.php?user_id=5"
+            "example": "https://yourfluentcart.com/wp-admin/user-edit.php?user_id=5"
           }
         }
       },

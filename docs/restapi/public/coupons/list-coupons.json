@@ -131,12 +131,12 @@
                         "updated_at": "2025-10-22T06:24:52+00:00"
                       }
                     ],
-                    "first_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=1",
+                    "first_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/coupons/?page=1",
                     "from": 1,
                     "last_page": 98,
-                    "last_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=98",
-                    "next_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=2",
-                    "path": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons",
+                    "last_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/coupons/?page=98",
+                    "next_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/coupons/?page=2",
+                    "path": "https://yourfluentcart.com/wp-json/fluent-cart/v2/coupons",
                     "per_page": 2,
                     "prev_page_url": null,
                     "to": 2,
@@ -369,7 +369,7 @@
           },
           "first_page_url": {
             "type": "string",
-            "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=1"
+            "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/coupons/?page=1"
           },
           "from": {
             "type": "integer",
@@ -381,16 +381,16 @@
           },
           "last_page_url": {
             "type": "string",
-            "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=98"
+            "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/coupons/?page=98"
           },
           "next_page_url": {
             "type": "string",
             "nullable": true,
-            "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons/?page=2"
+            "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/coupons/?page=2"
           },
           "path": {
             "type": "string",
-            "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/coupons"
+            "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/coupons"
           },
           "per_page": {
             "type": "integer",

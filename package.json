@@ -10,7 +10,10 @@
     "generate:manifest": "node generate-manifest.js",
     "docs:dev": "npm run generate:manifest && vitepress dev",
     "docs:build": "npm run generate:manifest && vitepress build",
-    "docs:preview": "vitepress preview"
+    "docs:preview": "vitepress preview",
+    "dev": "npm run generate:manifest && vitepress dev",
+    "build": "npm run generate:manifest && vitepress build",
+    "preview": "vitepress preview"
   },
   "packageManager": "yarn@4.11.0"
 }

@@ -121,7 +121,7 @@
                           "type": "string",
                           "format": "uri",
                           "description": "URL to first page",
-                          "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=1"
+                          "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/?page=1"
                         },
                         "from": {
                           "type": "integer",
@@ -137,7 +137,7 @@
                           "type": "string",
                           "format": "uri",
                           "description": "URL to last page",
-                          "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=59176"
+                          "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/?page=59176"
                         },
                         "links": {
                           "type": "array",
@@ -169,7 +169,7 @@
                           "type": "string",
                           "format": "uri",
                           "description": "Base path for pagination",
-                          "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/"
+                          "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/"
                         },
                         "per_page": {
                           "type": "integer",
@@ -241,10 +241,10 @@
                         "updated_at": "2025-11-12T11:40:10+00:00"
                       }
                     ],
-                    "first_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                    "first_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/?page=1",
                     "from": 1,
                     "last_page": 59176,
-                    "last_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=59176",
+                    "last_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/?page=59176",
                     "links": [
                       {
                         "url": null,
@@ -252,13 +252,13 @@
                         "active": false
                       },
                       {
-                        "url": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                        "url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/?page=1",
                         "label": "1",
                         "active": true
                       }
                     ],
-                    "next_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=2",
-                    "path": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/",
+                    "next_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/?page=2",
+                    "path": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/",
                     "per_page": 10,
                     "prev_page_url": null,
                     "to": 10,
@@ -580,7 +580,7 @@
                 "type": "string",
                 "format": "uri",
                 "description": "URL to first page",
-                "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=1"
+                "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/?page=1"
               },
               "from": {
                 "type": "integer",
@@ -596,7 +596,7 @@
                 "type": "string",
                 "format": "uri",
                 "description": "URL to last page",
-                "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/?page=59176"
+                "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/?page=59176"
               },
               "links": {
                 "type": "array",
@@ -628,7 +628,7 @@
                 "type": "string",
                 "format": "uri",
                 "description": "Base path for pagination",
-                "example": "https://YourWebsite.com/wp-json/fluent-cart/v2/orders/"
+                "example": "https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/"
               },
               "per_page": {
                 "type": "integer",

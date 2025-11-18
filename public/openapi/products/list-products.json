@@ -232,19 +232,19 @@
                         "post_name": "chatgptclaud-course",
                         "post_modified": "2025-10-31 04:55:15",
                         "post_modified_gmt": "2025-10-31 04:55:15",
-                        "guid": "https://yourfluentcart.com/items/chatgptclaud-course/",
+                        "guid": "https://YourWebsite.com/items/chatgptclaud-course/",
                         "post_type": "fluent-products",
-                        "view_url": "https://yourfluentcart.com/items/chatgptclaud-course/",
-                        "edit_url": "https://yourfluentcart.com/wp-admin/post.php?post=7529681&action=edit"
+                        "view_url": "https://YourWebsite.com/items/chatgptclaud-course/",
+                        "edit_url": "https://YourWebsite.com/wp-admin/post.php?post=7529681&action=edit"
                       }
                     ],
-                    "first_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/products/?page=1",
+                    "first_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/products/?page=1",
                     "from": 1,
                     "last_page": 27,
-                    "last_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/products/?page=27",
+                    "last_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/products/?page=27",
                     "links": [],
-                    "next_page_url": "https://yourfluentcart.com/wp-json/fluent-cart/v2/products/?page=2",
-                    "path": "https://yourfluentcart.com/wp-json/fluent-cart/v2/products",
+                    "next_page_url": "https://YourWebsite.com/wp-json/fluent-cart/v2/products/?page=2",
+                    "path": "https://YourWebsite.com/wp-json/fluent-cart/v2/products",
                     "per_page": 2,
                     "prev_page_url": null,
                     "to": 2,
@@ -381,7 +381,7 @@
             "type": "string",
             "format": "uri",
             "description": "Global unique identifier",
-            "example": "https://yourfluentcart.com/items/chatgptclaud-course/"
+            "example": "https://YourWebsite.com/items/chatgptclaud-course/"
           },
           "post_content": {
             "type": "string",

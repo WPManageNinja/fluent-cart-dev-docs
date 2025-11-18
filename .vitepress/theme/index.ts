@@ -436,13 +436,13 @@ export default {
                     <input 
                       type="text" 
                       data-server-url-input
-                      placeholder="yourfluentcart.com"
-                      value=""
+                      placeholder="YourWebsite.com"
+                      value="YourWebsite.com"
                       style="width: 100%; padding: 8px 12px; border: 1px solid var(--vp-c-divider, #ddd); border-radius: 4px; background: var(--vp-c-bg, #fff); color: var(--vp-c-text-1, #000); font-size: 0.9rem;"
                     />
                   </div>
                   <div style="font-size: 0.85rem; color: var(--vp-c-text-2, #666);">
-                    Full URL: <span data-server-url-display>https://yourfluentcart.com/wp-json/fluent-cart/v2</span>
+                    Full URL: <span data-server-url-display>https://YourWebsite.com/wp-json/fluent-cart/v2</span>
                   </div>
                 </div>
               `
@@ -477,8 +477,8 @@ export default {
                       const serverDisplay = serverUrlElement.querySelector('[data-server-url-display]') as HTMLElement | null
                       const authInput = authSection.querySelector('input[placeholder="username:application_password"]') as HTMLInputElement | null
                       
-                      if (serverInput) serverInput.value = 'yourfluentcart.com'
-                      if (serverDisplay) serverDisplay.textContent = 'https://yourfluentcart.com/wp-json/fluent-cart/v2'
+                      if (serverInput) serverInput.value = 'YourWebsite.com'
+                      if (serverDisplay) serverDisplay.textContent = 'https://YourWebsite.com/wp-json/fluent-cart/v2'
                       if (authInput) authInput.value = ''
                       window.__customServerUrl = undefined
                       
@@ -493,18 +493,18 @@ export default {
                 if (input && display) {
                   // Load saved server URL from localStorage
                   const savedServerUrl = localStorage.getItem(STORAGE_KEYS.SERVER_URL)
-                  if (savedServerUrl && savedServerUrl !== 'yourfluentcart.com') {
+                  if (savedServerUrl && savedServerUrl !== 'YourWebsite.com') {
                     input.value = savedServerUrl
                   }
                   
                   const updateServerUrl = () => {
-                    const website = input.value.trim() || 'yourfluentcart.com'
+                    const website = input.value.trim() || 'YourWebsite.com'
                     const fullUrl = `https://${website}/wp-json/fluent-cart/v2`
                     display.textContent = fullUrl
                     window.__customServerUrl = fullUrl
                     
                     // Save to localStorage
-                    if (website && website !== 'yourfluentcart.com') {
+                    if (website && website !== 'YourWebsite.com') {
                       localStorage.setItem(STORAGE_KEYS.SERVER_URL, website)
                     }
                   }

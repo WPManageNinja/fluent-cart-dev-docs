@@ -51,9 +51,9 @@
                     "post_name": "modern-sweatshirt-06-06-2025-12-51-25",
                     "post_modified": "2025-11-11 10:40:11",
                     "post_modified_gmt": "2025-11-11 10:40:11",
-                    "guid": "https://yourfluentcart.com/?items=modern-sweatshirt-06-06-2025-12-51-25",
+                    "guid": "https://YourWebsite.com/?items=modern-sweatshirt-06-06-2025-12-51-25",
                     "post_type": "fluent-products",
-                    "thumbnail": "https://yourfluentcart.com/wp-content/plugins/fluent-cart/assets/images/placeholder.svg",
+                    "thumbnail": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/placeholder.svg",
                     "detail": {
                       "id": 13,
                       "post_id": 7529088,
@@ -188,7 +188,7 @@
             "type": "string",
             "format": "uri",
             "description": "Global unique identifier",
-            "example": "https://yourfluentcart.com/?items=modern-sweatshirt-06-06-2025-12-51-25"
+            "example": "https://YourWebsite.com/?items=modern-sweatshirt-06-06-2025-12-51-25"
           },
           "post_type": {
             "type": "string",
@@ -199,7 +199,7 @@
             "type": "string",
             "format": "uri",
             "description": "Thumbnail image URL",
-            "example": "https://yourfluentcart.com/wp-content/plugins/fluent-cart/assets/images/placeholder.svg"
+            "example": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/placeholder.svg"
           },
           "detail": {
             "$ref": "#/components/schemas/ProductDetail"

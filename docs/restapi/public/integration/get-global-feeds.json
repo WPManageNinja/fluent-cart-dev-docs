@@ -40,7 +40,7 @@
                       "type": "string",
                       "format": "uri",
                       "description": "URL to all module configuration",
-                      "example": "https://yourfluentcart.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                      "example": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/integrations"
                     }
                   }
                 },
@@ -54,7 +54,7 @@
                       "category": "crm",
                       "disable_global_settings": true,
                       "config_url": "",
-                      "logo": "https://yourfluentcart.com/wp-content/plugins/fluent-cart/assets/images/integrations/webhook.svg",
+                      "logo": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/webhook.svg",
                       "enabled": true,
                       "scopes": [
                         "global",
@@ -65,7 +65,7 @@
                       "delay_on_global_action": true
                     }
                   },
-                  "all_module_config_url": "https://yourfluentcart.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                  "all_module_config_url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/integrations"
                 }
               }
             }
@@ -98,7 +98,7 @@
             "type": "string",
             "format": "uri",
             "description": "URL to all module configuration",
-            "example": "https://yourfluentcart.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+            "example": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/integrations"
           }
         }
       },
@@ -139,7 +139,7 @@
             "type": "string",
             "format": "uri",
             "description": "Integration logo URL",
-            "example": "https://yourfluentcart.com/wp-content/plugins/fluent-cart/assets/images/integrations/webhook.svg"
+            "example": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/webhook.svg"
           },
           "enabled": {
             "type": "boolean",

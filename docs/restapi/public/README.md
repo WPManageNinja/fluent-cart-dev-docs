@@ -60,7 +60,7 @@ To add a new operation:
 
 
 
-fetch('https://yourfluentcart.com/wp-json/fluent-cart/v2/orders/7536299', {
+fetch('https://YourWebsite.com/wp-json/fluent-cart/v2/orders/7536299', {
   method: 'DELETE',
   headers: {
     Authorization: 'Basic Zmx1ZW50Y2FydDpnUGFpIDZ5aEcgS3A0dSBlek9lIDdWa1EgVWNqdw=='

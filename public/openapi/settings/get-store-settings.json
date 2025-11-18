@@ -158,7 +158,7 @@
                             "url": {
                               "type": "string",
                               "format": "uri",
-                              "example": "https://yourfluentcart.com/wp-content/uploads/2025/10/FluentCart-Logo.webp"
+                              "example": "https://YourWebsite.com/wp-content/uploads/2025/10/FluentCart-Logo.webp"
                             },
                             "title": {
                               "type": "string",
@@ -239,7 +239,7 @@
                     "thousand_separator": "comma",
                     "store_logo": {
                       "id": "7529370",
-                      "url": "https://yourfluentcart.com/wp-content/uploads/2025/10/FluentCart-Logo.webp",
+                      "url": "https://YourWebsite.com/wp-content/uploads/2025/10/FluentCart-Logo.webp",
                       "title": "FluentCart-Logo"
                     },
                     "product_slug": "items",
@@ -411,7 +411,7 @@
                   "url": {
                     "type": "string",
                     "format": "uri",
-                    "example": "https://yourfluentcart.com/wp-content/uploads/2025/10/FluentCart-Logo.webp"
+                    "example": "https://YourWebsite.com/wp-content/uploads/2025/10/FluentCart-Logo.webp"
                   },
                   "title": {
                     "type": "string",

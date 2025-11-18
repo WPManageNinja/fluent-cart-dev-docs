@@ -415,3 +415,9 @@ details summary {
 details .language-php {
   margin-bottom: 0px !important;
 }
+
+/* Hide "Powered by VitePress OpenAPI" text */
+a[href*="github.com/enzonotario/vitepress-openapi"],
+span:has(> a[href*="github.com/enzonotario/vitepress-openapi"]) {
+  display: none !important;
+}

@@ -16,7 +16,9 @@ export default defineConfig({
   description: "Complete developer documentation for FluentCart e-commerce plugin",
   
   head: [
-    ['meta', { name: 'theme-color', content: '#136196' }]
+    ['meta', { name: 'theme-color', content: '#136196' }],
+    ['script', { src: 'https://cdn.jsdelivr.net/gh/fluent-docai/fluent-bot-chat-widget-open@latest/fluent-bot-chat-widget.umd.js' }],
+    ['script', {}, '(function() { function initWidget() { if (typeof FluentBotChatWidget !== "undefined") { FluentBotChatWidget.injectWidget("6b119e79-fde9-45ed-8d5d-fcd8b4dbe1ac"); } else { setTimeout(initWidget, 100); } } initWidget(); })();']
   ],
   
   vite: {

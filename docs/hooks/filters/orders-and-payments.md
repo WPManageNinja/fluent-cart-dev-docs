@@ -264,6 +264,110 @@ add_filter('fluent_cart/shipping_statuses', function($statuses, $data) {
 ```
 </details>
 
+### <code> payments/stripe_metadata_onetime </code>
+<details>
+<summary><code>fluent_cart/payments/stripe_metadata_onetime</code> &mdash; Filter Stripe metadata for one-time payments</summary>
+
+**When it runs:**
+This filter is applied when creating a one-time payment intent in Stripe, allowing you to add custom metadata to the transaction.
+
+**Parameters:**
+
+- `$metadata` (array): The metadata array that will be sent to Stripe
+    ```php
+    $metadata = [
+        'fct_ref_id' => 'order-uuid-here',
+        'Name'       => 'Customer Full Name',
+        'Email'      => 'customer@example.com',
+        'order_reference' => 'fct_order_id_123',
+    ];
+- `$context` (array): Contextual information about the payment
+    ```php
+    $context = [
+        'order'       => Order Model Object,
+        'transaction' => Transaction Model Object
+    ];
+    ```
+
+**Returns:**
+- `$metadata` (array): The modified metadata array
+
+**Usage:**
+```php
+add_filter('fluent_cart/payments/stripe_metadata_onetime', function($metadata, $context) {
+    // Add custom metadata for one-time payments
+    $metadata['your_key'] = 'Your Value';
+    
+    // Access order data
+    if (isset($context['order'])) {
+        $metadata['custom_field'] = $context['order']->id;
+    }
+    
+    return $metadata;
+}, 10, 2);
+```
+
+**Common Use Cases:**
+- Tracking order information in Stripe
+- Adding customer identifiers for reconciliation
+- Including custom analytics data
+- Storing transaction references from external systems
+</details>
+
+### <code> payments/stripe_metadata_subscription </code>
+<details>
+<summary><code>fluent_cart/payments/stripe_metadata_subscription</code> &mdash; Filter Stripe metadata for subscription payments</summary>
+
+**When it runs:**
+This filter is applied when creating a subscription payment intent in Stripe, allowing you to add custom metadata to subscription transactions.
+
+**Parameters:**
+
+- `$metadata` (array): The metadata array that will be sent to Stripe
+    ```php
+    $metadata = [
+        'fct_ref_id' => 'order-uuid-here',
+        'email'      => 'customer@example.com',
+        'name'       => 'Customer Full Name',
+        'subscription_item'       => 'Subscription Product Name',
+        'order_reference' => 'fct_order_id_123',
+    ];
+    ```
+- `$context` (array): Contextual information about the subscription
+    ```php
+    $context = [
+        'order'       => Order Model Object,
+        'transaction' => Transaction Model Object,
+        'subscription' => Subscription Model Object
+    ];
+    ```
+
+**Returns:**
+- `$metadata` (array): The modified metadata array
+
+**Usage:**
+```php
+add_filter('fluent_cart/payments/stripe_metadata_subscription', function($metadata, $context) {
+    // Add custom metadata for subscription payments
+    $metadata['your_key'] = 'Your Value';
+    
+    // Access subscription data
+    if (isset($context['subscription'])) {
+        $metadata['subscription_plan'] = $context['subscription']->billing_interval;
+        $metadata['custom_field'] = $context['subscription']->id;
+    }
+    
+    return $metadata;
+}, 10, 2);
+```
+
+**Common Use Cases:**
+- Tracking subscription details in Stripe
+- Adding customer identifiers for recurring payments
+- Including custom analytics data
+- Storing subscription references from external systems
+</details>
+
 ### <code> tax/country_tax_titles </code>
 <details>
 <summary><code>fluent_cart/tax/country_tax_titles</code> &mdash; Filter country tax titles</summary>

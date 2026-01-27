@@ -42,7 +42,12 @@ FluentCart modules are organized into several categories:
 - **Location**: `app/Modules/Integrations/`
 - **Examples**: FluentCRM, MailChimp, Webhooks
 
-#### 6. **Pro Modules** ⭐ **PRO ONLY**
+#### 6. **Custom Product Selling** ⭐ **NEW**
+- **Purpose**: Sell custom products without catalog entries
+- **Location**: Hook-based implementation
+- **Examples**: Add-ons, gift wrapping, custom subscriptions
+
+#### 7. **Pro Modules** ⭐ **PRO ONLY**
 - **Purpose**: Advanced features for FluentCart Pro
 - **Location**: `app/Modules/` (Pro-specific)
 - **Examples**: Licensing, Order Bump (Promotional)
@@ -451,11 +456,12 @@ Modules can be distributed through:
 
 Continue with module development:
 
-1. **[Payment Methods Module](./payment-methods)** - Payment gateway development
-2. **[Shipping Module](./shipping)** - Shipping method development
-3. **[Storage Drivers](./storage)** - File storage integration
-4. **[Licensing Module (Pro)](./licensing)** - Software license management
-5. **[Order Bump Module (Pro)](./order-bump)** - Promotional tools
+1. **[Custom Product Selling](./custom-product-selling)** - Sell custom products using hooks
+2. **[Payment Methods Module](./payment-methods)** - Payment gateway development
+3. **[Shipping Module](./shipping)** - Shipping method development
+4. **[Storage Drivers](./storage)** - File storage integration
+5. **[Licensing Module (Pro)](./licensing)** - Software license management
+6. **[Order Bump Module (Pro)](./order-bump)** - Promotional tools
 
 ## Previous/Next Navigation
 

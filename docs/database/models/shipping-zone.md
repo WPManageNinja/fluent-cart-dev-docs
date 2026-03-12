@@ -12,13 +12,23 @@ description: FluentCart ShippingZone model documentation with attributes, scopes
 | Name Space    | FluentCart\App\Models                          |
 | Class         | FluentCart\App\Models\ShippingZone             |
 
+## Traits
+
+- `FluentCart\App\Models\Concerns\CanSearch` - Provides `search()`, `groupSearch()`, `whereLike()`, `whereBeginsWith()`, `whereEndsWith()` scopes
+
+## Appended Attributes
+
+The following computed attributes are automatically appended to the model's array/JSON output:
+
+- `formatted_region` - Human-readable region name
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
 | id                 | Integer   | Primary Key |
 | name               | String    | Shipping zone name |
-| region             | String    | Region/country code |
+| region             | String    | Region/country code (or `'all'` for whole world) |
 | order              | Integer   | Display order |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
@@ -36,6 +46,7 @@ $shippingZone->id; // returns id
 $shippingZone->name; // returns zone name
 $shippingZone->region; // returns region code
 $shippingZone->order; // returns display order
+$shippingZone->formatted_region; // returns formatted region name (appended attribute)
 ```
 
 ## Relations
@@ -44,7 +55,7 @@ This model has the following relationships that you can use
 
 ### methods
 
-Access all shipping methods in this zone
+Access all shipping methods in this zone. Results are ordered by `id` descending.
 
 * return `FluentCart\App\Models\ShippingMethod` Model Collection
 
@@ -56,7 +67,7 @@ $methods = $shippingZone->methods;
 
 // For Filtering by methods relationship
 $shippingZones = FluentCart\App\Models\ShippingZone::whereHas('methods', function($query) {
-    $query->where('status', 'active');
+    $query->where('is_enabled', 1);
 })->get();
 ```
 
@@ -66,16 +77,16 @@ Along with Global Model methods, this model has few helper methods.
 
 ### getFormattedRegionAttribute()
 
-Get formatted region name (accessor)
+Get formatted region name (accessor). Returns `'Whole World'` if region is `'all'`, otherwise resolves the country code to its full name via `AddressHelper::getCountryNameByCode()`.
 
-* Parameters  
+* Parameters
    * none
 * Returns `string`
 
 #### Usage
 
 ```php
-$formattedRegion = $shippingZone->formatted_region; // Returns formatted region name
+$formattedRegion = $shippingZone->formatted_region; // e.g., "United States" or "Whole World"
 ```
 
 ## Usage Examples
@@ -116,7 +127,7 @@ foreach ($shippingZones as $zone) {
 
 ```php
 $usZones = FluentCart\App\Models\ShippingZone::where('region', 'US')->get();
-$euZones = FluentCart\App\Models\ShippingZone::where('region', 'EU')->get();
+$allWorldZones = FluentCart\App\Models\ShippingZone::where('region', 'all')->get();
 ```
 
 ### Get Zones Ordered by Display Order
@@ -125,11 +136,11 @@ $euZones = FluentCart\App\Models\ShippingZone::where('region', 'EU')->get();
 $orderedZones = FluentCart\App\Models\ShippingZone::orderBy('order', 'asc')->get();
 ```
 
-### Get Zones with Active Methods
+### Get Zones with Enabled Methods
 
 ```php
-$zonesWithActiveMethods = FluentCart\App\Models\ShippingZone::whereHas('methods', function($query) {
-    $query->where('status', 'active');
+$zonesWithEnabledMethods = FluentCart\App\Models\ShippingZone::whereHas('methods', function($query) {
+    $query->where('is_enabled', 1);
 })->get();
 ```
 
@@ -163,8 +174,7 @@ foreach ($zonesWithCounts as $zone) {
 
 ```php
 $shippingZone = FluentCart\App\Models\ShippingZone::find(1);
-$shippingZone->delete(); // This will also delete associated methods
+$shippingZone->delete();
 ```
 
 ---
-

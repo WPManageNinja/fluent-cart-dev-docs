@@ -16,10 +16,10 @@ description: FluentCart CustomerMeta model documentation with attributes, scopes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | customer_id        | Integer   | Reference to customer |
 | meta_key           | String    | Meta key name |
-| meta_value         | Text      | Meta value (JSON encoded for arrays/objects) |
+| meta_value         | Text      | Meta value (JSON encoded for arrays/objects, auto-encoded/decoded via mutator/accessor) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -35,7 +35,7 @@ $customerMeta = FluentCart\App\Models\CustomerMeta::find(1);
 $customerMeta->id; // returns id
 $customerMeta->customer_id; // returns customer ID
 $customerMeta->meta_key; // returns meta key
-$customerMeta->meta_value; // returns meta value
+$customerMeta->meta_value; // returns meta value (auto-decoded if JSON)
 ```
 
 ## Relations
@@ -46,7 +46,7 @@ This model has the following relationships that you can use
 
 Access the associated customer
 
-* return `FluentCart\App\Models\Customer` Model
+* return `FluentCart\App\Models\Customer` Model (BelongsTo)
 
 #### Example:
 
@@ -66,10 +66,10 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setMetaValueAttribute($value)
 
-Set meta value with automatic JSON encoding (mutator)
+Set meta value with automatic JSON encoding (mutator). Arrays and objects are encoded with `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` flags.
 
-* Parameters  
-   * $value - mixed (array, object, or string)
+* Parameters
+   * `$value` - mixed (array, object, or string)
 * Returns `void`
 
 #### Usage
@@ -81,11 +81,11 @@ $customerMeta->meta_value = ['preferences' => 'value', 'settings' => ['key' => '
 
 ### getMetaValueAttribute($value)
 
-Get meta value with automatic JSON decoding (accessor)
+Get meta value with automatic JSON decoding (accessor). If the stored string is valid JSON, it returns the decoded array. Otherwise, returns the raw string value.
 
-* Parameters  
-   * $value - mixed
-* Returns `mixed`
+* Parameters
+   * `$value` - mixed
+* Returns `mixed` (decoded array if valid JSON, otherwise original value)
 
 #### Usage
 
@@ -159,4 +159,3 @@ $customerMetas = FluentCart\App\Models\CustomerMeta::where('customer_id', 123)->
 ```
 
 ---
-

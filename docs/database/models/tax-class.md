@@ -12,15 +12,29 @@ description: FluentCart TaxClass model documentation with attributes, scopes, re
 | Name Space    | FluentCart\App\Models                        |
 | Class         | FluentCart\App\Models\TaxClass               |
 
+## Guarded & Fillable
+
+This model uses both `$guarded` and `$fillable`:
+
+- **Guarded:** `['id']`
+- **Fillable:** `['title', 'description', 'meta', 'slug']`
+
+## Lifecycle Hooks (booted)
+
+The model registers lifecycle hooks in the `booted()` method:
+
+- **Creating:** Automatically generates a unique slug from `title` via `generateUniqueSlug()`.
+- **Updating:** If `title` has changed (is dirty), the slug is regenerated to match the new title.
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | title              | String    | Tax class title |
 | description        | Text      | Tax class description |
-| meta               | JSON      | Additional metadata |
-| slug               | String    | URL-friendly slug (auto-generated) |
+| meta               | JSON      | Additional metadata (manual JSON mutator/accessor) |
+| slug               | String    | URL-friendly slug (auto-generated from title) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -37,6 +51,7 @@ $taxClass->id; // returns id
 $taxClass->title; // returns title
 $taxClass->description; // returns description
 $taxClass->slug; // returns slug
+$taxClass->meta; // returns array (accessor)
 ```
 
 ## Methods
@@ -45,9 +60,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setMetaAttribute($value)
 
-Set meta with automatic JSON encoding (mutator)
+Set meta with automatic JSON encoding (mutator). Encodes the value with `json_encode()`. Falls back to `'[]'` if encoding fails or value is falsy.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -60,11 +75,11 @@ $taxClass->meta = ['tax_rate' => 8.5, 'exempt_products' => [1, 2, 3]];
 
 ### getMetaAttribute($value)
 
-Get meta with automatic JSON decoding (accessor)
+Get meta with automatic JSON decoding (accessor). Decodes the stored JSON string into an associative array.
 
-* Parameters  
+* Parameters
    * $value - mixed
-* Returns `array`
+* Returns `array` - Decoded array, or empty array if value is falsy
 
 #### Usage
 
@@ -74,19 +89,18 @@ $meta = $taxClass->meta; // Returns decoded array
 
 ### generateUniqueSlug($title, $ignoreId = null)
 
-Generate unique slug for tax class (static method)
+Generate unique slug for tax class (protected static method). Uses `Str::slug()` to create a URL-friendly slug from the title, then appends a numeric suffix if the slug already exists. Falls back to `'tax-class'` as the base slug if `Str::slug()` returns empty.
 
-* Parameters  
+This method is called automatically by the model's lifecycle hooks -- you typically do not need to call it directly.
+
+* Parameters
    * $title - string
-   * $ignoreId - integer|null (default: null)
+   * $ignoreId - integer|null (default: null) - Exclude this ID when checking for uniqueness (used during updates)
 * Returns `string`
 
-#### Usage
-
-```php
-$slug = FluentCart\App\Models\TaxClass::generateUniqueSlug('Standard Tax');
-// Returns: "standard-tax"
-```
+::: info Note
+This method is `protected static`, so it is not callable from outside the model class. Slug generation happens automatically on create and on update (when the title changes).
+:::
 
 ## Usage Examples
 
@@ -174,25 +188,15 @@ $taxClass->delete();
 $orderedClasses = FluentCart\App\Models\TaxClass::orderBy('title', 'asc')->get();
 ```
 
-### Generate Unique Slug
+### Automatic Slug Generation
 
 ```php
-$slug = FluentCart\App\Models\TaxClass::generateUniqueSlug('New Tax Class');
-// Returns: "new-tax-class" or "new-tax-class-2" if exists
-```
+// Creating a class with a duplicate title auto-generates a unique slug
+$taxClass1 = FluentCart\App\Models\TaxClass::create(['title' => 'Sales Tax']);
+// slug: "sales-tax"
 
-### Get Tax Classes with Specific Meta
-
-```php
-$taxClasses = FluentCart\App\Models\TaxClass::all();
-
-foreach ($taxClasses as $class) {
-    $meta = $class->meta;
-    if (isset($meta['tax_rate']) && $meta['tax_rate'] > 8.0) {
-        echo "High Tax Class: " . $class->title;
-    }
-}
+$taxClass2 = FluentCart\App\Models\TaxClass::create(['title' => 'Sales Tax']);
+// slug: "sales-tax-2"
 ```
 
 ---
-

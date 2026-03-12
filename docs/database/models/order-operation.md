@@ -16,7 +16,7 @@ description: FluentCart OrderOperation model documentation with attributes, scop
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | order_id           | Integer   | Reference to order |
 | created_via        | String    | How the order was created |
 | has_tax            | Boolean   | Whether order has tax |
@@ -32,9 +32,11 @@ description: FluentCart OrderOperation model documentation with attributes, scop
 | utm_id             | String    | UTM ID parameter |
 | cart_hash          | String    | Cart hash identifier |
 | refer_url          | String    | Referral URL |
-| meta               | JSON      | Additional operation data |
+| meta               | JSON      | Additional operation data (has accessor/mutator but not in $fillable) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
+
+> **Note:** The `meta` column has accessor/mutator methods for JSON encoding/decoding but is not included in `$fillable`. It must be set directly on the model instance. The `id` column is both guarded and declared as `$primaryKey`.
 
 ## Usage
 
@@ -79,9 +81,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setMetaAttribute($value)
 
-Set meta from array (mutator)
+Set meta from array (mutator). Automatically JSON-encodes the value.
 
-* Parameters  
+* Parameters
    * $value - array|object
 * Returns `void`
 
@@ -93,9 +95,9 @@ $orderOperation->meta = ['analytics_data' => 'value', 'tracking_info' => 'data']
 
 ### getMetaAttribute($value)
 
-Get meta as array (accessor)
+Get meta as array (accessor). Automatically JSON-decodes the stored value.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `array`
 
@@ -160,4 +162,3 @@ $orderOperation = FluentCart\App\Models\OrderOperation::create([
 ```
 
 ---
-

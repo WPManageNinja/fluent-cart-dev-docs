@@ -12,11 +12,28 @@ description: FluentCart TaxRate model documentation with attributes, scopes, rel
 | Name Space    | FluentCart\App\Models                     |
 | Class         | FluentCart\App\Models\TaxRate             |
 
+## Guarded & Fillable
+
+This model uses both `$guarded` and `$fillable`:
+
+- **Guarded:** `['id']`
+- **Fillable:** `['class_id', 'country', 'state', 'postcode', 'city', 'rate', 'name', 'group', 'priority', 'is_compound', 'for_shipping', 'for_order']`
+
+## Timestamps
+
+This model has **timestamps disabled** (`$timestamps = false`). The `created_at` and `updated_at` columns are not automatically managed.
+
+## Appended Attributes
+
+The following computed attributes are automatically appended to the model's array/JSON output:
+
+- `formatted_state` - Human-readable state name
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | class_id           | Integer   | Reference to tax class |
 | country            | String    | Country code |
 | state              | String    | State/Province code |
@@ -30,6 +47,10 @@ description: FluentCart TaxRate model documentation with attributes, scopes, rel
 | for_shipping       | Boolean   | Whether tax applies to shipping |
 | for_order          | Boolean   | Whether tax applies to order |
 
+::: warning No Timestamps
+This model does not use automatic timestamps. There are no `created_at` or `updated_at` columns managed by the ORM.
+:::
+
 ## Usage
 
 Please check [Model Basic](/database/models) for Common methods.
@@ -42,7 +63,9 @@ $taxRate = FluentCart\App\Models\TaxRate::find(1);
 $taxRate->id; // returns id
 $taxRate->class_id; // returns class ID
 $taxRate->country; // returns country code
+$taxRate->state; // returns state code
 $taxRate->rate; // returns tax rate
+$taxRate->formatted_state; // returns formatted state name (appended attribute)
 ```
 
 ## Relations
@@ -67,6 +90,24 @@ $taxRates = FluentCart\App\Models\TaxRate::whereHas('tax_class', function($query
 })->get();
 ```
 
+## Methods
+
+Along with Global Model methods, this model has few helper methods.
+
+### getFormattedStateAttribute()
+
+Get formatted state name (accessor). Resolves the state code to its human-readable name using `AddressHelper::getStateNameByCode()`, using the model's `country` attribute for context.
+
+* Parameters
+   * none
+* Returns `string` - Formatted state name, or empty string if state is empty
+
+#### Usage
+
+```php
+$formattedState = $taxRate->formatted_state; // e.g., "California"
+```
+
 ## Usage Examples
 
 ### Get Tax Rates
@@ -77,6 +118,7 @@ echo "Name: " . $taxRate->name;
 echo "Rate: " . $taxRate->rate . "%";
 echo "Country: " . $taxRate->country;
 echo "State: " . $taxRate->state;
+echo "Formatted State: " . $taxRate->formatted_state;
 ```
 
 ### Create Tax Rate
@@ -186,4 +228,3 @@ $vatTaxRates = FluentCart\App\Models\TaxRate::where('group', 'vat')->get();
 ```
 
 ---
-

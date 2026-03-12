@@ -12,6 +12,10 @@ description: FluentCart OrderMeta model documentation with attributes, scopes, r
 | Name Space    | FluentCart\App\Models                        |
 | Class         | FluentCart\App\Models\OrderMeta              |
 
+## Traits
+
+- **CanSearch** - Provides `search()`, `whereLike()`, `whereBeginsWith()`, `whereEndsWith()`, and `groupSearch()` scopes
+
 ## Attributes
 
 | Attribute  | Data Type | Comment |
@@ -35,53 +39,90 @@ $orderMeta = FluentCart\App\Models\OrderMeta::find(1);
 $orderMeta->id; // returns id
 $orderMeta->order_id; // returns order ID
 $orderMeta->meta_key; // returns meta key
-$orderMeta->meta_value; // returns meta value
+$orderMeta->meta_value; // returns meta value (auto-decoded if JSON)
 ```
 
 ## Scopes
 
-This model has the following scopes that you can use
+This model has the following scopes via the `CanSearch` trait.
 
-### ofOrder($orderId)
+### search($params)
 
-Filter order meta by order ID
+Perform a parameterized search with various operators (=, like_all, between, in, not_in, etc.).
 
-* Parameters  
-   * $orderId - integer
+* Parameters
+   * $params - array of search parameters
 
 #### Usage:
 
 ```php
-// Get all meta for a specific order
-$orderMeta = FluentCart\App\Models\OrderMeta::ofOrder(123)->get();
+$orderMeta = FluentCart\App\Models\OrderMeta::search([
+    'meta_key' => 'billing_address',
+])->get();
 ```
 
-### ofMetaKey($metaKey)
+### whereLike($column, $value, $boolean = 'and')
 
-Filter order meta by meta key
+Filter with a WHERE LIKE %value% query.
 
-* Parameters  
-   * $metaKey - string
+* Parameters
+   * $column - string
+   * $value - string
+   * $boolean - string (default: 'and')
 
 #### Usage:
 
 ```php
-// Get all order meta for a specific key
-$orderMeta = FluentCart\App\Models\OrderMeta::ofMetaKey('billing_address')->get();
+$orderMeta = FluentCart\App\Models\OrderMeta::whereLike('meta_key', 'billing')->get();
 ```
 
-### ofMetaKeys($metaKeys)
+### whereBeginsWith($column, $value, $boolean = 'and')
 
-Filter order meta by multiple meta keys
+Filter with a WHERE LIKE value% query.
 
-* Parameters  
-   * $metaKeys - array
+* Parameters
+   * $column - string
+   * $value - string
+   * $boolean - string (default: 'and')
 
 #### Usage:
 
 ```php
-// Get order meta for multiple keys
-$orderMeta = FluentCart\App\Models\OrderMeta::ofMetaKeys(['billing_address', 'shipping_address'])->get();
+$orderMeta = FluentCart\App\Models\OrderMeta::whereBeginsWith('meta_key', 'shipping_')->get();
+```
+
+### whereEndsWith($column, $value, $boolean = 'and')
+
+Filter with a WHERE LIKE %value query.
+
+* Parameters
+   * $column - string
+   * $value - string
+   * $boolean - string (default: 'and')
+
+#### Usage:
+
+```php
+$orderMeta = FluentCart\App\Models\OrderMeta::whereEndsWith('meta_key', '_address')->get();
+```
+
+### groupSearch($groups)
+
+Perform grouped searches across the model and its relationships.
+
+* Parameters
+   * $groups - array of grouped search parameters
+
+#### Usage:
+
+```php
+$orderMeta = FluentCart\App\Models\OrderMeta::groupSearch([
+    'OrderMeta.meta_key' => [
+        'column' => 'meta_key',
+        'operator' => '=',
+        'value' => 'billing_address'
+    ],
+])->get();
 ```
 
 ## Relations
@@ -110,25 +151,11 @@ $orderMeta = FluentCart\App\Models\OrderMeta::whereHas('order', function($query)
 
 Along with Global Model methods, this model has few helper methods.
 
-### getMetaValueAttribute($value)
-
-Get meta value as array or string (accessor)
-
-* Parameters  
-   * $value - mixed
-* Returns `mixed`
-
-#### Usage
-
-```php
-$metaValue = $orderMeta->meta_value; // Returns array if JSON, string otherwise
-```
-
 ### setMetaValueAttribute($value)
 
-Set meta value from array or string (mutator)
+Set meta value with automatic JSON encoding for arrays and objects (mutator). Uses `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` flags.
 
-* Parameters  
+* Parameters
    * $value - array|object|string
 * Returns `void`
 
@@ -142,60 +169,34 @@ $orderMeta->meta_value = ['address' => '123 Main St', 'city' => 'New York'];
 $orderMeta->meta_value = 'simple string value';
 ```
 
-### getMetaValueAsArray()
+### getMetaValueAttribute($value)
 
-Get meta value as array (force array return)
+Get meta value with automatic JSON decoding (accessor). Returns the decoded array if the value is valid JSON, otherwise returns the original string.
 
-* Parameters  
-   * none
-* Returns `array`
+* Parameters
+   * $value - mixed
+* Returns `mixed` - array if valid JSON, original string otherwise
 
 #### Usage
 
 ```php
-$metaArray = $orderMeta->getMetaValueAsArray();
+$metaValue = $orderMeta->meta_value; // Returns array if JSON, string otherwise
 ```
 
-### getMetaValueAsString()
+### updateMeta($metaKey, $metaValue)
 
-Get meta value as string (force string return)
+Create or update a meta entry for the current order. If a record with the same `order_id` and `meta_key` exists, it updates the value; otherwise, it creates a new record.
 
-* Parameters  
-   * none
-* Returns `string`
-
-#### Usage
-
-```php
-$metaString = $orderMeta->getMetaValueAsString();
-```
-
-### isJsonValue()
-
-Check if meta value is JSON
-
-* Parameters  
-   * none
-* Returns `boolean`
+* Parameters
+   * $metaKey - string
+   * $metaValue - mixed
+* Returns `FluentCart\App\Models\OrderMeta`
 
 #### Usage
 
 ```php
-$isJson = $orderMeta->isJsonValue();
-```
-
-### getDecodedValue()
-
-Get decoded JSON value or original value
-
-* Parameters  
-   * none
-* Returns `mixed`
-
-#### Usage
-
-```php
-$decodedValue = $orderMeta->getDecodedValue();
+$orderMeta = FluentCart\App\Models\OrderMeta::find(1);
+$result = $orderMeta->updateMeta('custom_field', ['key' => 'value']);
 ```
 
 ## Common Meta Keys
@@ -275,6 +276,13 @@ $order->meta()->updateOrCreate(
 );
 ```
 
+### Update Meta via updateMeta()
+
+```php
+$orderMeta = FluentCart\App\Models\OrderMeta::where('order_id', 123)->first();
+$orderMeta->updateMeta('shipping_notes', 'Leave at front door');
+```
+
 ### Get All Order Meta as Key-Value Array
 
 ```php
@@ -283,4 +291,3 @@ $metaData = $order->meta()->pluck('meta_value', 'meta_key')->toArray();
 ```
 
 ---
-

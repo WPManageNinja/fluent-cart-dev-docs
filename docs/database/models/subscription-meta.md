@@ -19,7 +19,7 @@ description: FluentCart SubscriptionMeta model documentation with attributes, sc
 | id                 | Integer   | Primary Key |
 | subscription_id    | Integer   | Reference to subscription |
 | meta_key           | String    | Meta key name |
-| meta_value         | Text      | Meta value (JSON encoded for arrays/objects) |
+| meta_value         | Text      | Meta value (JSON encoded for arrays/objects, auto-encoded/decoded via mutator/accessor) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -35,7 +35,7 @@ $subscriptionMeta = FluentCart\App\Models\SubscriptionMeta::find(1);
 $subscriptionMeta->id; // returns id
 $subscriptionMeta->subscription_id; // returns subscription ID
 $subscriptionMeta->meta_key; // returns meta key
-$subscriptionMeta->meta_value; // returns meta value
+$subscriptionMeta->meta_value; // returns meta value (auto-decoded if JSON)
 ```
 
 ## Relations
@@ -44,9 +44,13 @@ This model has the following relationships that you can use
 
 ### product_detail
 
-Access the associated subscription
+Access the associated subscription (BelongsTo via `subscription_id` -> `id`).
 
-* return `FluentCart\App\Models\Subscription` Model
+::: info Note
+Despite the name `product_detail`, this relationship returns a `Subscription` model, not a `Product` model. This is a legacy naming convention.
+:::
+
+* return `FluentCart\App\Models\Subscription` Model (BelongsTo)
 
 #### Example:
 
@@ -66,10 +70,10 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setMetaValueAttribute($value)
 
-Set meta value with automatic JSON encoding (mutator)
+Set meta value with automatic JSON encoding (mutator). Arrays and objects are encoded with `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` flags.
 
-* Parameters  
-   * $value - mixed (array, object, or string)
+* Parameters
+   * `$value` - mixed (array, object, or string)
 * Returns `void`
 
 #### Usage
@@ -81,11 +85,11 @@ $subscriptionMeta->meta_value = ['custom_data' => 'value', 'settings' => ['key' 
 
 ### getMetaValueAttribute($value)
 
-Get meta value with automatic JSON decoding (accessor)
+Get meta value with automatic JSON decoding (accessor). If the stored string is valid JSON, it returns the decoded array. Otherwise, returns the raw string value.
 
-* Parameters  
-   * $value - mixed
-* Returns `mixed`
+* Parameters
+   * `$value` - mixed
+* Returns `mixed` (decoded array if valid JSON, otherwise original value)
 
 #### Usage
 
@@ -172,4 +176,3 @@ if ($settings) {
 ```
 
 ---
-

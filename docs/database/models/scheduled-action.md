@@ -12,11 +12,18 @@ description: FluentCart ScheduledAction model documentation with attributes, sco
 | Name Space    | FluentCart\App\Models                              |
 | Class         | FluentCart\App\Models\ScheduledAction              |
 
+## Guarded & Fillable
+
+This model uses both `$guarded` and `$fillable`:
+
+- **Guarded:** `['id']`
+- **Fillable:** `['scheduled_at', 'action', 'status', 'group', 'object_id', 'object_type', 'completed_at', 'retry_count', 'data', 'response_note']`
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | scheduled_at       | Date Time | When the action is scheduled to run |
 | action             | String    | Action to be performed |
 | status             | String    | Action status (pending, completed, failed) |
@@ -25,7 +32,7 @@ description: FluentCart ScheduledAction model documentation with attributes, sco
 | object_type        | String    | Type of the associated object |
 | completed_at       | Date Time | When the action was completed |
 | retry_count        | Integer   | Number of retry attempts |
-| data               | JSON      | Action data and parameters |
+| data               | JSON      | Action data and parameters (manual JSON mutator/accessor) |
 | response_note      | String    | Response or error note |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
@@ -43,6 +50,8 @@ $scheduledAction->id; // returns id
 $scheduledAction->scheduled_at; // returns scheduled time
 $scheduledAction->action; // returns action name
 $scheduledAction->status; // returns status
+$scheduledAction->data; // returns array (accessor)
+$scheduledAction->response_note; // returns response note
 ```
 
 ## Methods
@@ -51,9 +60,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setDataAttribute($value)
 
-Set data with automatic JSON encoding (mutator)
+Set data with automatic JSON encoding (mutator). If the value is an array or object, it is encoded with `json_encode()`. Otherwise the raw value is stored as-is.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -66,11 +75,11 @@ $scheduledAction->data = ['param1' => 'value1', 'param2' => 'value2'];
 
 ### getDataAttribute($value)
 
-Get data with automatic JSON decoding (accessor)
+Get data with automatic JSON decoding (accessor). Decodes the stored JSON string into an associative array.
 
-* Parameters  
+* Parameters
    * $value - mixed
-* Returns `array`
+* Returns `array` - Decoded array, or empty array if decoding fails or value is not a valid JSON array
 
 #### Usage
 
@@ -169,4 +178,3 @@ if ($failedAction) {
 ```
 
 ---
-

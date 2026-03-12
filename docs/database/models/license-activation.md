@@ -3,6 +3,8 @@ title: License Activation Model
 description: FluentCart Pro LicenseActivation model documentation with attributes, scopes, relationships, and methods.
 ---
 
+<Badge type="warning" text="Pro" />
+
 # License Activation Model
 
 | DB Table Name | {wp_db_prefix}_fct_license_activations      |
@@ -12,6 +14,13 @@ description: FluentCart Pro LicenseActivation model documentation with attribute
 | Name Space    | FluentCartPro\App\Modules\Licensing\Models  |
 | Class         | FluentCartPro\App\Modules\Licensing\Models\LicenseActivation |
 | Plugin        | FluentCart Pro                               |
+
+## Properties
+
+- **Table**: `fct_license_activations`
+- **Primary Key**: `id`
+- **Guarded**: `['id']`
+- **Fillable**: `['site_id', 'license_id', 'status', 'is_local', 'product_id', 'last_update_date', 'last_update_version', 'variation_id', 'activation_method', 'activation_hash']`
 
 ## Attributes
 
@@ -31,43 +40,83 @@ description: FluentCart Pro LicenseActivation model documentation with attribute
 | created_at          | DateTime  | Creation timestamp |
 | updated_at          | DateTime  | Last update timestamp |
 
-## Relationships
+## Usage
 
-### Belongs To
+Please check [Model Basic](/database/models) for Common methods.
 
-#### License
-- **Method**: `license()`
-- **Type**: `BelongsTo`
-- **Model**: `FluentCartPro\App\Modules\Licensing\Models\License`
-- **Foreign Key**: `license_id`
-- **Local Key**: `id`
+### Accessing Attributes
 
-#### Site
-- **Method**: `site()`
-- **Type**: `BelongsTo`
-- **Model**: `FluentCartPro\App\Modules\Licensing\Models\LicenseSite`
-- **Foreign Key**: `site_id`
-- **Local Key**: `id`
+```php
+$activation = FluentCartPro\App\Modules\Licensing\Models\LicenseActivation::find(1);
+
+$activation->id; // returns id
+$activation->license_id; // returns license ID
+$activation->site_id; // returns site ID
+$activation->status; // returns status
+$activation->is_local; // returns whether local
+$activation->activation_hash; // returns activation hash
+```
+
+## Relations
+
+This model has the following relationships that you can use
+
+### license
+
+Access the associated license (BelongsTo)
+
+* return `FluentCartPro\App\Modules\Licensing\Models\License` Model
+
+#### Example:
+
+```php
+// Accessing License
+$license = $activation->license;
+
+// For Filtering by license relationship
+$activations = FluentCartPro\App\Modules\Licensing\Models\LicenseActivation::whereHas('license', function($query) {
+    $query->where('status', 'active');
+})->get();
+```
+
+### site
+
+Access the associated license site (BelongsTo)
+
+* return `FluentCartPro\App\Modules\Licensing\Models\LicenseSite` Model
+
+#### Example:
+
+```php
+// Accessing Site
+$site = $activation->site;
+
+// For Filtering by site relationship
+$activations = FluentCartPro\App\Modules\Licensing\Models\LicenseActivation::whereHas('site', function($query) {
+    $query->where('site_url', 'like', '%example.com%');
+})->get();
+```
 
 ## Methods
 
-### Status Management
+Along with Global Model methods, this model has few helper methods.
 
-#### updateStatus($newStatus)
-Updates the activation status and triggers related actions.
+### updateStatus($newStatus)
 
-**Parameters:**
-- `$newStatus` (string) - New status value
+Updates the activation status and triggers related action hooks.
 
-**Returns:** `$this` - Current model instance
+* Parameters
+   * $newStatus - string - New status value
+* Returns `$this` - Current model instance
 
 **Actions Triggered:**
 - `fluent_cart_sl/license_activation_status_updated`
 - `fluent_cart_sl/license_activation_status_updated_to_{$newStatus}`
 
-**Example:**
+#### Usage
+
 ```php
-$activation = LicenseActivation::find(1);
+$activation = FluentCartPro\App\Modules\Licensing\Models\LicenseActivation::find(1);
 $activation->updateStatus('active');
 ```
 
@@ -84,6 +133,7 @@ $activation = LicenseActivation::create([
     'status' => 'active',
     'is_local' => false,
     'product_id' => 456,
+    'variation_id' => 789,
     'activation_method' => 'api',
     'activation_hash' => 'unique_hash_here'
 ]);
@@ -98,8 +148,16 @@ $activations = LicenseActivation::where('license_id', 123)->get();
 // Get active activations
 $activeActivations = LicenseActivation::where('status', 'active')->get();
 
+// Get non-local active activations
+$remoteActivations = LicenseActivation::where('status', 'active')
+    ->where('is_local', '!=', 1)
+    ->get();
+
 // Get activations with license relationship
 $activationsWithLicense = LicenseActivation::with('license')->get();
+
+// Get activations with site relationship
+$activationsWithSite = LicenseActivation::with('site')->get();
 ```
 
 ### Updating Activation Status
@@ -107,10 +165,10 @@ $activationsWithLicense = LicenseActivation::with('license')->get();
 ```php
 $activation = LicenseActivation::find(1);
 
-// Update status (triggers actions)
+// Update status (triggers action hooks)
 $activation->updateStatus('inactive');
 
-// Direct status update (no actions)
+// Direct status update (no action hooks)
 $activation->status = 'inactive';
 $activation->save();
 ```
@@ -119,13 +177,8 @@ $activation->save();
 
 - [License Model](./license) - Main license model
 - [License Site Model](./license-site) - Licensed site management
-- [Licensing Module](/modules/licensing) - Complete licensing system
-- [Database Schema](/database/schema) - Database structure
-
-## Previous/Next Navigation
-
-- **Previous**: [License Meta Model](./license-meta) - License metadata
-- **Next**: [Database Schema](/database/schema) - Complete database structure
+- [License Meta Model](./license-meta) - License metadata
 
 ---
 
+**Plugin**: FluentCart Pro

@@ -12,6 +12,13 @@ description: FluentCart User model documentation with attributes, scopes, relati
 | Name Space    | FluentCart\App\Models             |
 | Class         | FluentCart\App\Models\User        |
 
+## Properties
+
+- **Table**: `users`
+- **Primary Key**: `ID`
+- **Guarded**: `['password']`
+- **Fillable**: Not explicitly defined (uses guarded approach)
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
@@ -48,7 +55,7 @@ This model has the following relationships that you can use
 
 ### customer
 
-Access the associated customer
+Access the associated customer (HasOne)
 
 * return `FluentCart\App\Models\Customer` Model
 
@@ -70,9 +77,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### userCan($permission)
 
-Check if the user has a specific permission
+Check if the user has a specific permission. Delegates to `PermissionManager::hasPermission()`.
 
-* Parameters  
+* Parameters
    * $permission - string|array
 * Returns `boolean`
 
@@ -86,9 +93,9 @@ $canManageProducts = $user->userCan(['manage_products', 'edit_products']);
 
 ### userCanAny($permission)
 
-Check if the user has any of the specified permissions
+Check if the user has any of the specified permissions. Delegates to `PermissionManager::hasAnyPermission()`.
 
-* Parameters  
+* Parameters
    * $permission - string|array
 * Returns `boolean`
 
@@ -101,11 +108,11 @@ $canManage = $user->userCanAny(['manage_orders', 'manage_products']);
 
 ### setStoreRole($role)
 
-Set store role for the user (Pro feature)
+Set store role for the user. Stores the role in user meta key `_fluent_cart_admin_role`. Returns a `WP_Error` if the user already has the `manage_options` capability (WordPress Administrator).
 
-* Parameters  
+* Parameters
    * $role - string
-* Returns `boolean|\WP_Error`
+* Returns `int|bool|\WP_Error` - Returns WP_Error for administrators, otherwise the result of `update_user_meta()`
 
 #### Usage
 
@@ -201,4 +208,3 @@ $storeManagers = get_users([
 ```
 
 ---
-

@@ -1,7 +1,9 @@
 ---
 title: Order Promotion Stat Model
-description: FluentCart OrderPromotionStat model documentation with attributes, scopes, relationships, and methods.
+description: FluentCart Pro OrderPromotionStat model documentation with attributes, scopes, relationships, and methods.
 ---
+
+<Badge type="warning" text="Pro" />
 
 # Order Promotion Stat Model
 
@@ -11,6 +13,14 @@ description: FluentCart OrderPromotionStat model documentation with attributes, 
 | Source File   | fluent-cart-pro/app/Modules/Promotional/Models/OrderPromotionStat.php |
 | Name Space    | FluentCartPro\App\Modules\Promotional\Models          |
 | Class         | FluentCartPro\App\Modules\Promotional\Models\OrderPromotionStat |
+| Plugin        | FluentCart Pro                                         |
+
+## Properties
+
+- **Table**: `fct_order_promotion_stats`
+- **Primary Key**: `id`
+- **Guarded**: `['id']`
+- **Fillable**: `['promotion_id', 'order_id', 'object_id', 'amount', 'status']`
 
 ## Attributes
 
@@ -37,7 +47,9 @@ $orderPromotionStat = FluentCartPro\App\Modules\Promotional\Models\OrderPromotio
 $orderPromotionStat->id; // returns id
 $orderPromotionStat->promotion_id; // returns promotion ID
 $orderPromotionStat->order_id; // returns order ID
+$orderPromotionStat->object_id; // returns object ID
 $orderPromotionStat->amount; // returns amount
+$orderPromotionStat->status; // returns status
 ```
 
 ## Relations
@@ -46,7 +58,7 @@ This model has the following relationships that you can use
 
 ### order
 
-Access the associated order
+Access the associated order (BelongsTo)
 
 * return `FluentCart\App\Models\Order` Model
 
@@ -64,7 +76,7 @@ $orderPromotionStats = FluentCartPro\App\Modules\Promotional\Models\OrderPromoti
 
 ### promotion
 
-Access the associated order promotion
+Access the associated order promotion (BelongsTo)
 
 * return `FluentCartPro\App\Modules\Promotional\Models\OrderPromotion` Model
 
@@ -82,16 +94,6 @@ $orderPromotionStats = FluentCartPro\App\Modules\Promotional\Models\OrderPromoti
 
 ## Usage Examples
 
-### Get Order Promotion Stats
-
-```php
-$orderPromotionStat = FluentCartPro\App\Modules\Promotional\Models\OrderPromotionStat::find(1);
-echo "Promotion ID: " . $orderPromotionStat->promotion_id;
-echo "Order ID: " . $orderPromotionStat->order_id;
-echo "Amount: " . $orderPromotionStat->amount;
-echo "Status: " . $orderPromotionStat->status;
-```
-
 ### Create Order Promotion Stat
 
 ```php
@@ -102,18 +104,6 @@ $orderPromotionStat = FluentCartPro\App\Modules\Promotional\Models\OrderPromotio
     'amount' => 15.99,
     'status' => 'applied'
 ]);
-```
-
-### Get All Order Promotion Stats
-
-```php
-$orderPromotionStats = FluentCartPro\App\Modules\Promotional\Models\OrderPromotionStat::all();
-
-foreach ($orderPromotionStats as $stat) {
-    echo "Promotion: " . $stat->promotion_id;
-    echo "Order: " . $stat->order_id;
-    echo "Amount: " . $stat->amount;
-}
 ```
 
 ### Get Stats by Promotion
@@ -170,10 +160,10 @@ $orderPromotionStat->update([
 $objectStats = FluentCartPro\App\Modules\Promotional\Models\OrderPromotionStat::where('object_id', 456)->get();
 ```
 
-### Get Stats Ordered by Amount
+### Get Stats for Date Range
 
 ```php
-$orderedStats = FluentCartPro\App\Modules\Promotional\Models\OrderPromotionStat::orderBy('amount', 'desc')->get();
+$stats = FluentCartPro\App\Modules\Promotional\Models\OrderPromotionStat::whereBetween('created_at', ['2024-01-01', '2024-01-31'])->get();
 ```
 
 ### Delete Order Promotion Stat
@@ -183,23 +173,6 @@ $orderPromotionStat = FluentCartPro\App\Modules\Promotional\Models\OrderPromotio
 $orderPromotionStat->delete();
 ```
 
-### Get Stats for Date Range
-
-```php
-$stats = FluentCartPro\App\Modules\Promotional\Models\OrderPromotionStat::whereBetween('created_at', ['2024-01-01', '2024-01-31'])->get();
-```
-
-### Get Stats with Promotion Details
-
-```php
-$stats = FluentCartPro\App\Modules\Promotional\Models\OrderPromotionStat::with('promotion')->get();
-
-foreach ($stats as $stat) {
-    echo "Promotion: " . $stat->promotion->title;
-    echo "Type: " . $stat->promotion->type;
-    echo "Amount: " . $stat->amount;
-}
-```
-
 ---
 
+**Plugin**: FluentCart Pro

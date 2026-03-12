@@ -12,6 +12,30 @@ description: FluentCart OrderTransaction model documentation with attributes, sc
 | Name Space    | FluentCart\App\Models                        |
 | Class         | FluentCart\App\Models\OrderTransaction       |
 
+## Traits
+
+- **CanSearch** (`FluentCart\App\Models\Concerns\CanSearch`) -- Provides `search`, `groupSearch`, `whereLike`, `whereBeginsWith`, and `whereEndsWith` scopes for flexible querying.
+
+## Appends
+
+The model automatically appends the following computed attributes to its array/JSON output:
+
+- `url` -- Transaction URL generated via the `getUrlAttribute` accessor
+
+## Boot
+
+On the `creating` event the model auto-generates a `uuid` when one is not already set:
+
+```php
+$model->uuid = md5(time() . wp_generate_uuid4());
+```
+
+## Searchable Fields
+
+The following columns are searchable via the `CanSearch` trait:
+
+`id`, `total`, `status`, `payment_method`, `currency`, `created_at`, `updated_at`
+
 ## Attributes
 
 | Attribute           | Data Type | Comment |
@@ -24,15 +48,15 @@ description: FluentCart OrderTransaction model documentation with attributes, sc
 | payment_mode        | String    | Payment mode (live, test) |
 | payment_method_type | String    | Payment method type (card, bank, etc.) |
 | currency            | String    | Transaction currency |
-| transaction_type    | String    | Transaction type (charge, refund, partial_refund) |
+| transaction_type    | String    | Transaction type (charge, refund, partial_refund, dispute) |
 | subscription_id     | Integer   | Reference to subscription (if applicable) |
 | card_last_4         | String    | Last 4 digits of card |
 | card_brand          | String    | Card brand (visa, mastercard, etc.) |
 | status              | String    | Transaction status |
 | total               | Bigint    | Transaction amount in cents |
 | rate                | Bigint    | Exchange rate |
-| meta                | JSON      | Additional transaction data |
-| uuid                | String    | Unique transaction identifier |
+| meta                | JSON      | Additional transaction data (stored as JSON, accessed as array via accessor/mutator) |
+| uuid                | String    | Unique transaction identifier (auto-generated on create) |
 | created_at          | Date Time | Creation timestamp |
 | updated_at          | Date Time | Last update timestamp |
 
@@ -47,34 +71,22 @@ $transaction = FluentCart\App\Models\OrderTransaction::find(1);
 
 $transaction->id; // returns id
 $transaction->order_id; // returns order ID
-$transaction->total; // returns total amount
+$transaction->total; // returns total amount in cents
 $transaction->status; // returns status
 $transaction->payment_method; // returns payment method
+$transaction->meta; // returns array (auto-decoded from JSON)
+$transaction->url; // returns computed transaction URL (appended attribute)
 ```
 
 ## Scopes
 
 This model has the following scopes that you can use
 
-### ofOrder($orderId)
-
-Filter transactions by order ID
-
-* Parameters  
-   * $orderId - integer
-
-#### Usage:
-
-```php
-// Get all transactions for a specific order
-$transactions = FluentCart\App\Models\OrderTransaction::ofOrder(123)->get();
-```
-
 ### ofStatus($status)
 
 Filter transactions by status
 
-* Parameters  
+* Parameters
    * $status - string
 
 #### Usage:
@@ -84,12 +96,12 @@ Filter transactions by status
 $transactions = FluentCart\App\Models\OrderTransaction::ofStatus('succeeded')->get();
 ```
 
-### ofPaymentMethod($paymentMethod)
+### ofPaymentMethod($methodName)
 
 Filter transactions by payment method
 
-* Parameters  
-   * $paymentMethod - string
+* Parameters
+   * $methodName - string
 
 #### Usage:
 
@@ -98,60 +110,35 @@ Filter transactions by payment method
 $transactions = FluentCart\App\Models\OrderTransaction::ofPaymentMethod('stripe')->get();
 ```
 
-### ofTransactionType($type)
+### searchByPayerEmail($data)
 
-Filter transactions by transaction type
+Filter transactions by the payer email address stored in the `meta` JSON column at `$.payer.email_address`. Supports multiple operators.
 
-* Parameters  
-   * $type - string
-
-#### Usage:
-
-```php
-// Get all charge transactions
-$transactions = FluentCart\App\Models\OrderTransaction::ofTransactionType('charge')->get();
-```
-
-### ofSubscription($subscriptionId)
-
-Filter transactions by subscription ID
-
-* Parameters  
-   * $subscriptionId - integer
+* Parameters
+   * $data - array with keys:
+      * `value` (string) - The email or partial email to search for
+      * `operator` (string, optional) - One of `contains` (default), `starts_with`, `ends_with`, `equals`, `not_like`
 
 #### Usage:
 
 ```php
-// Get all transactions for a specific subscription
-$transactions = FluentCart\App\Models\OrderTransaction::ofSubscription(456)->get();
-```
+// Find transactions where payer email contains "example.com"
+$transactions = FluentCart\App\Models\OrderTransaction::searchByPayerEmail([
+    'value'    => 'example.com',
+    'operator' => 'contains',
+])->get();
 
-### ofCurrency($currency)
+// Find transactions where payer email starts with "john"
+$transactions = FluentCart\App\Models\OrderTransaction::searchByPayerEmail([
+    'value'    => 'john',
+    'operator' => 'starts_with',
+])->get();
 
-Filter transactions by currency
-
-* Parameters  
-   * $currency - string
-
-#### Usage:
-
-```php
-// Get all USD transactions
-$transactions = FluentCart\App\Models\OrderTransaction::ofCurrency('USD')->get();
-```
-
-### ofPaymentMode($mode)
-
-Filter transactions by payment mode
-
-* Parameters  
-   * $mode - string
-
-#### Usage:
-
-```php
-// Get all live transactions
-$transactions = FluentCart\App\Models\OrderTransaction::ofPaymentMode('live')->get();
+// Find transactions where payer email exactly matches
+$transactions = FluentCart\App\Models\OrderTransaction::searchByPayerEmail([
+    'value'    => 'john@example.com',
+    'operator' => 'equals',
+])->get();
 ```
 
 ## Relations
@@ -160,7 +147,7 @@ This model has the following relationships that you can use
 
 ### order
 
-Access the associated order
+Access the associated order (belongsTo)
 
 * return `FluentCart\App\Models\Order` Model
 
@@ -176,9 +163,22 @@ $transactions = FluentCart\App\Models\OrderTransaction::whereHas('order', functi
 })->get();
 ```
 
+### orders
+
+Access the associated order via hasOne (alternative to `order` relationship)
+
+* return `FluentCart\App\Models\Order` Model (HasOne)
+
+#### Example:
+
+```php
+// Accessing Order via hasOne
+$order = $transaction->orders;
+```
+
 ### subscription
 
-Access the associated subscription
+Access the associated subscription (hasOne)
 
 * return `FluentCart\App\Models\Subscription` Model
 
@@ -200,10 +200,10 @@ Along with Global Model methods, this model has few helper methods.
 
 ### getMetaAttribute($value)
 
-Get meta as array (accessor)
+Get meta as array (accessor). Automatically decodes the JSON string stored in the database into a PHP array.
 
-* Parameters  
-   * $value - mixed
+* Parameters
+   * $value - mixed (raw JSON string from database)
 * Returns `array`
 
 #### Usage
@@ -214,9 +214,9 @@ $meta = $transaction->meta; // Returns array
 
 ### setMetaAttribute($value)
 
-Set meta from array (mutator)
+Set meta from array/object (mutator). Automatically encodes the value to a JSON string for storage.
 
-* Parameters  
+* Parameters
    * $value - array|object
 * Returns `void`
 
@@ -226,216 +226,127 @@ Set meta from array (mutator)
 $transaction->meta = ['gateway_response' => 'success', 'fee' => 2.9];
 ```
 
-### getUrlAttribute()
+### getUrlAttribute($value)
 
-Get transaction URL (accessor)
+Get transaction URL (accessor). Applies the `fluent_cart/transaction/url_{payment_method}` filter to generate a gateway-specific URL.
 
-* Parameters  
-   * none
-* Returns `string`
-
-#### Usage
-
-```php
-$url = $transaction->url; // Returns transaction URL
-```
-
-### getFormattedTotal()
-
-Get formatted total amount with currency
-
-* Parameters  
-   * none
-* Returns `string`
-
-#### Usage
-
-```php
-$formattedTotal = $transaction->getFormattedTotal(); // Returns: "$99.99"
-```
-
-### getFormattedTotalAmount()
-
-Get formatted total amount without currency symbol
-
-* Parameters  
-   * none
-* Returns `string`
-
-#### Usage
-
-```php
-$formattedAmount = $transaction->getFormattedTotalAmount(); // Returns: "99.99"
-```
-
-### isSuccessful()
-
-Check if transaction is successful
-
-* Parameters  
-   * none
-* Returns `boolean`
-
-#### Usage
-
-```php
-$isSuccessful = $transaction->isSuccessful();
-```
-
-### isFailed()
-
-Check if transaction failed
-
-* Parameters  
-   * none
-* Returns `boolean`
-
-#### Usage
-
-```php
-$isFailed = $transaction->isFailed();
-```
-
-### isPending()
-
-Check if transaction is pending
-
-* Parameters  
-   * none
-* Returns `boolean`
-
-#### Usage
-
-```php
-$isPending = $transaction->isPending();
-```
-
-### isRefund()
-
-Check if transaction is a refund
-
-* Parameters  
-   * none
-* Returns `boolean`
-
-#### Usage
-
-```php
-$isRefund = $transaction->isRefund();
-```
-
-### isPartialRefund()
-
-Check if transaction is a partial refund
-
-* Parameters  
-   * none
-* Returns `boolean`
-
-#### Usage
-
-```php
-$isPartialRefund = $transaction->isPartialRefund();
-```
-
-### isCharge()
-
-Check if transaction is a charge
-
-* Parameters  
-   * none
-* Returns `boolean`
-
-#### Usage
-
-```php
-$isCharge = $transaction->isCharge();
-```
-
-### isSubscriptionTransaction()
-
-Check if transaction is related to subscription
-
-* Parameters  
-   * none
-* Returns `boolean`
-
-#### Usage
-
-```php
-$isSubscriptionTransaction = $transaction->isSubscriptionTransaction();
-```
-
-### getCardDisplayInfo()
-
-Get card display information
-
-* Parameters  
-   * none
-* Returns `string`
-
-#### Usage
-
-```php
-$cardInfo = $transaction->getCardDisplayInfo(); // Returns: "Visa ****1234"
-```
-
-### getPaymentMethodTitle()
-
-Get payment method display title
-
-* Parameters  
-   * none
-* Returns `string`
-
-#### Usage
-
-```php
-$paymentTitle = $transaction->getPaymentMethodTitle(); // Returns: "Credit Card"
-```
-
-### getGatewayTransactionId()
-
-Get gateway transaction ID
-
-* Parameters  
-   * none
-* Returns `string`
-
-#### Usage
-
-```php
-$gatewayId = $transaction->getGatewayTransactionId();
-```
-
-### getMetaValue($key, $default = null)
-
-Get specific meta value
-
-* Parameters  
-   * $key - string
-   * $default - mixed
-* Returns `mixed`
-
-#### Usage
-
-```php
-$gatewayResponse = $transaction->getMetaValue('gateway_response', 'unknown');
-```
-
-### setMetaValue($key, $value)
-
-Set specific meta value
-
-* Parameters  
-   * $key - string
+* Parameters
    * $value - mixed
-* Returns `void`
+* Returns `string`
 
 #### Usage
 
 ```php
-$transaction->setMetaValue('processing_fee', 2.9);
+$url = $transaction->url; // Returns filtered transaction URL
+```
+
+### updateStatus($newStatus, $otherData = [])
+
+Update the transaction status. If the new status is the same as the current status, no update is performed. Optionally fills additional data before saving.
+
+* Parameters
+   * $newStatus - string - The new status to set
+   * $otherData - array (optional) - Additional fillable attributes to update
+* Returns `OrderTransaction` - The current model instance
+
+#### Usage
+
+```php
+// Update status only
+$transaction->updateStatus('succeeded');
+
+// Update status with additional data
+$transaction->updateStatus('succeeded', [
+    'vendor_charge_id' => 'ch_abc123',
+    'card_last_4'      => '4242',
+    'card_brand'       => 'visa',
+]);
+```
+
+### bulkDeleteByOrderIds($ids, $params = [])
+
+Delete all transactions associated with the given order IDs. This is a static method.
+
+* Parameters
+   * $ids - array - Array of order IDs
+   * $params - array (optional) - Currently unused
+* Returns `mixed` - Result of the delete query
+
+#### Usage
+
+```php
+// Delete all transactions for specific orders
+FluentCart\App\Models\OrderTransaction::bulkDeleteByOrderIds([123, 456, 789]);
+```
+
+### getMaxRefundableAmount()
+
+Calculate the maximum refundable amount for this transaction. Returns 0 if the transaction status is not `succeeded`. Subtracts any already-refunded amount (from `meta.refunded_total`) from the transaction total.
+
+* Parameters
+   * none
+* Returns `int` - The maximum refundable amount in cents
+
+#### Usage
+
+```php
+$maxRefund = $transaction->getMaxRefundableAmount();
+// If total is 5000 (cents) and 2000 has been refunded, returns 3000
+```
+
+### getPaymentMethodText()
+
+Get a human-readable payment method description. If card brand and last 4 digits are available, returns a formatted string like "visa ***4242". Otherwise returns the raw payment method key.
+
+* Parameters
+   * none
+* Returns `string`
+
+#### Usage
+
+```php
+$text = $transaction->getPaymentMethodText();
+// Returns "visa ***4242" or "stripe" (fallback)
+```
+
+### getReceiptPageUrl($filtered = false)
+
+Generate the receipt page URL for this transaction. Appends the `trx_hash` query parameter (the transaction's uuid) to the store's configured receipt page URL.
+
+* Parameters
+   * $filtered - boolean (optional, default `false`) - When `true`, applies the `fluentcart/transaction/receipt_page_url` filter
+* Returns `string` - The full receipt page URL
+
+#### Usage
+
+```php
+// Get basic receipt URL
+$url = $transaction->getReceiptPageUrl();
+
+// Get filtered receipt URL (allows plugins to modify)
+$url = $transaction->getReceiptPageUrl(true);
+```
+
+### acceptDispute($args = [])
+
+Accept a payment dispute for this transaction. Only works on transactions where `transaction_type` is `dispute`. Calls the payment gateway's remote dispute handler, updates the transaction status to `dispute_lost`, adjusts the order's `total_paid` and `payment_status`, and logs the action.
+
+* Parameters
+   * $args - array (optional) - Accepts:
+      * `dispute_note` (string) - Optional note about the dispute acceptance
+* Returns `void|\WP_Error` - Returns `WP_Error` if the transaction is not a dispute, the payment method does not support remote dispute management, or the remote handler fails
+
+#### Usage
+
+```php
+$result = $transaction->acceptDispute([
+    'dispute_note' => 'Customer claim accepted, refund approved.',
+]);
+
+if (is_wp_error($result)) {
+    // Handle error
+    echo $result->get_error_message();
+}
 ```
 
 ## Transaction Statuses
@@ -449,6 +360,7 @@ Common transaction statuses in FluentCart:
 - `cancelled` - Transaction was cancelled
 - `refunded` - Transaction was refunded
 - `partially_refunded` - Transaction was partially refunded
+- `dispute_lost` - Dispute accepted/lost
 
 ## Transaction Types
 
@@ -457,8 +369,7 @@ Common transaction types in FluentCart:
 - `charge` - Initial charge/payment
 - `refund` - Full refund
 - `partial_refund` - Partial refund
-- `subscription_charge` - Subscription payment
-- `signup_fee` - Subscription signup fee
+- `dispute` - Payment dispute
 
 ## Usage Examples
 
@@ -469,14 +380,14 @@ $order = FluentCart\App\Models\Order::find(123);
 $transactions = $order->transactions()->orderBy('created_at', 'desc')->get();
 
 foreach ($transactions as $transaction) {
-    echo "Transaction: " . $transaction->getFormattedTotal() . " - " . $transaction->status;
+    echo "Transaction #{$transaction->id}: {$transaction->total} cents - {$transaction->status}";
 }
 ```
 
 ### Get Successful Transactions for Date Range
 
 ```php
-$transactions = FluentCart\App\Models\OrderTransaction::where('status', 'succeeded')
+$transactions = FluentCart\App\Models\OrderTransaction::ofStatus('succeeded')
     ->whereBetween('created_at', ['2024-01-01', '2024-01-31'])
     ->get();
 ```
@@ -495,5 +406,21 @@ $subscriptionTransactions = FluentCart\App\Models\OrderTransaction::whereNotNull
     ->get();
 ```
 
----
+### Calculate Refundable Amount
 
+```php
+$transaction = FluentCart\App\Models\OrderTransaction::find(1);
+$maxRefund = $transaction->getMaxRefundableAmount();
+echo "Max refundable: " . $maxRefund . " cents";
+```
+
+### Search by Payer Email
+
+```php
+$transactions = FluentCart\App\Models\OrderTransaction::searchByPayerEmail([
+    'value'    => 'customer@example.com',
+    'operator' => 'equals',
+])->get();
+```
+
+---

@@ -292,7 +292,8 @@ export default defineConfig({
                 items: [
                   { text: 'Action Hooks Overview', link: '/hooks/actions' },
                   { text: 'Orders', link: '/hooks/actions/orders' },
-                  { text: 'Subscriptions & Licenses', link: '/hooks/actions/subscriptions-and-licenses' },
+                  { text: 'Subscriptions', link: '/hooks/actions/subscriptions' },
+                  { text: 'Licenses', link: '/hooks/actions/licenses' },
                   { text: 'Cart & Checkout', link: '/hooks/actions/cart-and-checkout' },
                   { text: 'Customers & Users', link: '/hooks/actions/customers-and-users' },
                   { text: 'Products & Coupons', link: '/hooks/actions/products-and-coupons' },

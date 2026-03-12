@@ -12,13 +12,19 @@ description: FluentCart ProductDownload model documentation with attributes, sco
 | Name Space    | FluentCart\App\Models                              |
 | Class         | FluentCart\App\Models\ProductDownload              |
 
+## Traits
+
+| Trait     | Description                            |
+| --------- | -------------------------------------- |
+| CanSearch | Provides `search()`, `groupSearch()`, `whereLike()`, `whereBeginsWith()`, `whereEndsWith()` query scopes |
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
 | id                 | Integer   | Primary Key |
 | post_id            | Integer   | Reference to WordPress post (product) |
-| product_variation_id | String  | Product variation IDs (JSON encoded) |
+| product_variation_id | JSON    | Product variation IDs (JSON encoded array, auto-encoded/decoded via mutator/accessor) |
 | download_identifier | String  | Download identifier |
 | title              | String    | Download title |
 | type               | String    | Download type |
@@ -27,7 +33,7 @@ description: FluentCart ProductDownload model documentation with attributes, sco
 | file_path          | String    | File path |
 | file_url           | String    | File URL |
 | file_size          | Integer   | File size in bytes |
-| settings           | JSON      | Download settings |
+| settings           | JSON      | Download settings (auto-encoded/decoded via mutator/accessor) |
 | serial             | String    | Serial number |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
@@ -45,6 +51,27 @@ $productDownload->id; // returns id
 $productDownload->post_id; // returns post ID
 $productDownload->title; // returns download title
 $productDownload->file_size; // returns file size
+$productDownload->product_variation_id; // returns array of variation IDs
+$productDownload->settings; // returns decoded settings array
+```
+
+## Scopes
+
+This model has the following scopes that you can use
+
+### search($params) <Badge type="tip" text="from CanSearch" />
+
+Search downloads by parameters. Supports operators: `=`, `between`, `like_all`, `in`, `not_in`, `is_null`, `is_not_null`, and more.
+
+* Parameters
+   * `$params` (Array) - Search parameters
+
+#### Usage:
+
+```php
+$downloads = FluentCart\App\Models\ProductDownload::search([
+    'type' => ['value' => 'pdf', 'operator' => '=']
+])->get();
 ```
 
 ## Relations
@@ -55,7 +82,7 @@ This model has the following relationships that you can use
 
 Access the associated product (WordPress post)
 
-* return `FluentCart\App\Models\Product` Model
+* return `FluentCart\App\Models\Product` Model (BelongsTo via `post_id` -> `ID`)
 
 #### Example:
 
@@ -71,9 +98,9 @@ $productDownloads = FluentCart\App\Models\ProductDownload::whereHas('product', f
 
 ### download_permissions
 
-Access all download permissions
+Access all download permissions for this download
 
-* return `FluentCart\App\Models\OrderDownloadPermission` Model Collection
+* return `FluentCart\App\Models\OrderDownloadPermission` Model Collection (HasMany via `download_id` -> `id`)
 
 #### Example:
 
@@ -93,10 +120,10 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setSettingsAttribute($settings)
 
-Set settings with automatic JSON encoding (mutator)
+Set settings with automatic JSON encoding (mutator). Arrays and objects are encoded with `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` flags.
 
-* Parameters  
-   * $settings - mixed (array, object, or string)
+* Parameters
+   * `$settings` - mixed (array, object, or string)
 * Returns `void`
 
 #### Usage
@@ -108,10 +135,10 @@ $productDownload->settings = ['access_limit' => 5, 'expiry_days' => 30];
 
 ### getSettingsAttribute($settings)
 
-Get settings with automatic JSON decoding (accessor)
+Get settings with automatic JSON decoding (accessor). If the stored string is valid JSON, it returns the decoded array. Otherwise, returns the raw value.
 
-* Parameters  
-   * $settings - mixed
+* Parameters
+   * `$settings` - mixed
 * Returns `mixed`
 
 #### Usage
@@ -122,10 +149,10 @@ $settings = $productDownload->settings; // Returns decoded value (array, object,
 
 ### setProductVariationIdAttribute($variations)
 
-Set product variation IDs with automatic JSON encoding (mutator)
+Set product variation IDs with automatic JSON encoding (mutator). Accepts an array of IDs, a single numeric ID (wrapped in an array), or defaults to an empty array.
 
-* Parameters  
-   * $variations - array
+* Parameters
+   * `$variations` - array|int|mixed
 * Returns `void`
 
 #### Usage
@@ -133,14 +160,17 @@ Set product variation IDs with automatic JSON encoding (mutator)
 ```php
 $productDownload->product_variation_id = [1, 2, 3];
 // Automatically JSON encodes array
+
+$productDownload->product_variation_id = 5;
+// Automatically wraps in array: [5]
 ```
 
 ### getProductVariationIdAttribute($value)
 
-Get product variation IDs with automatic JSON decoding (accessor)
+Get product variation IDs with automatic JSON decoding (accessor). Always returns an array.
 
-* Parameters  
-   * $value - mixed
+* Parameters
+   * `$value` - mixed
 * Returns `array`
 
 #### Usage
@@ -151,9 +181,9 @@ $variationIds = $productDownload->product_variation_id; // Returns array of vari
 
 ### getSignedDownloadUrl()
 
-Get signed download URL
+Get signed download URL using the `DownloadService`. Generates a secure, time-limited URL for file access.
 
-* Parameters  
+* Parameters
    * none
 * Returns `string`
 
@@ -232,4 +262,3 @@ $zipDownloads = FluentCart\App\Models\ProductDownload::where('type', 'zip')->get
 ```
 
 ---
-

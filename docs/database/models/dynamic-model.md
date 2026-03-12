@@ -12,6 +12,10 @@ description: FluentCart DynamicModel model documentation with attributes, scopes
 | Name Space    | FluentCart\App\Models                       |
 | Class         | FluentCart\App\Models\DynamicModel          |
 
+## Traits
+
+- **CanSearch** (`FluentCart\App\Models\Concerns\CanSearch`) - Provides `search()`, `groupSearch()`, `whereLike()`, `whereBeginsWith()`, and `whereEndsWith()` query scopes.
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
@@ -20,6 +24,10 @@ description: FluentCart DynamicModel model documentation with attributes, scopes
 | *                  | Mixed     | All attributes are fillable (guarded = []) |
 | created_at         | Date Time | Creation timestamp (if table has timestamps) |
 | updated_at         | Date Time | Last update timestamp (if table has timestamps) |
+
+## Guarded Attributes
+
+No attributes are guarded (`$guarded = []`). All attributes are mass-assignable.
 
 ## Usage
 
@@ -40,9 +48,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### __construct($attributes = [], $table = null)
 
-Dynamic model constructor
+Dynamic model constructor. Calls the parent constructor with the given attributes and then sets the table name to the provided value.
 
-* Parameters  
+* Parameters
    * $attributes - array (default: [])
    * $table - string|null (default: null)
 * Returns `void`
@@ -128,14 +136,19 @@ $dynamicModel->where('id', 1)->delete();
 $dynamicModel->where('event_name', 'old_event')->delete();
 ```
 
-### Use with Search Trait
+### Use CanSearch Trait Scopes
 
 ```php
 // Create dynamic model for custom table
 $dynamicModel = new FluentCart\App\Models\DynamicModel([], 'custom_analytics');
 
-// Search functionality is available
-$results = $dynamicModel->searchBy('page_view')->get();
+// Search with the search scope (from CanSearch trait)
+$results = $dynamicModel->search([
+    'event_name' => ['column' => 'event_name', 'operator' => 'like_all', 'value' => 'page_view']
+])->get();
+
+// Use whereLike scope
+$results = $dynamicModel->whereLike('event_name', 'page')->get();
 ```
 
 ### Dynamic Model for Temporary Tables
@@ -153,4 +166,3 @@ $tempModel->create([
 ```
 
 ---
-

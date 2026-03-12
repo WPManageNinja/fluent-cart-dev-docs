@@ -16,7 +16,7 @@ description: FluentCart OrderDownloadPermission model documentation with attribu
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | order_id           | Integer   | Reference to order |
 | variation_id       | Integer   | Reference to product variation |
 | customer_id        | Integer   | Reference to customer |
@@ -26,6 +26,8 @@ description: FluentCart OrderDownloadPermission model documentation with attribu
 | access_expires     | Date Time | When download access expires |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
+
+> **Note:** The `id` column is both guarded and declared as `$primaryKey`.
 
 ## Usage
 
@@ -40,6 +42,8 @@ $orderDownloadPermission->id; // returns id
 $orderDownloadPermission->order_id; // returns order ID
 $orderDownloadPermission->customer_id; // returns customer ID
 $orderDownloadPermission->download_count; // returns download count
+$orderDownloadPermission->download_limit; // returns download limit
+$orderDownloadPermission->access_expires; // returns access expiry date
 ```
 
 ## Relations
@@ -143,4 +147,3 @@ $activePermissions = FluentCart\App\Models\OrderDownloadPermission::where('acces
 ```
 
 ---
-

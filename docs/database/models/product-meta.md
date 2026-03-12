@@ -16,11 +16,11 @@ description: FluentCart ProductMeta model documentation with attributes, scopes,
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | object_id          | Integer   | ID of the associated object |
 | object_type        | String    | Type of object (product, variation, etc.) |
 | meta_key           | String    | Meta key name |
-| meta_value         | Text      | Meta value (JSON encoded for arrays/objects) |
+| meta_value         | Text      | Meta value (JSON encoded for arrays/objects, auto-encoded/decoded via mutator/accessor) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -37,7 +37,12 @@ $productMeta->id; // returns id
 $productMeta->object_id; // returns object ID
 $productMeta->object_type; // returns object type
 $productMeta->meta_key; // returns meta key
+$productMeta->meta_value; // returns meta value (auto-decoded if JSON)
 ```
+
+## Relations
+
+This model does not define any relationships. It is a generic meta storage model that uses `object_id` and `object_type` to associate with different parent entities (products, variations, etc.).
 
 ## Methods
 
@@ -45,10 +50,10 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setMetaValueAttribute($meta_value)
 
-Set meta value with automatic JSON encoding (mutator)
+Set meta value with automatic JSON encoding (mutator). Arrays and objects are encoded with `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` flags.
 
-* Parameters  
-   * $meta_value - mixed (array, object, or string)
+* Parameters
+   * `$meta_value` - mixed (array, object, or string)
 * Returns `void`
 
 #### Usage
@@ -60,11 +65,11 @@ $productMeta->meta_value = ['custom_data' => 'value', 'settings' => ['key' => 'v
 
 ### getMetaValueAttribute($value)
 
-Get meta value with automatic JSON decoding (accessor)
+Get meta value with automatic JSON decoding (accessor). If the stored string is valid JSON, it returns the decoded array. Otherwise, returns the raw string value.
 
-* Parameters  
-   * $value - mixed
-* Returns `mixed`
+* Parameters
+   * `$value` - mixed
+* Returns `mixed` (decoded array if valid JSON, otherwise original value)
 
 #### Usage
 
@@ -151,4 +156,3 @@ $variationMetas = FluentCart\App\Models\ProductMeta::where('object_type', 'varia
 ```
 
 ---
-

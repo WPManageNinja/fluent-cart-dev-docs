@@ -16,16 +16,18 @@ description: FluentCart OrderTaxRate model documentation with attributes, scopes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | order_id           | Integer   | Reference to order |
 | tax_rate_id        | Integer   | Reference to tax rate |
-| shipping_tax       | Decimal   | Shipping tax amount |
-| order_tax          | Decimal   | Order tax amount |
-| total_tax          | Decimal   | Total tax amount |
+| shipping_tax       | Decimal   | Shipping tax amount (in cents) |
+| order_tax          | Decimal   | Order tax amount (in cents) |
+| total_tax          | Decimal   | Total tax amount (in cents) |
 | meta               | JSON      | Additional tax data |
 | filed_at           | Date Time | Tax filing date |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
+
+> **Note:** The `id` column is both guarded and declared as `$primaryKey`.
 
 ## Usage
 
@@ -48,9 +50,9 @@ This model has the following scopes that you can use
 
 ### validOrder()
 
-Filter tax rates for valid orders
+Filter tax rates to only include those belonging to completed orders. Uses a `whereHas` on the `order` relationship with `status = 'completed'`.
 
-* Parameters  
+* Parameters
    * none
 
 #### Usage:
@@ -106,9 +108,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setMetaAttribute($value)
 
-Set meta from array (mutator)
+Set meta from array (mutator). Automatically JSON-encodes the value.
 
-* Parameters  
+* Parameters
    * $value - array|object
 * Returns `void`
 
@@ -120,9 +122,9 @@ $orderTaxRate->meta = ['tax_details' => 'value', 'filing_info' => 'data'];
 
 ### getMetaAttribute($value)
 
-Get meta as array (accessor)
+Get meta as array (accessor). Automatically JSON-decodes the stored value.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `array`
 
@@ -158,9 +160,9 @@ $completedOrderTaxRates = FluentCart\App\Models\OrderTaxRate::validOrder()->get(
 $orderTaxRate = FluentCart\App\Models\OrderTaxRate::create([
     'order_id' => 123,
     'tax_rate_id' => 5,
-    'shipping_tax' => 2.50,
-    'order_tax' => 15.75,
-    'total_tax' => 18.25,
+    'shipping_tax' => 250,
+    'order_tax' => 1575,
+    'total_tax' => 1825,
     'filed_at' => now()
 ]);
 ```
@@ -174,4 +176,3 @@ $taxRate = $orderTaxRate->tax_rate;
 ```
 
 ---
-

@@ -12,6 +12,10 @@ description: FluentCart AttributeTerm model documentation with attributes, scope
 | Name Space    | FluentCart\App\Models                       |
 | Class         | FluentCart\App\Models\AttributeTerm         |
 
+## Traits
+
+- **CanSearch** (`FluentCart\App\Models\Concerns\CanSearch`) - Provides `search()`, `groupSearch()`, `whereLike()`, `whereBeginsWith()`, and `whereEndsWith()` query scopes.
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
@@ -37,8 +41,11 @@ $attributeTerm = FluentCart\App\Models\AttributeTerm::find(1);
 
 $attributeTerm->id; // returns id
 $attributeTerm->group_id; // returns group ID
+$attributeTerm->serial; // returns serial number
 $attributeTerm->title; // returns title
 $attributeTerm->slug; // returns slug
+$attributeTerm->description; // returns description
+$attributeTerm->settings; // returns settings (auto-decoded from JSON)
 ```
 
 ## Scopes
@@ -47,10 +54,10 @@ This model has the following scopes that you can use
 
 ### applyCustomFilters($filters)
 
-Apply custom filters to the query
+Apply custom filters to the query. Accepts filters for any fillable attribute (`group_id`, `serial`, `title`, `slug`, `description`, `settings`). Supported operators: `includes` (LIKE), `not_includes` (NOT LIKE), `gt` (>), `lt` (<), and standard SQL comparison operators.
 
-* Parameters  
-   * $filters - array
+* Parameters
+   * $filters - array of filter arrays, each with `value` and `operator` keys
 
 #### Usage:
 
@@ -68,7 +75,7 @@ This model has the following relationships that you can use
 
 ### group
 
-Access the associated attribute group
+Access the associated attribute group (`belongsTo`)
 
 * return `FluentCart\App\Models\AttributeGroup` Model
 
@@ -90,9 +97,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setSettingsAttribute($value)
 
-Set settings with automatic JSON encoding (mutator)
+Set settings with automatic JSON encoding (mutator). If the value is an array or object, it is JSON-encoded with `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` flags.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -105,9 +112,9 @@ $attributeTerm->settings = ['color_code' => '#FF0000', 'display_order' => 1];
 
 ### getSettingsAttribute($value)
 
-Get settings with automatic JSON decoding (accessor)
+Get settings with automatic JSON decoding (accessor). If the stored value is a string, it attempts to JSON-decode it. Returns the original string if decoding fails.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `mixed`
 
@@ -174,13 +181,6 @@ $filters = [
 $filteredTerms = FluentCart\App\Models\AttributeTerm::applyCustomFilters($filters)->get();
 ```
 
-### Get Terms by Title
-
-```php
-$redTerms = FluentCart\App\Models\AttributeTerm::where('title', 'Red')->get();
-$smallTerms = FluentCart\App\Models\AttributeTerm::where('title', 'Small')->get();
-```
-
 ### Get Terms Ordered by Serial
 
 ```php
@@ -212,5 +212,16 @@ foreach ($termsWithSettings as $term) {
 }
 ```
 
----
+### Use CanSearch Trait Scopes
 
+```php
+// Search with the search scope (from CanSearch trait)
+$terms = FluentCart\App\Models\AttributeTerm::search([
+    'title' => ['column' => 'title', 'operator' => 'like_all', 'value' => 'Red']
+])->get();
+
+// Use whereLike scope
+$terms = FluentCart\App\Models\AttributeTerm::whereLike('title', 'Re')->get();
+```
+
+---

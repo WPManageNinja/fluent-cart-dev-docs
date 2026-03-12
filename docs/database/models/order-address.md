@@ -26,9 +26,24 @@ description: FluentCart OrderAddress model documentation with attributes, scopes
 | state              | String    | State/Province |
 | postcode           | String    | Postal/ZIP code |
 | country            | String    | Country code |
-| meta               | json NULL |  |
+| meta               | JSON NULL | Additional address data (stores phone, company_name, label in `other_data`) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
+
+## Appended Attributes
+
+The following virtual attributes are appended to every serialized response via `$appends`:
+
+| Attribute          | Data Type    | Description |
+| ------------------ | ------------ | ----------- |
+| email              | String/Null  | Email from associated order's customer |
+| first_name         | String/Null  | First part of name (split by space) |
+| last_name          | String/Null  | Last part of name (split by space) |
+| full_name          | String/Null  | Same as `name` attribute |
+| formatted_address  | Array        | Full formatted address array with resolved country/state names |
+| company_name       | String       | Company name stored in `meta.other_data.company_name` |
+| phone              | String       | Phone number stored in `meta.other_data.phone` |
+| label              | String       | Address label stored in `meta.other_data.label` |
 
 ## Usage
 
@@ -43,6 +58,14 @@ $orderAddress->id; // returns id
 $orderAddress->order_id; // returns order ID
 $orderAddress->type; // returns address type
 $orderAddress->name; // returns full name
+$orderAddress->email; // returns email from order's customer
+$orderAddress->first_name; // returns first name
+$orderAddress->last_name; // returns last name
+$orderAddress->full_name; // returns full name (alias for name)
+$orderAddress->company_name; // returns company name from meta
+$orderAddress->phone; // returns phone from meta
+$orderAddress->label; // returns label from meta
+$orderAddress->formatted_address; // returns formatted address array
 ```
 
 ## Relations
@@ -71,11 +94,39 @@ $orderAddresses = FluentCart\App\Models\OrderAddress::whereHas('order', function
 
 Along with Global Model methods, this model has few helper methods.
 
+### setMetaAttribute($value)
+
+Set meta from array/object (mutator). Automatically JSON-encodes the value.
+
+* Parameters
+   * $value - array|object|null
+* Returns `void`
+
+#### Usage
+
+```php
+$orderAddress->meta = ['other_data' => ['phone' => '555-1234', 'company_name' => 'Acme Inc']];
+```
+
+### getMetaAttribute($value)
+
+Get meta as array (accessor). Automatically JSON-decodes the stored value.
+
+* Parameters
+   * $value - mixed
+* Returns `array`
+
+#### Usage
+
+```php
+$meta = $orderAddress->meta; // Returns array
+```
+
 ### getFullNameAttribute()
 
-Get full name (accessor)
+Get full name (accessor). Returns the `name` attribute directly.
 
-* Parameters  
+* Parameters
    * none
 * Returns `string|null`
 
@@ -87,9 +138,9 @@ $fullName = $orderAddress->full_name; // Returns full name
 
 ### getFirstNameAttribute()
 
-Get first name (accessor)
+Get first name (accessor). Splits `name` by space and returns the first part.
 
-* Parameters  
+* Parameters
    * none
 * Returns `string|null`
 
@@ -101,9 +152,9 @@ $firstName = $orderAddress->first_name; // Returns first name
 
 ### getLastNameAttribute()
 
-Get last name (accessor)
+Get last name (accessor). Splits `name` by space and returns the last part.
 
-* Parameters  
+* Parameters
    * none
 * Returns `string|null`
 
@@ -115,9 +166,9 @@ $lastName = $orderAddress->last_name; // Returns last name
 
 ### getEmailAttribute()
 
-Get email address from associated order (accessor)
+Get email address from associated order's customer (accessor).
 
-* Parameters  
+* Parameters
    * none
 * Returns `string|null`
 
@@ -127,11 +178,95 @@ Get email address from associated order (accessor)
 $email = $orderAddress->email; // Returns email from order's customer
 ```
 
+### getCompanyNameAttribute()
+
+Get company name from meta `other_data.company_name` (accessor).
+
+* Parameters
+   * none
+* Returns `string`
+
+#### Usage
+
+```php
+$companyName = $orderAddress->company_name; // Returns company name or empty string
+```
+
+### setCompanyNameAttribute($value)
+
+Set company name in meta `other_data.company_name` (mutator). Skips if value is falsy.
+
+* Parameters
+   * $value - string|null
+* Returns `void`
+
+#### Usage
+
+```php
+$orderAddress->company_name = 'Acme Inc';
+```
+
+### getPhoneAttribute()
+
+Get phone number from meta `other_data.phone` (accessor).
+
+* Parameters
+   * none
+* Returns `string`
+
+#### Usage
+
+```php
+$phone = $orderAddress->phone; // Returns phone number or empty string
+```
+
+### setPhoneAttribute($value)
+
+Set phone number in meta `other_data.phone` (mutator). Skips if value is falsy.
+
+* Parameters
+   * $value - string|null
+* Returns `void`
+
+#### Usage
+
+```php
+$orderAddress->phone = '555-1234';
+```
+
+### getLabelAttribute()
+
+Get address label from meta `other_data.label` (accessor).
+
+* Parameters
+   * none
+* Returns `string`
+
+#### Usage
+
+```php
+$label = $orderAddress->label; // Returns label or empty string
+```
+
+### setLabelAttribute($value)
+
+Set address label in meta `other_data.label` (mutator). Skips if value is falsy.
+
+* Parameters
+   * $value - string|null
+* Returns `void`
+
+#### Usage
+
+```php
+$orderAddress->label = 'Home';
+```
+
 ### getFormattedAddressAttribute()
 
-Get formatted address as array (accessor)
+Get formatted address as array (accessor). Delegates to `getFormattedAddress()`.
 
-* Parameters  
+* Parameters
    * none
 * Returns `array`
 
@@ -143,11 +278,11 @@ $formattedAddress = $orderAddress->formatted_address; // Returns formatted addre
 
 ### getFormattedAddress($filtered = false)
 
-Get formatted address with optional filtering
+Get formatted address with optional filtering. Returns an array including resolved country/state names, full address string, and all name/email/company fields.
 
-* Parameters  
-   * $filtered - boolean (default: false)
-* Returns `array`
+* Parameters
+   * $filtered - boolean (default: false) - When true, removes empty values from the address array
+* Returns `array` - Keys: `country`, `state`, `city`, `postcode`, `address_1`, `address_2`, `type`, `name`, `first_name`, `last_name`, `full_name`, `email`, `company_name`, `label`, `full_address`
 
 #### Usage
 
@@ -157,9 +292,9 @@ $formattedAddress = $orderAddress->getFormattedAddress(true); // Returns filtere
 
 ### getAddressAsText($isHtml = false, $includeName = true, $separator = ', ')
 
-Get address as formatted text
+Get address as formatted text string.
 
-* Parameters  
+* Parameters
    * $isHtml - boolean (default: false)
    * $includeName - boolean (default: true)
    * $separator - string (default: ', ')
@@ -168,7 +303,25 @@ Get address as formatted text
 #### Usage
 
 ```php
-$addressText = $orderAddress->getAddressAsText(false, true, ', '); // Returns: "John Doe, 123 Main St, New York, NY 10001, US"
+$addressText = $orderAddress->getAddressAsText(false, true, ', '); // Returns: "John Doe, 123 Main St, New York, NY, 10001, US"
+```
+
+### getFormattedDataForCheckout($prefix = 'billing_')
+
+Get address data formatted for checkout forms. Returns an associative array with prefixed keys suitable for pre-filling checkout fields. When prefix is `billing_`, the `billing_full_name` key is excluded.
+
+* Parameters
+   * $prefix - string (default: 'billing_')
+* Returns `array` - Keys like `{prefix}address_id`, `{prefix}full_name`, `{prefix}address_1`, `{prefix}address_2`, `{prefix}city`, `{prefix}state`, `{prefix}phone`, `{prefix}postcode`, `{prefix}country`, `{prefix}company_name`
+
+#### Usage
+
+```php
+$checkoutData = $orderAddress->getFormattedDataForCheckout('billing_');
+// Returns: ['billing_address_id' => 1, 'billing_address_1' => '123 Main St', ...]
+
+$shippingData = $orderAddress->getFormattedDataForCheckout('shipping_');
+// Returns: ['shipping_address_id' => 1, 'shipping_full_name' => 'John Doe', ...]
 ```
 
 ## Address Types
@@ -229,8 +382,15 @@ $orderAddress = FluentCart\App\Models\OrderAddress::create([
 ```php
 $address = FluentCart\App\Models\OrderAddress::find(1);
 $formattedText = $address->getAddressAsText();
-// Returns: "John Doe, 123 Main Street, New York, NY 10001, US"
+// Returns: "John Doe, 123 Main Street, New York, NY, 10001, US"
+```
+
+### Get Checkout-Ready Data
+
+```php
+$address = FluentCart\App\Models\OrderAddress::find(1);
+$billingData = $address->getFormattedDataForCheckout('billing_');
+$shippingData = $address->getFormattedDataForCheckout('shipping_');
 ```
 
 ---
-

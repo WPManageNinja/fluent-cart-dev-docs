@@ -1,7 +1,9 @@
 ---
 title: Order Promotion Model
-description: FluentCart OrderPromotion model documentation with attributes, scopes, relationships, and methods.
+description: FluentCart Pro OrderPromotion model documentation with attributes, scopes, relationships, and methods.
 ---
+
+<Badge type="warning" text="Pro" />
 
 # Order Promotion Model
 
@@ -11,13 +13,25 @@ description: FluentCart OrderPromotion model documentation with attributes, scop
 | Source File   | fluent-cart-pro/app/Modules/Promotional/Models/OrderPromotion.php |
 | Name Space    | FluentCartPro\App\Modules\Promotional\Models     |
 | Class         | FluentCartPro\App\Modules\Promotional\Models\OrderPromotion |
+| Plugin        | FluentCart Pro                                    |
+
+## Properties
+
+- **Table**: `fct_order_promotions`
+- **Primary Key**: `id`
+- **Guarded**: `['id']`
+- **Fillable**: `['hash', 'parent_id', 'type', 'status', 'src_object_id', 'src_object_type', 'title', 'description', 'conditions', 'config', 'priority']`
+
+## Boot Logic
+
+The model registers a `creating` event that auto-generates a `hash` (using `md5('fct_promotion_' . wp_generate_uuid4() . time())`) if one is not provided, and defaults empty `conditions` and `config` to empty JSON arrays.
 
 ## Attributes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
 | id                 | Integer   | Primary Key |
-| hash               | String    | Unique promotion hash |
+| hash               | String    | Unique promotion hash (auto-generated on creation) |
 | parent_id          | Integer   | Parent promotion ID |
 | type               | String    | Promotion type |
 | status             | String    | Promotion status |
@@ -25,8 +39,8 @@ description: FluentCart OrderPromotion model documentation with attributes, scop
 | src_object_type    | String    | Source object type |
 | title              | String    | Promotion title |
 | description        | Text      | Promotion description |
-| conditions         | JSON      | Promotion conditions |
-| config             | JSON      | Promotion configuration |
+| conditions         | JSON      | Promotion conditions (auto JSON encode/decode via accessor/mutator) |
+| config             | JSON      | Promotion configuration (auto JSON encode/decode via accessor/mutator) |
 | priority           | Integer   | Promotion priority |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
@@ -44,6 +58,8 @@ $orderPromotion->id; // returns id
 $orderPromotion->hash; // returns hash
 $orderPromotion->type; // returns type
 $orderPromotion->status; // returns status
+$orderPromotion->conditions; // returns decoded array
+$orderPromotion->config; // returns decoded array
 ```
 
 ## Relations
@@ -52,7 +68,7 @@ This model has the following relationships that you can use
 
 ### product_variant
 
-Access the associated product variant
+Access the associated product variant (BelongsTo via `src_object_id`)
 
 * return `FluentCart\App\Models\ProductVariation` Model
 
@@ -74,9 +90,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setConditionsAttribute($value)
 
-Set conditions with automatic JSON encoding (mutator)
+Set conditions with automatic JSON encoding (mutator). Arrays and objects are JSON encoded before storage.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -89,23 +105,23 @@ $orderPromotion->conditions = ['min_amount' => 100, 'product_ids' => [1, 2, 3]];
 
 ### getConditionsAttribute($value)
 
-Get conditions with automatic JSON decoding (accessor)
+Get conditions with automatic JSON decoding (accessor). If the stored value is a JSON string, it is decoded to an array.
 
-* Parameters  
+* Parameters
    * $value - mixed
-* Returns `mixed`
+* Returns `mixed` - array if JSON string, otherwise original value
 
 #### Usage
 
 ```php
-$conditions = $orderPromotion->conditions; // Returns decoded value (array, object, or string)
+$conditions = $orderPromotion->conditions; // Returns decoded array
 ```
 
 ### setConfigAttribute($value)
 
-Set config with automatic JSON encoding (mutator)
+Set config with automatic JSON encoding (mutator). Arrays and objects are JSON encoded before storage.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -118,29 +134,19 @@ $orderPromotion->config = ['discount_type' => 'percentage', 'discount_value' => 
 
 ### getConfigAttribute($value)
 
-Get config with automatic JSON decoding (accessor)
+Get config with automatic JSON decoding (accessor). If the stored value is a JSON string, it is decoded to an array.
 
-* Parameters  
+* Parameters
    * $value - mixed
-* Returns `mixed`
+* Returns `mixed` - array if JSON string, otherwise original value
 
 #### Usage
 
 ```php
-$config = $orderPromotion->config; // Returns decoded value (array, object, or string)
+$config = $orderPromotion->config; // Returns decoded array
 ```
 
 ## Usage Examples
-
-### Get Order Promotions
-
-```php
-$orderPromotion = FluentCartPro\App\Modules\Promotional\Models\OrderPromotion::find(1);
-echo "Title: " . $orderPromotion->title;
-echo "Type: " . $orderPromotion->type;
-echo "Status: " . $orderPromotion->status;
-echo "Hash: " . $orderPromotion->hash;
-```
 
 ### Create Order Promotion
 
@@ -163,19 +169,7 @@ $orderPromotion = FluentCartPro\App\Modules\Promotional\Models\OrderPromotion::c
     ],
     'priority' => 1
 ]);
-// Hash will be automatically generated
-```
-
-### Get All Order Promotions
-
-```php
-$orderPromotions = FluentCartPro\App\Modules\Promotional\Models\OrderPromotion::all();
-
-foreach ($orderPromotions as $promotion) {
-    echo "Promotion: " . $promotion->title;
-    echo "Type: " . $promotion->type;
-    echo "Status: " . $promotion->status;
-}
+// Hash is automatically generated during creation
 ```
 
 ### Get Active Promotions
@@ -256,3 +250,4 @@ foreach ($promotions as $promotion) {
 
 ---
 
+**Plugin**: FluentCart Pro

@@ -12,23 +12,27 @@ description: FluentCart AppliedCoupon model documentation with attributes, scope
 | Name Space    | FluentCart\App\Models                            |
 | Class         | FluentCart\App\Models\AppliedCoupon              |
 
+## Traits
+
+- **CanUpdateBatch** - Provides `batchUpdate()` scope for batch updating multiple records
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
+| id                 | Integer   | Primary Key (guarded) |
 | order_id           | Integer   | Reference to order |
 | coupon_id          | Integer   | Reference to coupon |
 | code               | String    | Coupon code |
-| amount             | Decimal   | Discount amount applied |
+| amount             | Decimal   | Discount amount applied (in cents) |
 | settings           | JSON      | (Dynamic/Meta) Coupon settings, may not be a physical DB column |
-| other_info         | JSON      | (Dynamic/Meta) Additional coupon information, may not be a physical DB column |
+| other_info         | JSON      | (Dynamic/Meta) Additional coupon information (buy/get product IDs), may not be a physical DB column |
 | categories         | JSON      | (Dynamic/Meta) Product categories, may not be a physical DB column |
-| products           | JSON      | (Dynamic/Meta) Product IDs, may not be a physical DB column |
+| products           | JSON      | (Dynamic/Meta) Product IDs (stored as integers), may not be a physical DB column |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
-> **Note:** Some fields above (settings, other_info, categories, products) are handled as dynamic/meta properties in the model and may not exist as physical columns in the database schema. They are available via accessors/mutators for developer convenience.
+> **Note:** Some fields above (settings, other_info, categories, products) are handled as dynamic/meta properties in the model and may not exist as physical columns in the database schema. They are available via accessors/mutators for developer convenience. The `id` column is both guarded and declared as `$primaryKey`.
 
 ## Usage
 
@@ -42,7 +46,29 @@ $appliedCoupon = FluentCart\App\Models\AppliedCoupon::find(1);
 $appliedCoupon->id; // returns id
 $appliedCoupon->order_id; // returns order ID
 $appliedCoupon->coupon_id; // returns coupon ID
+$appliedCoupon->code; // returns coupon code
 $appliedCoupon->amount; // returns discount amount
+```
+
+## Scopes
+
+This model has the following scopes via the `CanUpdateBatch` trait.
+
+### batchUpdate($values, $index = null)
+
+Batch update multiple records at once. Uses the primary key as the default index column.
+
+* Parameters
+   * $values - array of records to update
+   * $index - string|null (default: primary key)
+
+#### Usage:
+
+```php
+FluentCart\App\Models\AppliedCoupon::batchUpdate([
+    ['id' => 1, 'amount' => 500],
+    ['id' => 2, 'amount' => 1000],
+]);
 ```
 
 ## Relations
@@ -69,7 +95,7 @@ $appliedCoupons = FluentCart\App\Models\AppliedCoupon::whereHas('order', functio
 
 ### coupon
 
-Access the associated coupon
+Access the associated coupon. This relationship uses `code` as the foreign key and `id` as the owner key on the `Coupon` model.
 
 * return `FluentCart\App\Models\Coupon` Model
 
@@ -91,9 +117,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setSettingsAttribute($value)
 
-Set settings with automatic JSON encoding (mutator)
+Set settings with automatic JSON encoding (mutator). Uses `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` flags. Stores the encoded value in the `meta_value` column.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -106,9 +132,9 @@ $appliedCoupon->settings = ['discount_type' => 'percentage', 'value' => 10];
 
 ### getSettingsAttribute($value)
 
-Get settings with automatic JSON decoding (accessor)
+Get settings with automatic JSON decoding (accessor). Returns decoded array if valid JSON, otherwise returns the original value.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `mixed`
 
@@ -120,10 +146,10 @@ $settings = $appliedCoupon->settings; // Returns decoded value (array, object, o
 
 ### setOtherInfoAttribute($value)
 
-Set other info with automatic JSON encoding and product ID conversion (mutator)
+Set other info with automatic JSON encoding and product ID conversion (mutator). Accepts JSON strings, arrays, or objects. Automatically converts `buy_products` and `get_products` arrays to integer values.
 
-* Parameters  
-   * $value - mixed (array, object, or string)
+* Parameters
+   * $value - mixed (array, object, or JSON string)
 * Returns `void`
 
 #### Usage
@@ -138,23 +164,23 @@ $appliedCoupon->other_info = [
 
 ### getOtherInfoAttribute($value)
 
-Get other info with automatic JSON decoding (accessor)
+Get other info with automatic JSON decoding (accessor). Returns empty array if value is empty.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `array`
 
 #### Usage
 
 ```php
-$otherInfo = $appliedCoupon->other_info; // Returns decoded array
+$otherInfo = $appliedCoupon->other_info; // Returns decoded array or empty array
 ```
 
 ### setCategoriesAttribute($value)
 
-Set categories with automatic JSON encoding (mutator)
+Set categories with automatic JSON encoding (mutator). Arrays and objects are JSON-encoded; other types result in an empty JSON array.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -167,23 +193,23 @@ $appliedCoupon->categories = ['electronics', 'books', 'clothing'];
 
 ### getCategoriesAttribute($value)
 
-Get categories with automatic JSON decoding (accessor)
+Get categories with automatic JSON decoding (accessor). Returns empty array if value is empty.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `array`
 
 #### Usage
 
 ```php
-$categories = $appliedCoupon->categories; // Returns decoded array
+$categories = $appliedCoupon->categories; // Returns decoded array or empty array
 ```
 
 ### setProductsAttribute($value)
 
-Set products with automatic JSON encoding and integer conversion (mutator)
+Set products with automatic JSON encoding and integer conversion (mutator). Each item in the array is converted to an integer via `intval()`. Non-array/object values result in an empty JSON array.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -196,16 +222,16 @@ $appliedCoupon->products = [1, 2, 3, 4, 5];
 
 ### getProductsAttribute($value)
 
-Get products with automatic JSON decoding (accessor)
+Get products with automatic JSON decoding (accessor). Returns empty array if value is empty.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `array`
 
 #### Usage
 
 ```php
-$products = $appliedCoupon->products; // Returns decoded array of integers
+$products = $appliedCoupon->products; // Returns decoded array of integers or empty array
 ```
 
 ## Usage Examples
@@ -238,9 +264,7 @@ $appliedCoupon = FluentCart\App\Models\AppliedCoupon::create([
     'order_id' => 123,
     'coupon_id' => 5,
     'code' => 'SAVE10',
-    'amount' => 10.00,
-    'settings' => ['discount_type' => 'fixed', 'value' => 10],
-    'products' => [1, 2, 3]
+    'amount' => 1000,
 ]);
 ```
 
@@ -264,5 +288,14 @@ $appliedCoupons = FluentCart\App\Models\AppliedCoupon::where('code', 'SAVE10')->
 $appliedCoupons = FluentCart\App\Models\AppliedCoupon::whereBetween('created_at', ['2024-01-01', '2024-01-31'])->get();
 ```
 
----
+### Batch Update Coupon Amounts
 
+```php
+FluentCart\App\Models\AppliedCoupon::batchUpdate([
+    ['id' => 1, 'amount' => 500],
+    ['id' => 2, 'amount' => 1500],
+    ['id' => 3, 'amount' => 2000],
+]);
+```
+
+---

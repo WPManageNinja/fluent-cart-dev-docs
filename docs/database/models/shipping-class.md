@@ -12,13 +12,23 @@ description: FluentCart ShippingClass model documentation with attributes, scope
 | Name Space    | FluentCart\App\Models                            |
 | Class         | FluentCart\App\Models\ShippingClass              |
 
+## Traits
+
+- `FluentCart\App\Models\Concerns\CanSearch` - Provides `search()`, `groupSearch()`, `whereLike()`, `whereBeginsWith()`, `whereEndsWith()` scopes
+
+## Casts
+
+| Attribute | Cast Type |
+| --------- | --------- |
+| cost      | float     |
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
 | id                 | Integer   | Primary Key |
 | name               | String    | Shipping class name |
-| cost               | Float     | Shipping cost |
+| cost               | Float     | Shipping cost (cast to float) |
 | type               | String    | Shipping class type |
 | per_item           | Boolean   | Whether cost is per item |
 | created_at         | Date Time | Creation timestamp |
@@ -35,9 +45,18 @@ $shippingClass = FluentCart\App\Models\ShippingClass::find(1);
 
 $shippingClass->id; // returns id
 $shippingClass->name; // returns name
-$shippingClass->cost; // returns cost
+$shippingClass->cost; // returns cost (cast to float)
 $shippingClass->type; // returns type
+$shippingClass->per_item; // returns per_item flag
 ```
+
+## Relations
+
+This model does not currently define any relationships.
+
+::: info Note
+A `products` relationship (`hasMany` to `Product`) is planned but not yet implemented in the source code.
+:::
 
 ## Usage Examples
 
@@ -119,8 +138,7 @@ $orderedClasses = FluentCart\App\Models\ShippingClass::orderBy('cost', 'asc')->g
 ### Search Shipping Classes
 
 ```php
-$searchResults = FluentCart\App\Models\ShippingClass::searchBy('Standard')->get();
+$searchResults = FluentCart\App\Models\ShippingClass::whereLike('name', 'Standard')->get();
 ```
 
 ---
-

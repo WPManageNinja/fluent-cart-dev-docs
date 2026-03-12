@@ -21,6 +21,12 @@ description: FluentCart Label model documentation with attributes, scopes, relat
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
+## Casts
+
+| Attribute | Cast Type |
+| --------- | --------- |
+| id        | integer   |
+
 ## Usage
 
 Please check [Model Basic](/database/models) for Common methods.
@@ -40,9 +46,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setValueAttribute($value)
 
-Set value with automatic serialization (mutator)
+Set value with automatic serialization (mutator). Uses WordPress `maybe_serialize()` to serialize arrays and objects before storing.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `void`
 
@@ -50,14 +56,14 @@ Set value with automatic serialization (mutator)
 
 ```php
 $label->value = ['name' => 'VIP Customer', 'color' => 'gold'];
-// Automatically serializes the value
+// Automatically serializes the value using maybe_serialize()
 ```
 
 ### getValueAttribute($value)
 
-Get value with automatic unserialization (accessor)
+Get value with automatic unserialization (accessor). Uses WordPress `maybe_unserialize()` to unserialize stored values.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `mixed`
 
@@ -135,19 +141,6 @@ $label = FluentCart\App\Models\Label::find(1);
 $label->delete();
 ```
 
-### Get Labels with Specific Structure
-
-```php
-$labels = FluentCart\App\Models\Label::all();
-
-foreach ($labels as $label) {
-    $value = $label->value;
-    if (is_array($value) && isset($value['name']) && isset($value['color'])) {
-        echo "Label: " . $value['name'] . " (Color: " . $value['color'] . ")";
-    }
-}
-```
-
 ### Create Simple Label
 
 ```php
@@ -162,20 +155,4 @@ $label = FluentCart\App\Models\Label::create([
 $orderedLabels = FluentCart\App\Models\Label::orderBy('id', 'asc')->get();
 ```
 
-### Get Labels by Value Type
-
-```php
-$labels = FluentCart\App\Models\Label::all();
-
-foreach ($labels as $label) {
-    $value = $label->value;
-    if (is_string($value)) {
-        echo "String Label: " . $value;
-    } elseif (is_array($value)) {
-        echo "Array Label: " . print_r($value, true);
-    }
-}
-```
-
 ---
-

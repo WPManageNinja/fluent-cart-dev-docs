@@ -18,26 +18,26 @@ description: FluentCart Order model documentation with attributes, scopes, relat
 | ------------------ | --------- | ------- |
 | id                 | Integer   | Primary Key |
 | status             | String    | Order status (draft, pending, processing, completed, etc.) |
-| parent_id          | Integer   | Parent order ID (for refunds) |
+| parent_id          | Integer   | Parent order ID (for renewals/child orders) |
 | receipt_number     | Integer   | Receipt number |
 | invoice_no         | String    | Invoice number |
 | fulfillment_type   | String    | Fulfillment type (physical, digital) |
-| type               | String    | Order type (payment, refund) |
+| type               | String    | Order type (subscription, renewal, etc.) |
 | mode               | String    | Order mode (live, test) |
 | shipping_status    | String    | Shipping status |
-| customer_id        | Integer   | Customer ID |
+| customer_id        | Integer   | Customer ID (cast to integer) |
 | payment_method     | String    | Payment method |
 | payment_status     | String    | Payment status |
 | payment_method_title | String | Payment method title |
 | currency           | String    | Currency code |
-| subtotal           | Integer   | Subtotal in cents |
-| discount_tax       | Integer   | Discount tax in cents |
-| manual_discount_total | Integer | Manual discount total in cents |
-| coupon_discount_total | Integer | Coupon discount total in cents |
-| shipping_tax       | Integer   | Shipping tax in cents |
-| shipping_total     | Integer   | Shipping total in cents |
-| tax_total          | Integer   | Tax total in cents |
-| total_amount       | Integer   | Total amount in cents |
+| subtotal           | Integer   | Subtotal in cents (cast to double) |
+| discount_tax       | Integer   | Discount tax in cents (cast to double) |
+| manual_discount_total | Integer | Manual discount total in cents (cast to double) |
+| coupon_discount_total | Integer | Coupon discount total in cents (cast to double) |
+| shipping_tax       | Integer   | Shipping tax in cents (cast to double) |
+| shipping_total     | Integer   | Shipping total in cents (cast to double) |
+| tax_total          | Integer   | Tax total in cents (cast to double) |
+| total_amount       | Integer   | Total amount in cents (cast to double) |
 | total_paid         | Integer   | Total paid in cents |
 | total_refund       | Integer   | Total refund in cents |
 | rate               | Decimal   | Exchange rate |
@@ -47,7 +47,7 @@ description: FluentCart Order model documentation with attributes, scopes, relat
 | completed_at       | Date Time | Completion timestamp |
 | refunded_at        | Date Time | Refund timestamp |
 | uuid               | String    | Unique identifier |
-| config             | JSON      | Order configuration |
+| config             | JSON      | Order configuration (auto-encoded/decoded via accessor/mutator) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -133,7 +133,7 @@ $deleted = $order->deleteMeta('custom_field');
 
 ### getTotalPaidAmount()
 
-Get total paid amount
+Get total paid amount from succeeded transactions
 
 * Returns `Integer` - Total paid amount in cents
 
@@ -144,7 +144,7 @@ $totalPaid = $order->getTotalPaidAmount();
 
 ### getTotalRefundAmount()
 
-Get total refund amount
+Get total refund amount from refunded transactions
 
 * Returns `Integer` - Total refund amount in cents
 
@@ -155,7 +155,7 @@ $totalRefund = $order->getTotalRefundAmount();
 
 ### recountTotalPaidAndRefund()
 
-Recount total paid and refund amounts
+Recount total paid and refund amounts. Updates `total_refund` and sets `payment_status` to refunded or partially refunded as appropriate.
 
 * Returns `FluentCart\App\Models\Order` - Updated order instance
 
@@ -168,7 +168,7 @@ $order->recountTotalPaidAndRefund();
 
 Sync order after refund
 
-* Parameters: `$type` (String) - Refund type, `$refundedAmount` (Integer) - Refund amount
+* Parameters: `$type` (String) - Refund type ('full' or 'partial'), `$refundedAmount` (Integer) - Refund amount
 * Returns `FluentCart\App\Models\Order` - Updated order instance
 
 ```php
@@ -178,9 +178,9 @@ $order->syncOrderAfterRefund('full', 1000);
 
 ### updateRefundedItems($refundedItemIds, $refundedAmount)
 
-Update refunded items
+Update refunded items. Distributes refund amount proportionally across the specified order items.
 
-* Parameters: `$refundedItemIds` (Array) - Item IDs, `$refundedAmount` (Integer) - Refund amount
+* Parameters: `$refundedItemIds` (Array) - Order item IDs, `$refundedAmount` (Integer) - Refund amount
 
 ```php
 $order = FluentCart\App\Models\Order::find(1);
@@ -189,7 +189,7 @@ $order->updateRefundedItems([1, 2, 3], 1000);
 
 ### recountTotalPaid()
 
-Recount total paid amount
+Recount total paid amount (paid minus refunded)
 
 * Returns `FluentCart\App\Models\Order` - Updated order instance
 
@@ -200,9 +200,9 @@ $order->recountTotalPaid();
 
 ### getLatestTransactionAttribute()
 
-Get latest transaction
+Get latest non-refund transaction (accessor, accessed as `latest_transaction` attribute)
 
-* Returns `FluentCart\App\Models\OrderTransaction` - Latest transaction
+* Returns `FluentCart\App\Models\OrderTransaction|null` - Latest transaction
 
 ```php
 $order = FluentCart\App\Models\Order::find(1);
@@ -224,7 +224,7 @@ $isSubscription = $order->isSubscription();
 
 Get order view URL
 
-* Parameters: `$type` (String) - View type (customer, admin)
+* Parameters: `$type` (String) - View type ('customer' or 'admin')
 * Returns `String` - View URL
 
 ```php
@@ -234,9 +234,9 @@ $viewUrl = $order->getViewUrl('admin');
 
 ### getLatestTransaction()
 
-Get latest transaction
+Get latest non-refund transaction (method call, unlike the accessor attribute)
 
-* Returns `FluentCart\App\Models\OrderTransaction` - Latest transaction
+* Returns `FluentCart\App\Models\OrderTransaction|null` - Latest transaction
 
 ```php
 $order = FluentCart\App\Models\Order::find(1);
@@ -245,9 +245,9 @@ $transaction = $order->getLatestTransaction();
 
 ### currentSubscription()
 
-Get current subscription
+Get current active subscription for this order
 
-* Returns `FluentCart\App\Models\Subscription|null` - Current subscription
+* Returns `FluentCart\App\Models\Subscription|null` - Current active subscription
 
 ```php
 $order = FluentCart\App\Models\Order::find(1);
@@ -256,7 +256,7 @@ $subscription = $order->currentSubscription();
 
 ### getDownloads($scope = 'email')
 
-Get order downloads
+Get order downloads. Returns downloadable files associated with the order items, filtered by product variation authorization.
 
 * Parameters: `$scope` (String) - Download scope
 * Returns `Array` - Download data
@@ -266,16 +266,28 @@ $order = FluentCart\App\Models\Order::find(1);
 $downloads = $order->getDownloads('email');
 ```
 
-### getLicenses($with = [])
+### getLicenses($with = ['product', 'productVariant'])
 
-Get order licenses
+Get order licenses (requires Pro and active license module)
 
-* Parameters: `$with` (Array) - Relationships to load
-* Returns `Illuminate\Database\Eloquent\Collection|null` - Licenses
+* Parameters: `$with` (Array) - Relationships to eager load (default: `['product', 'productVariant']`)
+* Returns `Illuminate\Database\Eloquent\Collection|null` - Licenses collection or null if module inactive
 
 ```php
 $order = FluentCart\App\Models\Order::find(1);
 $licenses = $order->getLicenses(['product', 'productVariant']);
+```
+
+### getDownloadsById($orderId)
+
+Get downloads for a specific order by ID
+
+* Parameters: `$orderId` (Integer) - Order ID
+* Returns `Array` - Download data
+
+```php
+$order = FluentCart\App\Models\Order::find(1);
+$downloads = $order->getDownloadsById(42);
 ```
 
 ### getReceiptUrl()
@@ -302,7 +314,7 @@ $order->addLog('Status Updated', 'Order status changed to completed', 'info', 'a
 
 ### canBeRefunded()
 
-Check if order can be refunded
+Check if order can be refunded. Returns false if the order has been upgraded to another order.
 
 * Returns `Boolean` - True if order can be refunded
 
@@ -313,13 +325,27 @@ $canBeRefunded = $order->canBeRefunded();
 
 ### generateReceiptNumber()
 
-Generate receipt number
+Generate receipt number and invoice number if not already set
 
 * Returns `FluentCart\App\Models\Order` - Updated order instance
 
 ```php
 $order = FluentCart\App\Models\Order::find(1);
 $order->generateReceiptNumber();
+```
+
+### canBeDeleted()
+
+Check if order can be deleted. Validates order status, payment status, mode, and subscription state. Test mode orders can always be deleted. Live orders must be canceled or on-hold, and must not have an active subscription.
+
+* Returns `Boolean|WP_Error` - True if order can be deleted, or WP_Error with reason
+
+```php
+$order = FluentCart\App\Models\Order::find(1);
+$canBeDeleted = $order->canBeDeleted();
+if (is_wp_error($canBeDeleted)) {
+    echo $canBeDeleted->get_error_message();
+}
 ```
 
 ## Relations
@@ -383,7 +409,7 @@ $items = $order->order_items;
 
 ### filteredOrderItems
 
-Access the filtered order items.
+Access the filtered order items based on priority rules for payment_type (onetime > subscription > adjustment).
 
 *   Returns `Illuminate\Database\Eloquent\Collection` of `FluentCart\App\Models\OrderItem`
 
@@ -414,6 +440,17 @@ $order = FluentCart\App\Models\Order::find(1);
 $meta = $order->orderMeta;
 ```
 
+### orderTaxRates
+
+Access the order tax rates.
+
+*   Returns `Illuminate\Database\Eloquent\Collection` of `FluentCart\App\Models\OrderTaxRate`
+
+```php
+$order = FluentCart\App\Models\Order::find(1);
+$taxRates = $order->orderTaxRates;
+```
+
 ### appliedCoupons
 
 Access the applied coupons.
@@ -427,7 +464,7 @@ $appliedCoupons = $order->appliedCoupons;
 
 ### usedCoupons
 
-Access the used coupons.
+Access the used coupons (through the applied coupons intermediate table).
 
 *   Returns `Illuminate\Database\Eloquent\Collection` of `FluentCart\App\Models\Coupon`
 
@@ -482,7 +519,7 @@ $licenses = $order->licenses;
 
 ### labels
 
-Access the order labels.
+Access the order labels (morph many relationship).
 
 *   Returns `Illuminate\Database\Eloquent\Collection` of `FluentCart\App\Models\LabelRelationship`
 
@@ -493,7 +530,7 @@ $labels = $order->labels;
 
 ### renewals
 
-Access the order renewals.
+Access the order renewals (child orders of type 'renewal', excluding canceled, failed, and on-hold).
 
 *   Returns `Illuminate\Database\Eloquent\Collection` of `FluentCart\App\Models\Order`
 
@@ -502,13 +539,24 @@ $order = FluentCart\App\Models\Order::find(1);
 $renewals = $order->renewals;
 ```
 
+### orderOperation
+
+Access the order operation record.
+
+*   Returns `FluentCart\App\Models\OrderOperation`
+
+```php
+$order = FluentCart\App\Models\Order::find(1);
+$operation = $order->orderOperation;
+```
+
 ## Scopes
 
 This model has the following scopes that you can use
 
 ### searchBy($search)
 
-Search orders by query
+Search orders by query. Searches across order ID, status, total amount, payment status, payment method, invoice number, order item titles, and customer name/email.
 
 * Parameters: `$search` (String) - Search query
 

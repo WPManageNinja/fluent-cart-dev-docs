@@ -23,6 +23,12 @@ description: FluentCart LabelRelationship model documentation with attributes, s
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
+## Casts
+
+| Attribute | Cast Type |
+| --------- | --------- |
+| label_id  | integer   |
+
 ## Usage
 
 Please check [Model Basic](/database/models) for Common methods.
@@ -44,7 +50,7 @@ This model has the following relationships that you can use
 
 ### labelable
 
-Access the labeled object (polymorphic relationship)
+Access the labeled object (polymorphic `morphTo` relationship)
 
 * return `mixed` (Order, Customer, or other labeled models)
 
@@ -143,24 +149,6 @@ $labelRelationship = FluentCart\App\Models\LabelRelationship::find(1);
 $labelRelationship->delete();
 ```
 
-### Get Label Relationships by Label ID
-
-```php
-$labelRelationships = FluentCart\App\Models\LabelRelationship::where('label_id', 1)->get();
-```
-
-### Get Label Relationships by Object ID
-
-```php
-$labelRelationships = FluentCart\App\Models\LabelRelationship::where('labelable_id', 123)->get();
-```
-
-### Get Label Relationships Ordered by Creation
-
-```php
-$orderedRelationships = FluentCart\App\Models\LabelRelationship::orderBy('created_at', 'desc')->get();
-```
-
 ### Get Label Relationships for Multiple Objects
 
 ```php
@@ -170,4 +158,3 @@ $labelRelationships = FluentCart\App\Models\LabelRelationship::where('labelable_
 ```
 
 ---
-

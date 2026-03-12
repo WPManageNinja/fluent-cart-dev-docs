@@ -24,6 +24,10 @@ description: FluentCart Meta model documentation with attributes, scopes, relati
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
+## Guarded Attributes
+
+The `id` field is explicitly guarded via `$guarded = ['id']`.
+
 ## Usage
 
 Please check [Model Basic](/database/models) for Common methods.
@@ -37,6 +41,7 @@ $meta->id; // returns id
 $meta->object_type; // returns object type
 $meta->object_id; // returns object ID
 $meta->meta_key; // returns meta key
+$meta->meta_value; // returns meta value (auto-decoded from JSON)
 ```
 
 ## Scopes
@@ -45,9 +50,9 @@ This model has the following scopes that you can use
 
 ### userTheme()
 
-Filter meta for current user's theme
+Filter meta for current user's theme setting. Filters by `object_type = User::class`, `object_id = current user ID`, and `meta_key = 'theme'`.
 
-* Parameters  
+* Parameters
    * none
 
 #### Usage:
@@ -59,9 +64,9 @@ $userTheme = FluentCart\App\Models\Meta::userTheme()->first();
 
 ### upgradeablePath($productId)
 
-Filter meta for upgradeable paths by product ID
+Filter meta for upgradeable paths by product ID. Uses a `whereHas` on the `upgradeableVariants` relationship and filters by `PlanUpgradeService::$metaType` and `PlanUpgradeService::$metaKey`.
 
-* Parameters  
+* Parameters
    * $productId - integer
 
 #### Usage:
@@ -77,7 +82,7 @@ This model has the following relationships that you can use
 
 ### upgradeableVariants
 
-Access all upgradeable variants
+Access all upgradeable variants (`hasMany`). Links via `object_id` to `ProductVariation.id`.
 
 * return `FluentCart\App\Models\ProductVariation` Model Collection
 
@@ -99,9 +104,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### setMetaValueAttribute($meta_value)
 
-Set meta value with automatic JSON encoding (mutator)
+Set meta value with automatic JSON encoding (mutator). If the value is an array or object, it is JSON-encoded with `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES` flags.
 
-* Parameters  
+* Parameters
    * $meta_value - mixed (array, object, or string)
 * Returns `void`
 
@@ -114,16 +119,16 @@ $meta->meta_value = ['custom_data' => 'value', 'settings' => ['key' => 'value']]
 
 ### getMetaValueAttribute($value)
 
-Get meta value with automatic JSON decoding (accessor)
+Get meta value with automatic JSON decoding (accessor). If the stored value is a string, it attempts to JSON-decode it. Returns the decoded value if successful, or the original string if decoding returns `null`.
 
-* Parameters  
+* Parameters
    * $value - mixed
 * Returns `mixed`
 
 #### Usage
 
 ```php
-$metaValue = $meta->meta_value; // Returns decoded value (array, object, or string)
+$metaValue = $meta->meta_value; // Returns decoded value (array or string)
 ```
 
 ## Usage Examples
@@ -215,4 +220,3 @@ $objectMetas = FluentCart\App\Models\Meta::where('object_type', 'ProductVariatio
 ```
 
 ---
-

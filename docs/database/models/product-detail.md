@@ -1,6 +1,6 @@
 ---
 title: Product Detail Model
-description: FluentCart ProductDetail model documentation with attributes, scopes, relationships, and methods.
+description: FluentCart ProductDetail model documentation with attributes, casts, appends, relationships, and methods.
 ---
 
 # Product Detail Model
@@ -12,24 +12,57 @@ description: FluentCart ProductDetail model documentation with attributes, scope
 | Name Space    | FluentCart\App\Models                            |
 | Class         | FluentCart\App\Models\ProductDetail              |
 
+## Traits
+
+| Trait            | Description |
+| ---------------- | ----------- |
+| CanSearch         | Adds search scope capabilities to the model |
+| CanUpdateBatch    | Adds batch update capabilities to the model |
+
 ## Attributes
 
-| Attribute          | Data Type | Comment |
-| ------------------ | --------- | ------- |
-| id                 | Integer   | Primary Key |
-| post_id            | Integer   | Reference to WordPress post (product) |
-| fulfillment_type   | String    | Fulfillment type (physical, digital) |
-| min_price          | Decimal   | Minimum price |
-| max_price          | Decimal   | Maximum price |
-| default_variation_id | String  | Default variation ID |
-| variation_type     | String    | Variation type (simple, variable) |
-| stock_availability | String    | Stock availability status |
-| other_info         | JSON      | Additional product information |
-| default_media      | JSON      | Default media information |
-| manage_stock       | String    | Whether to manage stock |
-| manage_downloadable | String   | Whether to manage downloadable files |
-| created_at         | Date Time | Creation timestamp |
-| updated_at         | Date Time | Last update timestamp |
+| Attribute            | Data Type | Comment |
+| -------------------- | --------- | ------- |
+| id                   | Integer   | Primary Key (guarded) |
+| post_id              | Integer   | Reference to WordPress post (product). Cast as `integer`. |
+| fulfillment_type     | String    | Fulfillment type (physical, digital) |
+| min_price            | Double    | Minimum price (cents). Cast as `double`. Dynamically computed from variants via accessor. |
+| max_price            | Double    | Maximum price (cents). Cast as `double`. Dynamically computed from variants via accessor. |
+| default_variation_id | String    | Default variation ID |
+| variation_type       | String    | Variation type (simple, variable) |
+| stock_availability   | String    | Stock availability quantity / status |
+| other_info           | JSON      | Additional product information (auto JSON encoded/decoded via mutator/accessor) |
+| default_media        | JSON      | Default media information (auto JSON encoded/decoded via mutator/accessor) |
+| manage_stock         | String    | Whether to manage stock |
+| manage_downloadable  | String    | Whether to manage downloadable files |
+| created_at           | Date Time | Creation timestamp |
+| updated_at           | Date Time | Last update timestamp |
+
+## Fillable Attributes
+
+The following attributes are mass-assignable:
+
+`post_id`, `fulfillment_type`, `min_price`, `max_price`, `default_variation_id`, `variation_type`, `stock_availability`, `other_info`, `default_media`, `manage_stock`, `manage_downloadable`
+
+The `id` attribute is guarded and cannot be mass-assigned.
+
+## Casts
+
+| Attribute | Cast Type |
+| --------- | --------- |
+| post_id   | integer   |
+| min_price | double    |
+| max_price | double    |
+
+## Appends
+
+The following computed attributes are automatically appended to the model's array/JSON output:
+
+| Appended Attribute    | Description |
+| --------------------- | ----------- |
+| featured_media        | First image from the gallery (via `getFeaturedMediaAttribute`) |
+| formatted_min_price   | Human-readable minimum price (via `getFormattedMinPriceAttribute`) |
+| formatted_max_price   | Human-readable maximum price (via `getFormattedMaxPriceAttribute`) |
 
 ## Usage
 
@@ -41,9 +74,12 @@ Please check [Model Basic](/database/models) for Common methods.
 $productDetail = FluentCart\App\Models\ProductDetail::find(1);
 
 $productDetail->id; // returns id
-$productDetail->post_id; // returns post ID
-$productDetail->min_price; // returns minimum price
-$productDetail->max_price; // returns maximum price
+$productDetail->post_id; // returns post ID (cast as integer)
+$productDetail->min_price; // returns minimum price (dynamically computed from variants)
+$productDetail->max_price; // returns maximum price (dynamically computed from variants)
+$productDetail->featured_media; // returns first gallery image or null (appended)
+$productDetail->formatted_min_price; // returns formatted min price string (appended)
+$productDetail->formatted_max_price; // returns formatted max price string (appended)
 ```
 
 ## Relations
@@ -52,8 +88,9 @@ This model has the following relationships that you can use
 
 ### product
 
-Access the associated product (WordPress post)
+Access the associated product (WordPress post). Linked via `post_id` to `ID` on the products table.
 
+* Relationship type: `BelongsTo`
 * return `FluentCart\App\Models\Product` Model
 
 #### Example:
@@ -70,8 +107,9 @@ $productDetails = FluentCart\App\Models\ProductDetail::whereHas('product', funct
 
 ### galleryImage
 
-Access the associated gallery image meta
+Access the associated gallery image meta. This is a `HasOne` relation to `PostMeta` filtered by `meta_key = 'fluent-products-gallery-image'`, linked via `post_id`.
 
+* Relationship type: `HasOne`
 * return `FluentCart\App\Models\WpModels\PostMeta` Model
 
 #### Example:
@@ -83,8 +121,9 @@ $galleryImage = $productDetail->galleryImage;
 
 ### variants
 
-Access all product variations
+Access all product variations, ordered by `serial_index` ascending. Linked via `post_id` on both tables.
 
+* Relationship type: `HasMany`
 * return `FluentCart\App\Models\ProductVariation` Model Collection
 
 #### Example:
@@ -101,8 +140,11 @@ $productDetails = FluentCart\App\Models\ProductDetail::whereHas('variants', func
 
 ### attrMap
 
-Access all attribute relations
+Access all attribute relations. Linked via `object_id` (on `AttributeRelation`) to `id` (on `ProductDetail`).
 
+When a `ProductDetail` record is deleted, all related `attrMap` records are automatically cascade-deleted via the model's `boot()` method.
+
+* Relationship type: `HasMany`
 * return `FluentCart\App\Models\AttributeRelation` Model Collection
 
 #### Example:
@@ -112,15 +154,24 @@ Access all attribute relations
 $attrMap = $productDetail->attrMap;
 ```
 
+## Cascade Deletes
+
+The model registers a `deleting` event in its `boot()` method. When a `ProductDetail` is deleted, all associated `attrMap` (AttributeRelation) records are automatically deleted:
+
+```php
+// When you delete a ProductDetail, its attrMap relations are removed automatically
+$productDetail->delete(); // Also deletes all related AttributeRelation records
+```
+
 ## Methods
 
 Along with Global Model methods, this model has few helper methods.
 
 ### setOtherInfoAttribute($value)
 
-Set other info with automatic JSON encoding (mutator)
+Set other info with automatic JSON encoding (mutator). Arrays and objects are JSON encoded; strings are stored as-is.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -133,23 +184,23 @@ $productDetail->other_info = ['custom_data' => 'value', 'settings' => ['key' => 
 
 ### getOtherInfoAttribute($value)
 
-Get other info with automatic JSON decoding (accessor)
+Get other info with automatic JSON decoding (accessor). Returns the decoded array or `null` if empty.
 
-* Parameters  
+* Parameters
    * $value - mixed
-* Returns `mixed`
+* Returns `array|null`
 
 #### Usage
 
 ```php
-$otherInfo = $productDetail->other_info; // Returns decoded value (array, object, or string)
+$otherInfo = $productDetail->other_info; // Returns decoded array or null
 ```
 
 ### setDefaultMediaAttribute($value)
 
-Set default media with automatic JSON encoding (mutator)
+Set default media with automatic JSON encoding (mutator). Arrays and objects are JSON encoded; strings are stored as-is.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -162,23 +213,51 @@ $productDetail->default_media = ['url' => 'image.jpg', 'alt' => 'Product Image']
 
 ### getDefaultMediaAttribute($value)
 
-Get default media with automatic JSON decoding (accessor)
+Get default media with automatic JSON decoding (accessor). Returns the decoded array or `null` if empty.
 
-* Parameters  
+* Parameters
    * $value - mixed
-* Returns `mixed`
+* Returns `array|null`
 
 #### Usage
 
 ```php
-$defaultMedia = $productDetail->default_media; // Returns decoded value (array, object, or string)
+$defaultMedia = $productDetail->default_media; // Returns decoded array or null
+```
+
+### getMinPriceAttribute()
+
+Dynamic accessor that overrides the `min_price` database column. Instead of returning the stored value, it computes the minimum `item_price` from all associated variants.
+
+* Parameters
+   * none
+* Returns `double|null`
+
+#### Usage
+
+```php
+$minPrice = $productDetail->min_price; // Returns the minimum item_price across all variants
+```
+
+### getMaxPriceAttribute()
+
+Dynamic accessor that overrides the `max_price` database column. Instead of returning the stored value, it computes the maximum `item_price` from all associated variants.
+
+* Parameters
+   * none
+* Returns `double|null`
+
+#### Usage
+
+```php
+$maxPrice = $productDetail->max_price; // Returns the maximum item_price across all variants
 ```
 
 ### getFormattedMinPriceAttribute()
 
-Get formatted minimum price (accessor)
+Get formatted minimum price (accessor). Uses `Helper::toDecimal()` to convert the min_price (in cents) to a human-readable decimal string.
 
-* Parameters  
+* Parameters
    * none
 * Returns `string`
 
@@ -190,9 +269,9 @@ $formattedMinPrice = $productDetail->formatted_min_price; // Returns formatted p
 
 ### getFormattedMaxPriceAttribute()
 
-Get formatted maximum price (accessor)
+Get formatted maximum price (accessor). Uses `Helper::toDecimal()` to convert the max_price (in cents) to a human-readable decimal string.
 
-* Parameters  
+* Parameters
    * none
 * Returns `string`
 
@@ -204,11 +283,11 @@ $formattedMaxPrice = $productDetail->formatted_max_price; // Returns formatted p
 
 ### getFeaturedMediaAttribute()
 
-Get featured media from gallery (accessor)
+Get featured media from gallery (accessor). Returns the first element from the gallery image meta value, or `null` if the gallery is empty or not set.
 
-* Parameters  
+* Parameters
    * none
-* Returns `mixed`
+* Returns `mixed|null`
 
 #### Usage
 
@@ -218,31 +297,46 @@ $featuredMedia = $productDetail->featured_media; // Returns first gallery image 
 
 ### hasPriceVariation()
 
-Check if product has price variation
+Check if product has a price variation. Returns `true` only when the product's `variation_type` is `'simple'` **and** `max_price` differs from `min_price`.
 
-* Parameters  
+* Parameters
    * none
 * Returns `boolean`
 
 #### Usage
 
 ```php
-$hasVariation = $productDetail->hasPriceVariation(); // Returns true if min_price != max_price
+$hasVariation = $productDetail->hasPriceVariation();
+// Returns true if variation_type is 'simple' AND min_price != max_price
 ```
 
 ### getStockAvailability($variationId = null)
 
-Get stock availability information
+Get stock availability information. Returns an array describing stock status. The result is passed through the `fluent_cart/product_stock_availability` filter hook, allowing external modification.
 
-* Parameters  
+* Parameters
    * $variationId - integer|null (default: null)
-* Returns `array`
+* Returns `array` with keys: `manage_stock` (bool), `availability` (string), `class` (string), `available_quantity` (int|null)
+
+**Return scenarios:**
+
+| Condition | manage_stock | availability | class | available_quantity |
+| --------- | ------------ | ------------ | ----- | ------------------ |
+| `manage_stock` is falsy | `false` | "In Stock" | "in-stock" | `null` |
+| `manage_stock` truthy, `stock_availability` truthy | `true` | "In Stock" | "in-stock" | `stock_availability` value |
+| `manage_stock` truthy, `stock_availability` falsy | `true` | "Out of Stock" | "out-of-stock" | `stock_availability` value |
+
+**Filter hook:** `fluent_cart/product_stock_availability`
+- Receives: `$availability` array, `['detail' => $this, 'variation_id' => $variationId]`
 
 #### Usage
 
 ```php
 $stockInfo = $productDetail->getStockAvailability();
 // Returns array with manage_stock, availability, class, available_quantity
+
+// With a specific variation
+$stockInfo = $productDetail->getStockAvailability($variationId);
 ```
 
 ## Usage Examples
@@ -303,5 +397,20 @@ if ($featuredMedia) {
 }
 ```
 
----
+### Dynamic Price Computation
 
+```php
+// min_price and max_price are dynamically computed from variants
+$productDetail = FluentCart\App\Models\ProductDetail::find(1);
+
+// These pull min/max item_price from the variants table, not the stored column values
+$minPrice = $productDetail->min_price;
+$maxPrice = $productDetail->max_price;
+
+// Check if a simple product has a price range
+if ($productDetail->hasPriceVariation()) {
+    echo "Price range: $minPrice - $maxPrice";
+}
+```
+
+---

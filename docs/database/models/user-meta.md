@@ -1,6 +1,6 @@
 ---
 title: User Meta Model
-description: FluentCart UserMeta model documentation with attributes, scopes, relationships, and methods.
+description: FluentCart Pro UserMeta model documentation with attributes, scopes, relationships, and methods.
 ---
 
 # User Meta Model
@@ -11,6 +11,13 @@ description: FluentCart UserMeta model documentation with attributes, scopes, re
 | Source File   | fluent-cart-pro/app/Models/UserMeta.php |
 | Name Space    | FluentCartPro\App\Models             |
 | Class         | FluentCartPro\App\Models\UserMeta    |
+| Plugin        | FluentCart Pro                        |
+
+## Properties
+
+- **Table**: `usermeta`
+- **Primary Key**: `umeta_id`
+- **Fillable**: `['user_id', 'meta_key', 'meta_value']`
 
 ## Attributes
 
@@ -42,9 +49,9 @@ This model has the following relationships that you can use
 
 ### user
 
-Access the associated user
+Access the associated user (BelongsTo)
 
-* return `FluentCart\App\Models\User` Model
+* return `FluentCartPro\App\Models\User` Model (via `belongsTo(User::class, 'user_id', 'ID')`)
 
 #### Example:
 
@@ -147,20 +154,6 @@ $userMeta = FluentCartPro\App\Models\UserMeta::find(1);
 $userMeta->delete();
 ```
 
-### Get Meta by Value
-
-```php
-$adminUsers = FluentCartPro\App\Models\UserMeta::where('meta_key', 'fluent_cart_admin_role')
-    ->where('meta_value', 'store_admin')
-    ->get();
-```
-
-### Get Meta Ordered by User ID
-
-```php
-$orderedMetas = FluentCartPro\App\Models\UserMeta::orderBy('user_id', 'asc')->get();
-```
-
 ### Get Meta for Multiple Users
 
 ```php
@@ -175,3 +168,4 @@ $userMetas = FluentCartPro\App\Models\UserMeta::whereIn('meta_key', ['fluent_car
 
 ---
 
+**Plugin**: FluentCart Pro

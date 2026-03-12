@@ -3,6 +3,8 @@ title: License Meta Model
 description: FluentCart Pro LicenseMeta model documentation with attributes, scopes, relationships, and methods.
 ---
 
+<Badge type="warning" text="Pro" />
+
 # License Meta Model
 
 | DB Table Name | {wp_db_prefix}_fct_license_meta              |
@@ -13,16 +15,28 @@ description: FluentCart Pro LicenseMeta model documentation with attributes, sco
 | Class         | FluentCartPro\App\Modules\Licensing\Models\LicenseMeta |
 | Plugin        | FluentCart Pro                               |
 
+## Properties
+
+- **Table**: `fct_license_meta`
+- **Primary Key**: `id`
+- **Guarded**: `['id']`
+- **Fillable**: `['object_id', 'object_type', 'meta_key', 'meta_value']`
+
+::: warning Note on Schema
+The fillable attributes use `object_id` and `object_type` (not `license_id`). This is a polymorphic-style meta table that can store meta for different object types.
+:::
+
 ## Attributes
 
-| Attribute  | Data Type | Comment |
-| ---------- | --------- | ------- |
-| id         | Integer   | Primary Key |
-| license_id | Integer   | Reference to license |
-| meta_key   | String    | Meta key name |
-| meta_value | Text      | Meta value (JSON or string) |
-| created_at | Date Time | Creation timestamp |
-| updated_at | Date Time | Last update timestamp |
+| Attribute   | Data Type | Comment |
+| ----------- | --------- | ------- |
+| id          | Integer   | Primary Key |
+| object_id   | Integer   | Reference to the parent object (e.g., license ID) |
+| object_type | String    | Type of the parent object |
+| meta_key    | String    | Meta key name |
+| meta_value  | Text      | Meta value (auto JSON encode/decode via accessor/mutator) |
+| created_at  | Date Time | Creation timestamp |
+| updated_at  | Date Time | Last update timestamp |
 
 ## Usage
 
@@ -34,77 +48,10 @@ Please check [Model Basic](/database/models) for Common methods.
 $licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::find(1);
 
 $licenseMeta->id; // returns id
-$licenseMeta->license_id; // returns license ID
+$licenseMeta->object_id; // returns object ID
+$licenseMeta->object_type; // returns object type
 $licenseMeta->meta_key; // returns meta key
-$licenseMeta->meta_value; // returns meta value
-```
-
-## Scopes
-
-This model has the following scopes that you can use
-
-### ofLicense($licenseId)
-
-Filter license meta by license ID
-
-* Parameters  
-   * $licenseId - integer
-
-#### Usage:
-
-```php
-// Get all meta for a specific license
-$licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::ofLicense(123)->get();
-```
-
-### ofMetaKey($metaKey)
-
-Filter license meta by meta key
-
-* Parameters  
-   * $metaKey - string
-
-#### Usage:
-
-```php
-// Get all license meta for a specific key
-$licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::ofMetaKey('activation_data')->get();
-```
-
-### ofMetaKeys($metaKeys)
-
-Filter license meta by multiple meta keys
-
-* Parameters  
-   * $metaKeys - array
-
-#### Usage:
-
-```php
-// Get license meta for multiple keys
-$licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::ofMetaKeys(['activation_data', 'renewal_info'])->get();
-```
-
-## Relations
-
-This model has the following relationships that you can use
-
-### license
-
-Access the associated license
-
-* return `FluentCartPro\App\Modules\Licensing\Models\License` Model
-
-#### Example:
-
-```php
-// Accessing License
-$license = $licenseMeta->license;
-
-// For Filtering by license relationship
-$licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::whereHas('license', function($query) {
-    $query->where('status', 'active');
-})->get();
+$licenseMeta->meta_value; // returns meta value (auto-decoded from JSON if applicable)
 ```
 
 ## Methods
@@ -113,23 +60,23 @@ Along with Global Model methods, this model has few helper methods.
 
 ### getMetaValueAttribute($value)
 
-Get meta value as array or string (accessor)
+Get meta value with automatic JSON decoding (accessor). If the stored value is a JSON string, it is decoded to an array. Otherwise returns the original value.
 
-* Parameters  
+* Parameters
    * $value - mixed
-* Returns `mixed`
+* Returns `mixed` - array if valid JSON string, otherwise original value
 
 #### Usage
 
 ```php
-$metaValue = $licenseMeta->meta_value; // Returns array if JSON, string otherwise
+$metaValue = $licenseMeta->meta_value; // Returns array if JSON, original value otherwise
 ```
 
 ### setMetaValueAttribute($value)
 
-Set meta value from array or string (mutator)
+Set meta value with automatic JSON encoding (mutator). Arrays and objects are JSON encoded before storage.
 
-* Parameters  
+* Parameters
    * $value - array|object|string
 * Returns `void`
 
@@ -139,170 +86,79 @@ Set meta value from array or string (mutator)
 // Set array value (will be JSON encoded)
 $licenseMeta->meta_value = ['site_url' => 'https://example.com', 'activated_at' => '2024-01-01'];
 
-// Set string value
+// Set string value (stored as-is)
 $licenseMeta->meta_value = 'simple string value';
 ```
-
-### getMetaValueAsArray()
-
-Get meta value as array (force array return)
-
-* Parameters  
-   * none
-* Returns `array`
-
-#### Usage
-
-```php
-$metaArray = $licenseMeta->getMetaValueAsArray();
-```
-
-### getMetaValueAsString()
-
-Get meta value as string (force string return)
-
-* Parameters  
-   * none
-* Returns `string`
-
-#### Usage
-
-```php
-$metaString = $licenseMeta->getMetaValueAsString();
-```
-
-### isJsonValue()
-
-Check if meta value is JSON
-
-* Parameters  
-   * none
-* Returns `boolean`
-
-#### Usage
-
-```php
-$isJson = $licenseMeta->isJsonValue();
-```
-
-### getDecodedValue()
-
-Get decoded JSON value or original value
-
-* Parameters  
-   * none
-* Returns `mixed`
-
-#### Usage
-
-```php
-$decodedValue = $licenseMeta->getDecodedValue();
-```
-
-## Common Meta Keys
-
-Here are some common meta keys used in FluentCart Pro licensing:
-
-### Activation Information
-- `activation_data` - Activation details and site information
-- `activation_count` - Number of activations
-- `last_activation` - Last activation date
-- `activation_history` - History of all activations
-
-### Renewal Information
-- `renewal_info` - Renewal details and history
-- `auto_renew` - Auto-renewal setting
-- `renewal_date` - Next renewal date
-- `renewal_attempts` - Number of renewal attempts
-
-### License Configuration
-- `license_config` - License-specific configuration
-- `max_sites` - Maximum number of sites allowed
-- `allowed_domains` - List of allowed domains
-- `restrictions` - License restrictions
-
-### Support Information
-- `support_expiry` - Support expiration date
-- `support_level` - Support level (basic, premium, etc.)
-- `support_notes` - Support-related notes
-
-### Custom Fields
-- `custom_field_*` - Custom field values
-- `_custom_*` - Custom meta fields
 
 ## Usage Examples
 
 ### Get License Meta
 
 ```php
-$license = FluentCartPro\App\Modules\Licensing\Models\License::find(123);
-$activationData = $license->meta()->where('meta_key', 'activation_data')->first();
+$licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::where('object_id', 123)
+    ->where('meta_key', 'activation_data')
+    ->first();
 
-if ($activationData) {
-    $data = $activationData->meta_value; // Returns array
-    echo "Last activation: " . $data['last_activation'];
+if ($licenseMeta) {
+    $data = $licenseMeta->meta_value; // Returns array (auto-decoded)
 }
 ```
 
 ### Set License Custom Meta
 
 ```php
-$license = FluentCartPro\App\Modules\Licensing\Models\License::find(123);
-
-// Set custom meta
-$license->meta()->updateOrCreate(
-    ['meta_key' => 'custom_field'],
-    ['meta_value' => ['value' => 'custom data', 'type' => 'text']]
+FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::updateOrCreate(
+    [
+        'object_id' => 123,
+        'object_type' => 'license',
+        'meta_key' => 'custom_field'
+    ],
+    [
+        'meta_value' => ['value' => 'custom data', 'type' => 'text']
+    ]
 );
 ```
 
-### Get All License Meta as Key-Value Array
+### Get All Meta for an Object
 
 ```php
-$license = FluentCartPro\App\Modules\Licensing\Models\License::find(123);
-$metaData = $license->meta()->pluck('meta_value', 'meta_key')->toArray();
+$metaData = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::where('object_id', 123)
+    ->where('object_type', 'license')
+    ->pluck('meta_value', 'meta_key')
+    ->toArray();
 ```
 
-### Get License Activation Data
+### Create License Meta
 
 ```php
-$license = FluentCartPro\App\Modules\Licensing\Models\License::find(123);
-$activationData = $license->meta()->where('meta_key', 'activation_data')->first();
-
-if ($activationData) {
-    $data = $activationData->meta_value;
-    echo "Activated sites: " . count($data['sites']);
-    echo "Last activation: " . $data['last_activation'];
-}
+$licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::create([
+    'object_id' => 123,
+    'object_type' => 'license',
+    'meta_key' => 'renewal_info',
+    'meta_value' => ['auto_renew' => true, 'next_date' => '2025-01-01']
+]);
 ```
 
-### Update License Configuration
+### Update License Meta
 
 ```php
-$license = FluentCartPro\App\Modules\Licensing\Models\License::find(123);
-
-// Update license configuration
-$license->meta()->updateOrCreate(
-    ['meta_key' => 'license_config'],
-    ['meta_value' => [
-        'max_sites' => 5,
-        'auto_renew' => true,
-        'allowed_domains' => ['example.com', 'test.com']
-    ]]
-);
+$licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::find(1);
+$licenseMeta->update([
+    'meta_value' => ['updated_value' => true]
+]);
 ```
 
-### Get License Support Information
+### Get Meta by Key
 
 ```php
-$license = FluentCartPro\App\Modules\Licensing\Models\License::find(123);
-$supportInfo = $license->meta()->where('meta_key', 'support_info')->first();
+$activationMetas = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::where('meta_key', 'activation_data')->get();
+```
 
-if ($supportInfo) {
-    $data = $supportInfo->meta_value;
-    echo "Support level: " . $data['level'];
-    echo "Support expires: " . $data['expiry'];
-}
+### Delete License Meta
+
+```php
+$licenseMeta = FluentCartPro\App\Modules\Licensing\Models\LicenseMeta::find(1);
+$licenseMeta->delete();
 ```
 
 ---

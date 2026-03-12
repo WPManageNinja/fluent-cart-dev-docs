@@ -12,6 +12,30 @@ description: FluentCart ShippingMethod model documentation with attributes, scop
 | Name Space    | FluentCart\App\Models                            |
 | Class         | FluentCart\App\Models\ShippingMethod             |
 
+## Traits
+
+- `FluentCart\App\Models\Concerns\CanSearch` - Provides `search()`, `groupSearch()`, `whereLike()`, `whereBeginsWith()`, `whereEndsWith()` scopes
+
+## Appended Attributes
+
+The following computed attributes are automatically appended to the model's array/JSON output:
+
+- `formatted_states` - Array of human-readable state names
+
+## Casts
+
+| Attribute   | Cast Type |
+| ----------- | --------- |
+| settings    | array     |
+| states      | array     |
+| is_enabled  | boolean   |
+
+## Default Attribute Values
+
+| Attribute | Default |
+| --------- | ------- |
+| states    | `'[]'`  |
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
@@ -20,12 +44,12 @@ description: FluentCart ShippingMethod model documentation with attributes, scop
 | zone_id            | Integer   | Reference to shipping zone |
 | title              | String    | Shipping method title |
 | type               | String    | Shipping method type |
-| settings           | Array     | Shipping method settings |
+| settings           | Array     | Shipping method settings (cast to array) |
 | amount             | Decimal   | Shipping amount |
-| is_enabled         | Boolean   | Whether method is enabled |
+| is_enabled         | Boolean   | Whether method is enabled (cast to boolean) |
 | order              | Integer   | Display order |
-| states             | Array     | Applicable states |
-| meta               | JSON      | Additional metadata |
+| states             | Array     | Applicable states (cast to array, defaults to empty array) |
+| meta               | JSON      | Additional metadata (manual JSON mutator/accessor) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -42,6 +66,11 @@ $shippingMethod->id; // returns id
 $shippingMethod->zone_id; // returns zone ID
 $shippingMethod->title; // returns title
 $shippingMethod->amount; // returns amount
+$shippingMethod->is_enabled; // returns boolean
+$shippingMethod->settings; // returns array (cast)
+$shippingMethod->states; // returns array (cast)
+$shippingMethod->meta; // returns array (accessor)
+$shippingMethod->formatted_states; // returns array of formatted state names (appended attribute)
 ```
 
 ## Scopes
@@ -50,11 +79,17 @@ This model has the following scopes that you can use
 
 ### applicableToCountry($country, $state)
 
-Filter methods applicable to specific country and state
+Filter methods applicable to a specific country and state. This scope:
+1. Filters by zone region matching the country or `'all'`
+2. Filters by states -- includes methods with empty states array, or methods whose states contain the given state
+3. Orders results by `amount` descending
+4. Only returns enabled methods (`is_enabled = 1`)
 
-* Parameters  
-   * $country - string
-   * $state - string|null
+Supports both MySQL (using JSON functions) and SQLite (using string search) for state filtering.
+
+* Parameters
+   * $country - string (country code)
+   * $state - string|null (state code)
 
 #### Usage:
 
@@ -94,11 +129,11 @@ Along with Global Model methods, this model has few helper methods.
 
 ### getFormattedStatesAttribute()
 
-Get formatted states array (accessor)
+Get formatted states array (accessor). Maps each state code to its human-readable name using `AddressHelper::getStateNameByCode()`, resolving against the zone's region.
 
-* Parameters  
+* Parameters
    * none
-* Returns `array`
+* Returns `array` - Array of formatted state name strings, or empty array if states is not an array
 
 #### Usage
 
@@ -108,9 +143,9 @@ $formattedStates = $shippingMethod->formatted_states; // Returns array of format
 
 ### setMetaAttribute($value)
 
-Set meta with automatic JSON encoding (mutator)
+Set meta with automatic JSON encoding (mutator). Encodes the value with `json_encode()`. Falls back to `'[]'` if encoding fails or value is falsy.
 
-* Parameters  
+* Parameters
    * $value - mixed (array, object, or string)
 * Returns `void`
 
@@ -123,11 +158,11 @@ $shippingMethod->meta = ['custom_data' => 'value', 'settings' => ['key' => 'valu
 
 ### getMetaAttribute($value)
 
-Get meta with automatic JSON decoding (accessor)
+Get meta with automatic JSON decoding (accessor). Decodes the stored JSON string into an associative array.
 
-* Parameters  
+* Parameters
    * $value - mixed
-* Returns `array`
+* Returns `array` - Decoded array, or empty array if value is falsy
 
 #### Usage
 
@@ -230,4 +265,3 @@ foreach ($methods as $method) {
 ```
 
 ---
-

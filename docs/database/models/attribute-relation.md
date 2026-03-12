@@ -19,7 +19,7 @@ description: FluentCart AttributeRelation model documentation with attributes, s
 | id                 | Integer   | Primary Key |
 | group_id           | Integer   | Reference to attribute group |
 | term_id            | Integer   | Reference to attribute term |
-| object_id          | Integer   | Reference to object (product detail, variation, etc.) |
+| object_id          | Integer   | Reference to product detail (variation) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -35,7 +35,7 @@ $attributeRelation = FluentCart\App\Models\AttributeRelation::find(1);
 $attributeRelation->id; // returns id
 $attributeRelation->group_id; // returns group ID
 $attributeRelation->term_id; // returns term ID
-$attributeRelation->object_id; // returns object ID
+$attributeRelation->object_id; // returns object ID (product detail ID)
 ```
 
 ## Relations
@@ -44,7 +44,7 @@ This model has the following relationships that you can use
 
 ### group
 
-Access the associated attribute group
+Access the associated attribute group (`belongsTo`)
 
 * return `FluentCart\App\Models\AttributeGroup` Model
 
@@ -62,7 +62,7 @@ $attributeRelations = FluentCart\App\Models\AttributeRelation::whereHas('group',
 
 ### term
 
-Access the associated attribute term
+Access the associated attribute term (`belongsTo`)
 
 * return `FluentCart\App\Models\AttributeTerm` Model
 
@@ -80,7 +80,7 @@ $attributeRelations = FluentCart\App\Models\AttributeRelation::whereHas('term', 
 
 ### productDetails
 
-Access the associated product detail
+Access the associated product detail (`belongsTo`). Links via `object_id` to `ProductDetail.id`.
 
 * return `FluentCart\App\Models\ProductDetail` Model
 
@@ -184,4 +184,3 @@ $multiProductRelations = FluentCart\App\Models\AttributeRelation::whereIn('objec
 ```
 
 ---
-

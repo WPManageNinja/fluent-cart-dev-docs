@@ -1,12 +1,285 @@
 /// <reference types="node" />
 
 import { defineConfig } from 'vitepress'
-import { copyFileSync, mkdirSync, readdirSync, statSync, existsSync, writeFileSync } from 'fs'
+import { copyFileSync, mkdirSync, readdirSync, statSync, existsSync, writeFileSync, readFileSync } from 'fs'
 import { join, dirname, relative } from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+const projectRoot = join(__dirname, '..')
+
+// Explicit logical ordering per module — slug order defines sidebar order
+// Any slugs not listed here appear at the end (alphabetically)
+const MODULE_ORDER: Record<string, string[]> = {
+  orders: [
+    'list-orders', 'get-order', 'create-order', 'update-order', 'delete-order',
+    'mark-as-paid', 'refund-order', 'accept-dispute',
+    'update-order-address', 'update-order-address-id', 'change-customer', 'create-and-change-customer',
+    'get-order-transactions', 'get-single-transaction', 'update-transaction-status',
+    'create-custom-order-item', 'update-statuses', 'sync-order-statuses',
+    'get-shipping-methods', 'calculate-shipping',
+    'generate-missing-licenses', 'bulk-actions',
+  ],
+  products: [
+    'list-products', 'get-product', 'create-product', 'update-product-detail', 'delete-product', 'duplicate-product',
+    'search-products-by-name', 'fetch-products-by-ids',
+    'get-product-pricing', 'update-product-pricing',
+    'list-product-variations', 'list-all-variants', 'create-variation', 'update-variation', 'delete-variation',
+    'fetch-variations-by-ids', 'search-variants-by-name', 'search-product-variant-options',
+    'update-variant-option', 'update-variation-pricing-table', 'set-variation-media',
+    'find-subscription-variants',
+    'update-inventory', 'update-manage-stock', 'suggest-sku',
+    'get-downloadable-url', 'sync-downloadable-files', 'update-downloadable-file', 'delete-downloadable-file',
+    'get-bundle-info', 'save-bundle-info',
+    'get-upgrade-settings', 'get-variation-upgrade-paths', 'save-upgrade-path', 'update-upgrade-path', 'delete-upgrade-path',
+    'get-pricing-widgets', 'get-related-products', 'get-max-excerpt-word-count', 'update-long-desc-editor-mode',
+    'fetch-taxonomy-terms', 'fetch-terms-by-parent', 'add-product-terms', 'sync-taxonomy-terms', 'delete-taxonomy-term',
+    'update-shipping-class', 'remove-shipping-class', 'update-tax-class', 'remove-tax-class',
+    'get-product-integration-settings', 'get-product-integration-feeds', 'save-product-integration',
+    'change-integration-status', 'delete-product-integration',
+    'bulk-edit-fetch', 'bulk-insert-products', 'bulk-update-products', 'do-bulk-action', 'create-dummy-products',
+  ],
+  customers: [
+    'list-customers', 'get-customer', 'create-customer', 'update-customer',
+    'get-customer-stats', 'get-customer-orders', 'find-customer-order', 'recalculate-ltv',
+    'get-customer-addresses', 'create-address', 'update-address', 'set-primary-address', 'delete-address',
+    'update-additional-info',
+    'attach-user', 'detach-user', 'get-attachable-users',
+    'bulk-actions',
+  ],
+  coupons: [
+    'list-coupons', 'get-coupon', 'create-coupon', 'update-coupon', 'delete-coupon',
+    'list-coupon-codes', 'apply-coupon', 'cancel-coupon', 're-apply-coupons',
+    'check-product-eligibility',
+    'get-coupon-settings', 'store-coupon-settings',
+  ],
+  subscriptions: [
+    'list-subscriptions', 'get-subscription', 'list-customer-subscriptions', 'get-customer-subscription',
+    'cancel-subscription', 'pause-subscription', 'resume-subscription', 'reactivate-subscription',
+    'cancel-auto-renew',
+    'update-payment-method', 'switch-payment-method',
+    'initiate-early-payment', 'generate-early-payment-link',
+    'confirm-subscription-switch', 'get-or-create-plan',
+    'fetch-subscription-remote', 'get-setup-intent-attempts',
+  ],
+  tax: [
+    'get-tax-settings', 'save-tax-settings',
+    'list-tax-classes', 'create-tax-class', 'update-tax-class', 'delete-tax-class',
+    'list-all-tax-rates', 'create-tax-rate', 'update-tax-rate', 'delete-tax-rate',
+    'list-tax-records', 'mark-taxes-as-filed',
+    'get-country-tax-rates', 'get-country-tax-id', 'save-country-tax-id',
+    'save-configured-countries',
+    'get-eu-tax-rates', 'save-eu-vat-cross-border-settings',
+    'get-preconfigured-tax-rates',
+    'save-oss-tax-override', 'delete-oss-tax-override',
+    'save-oss-shipping-tax-override', 'delete-oss-shipping-tax-override',
+    'save-shipping-tax-override', 'delete-shipping-tax-override',
+    'delete-country-rates',
+  ],
+  shipping: [
+    'list-shipping-zones', 'get-shipping-zone', 'create-shipping-zone', 'update-shipping-zone', 'delete-shipping-zone',
+    'update-zone-order', 'get-zone-states',
+    'create-shipping-method', 'update-shipping-method', 'delete-shipping-method',
+    'list-shipping-classes', 'get-shipping-class', 'create-shipping-class', 'update-shipping-class', 'delete-shipping-class',
+  ],
+  settings: [
+    'get-store-settings', 'save-store-settings',
+    'get-module-settings', 'save-module-settings',
+    'get-checkout-fields', 'save-checkout-fields',
+    'save-confirmation-settings',
+    'get-permissions', 'save-permissions',
+    'list-all-payment-methods', 'get-payment-method-settings', 'save-payment-method-settings',
+    'get-payment-method-connection-info', 'save-payment-method-design', 'reorder-payment-methods',
+    'disconnect-payment-method', 'activate-payment-addon', 'install-payment-addon',
+    'check-paypal-webhook', 'setup-paypal-webhook', 'exchange-paypal-seller-auth-token',
+    'list-all-storage-drivers', 'get-active-storage-drivers', 'get-storage-driver-settings',
+    'save-storage-driver-settings', 'verify-storage-driver-connection',
+    'get-plugin-addons', 'activate-plugin-addon', 'install-plugin-addon',
+    'get-email-shortcodes',
+  ],
+  'email-notification': [
+    'list-notifications', 'get-notification', 'update-notification', 'enable-notification',
+    'preview-notification', 'preview-default-template',
+    'get-settings', 'save-settings',
+    'get-shortcodes',
+    'get-reminders', 'save-reminders',
+  ],
+  reports: [
+    'get-overview', 'report-overview', 'get-dashboard-summary', 'dashboard-stats',
+    'get-revenue', 'revenue-by-group',
+    'order-chart', 'fetch-order-by-group', 'quick-order-stats',
+    'get-recent-orders', 'get-unfulfilled-orders', 'order-completion-time', 'order-value-distribution', 'item-count-distribution',
+    'sales-report', 'sales-growth', 'sales-growth-chart',
+    'product-report', 'product-performance', 'fetch-top-sold-products', 'fetch-top-sold-variants', 'top-products-sold',
+    'customer-report', 'daily-signups', 'fetch-new-vs-returning-customer', 'search-repeat-customer',
+    'subscription-chart', 'subscription-cohorts', 'subscription-retention', 'future-renewals',
+    'refund-chart', 'refund-data-by-group', 'weeks-between-refund',
+    'retention-chart', 'generate-retention-snapshots', 'retention-snapshots-status',
+    'license-chart', 'license-pie-chart', 'license-summary',
+    'country-heat-map', 'sources',
+    'cart-report', 'fetch-report-by-day-and-hour', 'fetch-report-meta',
+    'get-recent-activities',
+  ],
+  integration: [
+    'list-addons', 'install-addon-plugin',
+    'get-global-settings', 'set-global-settings',
+    'get-global-feeds', 'get-feed-lists', 'get-feed-settings', 'save-feed-settings',
+    'change-feed-status', 'delete-feed',
+    'list-product-feeds', 'get-product-integration-settings', 'save-product-integration',
+    'change-product-feed-status', 'delete-product-integration',
+    'get-dynamic-options', 'chained-data-request',
+  ],
+  files: [
+    'list-files', 'get-bucket-list', 'upload-file', 'upload-editor-file', 'delete-file',
+  ],
+  'labels-attributes': [
+    'list-labels', 'create-label', 'update-label-selections',
+    'list-attribute-groups', 'get-attribute-group', 'create-attribute-group', 'update-attribute-group', 'delete-attribute-group',
+    'list-attribute-terms', 'create-attribute-term', 'update-attribute-term', 'delete-attribute-term',
+    'change-term-sort-order',
+  ],
+  dashboard: [
+    'initialize-app', 'get-dashboard-stats', 'get-widgets',
+    'get-onboarding-data', 'get-onboarding-settings', 'save-onboarding-settings',
+    'get-filter-options', 'get-search-options', 'get-country-info', 'list-countries',
+    'list-activities', 'mark-activity-read', 'delete-activity',
+    'attach-note-to-order',
+    'list-attachments', 'upload-attachment',
+    'get-print-templates', 'save-print-templates',
+    'create-all-pages', 'create-single-page',
+  ],
+  'public-shop': [
+    'list-products', 'get-product-views', 'search-products',
+  ],
+  checkout: [
+    'get-checkout-summary', 'get-country-info',
+    'get-available-shipping-methods', 'get-shipping-methods-list-view',
+    'get-order-info', 'place-order', 'login',
+  ],
+  'customer-profile': [
+    'get-profile-details', 'update-profile-details',
+    'get-customer-details', 'update-customer-details',
+    'dashboard-overview',
+    'list-orders', 'get-order-details', 'get-customer-orders',
+    'list-downloads',
+    'get-upgrade-paths',
+    'create-profile-address', 'update-profile-address', 'delete-profile-address', 'make-profile-address-primary',
+    'create-address-checkout', 'update-address-checkout', 'delete-address-checkout', 'select-address-for-checkout',
+    'set-address-as-primary',
+    'get-transaction-billing-address', 'save-transaction-billing-address',
+  ],
+  licensing: [
+    'list-licenses', 'get-license-details', 'delete-license',
+    'get-license-activations', 'update-license-activation-limit', 'update-license-status',
+    'regenerate-license-key', 'extend-license-validity',
+    'get-customer-licenses-admin', 'get-customer-license-details', 'list-customer-licenses',
+    'get-product-license-settings', 'save-product-license-settings',
+    'get-license-chart', 'get-license-pie-chart', 'get-license-summary',
+    'activate-plugin-license', 'deactivate-plugin-license', 'get-plugin-license-status',
+    'public-activate-license', 'public-deactivate-license', 'public-check-license',
+    'public-get-license-version', 'public-download-license-package',
+    'activate-site-admin', 'deactivate-site-admin', 'deactivate-site-customer',
+  ],
+  'roles-permissions': [
+    'list-roles', 'get-role', 'update-role',
+    'list-managers', 'assign-role', 'delete-role-assignment',
+    'search-users',
+    'get-permissions', 'save-permissions',
+  ],
+  'order-bumps': [
+    'list-order-bumps', 'get-order-bump', 'create-order-bump', 'update-order-bump', 'delete-order-bump',
+  ],
+}
+
+// Auto-generate sidebar items from docs/restapi/operations/
+function getOperationSidebarItems(moduleDir: string, label: string) {
+  const opsDir = join(projectRoot, 'docs', 'restapi', 'operations', moduleDir)
+  if (!existsSync(opsDir)) return []
+
+  const files = readdirSync(opsDir).filter(f => f.endsWith('.md'))
+  const order = MODULE_ORDER[moduleDir] || []
+
+  const items = files.map(file => {
+    const slug = file.replace('.md', '')
+    const content = readFileSync(join(opsDir, file), 'utf-8')
+    const titleMatch = content.match(/^title:\s*(.+)$/m)
+    const title = titleMatch ? titleMatch[1].replace(/['"]/g, '') : slug.replace(/-/g, ' ')
+    return { text: title, link: `/restapi/operations/${moduleDir}/${slug}`, _slug: slug }
+  })
+
+  // Sort by explicit order, unlisted items go to the end
+  items.sort((a, b) => {
+    const ia = order.indexOf(a._slug)
+    const ib = order.indexOf(b._slug)
+    const posA = ia === -1 ? 9999 : ia
+    const posB = ib === -1 ? 9999 : ib
+    if (posA !== posB) return posA - posB
+    return a.text.localeCompare(b.text)
+  })
+
+  return items.map(({ _slug, ...rest }) => rest)
+}
+
+// Build REST API sidebar with per-endpoint operation links
+function buildRestApiSidebar() {
+  const modules = [
+    { group: 'Core Resources', items: [
+      { text: 'Orders', link: '/restapi/orders', dir: 'orders' },
+      { text: 'Products', link: '/restapi/products', dir: 'products' },
+      { text: 'Customers', link: '/restapi/customers', dir: 'customers' },
+      { text: 'Coupons', link: '/restapi/coupons', dir: 'coupons' },
+      { text: 'Subscriptions', link: '/restapi/subscriptions', dir: 'subscriptions' },
+    ]},
+    { group: 'Configuration', items: [
+      { text: 'Tax', link: '/restapi/tax', dir: 'tax' },
+      { text: 'Shipping', link: '/restapi/shipping', dir: 'shipping' },
+      { text: 'Settings', link: '/restapi/settings', dir: 'settings' },
+      { text: 'Email Notifications', link: '/restapi/email-notifications', dir: 'email-notification' },
+    ]},
+    { group: 'Analytics & Content', items: [
+      { text: 'Reports', link: '/restapi/reports', dir: 'reports' },
+      { text: 'Integrations', link: '/restapi/integrations', dir: 'integration' },
+      { text: 'Files', link: '/restapi/files', dir: 'files' },
+      { text: 'Labels & Attributes', link: '/restapi/labels-and-attributes', dir: 'labels-attributes' },
+      { text: 'Dashboard', link: '/restapi/dashboard', dir: 'dashboard' },
+    ]},
+    { group: 'Storefront & Checkout', items: [
+      { text: 'Public Shop', link: '/restapi/public-shop', dir: 'public-shop' },
+      { text: 'Checkout', link: '/restapi/checkout', dir: 'checkout' },
+      { text: 'Customer Profile', link: '/restapi/customer-profile', dir: 'customer-profile' },
+    ]},
+    { group: 'Pro Features', items: [
+      { text: 'Licensing', link: '/restapi/licensing', dir: 'licensing' },
+      { text: 'Roles & Permissions', link: '/restapi/roles', dir: 'roles-permissions' },
+      { text: 'Order Bumps', link: '/restapi/order-bumps', dir: 'order-bumps' },
+    ]},
+  ]
+
+  const sidebar: any[] = [
+    { text: 'Getting Started', items: [{ text: 'API Overview', link: '/restapi/' }] }
+  ]
+
+  for (const section of modules) {
+    const sectionItems: any[] = []
+    for (const mod of section.items) {
+      const ops = getOperationSidebarItems(mod.dir, mod.text)
+      if (ops.length > 0) {
+        sectionItems.push({
+          text: mod.text,
+          link: mod.link,
+          collapsed: true,
+          items: ops
+        })
+      } else {
+        sectionItems.push({ text: mod.text, link: mod.link })
+      }
+    }
+    sidebar.push({ text: section.group, collapsed: false, items: sectionItems })
+  }
+
+  return sidebar
+}
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -27,10 +300,26 @@ export default defineConfig({
     plugins: [
       {
         name: 'copy-openapi-json-files',
+        configureServer(server) {
+          // Serve OpenAPI JSON files in dev mode at /openapi/public/ path
+          // (matches the production build path structure)
+          server.middlewares.use((req, res, next) => {
+            if (req.url?.startsWith('/openapi/public/')) {
+              const filePath = req.url.replace('/openapi/public/', '')
+              const fullPath = join(projectRoot, 'public', 'openapi', filePath)
+              if (existsSync(fullPath)) {
+                const content = readFileSync(fullPath, 'utf-8')
+                res.setHeader('Content-Type', 'application/json')
+                res.setHeader('Access-Control-Allow-Origin', '*')
+                res.end(content)
+                return
+              }
+            }
+            next()
+          })
+        },
         closeBundle() {
           // This runs after the bundle is closed
-          // __dirname is .vitepress, so go up one level to project root
-          const projectRoot = join(__dirname, '..')
           const sourceDir = join(projectRoot, 'public', 'openapi')
           const targetDir = join(__dirname, 'dist', 'openapi', 'public')
           
@@ -316,138 +605,7 @@ export default defineConfig({
           ]
         }
       ],
-      '/restapi/': [
-        {
-          text: 'Getting Started',
-          items: [
-            { text: 'API Overview', link: '/restapi/' }
-          ]
-        },
-        {
-          text: 'Orders',
-          items: [
-            { text: 'List Orders <badge type="tip">GET</badge>', link: '/restapi/operations/orders/list-orders' },
-            { text: 'Create Order <badge type="warning">POST</badge>', link: '/restapi/operations/orders/create-order' },
-            { text: 'Get Order <badge type="tip">GET</badge>', link: '/restapi/operations/orders/get-order' },
-            { text: 'Update Order <badge type="warning">POST</badge>', link: '/restapi/operations/orders/update-order' },
-            { text: 'Delete Order <badge type="danger">DELETE</badge>', link: '/restapi/operations/orders/delete-order' },
-            { text: 'Mark as Paid <badge type="warning">POST</badge>', link: '/restapi/operations/orders/mark-as-paid' },
-            { text: 'Refund Order <badge type="warning">POST</badge>', link: '/restapi/operations/orders/refund-order' },
-            { text: 'Update Statuses <badge type="info">PUT</badge>', link: '/restapi/operations/orders/update-statuses' }
-          ]
-        },
-        {
-          text: 'Products',
-          items: [
-            { text: 'List Products <badge type="tip">GET</badge>', link: '/restapi/operations/products/list-products' },
-            { text: 'Create Product <badge type="warning">POST</badge>', link: '/restapi/operations/products/create-product' },
-            { text: 'Get Product <badge type="tip">GET</badge>', link: '/restapi/operations/products/get-product' },
-            { text: 'Update Product Pricing <badge type="warning">POST</badge>', link: '/restapi/operations/products/update-product-pricing' },
-            { text: 'Delete Product <badge type="danger">DELETE</badge>', link: '/restapi/operations/products/delete-product' }
-          ]
-        },
-        {
-          text: 'Customers',
-          items: [
-            { text: 'List Customers <badge type="tip">GET</badge>', link: '/restapi/operations/customers/list-customers' },
-            { text: 'Create Customer <badge type="warning">POST</badge>', link: '/restapi/operations/customers/create-customer' },
-            { text: 'Get Customer <badge type="tip">GET</badge>', link: '/restapi/operations/customers/get-customer' },
-            { text: 'Update Customer <badge type="info">PUT</badge>', link: '/restapi/operations/customers/update-customer' }
-          ]
-        },
-        {
-          text: 'Coupons',
-          items: [
-            { text: 'List Coupons <badge type="tip">GET</badge>', link: '/restapi/operations/coupons/list-coupons' },
-            { text: 'Create Coupon <badge type="warning">POST</badge>', link: '/restapi/operations/coupons/create-coupon' },
-            { text: 'Get Coupon <badge type="tip">GET</badge>', link: '/restapi/operations/coupons/get-coupon' },
-            { text: 'Update Coupon <badge type="info">PUT</badge>', link: '/restapi/operations/coupons/update-coupon' },
-            { text: 'Delete Coupon <badge type="danger">DELETE</badge>', link: '/restapi/operations/coupons/delete-coupon' },
-            { text: 'Apply Coupon <badge type="warning">POST</badge>', link: '/restapi/operations/coupons/apply-coupon' }
-          ]
-        },
-        {
-          text: 'Subscriptions',
-          items: [
-            { text: 'List Subscriptions <badge type="tip">GET</badge>', link: '/restapi/operations/subscriptions/list-subscriptions' },
-            { text: 'Get Subscription <badge type="tip">GET</badge>', link: '/restapi/operations/subscriptions/get-subscription' },
-            { text: 'Cancel Subscription <badge type="info">PUT</badge>', link: '/restapi/operations/subscriptions/cancel-subscription' },
-            { text: 'Reactivate Subscription <badge type="info">PUT</badge>', link: '/restapi/operations/subscriptions/reactivate-subscription' }
-          ]
-        },
-        {
-          text: 'Tax',
-          items: [
-            { text: 'List Tax Classes <badge type="tip">GET</badge>', link: '/restapi/operations/tax/list-tax-classes' },
-            { text: 'Create Tax Class <badge type="warning">POST</badge>', link: '/restapi/operations/tax/create-tax-class' }
-          ]
-        },
-        {
-          text: 'Shipping',
-          items: [
-            { text: 'List Shipping Zones <badge type="tip">GET</badge>', link: '/restapi/operations/shipping/list-shipping-zones' }
-          ]
-        },
-        {
-          text: 'Settings',
-          items: [
-            { text: 'Get Store Settings <badge type="tip">GET</badge>', link: '/restapi/operations/settings/get-store-settings' },
-            { text: 'Save Store Settings <badge type="warning">POST</badge>', link: '/restapi/operations/settings/save-store-settings' }
-          ]
-        },
-        {
-          text: 'Reports',
-          items: [
-            { text: 'Get Reports Overview <badge type="tip">GET</badge>', link: '/restapi/operations/reports/get-overview' },
-            { text: 'Get Quick Order Stats <badge type="tip">GET</badge>', link: '/restapi/operations/reports/quick-order-stats' }
-          ]
-        },
-        {
-          text: 'Files',
-          items: [
-            { text: 'List Files <badge type="tip">GET</badge>', link: '/restapi/operations/files/list-files' },
-            { text: 'Upload File <badge type="warning">POST</badge>', link: '/restapi/operations/files/upload-file' }
-          ]
-        },
-        {
-          text: 'Dashboard',
-          items: [
-            { text: 'Get Dashboard Stats <badge type="tip">GET</badge>', link: '/restapi/operations/dashboard/get-dashboard-stats' }
-          ]
-        },
-        {
-          text: 'Roles & Permissions',
-          items: [
-            { text: 'Get Permissions <badge type="tip">GET</badge>', link: '/restapi/operations/roles-permissions/get-permissions' },
-            { text: 'Save Permissions <badge type="warning">POST</badge>', link: '/restapi/operations/roles-permissions/save-permissions' }
-          ]
-        },
-        {
-          text: 'Integration',
-          items: [
-            { text: 'List Addons <badge type="tip">GET</badge>', link: '/restapi/operations/integration/list-addons' },
-            { text: 'Get Global Settings <badge type="tip">GET</badge>', link: '/restapi/operations/integration/get-global-settings' },
-            { text: 'Set Global Settings <badge type="warning">POST</badge>', link: '/restapi/operations/integration/set-global-settings' },
-            { text: 'Get Global Feeds <badge type="tip">GET</badge>', link: '/restapi/operations/integration/get-global-feeds' }
-          ]
-        },
-        {
-          text: 'Licensing',
-          items: [
-            { text: 'Get License Line Chart <badge type="tip">GET</badge>', link: '/restapi/operations/licensing/get-license-chart' },
-            { text: 'Get License Pie Chart <badge type="tip">GET</badge>', link: '/restapi/operations/licensing/get-license-pie-chart' },
-            { text: 'Get License Summary <badge type="tip">GET</badge>', link: '/restapi/operations/licensing/get-license-summary' }
-          ]
-        },
-        {
-          text: 'Email Notification',
-          items: [
-            { text: 'List Notifications <badge type="tip">GET</badge>', link: '/restapi/operations/email-notification/list-notifications' },
-            { text: 'Get Notification Details <badge type="tip">GET</badge>', link: '/restapi/operations/email-notification/get-notification' },
-            { text: 'Update Notification <badge type="info">PUT</badge>', link: '/restapi/operations/email-notification/update-notification' }
-          ]
-        }
-      ],
+      '/restapi/': buildRestApiSidebar(),
       // '/api/': [
       //   {
       //     text: 'REST API',

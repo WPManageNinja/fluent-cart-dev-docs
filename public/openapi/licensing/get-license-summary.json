@@ -1,11 +1,36 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/reports/license-summary": {
       "get": {
         "operationId": "getLicenseSummary",
         "summary": "GET Get License Summary",
         "description": "Retrieve a summary of license statistics.",
-        "tags": ["Licensing"],
+        "tags": [
+          "Licensing"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -72,6 +97,15 @@
         }
       }
     }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
   }
 }
-

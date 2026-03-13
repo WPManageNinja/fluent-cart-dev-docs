@@ -4,5 +4,4 @@ description: "Create a new discount coupon."
 outline: false
 aside: false
 ---
-<OAOperation operationId="createCoupon" />
-
+<OAOperation operationId="createCoupon" specUrl="/openapi/public/coupons/create-coupon.json" />

@@ -1,0 +1,126 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/integration/feed/install-plugin": {
+      "post": {
+        "operationId": "installAddonPlugin",
+        "summary": "POST Install and Activate Add-on Plugin",
+        "description": "Install and activate a supported integration plugin from the WordPress.org repository. Only whitelisted plugins can be installed through this endpoint.",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "addon"
+                ],
+                "properties": {
+                  "addon": {
+                    "type": "string",
+                    "description": "The plugin slug to install",
+                    "enum": [
+                      "fluent-crm",
+                      "fluent-smtp",
+                      "fluent-community",
+                      "fluent-security",
+                      "fluentform",
+                      "fluent-support"
+                    ],
+                    "example": "fluent-crm"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    },
+                    "redirect": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL to redirect after installation"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Addon installation started successfully.",
+                  "redirect": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Addon cannot be installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "This addon cannot be installed at this time"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

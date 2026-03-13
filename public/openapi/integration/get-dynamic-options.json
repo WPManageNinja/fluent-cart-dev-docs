@@ -1,0 +1,145 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/integration/feed/dynamic_options": {
+      "get": {
+        "operationId": "getDynamicOptions",
+        "summary": "GET Dynamic Options",
+        "description": "Fetch dynamic select options for integration feed fields. Supports WordPress post type searches and provider-specific dynamic option lookups. Used by the feed editor to populate dropdown fields asynchronously.",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "option_key",
+            "in": "query",
+            "required": true,
+            "description": "The type of options to fetch (e.g., `post_type` for WordPress posts, or a provider-specific key)",
+            "schema": {
+              "type": "string",
+              "example": "post_type"
+            }
+          },
+          {
+            "name": "sub_option_key",
+            "in": "query",
+            "required": false,
+            "description": "Required when `option_key` is `post_type`. Specifies the post type slug (e.g., `post`, `page`, `fluent-products`)",
+            "schema": {
+              "type": "string",
+              "example": "page"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search term to filter results",
+            "schema": {
+              "type": "string",
+              "example": "about"
+            }
+          },
+          {
+            "name": "values",
+            "in": "query",
+            "required": false,
+            "description": "Array of pre-selected IDs to ensure they are included in the response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/DynamicOption"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "options": [
+                    {
+                      "id": "123",
+                      "title": "Example Product"
+                    },
+                    {
+                      "id": "456",
+                      "title": "Another Product"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DynamicOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Option identifier",
+            "example": "123"
+          },
+          "title": {
+            "type": "string",
+            "description": "Option display title",
+            "example": "Example Product"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

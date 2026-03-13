@@ -1,0 +1,109 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/roles": {
+      "get": {
+        "operationId": "listRoles",
+        "summary": "GET List Roles",
+        "description": "Retrieve all available FluentCart roles with their titles and descriptions. This returns the role definitions (not user assignments).",
+        "tags": [
+          "Roles"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roles": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/RoleDefinition"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "roles": {
+                    "super_admin": {
+                      "title": "Super Admin",
+                      "description": "With All Permissions"
+                    },
+                    "manager": {
+                      "title": "Manager",
+                      "description": "With All Permissions Except Sensitive Settings"
+                    },
+                    "worker": {
+                      "title": "Worker",
+                      "description": "View Access for products, customers, coupons, integrations. Manage Access for Order Statuses"
+                    },
+                    "accountant": {
+                      "title": "Accountant",
+                      "description": "View Access for products, customers, orders, subscriptions, licenses, coupons, reports and integrations"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RoleDefinition": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Display title of the role",
+            "example": "Manager"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the role's permissions",
+            "example": "With All Permissions Except Sensitive Settings"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group/{group_id}/term": {
+      "post": {
+        "operationId": "createAttributeTerm",
+        "summary": "POST Create Attribute Term",
+        "description": "Create a new term within an attribute group.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "The attribute group ID.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAttributeTermRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attribute term created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AttributeTerm"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully created!"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "id": 6,
+                    "group_id": 1,
+                    "serial": 10,
+                    "title": "Green",
+                    "slug": "green",
+                    "description": null,
+                    "settings": null,
+                    "created_at": "2025-01-15 12:00:00",
+                    "updated_at": "2025-01-15 12:00:00"
+                  },
+                  "message": "Successfully created!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attribute group not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Information mismatch."
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 404
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Information mismatch.",
+                  "code": 404
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "slug": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": {
+                    "title": [
+                      "Title is required"
+                    ],
+                    "slug": [
+                      "Slug is required"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateAttributeTermRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "slug"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Term title (max 50 characters). Must be unique across all terms.",
+            "example": "Green"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Term slug (max 50 characters). Must be unique across all terms. Used as an identifier in variation data.",
+            "example": "green"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Term description."
+          },
+          "serial": {
+            "type": "integer",
+            "description": "Sort order position (default: `10`). Lower values appear first.",
+            "default": 10,
+            "example": 3
+          }
+        }
+      },
+      "AttributeTerm": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Term ID",
+            "example": 6
+          },
+          "group_id": {
+            "type": "integer",
+            "description": "Parent attribute group ID",
+            "example": 1
+          },
+          "serial": {
+            "type": "integer",
+            "description": "Sort order position",
+            "example": 10
+          },
+          "title": {
+            "type": "string",
+            "description": "Term title",
+            "example": "Green"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Term slug identifier",
+            "example": "green"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Term description",
+            "example": null
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional term settings",
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (UTC)",
+            "example": "2025-01-15 12:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (UTC)",
+            "example": "2025-01-15 12:00:00"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

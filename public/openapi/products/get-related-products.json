@@ -1,0 +1,118 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/{productId}/related-products": {
+      "get": {
+        "operationId": "getRelatedProducts",
+        "summary": "GET Get Related Products",
+        "description": "Retrieve products related to a given product based on shared categories or brands.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The product ID",
+            "required": true
+          },
+          {
+            "name": "related_by_categories",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include products from same categories",
+            "required": false
+          },
+          {
+            "name": "related_by_brands",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Include products from same brands",
+            "required": false
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sort order (default: title_asc)",
+            "required": false
+          },
+          {
+            "name": "posts_per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of related products to return (default: 6)",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "products": [
+                    {
+                      "ID": 456,
+                      "post_title": "Related Product",
+                      "post_status": "publish"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

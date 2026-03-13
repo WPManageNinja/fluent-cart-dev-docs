@@ -1,0 +1,163 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customers/{customerId}": {
+      "put": {
+        "operationId": "updateCustomerDetails",
+        "summary": "PUT Update Customer Details",
+        "description": "Update the authenticated customer's profile details. The customerId must match the logged-in customer's record.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The customer ID. Must belong to the authenticated user.",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Customer email address. Must be unique and valid. Max 255 characters."
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "description": "Customer first name. Required when store uses separate name fields. Max 255 characters."
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "description": "Customer last name. Max 255 characters."
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "description": "Customer full name. Required when store uses full name mode. Max 255 characters."
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Customer city"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Customer state/province code"
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Customer postal/zip code"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Customer country code (e.g., `US`, `GB`)"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Internal notes about the customer"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Customer status"
+                  }
+                }
+              },
+              "example": {
+                "first_name": "John",
+                "last_name": "Smith",
+                "email": "john@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the updated customer data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Customer updated successfully!",
+                  "data": {
+                    "id": 1,
+                    "email": "john@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. The authenticated user does not own this customer record.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not authorized to update this customer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

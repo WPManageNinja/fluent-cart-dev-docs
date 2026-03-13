@@ -1,0 +1,115 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/make-primary-address": {
+      "post": {
+        "operationId": "makeProfileAddressPrimary",
+        "summary": "POST Make Profile Address Primary",
+        "description": "Set a specific address as the primary address for its type. All other addresses of the same type for the customer are demoted.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "addressId",
+                  "type"
+                ],
+                "properties": {
+                  "addressId": {
+                    "type": "integer",
+                    "description": "The address record ID to set as primary"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "billing",
+                      "shipping"
+                    ],
+                    "description": "Address type: `billing` or `shipping`"
+                  }
+                }
+              },
+              "example": {
+                "addressId": 5,
+                "type": "billing"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Address set as primary.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Address successfully set as the primary"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. The authenticated user does not own this address.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not authorized to update this address"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

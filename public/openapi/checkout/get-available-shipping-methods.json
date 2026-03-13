@@ -1,0 +1,206 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/checkout/get-available-shipping-methods": {
+      "get": {
+        "operationId": "getAvailableShippingMethods",
+        "summary": "GET Get Available Shipping Methods",
+        "description": "Retrieve shipping methods available for a given country and state. The country can be auto-detected from the customer's timezone or provided directly via country code.",
+        "tags": [
+          "Checkout"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "timezone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "IANA timezone string (e.g., `America/New_York`, `Europe/London`). Used to auto-detect the country. Either `timezone` or `country_code` must be provided",
+            "required": false
+          },
+          {
+            "name": "country_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ISO 3166-1 alpha-2 country code (e.g., `US`, `GB`). Used when `timezone` is not provided",
+            "required": false
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "State/province code to further filter applicable shipping methods",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns available shipping methods for the given location.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "available_shipping_methods": {
+                      "type": "array",
+                      "description": "List of available shipping methods",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Shipping method ID"
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Shipping method display name"
+                          },
+                          "charge_type": {
+                            "type": "string",
+                            "description": "Charge type (e.g., `flat_rate`)"
+                          },
+                          "charge_amount": {
+                            "type": "integer",
+                            "description": "Shipping charge in cents"
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "Shipping method status"
+                          },
+                          "countries": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "List of supported country codes"
+                          },
+                          "states": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "List of supported state codes (empty for all states)"
+                          }
+                        }
+                      }
+                    },
+                    "country_code": {
+                      "type": "string",
+                      "description": "The resolved country code"
+                    },
+                    "status": {
+                      "type": "boolean",
+                      "description": "Status flag (present in error responses)"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Error message when no country provided"
+                    },
+                    "view": {
+                      "type": "string",
+                      "description": "HTML view when no methods are available"
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Available shipping methods",
+                    "value": {
+                      "available_shipping_methods": [
+                        {
+                          "id": 1,
+                          "title": "Standard Shipping",
+                          "charge_type": "flat_rate",
+                          "charge_amount": 500,
+                          "status": "active",
+                          "countries": [
+                            "US",
+                            "CA"
+                          ],
+                          "states": []
+                        },
+                        {
+                          "id": 2,
+                          "title": "Express Shipping",
+                          "charge_type": "flat_rate",
+                          "charge_amount": 1500,
+                          "status": "active",
+                          "countries": [
+                            "US"
+                          ],
+                          "states": [
+                            "NY",
+                            "CA"
+                          ]
+                        }
+                      ],
+                      "country_code": "US"
+                    }
+                  },
+                  "missing_country": {
+                    "summary": "Missing country",
+                    "value": {
+                      "status": false,
+                      "message": "Country code is required"
+                    }
+                  },
+                  "no_methods": {
+                    "summary": "No methods available",
+                    "value": {
+                      "status": false,
+                      "country_code": "XX",
+                      "view": "<div class=\"fct-empty-state\">No shipping methods available for this address.</div>"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

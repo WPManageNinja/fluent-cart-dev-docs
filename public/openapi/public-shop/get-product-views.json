@@ -1,0 +1,203 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/public/product-views": {
+      "get": {
+        "operationId": "getProductViews",
+        "summary": "GET Get Product Views",
+        "description": "Retrieve server-rendered HTML views of product listings. Used by Gutenberg blocks and shortcodes for AJAX-powered product grids.",
+        "tags": [
+          "Public Shop"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of products per page"
+          },
+          {
+            "name": "current_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Current page number"
+          },
+          {
+            "name": "template_provider",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Template provider identifier for custom rendering"
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier used to retrieve cached block markup from transients"
+          },
+          {
+            "name": "order_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "default": "DESC"
+            },
+            "description": "Sort direction"
+          },
+          {
+            "name": "filters[sort_by]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name-asc",
+                "name-desc",
+                "price-low",
+                "price-high",
+                "date-newest",
+                "date-oldest"
+              ]
+            },
+            "description": "Sort preset"
+          },
+          {
+            "name": "filters[wildcard]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by product title"
+          },
+          {
+            "name": "filters[price_range_from]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Minimum price filter in decimal"
+          },
+          {
+            "name": "filters[price_range_to]",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            },
+            "description": "Maximum price filter in decimal"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "products": {
+                      "type": "object",
+                      "properties": {
+                        "views": {
+                          "type": "string",
+                          "description": "Server-rendered HTML of product listings"
+                        },
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "last_page": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": "integer"
+                        },
+                        "from": {
+                          "type": "integer"
+                        },
+                        "to": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "products": {
+                    "views": "<div class=\"fct-product-card\">...rendered HTML...</div>",
+                    "current_page": 1,
+                    "last_page": 3,
+                    "total": 24,
+                    "per_page": 10,
+                    "from": 1,
+                    "to": 10
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

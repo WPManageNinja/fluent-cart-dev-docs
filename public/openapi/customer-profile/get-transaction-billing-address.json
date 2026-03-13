@@ -1,0 +1,140 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/orders/{transaction_uuid}/billing-address": {
+      "get": {
+        "operationId": "getTransactionBillingAddress",
+        "summary": "GET Get Transaction Billing Address",
+        "description": "Retrieve the billing address associated with a specific transaction. Used for invoice/receipt editing in the customer portal.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "transaction_uuid",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The UUID of the transaction (alphanumeric with dashes)",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the billing address data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "address_1": {
+                          "type": "string"
+                        },
+                        "address_2": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "type": "string"
+                        },
+                        "postcode": {
+                          "type": "string"
+                        },
+                        "country": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "vat_tax_id": {
+                          "type": "string"
+                        },
+                        "address_id": {
+                          "type": [
+                            "integer",
+                            "string"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Success",
+                  "data": {
+                    "address_1": "123 Main St",
+                    "address_2": "",
+                    "city": "New York",
+                    "state": "NY",
+                    "postcode": "10001",
+                    "country": "US",
+                    "name": "John Doe",
+                    "vat_tax_id": "EU123456789",
+                    "address_id": 15
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer, transaction, or order not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Transaction not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

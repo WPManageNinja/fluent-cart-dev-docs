@@ -1,0 +1,287 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/country/rate": {
+      "post": {
+        "operationId": "createTaxRate",
+        "summary": "POST Create Tax Rate",
+        "description": "Create a new tax rate entry for a country.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "class_id"
+                ],
+                "properties": {
+                  "class_id": {
+                    "type": "integer",
+                    "description": "ID of the tax class this rate belongs to",
+                    "example": 1
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "ISO 3166-1 alpha-2 country code (max 45 characters)",
+                    "example": "FR"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "State/province code (max 45 characters)",
+                    "example": ""
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Postcode/ZIP code (max 45 characters)",
+                    "example": ""
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City name (max 45 characters)",
+                    "example": ""
+                  },
+                  "rate": {
+                    "type": "string",
+                    "description": "Tax rate percentage (e.g., \"19.0000\", max 45 characters)",
+                    "example": "20.0000"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name for the tax rate (max 45 characters)",
+                    "example": "FR Standard Tax"
+                  },
+                  "group": {
+                    "type": "string",
+                    "description": "Geographic group/continent code (e.g., EU, NA, max 45 characters)",
+                    "example": "EU"
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "description": "Priority for rate application order (min: 1)",
+                    "minimum": 1,
+                    "example": 1
+                  },
+                  "is_compound": {
+                    "type": "integer",
+                    "description": "Whether this rate is compound (0 or 1, default: 0)",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "default": 0,
+                    "example": 0
+                  },
+                  "for_shipping": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Shipping tax override rate. null means no override",
+                    "example": null
+                  },
+                  "for_order": {
+                    "type": "integer",
+                    "description": "Whether this rate applies at order level (0 or 1, default: 0)",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "default": 0,
+                    "example": 0
+                  }
+                }
+              },
+              "example": {
+                "class_id": 1,
+                "country": "FR",
+                "rate": "20.0000",
+                "name": "FR Standard Tax",
+                "group": "EU",
+                "priority": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tax rate created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rate": {
+                      "$ref": "#/components/schemas/TaxRateWithClass"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tax rate has been created successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rate": {
+                    "id": 10,
+                    "class_id": 1,
+                    "country": "FR",
+                    "state": "",
+                    "postcode": "",
+                    "city": "",
+                    "rate": "20.0000",
+                    "name": "FR Standard Tax",
+                    "group": "EU",
+                    "priority": 1,
+                    "is_compound": 0,
+                    "for_shipping": null,
+                    "for_order": 0,
+                    "formatted_state": "",
+                    "tax_class": {
+                      "id": 1,
+                      "title": "Standard"
+                    }
+                  },
+                  "message": "Tax rate has been created successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Tax class is required"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Tax class is required"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TaxRateWithClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 10
+          },
+          "class_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "country": {
+            "type": "string",
+            "example": "FR"
+          },
+          "state": {
+            "type": "string",
+            "example": ""
+          },
+          "postcode": {
+            "type": "string",
+            "example": ""
+          },
+          "city": {
+            "type": "string",
+            "example": ""
+          },
+          "rate": {
+            "type": "string",
+            "example": "20.0000"
+          },
+          "name": {
+            "type": "string",
+            "example": "FR Standard Tax"
+          },
+          "group": {
+            "type": "string",
+            "example": "EU"
+          },
+          "priority": {
+            "type": "integer",
+            "example": 1
+          },
+          "is_compound": {
+            "type": "integer",
+            "example": 0
+          },
+          "for_shipping": {
+            "type": "integer",
+            "nullable": true,
+            "example": null
+          },
+          "for_order": {
+            "type": "integer",
+            "example": 0
+          },
+          "formatted_state": {
+            "type": "string",
+            "example": ""
+          },
+          "tax_class": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              },
+              "title": {
+                "type": "string",
+                "example": "Standard"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

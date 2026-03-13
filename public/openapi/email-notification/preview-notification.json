@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/preview": {
+      "post": {
+        "operationId": "previewEmailNotification",
+        "summary": "POST Preview Notification",
+        "description": "Generate an HTML preview of a custom email notification template. Uses the block editor email body from the notification's saved settings, parses it through the block parser, wraps it in the email template layout, and resolves shortcodes using real or fallback order data.",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "notification_name"
+                ],
+                "properties": {
+                  "notification_name": {
+                    "type": "string",
+                    "description": "The notification key to preview (e.g., order_paid_customer)",
+                    "example": "order_paid_customer"
+                  },
+                  "order_id": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Specific order ID to use for shortcode data. If not provided or not found, the most recent order is used",
+                    "example": 42
+                  }
+                }
+              },
+              "example": {
+                "notification_name": "order_paid_customer",
+                "order_id": 42
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with rendered HTML",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "html": {
+                      "type": "string",
+                      "description": "Fully rendered email HTML including parsed block editor content, header, footer, and resolved shortcodes",
+                      "example": "<!DOCTYPE html><html>...rendered email HTML...</html>"
+                    }
+                  }
+                },
+                "example": {
+                  "html": "<!DOCTYPE html><html>...rendered email HTML...</html>"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing or invalid notification name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No notification name provided."
+                    }
+                  }
+                },
+                "example": {
+                  "message": "No notification name provided."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Notification not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Notification not found."
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Notification not found."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

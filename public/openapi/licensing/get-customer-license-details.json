@@ -1,0 +1,193 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/licenses/{license_key}": {
+      "get": {
+        "operationId": "getCustomerLicenseDetails",
+        "summary": "GET Get Customer License Details",
+        "description": "Retrieve full details of a specific license for the currently logged-in customer.",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "license_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The license key (alphanumeric with dashes)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "license": {
+                      "type": "object",
+                      "properties": {
+                        "license_key": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "expiration_date": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "variation_id": {
+                          "type": "integer"
+                        },
+                        "activation_count": {
+                          "type": "integer"
+                        },
+                        "limit": {
+                          "type": "integer"
+                        },
+                        "product_id": {
+                          "type": "integer"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "subtitle": {
+                          "type": "string"
+                        },
+                        "renewal_url": {
+                          "type": "string"
+                        },
+                        "has_upgrades": {
+                          "type": "boolean"
+                        },
+                        "order": {
+                          "type": "object",
+                          "properties": {
+                            "uuid": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "section_parts": {
+                      "type": "object",
+                      "description": "HTML content blocks injected via the `fluent_cart/customer/license_details_section_parts` filter",
+                      "properties": {
+                        "before_summary": {
+                          "type": "string"
+                        },
+                        "after_summary": {
+                          "type": "string"
+                        },
+                        "end_of_details": {
+                          "type": "string"
+                        },
+                        "additional_actions": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Success",
+                  "license": {
+                    "license_key": "XXXX-XXXX-XXXX-XXXX",
+                    "status": "active",
+                    "expiration_date": "2026-01-15 00:00:00",
+                    "variation_id": 15,
+                    "activation_count": 2,
+                    "limit": 5,
+                    "product_id": 10,
+                    "created_at": "2025-01-15 10:30:00",
+                    "title": "My Plugin",
+                    "subtitle": "Pro License",
+                    "renewal_url": "",
+                    "has_upgrades": true,
+                    "order": {
+                      "uuid": "order-uuid-here"
+                    }
+                  },
+                  "section_parts": {
+                    "before_summary": "",
+                    "after_summary": "",
+                    "end_of_details": "",
+                    "additional_actions": ""
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "License or customer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "License not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

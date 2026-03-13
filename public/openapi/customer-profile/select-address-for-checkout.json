@@ -1,0 +1,135 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customers/{customerAddressId}/update-address-select": {
+      "get": {
+        "operationId": "selectAddressForCheckout",
+        "summary": "GET Select Address for Checkout",
+        "description": "Select an existing address and apply it to the current cart/checkout session. Updates the cart's checkout data with the selected address and returns the rendered address HTML along with updated checkout fragments.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerAddressId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The address record ID to select",
+            "required": true
+          },
+          {
+            "name": "with",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Relationships to eager-load on the address",
+            "required": false
+          },
+          {
+            "name": "fct_cart_hash",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cart hash identifier to locate the active cart session",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the address HTML and updated checkout fragments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    },
+                    "fragments": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Address Attached",
+                  "data": "<div class=\"fct-address-info\">...</div>",
+                  "fragments": {
+                    ".fct-checkout-summary": "<div>...updated summary HTML...</div>"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Address not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Address not found"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. The authenticated user does not own this address.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not authorized to view this address"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

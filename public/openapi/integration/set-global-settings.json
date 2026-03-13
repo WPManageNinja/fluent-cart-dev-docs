@@ -1,12 +1,35 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/integration/global-settings": {
       "post": {
-        "operationId": "setIntegrationGlobalSettings",
-        "summary": "POST Set Global Settings",
-        "description": "Save or update global settings for an integration. The integration field should be a JSON string containing the integration configuration.",
+        "operationId": "saveGlobalIntegrationSettings",
+        "summary": "POST Save Global Integration Settings",
+        "description": "Save or update global configuration settings for a specific integration provider (e.g., API keys, authentication credentials).",
         "tags": [
-          "Integration"
+          "Integrations"
         ],
         "security": [
           {
@@ -20,139 +43,47 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "integration_name",
+                  "settings_key",
                   "integration"
                 ],
                 "properties": {
-                  "integration_name": {
+                  "settings_key": {
                     "type": "string",
-                    "description": "Integration provider name (required)",
-                    "example": "webhook"
+                    "description": "The integration provider key",
+                    "example": "fluent-crm"
                   },
                   "integration": {
-                    "type": "string",
-                    "description": "Integration configuration as JSON string (required)",
-                    "example": "{\"api_key\":\"your-api-key\",\"enabled\":true}"
-                  },
-                  "integration_id": {
-                    "type": "integer",
-                    "nullable": true,
-                    "description": "Integration ID for updates (optional, omit for new integrations)",
-                    "example": null
-                  },
-                  "data_type": {
-                    "type": "string",
-                    "enum": [
-                      "stringify",
-                      "object"
-                    ],
-                    "description": "Data type - use 'stringify' if integration is already a JSON string",
-                    "example": "stringify"
+                    "type": "object",
+                    "description": "The settings data to save (fields vary by provider)",
+                    "example": {
+                      "api_key": "your-api-key",
+                      "api_url": "https://example.com"
+                    }
                   }
                 }
-              },
-              "example": {
-                "integration_name": "webhook",
-                "integration": "{\"api_key\":\"your-api-key\",\"enabled\":true}",
-                "integration_id": null
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Settings saved successfully",
+            "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string",
-                      "description": "Success message",
-                      "example": "Integration has been successfully saved"
+                      "type": "string"
                     },
-                    "integration_id": {
-                      "type": "integer",
-                      "nullable": true,
-                      "description": "Integration ID (null for new, integer for existing)",
-                      "example": 1
-                    },
-                    "integration_name": {
-                      "type": "string",
-                      "description": "Integration provider name",
-                      "example": "webhook"
-                    },
-                    "created": {
-                      "type": "boolean",
-                      "description": "Whether this was a new integration (true) or update (false)",
-                      "example": true
-                    },
-                    "feedData": {
-                      "type": "object",
-                      "description": "Saved feed data",
-                      "properties": {
-                        "meta_key": {
-                          "type": "string",
-                          "description": "Meta key (integration name)",
-                          "example": "webhook"
-                        },
-                        "meta_value": {
-                          "type": "object",
-                          "description": "Integration configuration object",
-                          "additionalProperties": true
-                        },
-                        "object_type": {
-                          "type": "string",
-                          "description": "Object type",
-                          "example": "order_integration"
-                        }
-                      }
+                    "status": {
+                      "type": "boolean"
                     }
                   }
                 },
                 "example": {
-                  "message": "Integration has been successfully saved",
-                  "integration_id": 1,
-                  "integration_name": "webhook",
-                  "created": true,
-                  "feedData": {
-                    "meta_key": "webhook",
-                    "meta_value": {
-                      "api_key": "your-api-key",
-                      "enabled": true
-                    },
-                    "object_type": "order_integration"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request - validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "message": "Validation Failed, Please fill up the required fields.",
-                  "errors": {
-                    "api_key": "API Key is required."
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found - integration not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "message": "Integration not found"
+                  "message": "Settings saved successfully",
+                  "status": true
                 }
               }
             }
@@ -162,87 +93,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "SetGlobalSettingsRequest": {
-        "type": "object",
-        "required": [
-          "integration_name",
-          "integration"
-        ],
-        "properties": {
-          "integration_name": {
-            "type": "string",
-            "description": "Integration provider name (required)",
-            "example": "webhook"
-          },
-          "integration": {
-            "type": "string",
-            "description": "Integration configuration as JSON string (required)",
-            "example": "{\"api_key\":\"your-api-key\",\"enabled\":true}"
-          },
-          "integration_id": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Integration ID for updates (optional, omit for new integrations)",
-            "example": null
-          },
-          "data_type": {
-            "type": "string",
-            "enum": [
-              "stringify",
-              "object"
-            ],
-            "description": "Data type - use 'stringify' if integration is already a JSON string",
-            "example": "stringify"
-          }
-        }
-      },
-      "SetGlobalSettingsResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "Integration has been successfully saved"
-          },
-          "integration_id": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Integration ID (null for new, integer for existing)",
-            "example": 1
-          },
-          "integration_name": {
-            "type": "string",
-            "description": "Integration provider name",
-            "example": "webhook"
-          },
-          "created": {
-            "type": "boolean",
-            "description": "Whether this was a new integration (true) or update (false)",
-            "example": true
-          },
-          "feedData": {
-            "type": "object",
-            "description": "Saved feed data",
-            "properties": {
-              "meta_key": {
-                "type": "string",
-                "description": "Meta key (integration name)",
-                "example": "webhook"
-              },
-              "meta_value": {
-                "type": "object",
-                "description": "Integration configuration object",
-                "additionalProperties": true
-              },
-              "object_type": {
-                "type": "string",
-                "description": "Object type",
-                "example": "order_integration"
-              }
-            }
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -1,0 +1,164 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/advance_filter/get-filter-options": {
+      "get": {
+        "operationId": "getFilterOptions",
+        "summary": "GET Get Filter Options",
+        "description": "Retrieve dynamic filter options for the advanced filter dropdowns. Supports loading product variations, labels, and extensible custom data keys via WordPress filters.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "remote_data_key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The type of filter options to retrieve. Built-in values: product_variations, labels. Custom values are resolved via WordPress filters."
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query to filter options"
+          },
+          {
+            "name": "include_ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specific IDs to include in results"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Maximum number of options to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FilterOption"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "options": [
+                    {
+                      "id": 1,
+                      "title": "Premium T-Shirt - Small / Red",
+                      "children": [
+                        {
+                          "id": 10,
+                          "title": "Small / Red"
+                        },
+                        {
+                          "id": 11,
+                          "title": "Medium / Blue"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FilterOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Option ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Option display title",
+            "example": "Premium T-Shirt - Small / Red"
+          },
+          "children": {
+            "type": "array",
+            "description": "Child options (e.g., product variations)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Child option ID",
+                  "example": 10
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Child option title",
+                  "example": "Small / Red"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

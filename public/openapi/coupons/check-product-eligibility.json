@@ -1,0 +1,129 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/coupons/checkProductEligibility": {
+      "post": {
+        "operationId": "checkProductEligibility",
+        "summary": "POST Check Product Eligibility",
+        "description": "Check whether a product is eligible for a set of applied coupons. This is used in the order form to validate that adding a product does not conflict with currently applied coupons.",
+        "tags": [
+          "Coupons"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "productId"
+                ],
+                "properties": {
+                  "productId": {
+                    "type": "integer",
+                    "description": "The product (post) ID to check eligibility for"
+                  },
+                  "appliedCoupons": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of coupon codes currently applied. Each code is checked against the product's categories and the coupon's inclusion/exclusion rules."
+                  },
+                  "origin": {
+                    "type": "string",
+                    "description": "The context where the check originates (e.g., checkout, admin_order)"
+                  }
+                }
+              },
+              "example": {
+                "productId": 42,
+                "appliedCoupons": [
+                  "SAVE10",
+                  "WELCOME5"
+                ],
+                "origin": "admin_order"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Eligibility check result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isApplicable": {
+                      "type": "boolean",
+                      "description": "Whether the product is eligible for the applied coupons"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Reason for ineligibility (only present when isApplicable is false)"
+                    }
+                  }
+                },
+                "examples": {
+                  "eligible": {
+                    "summary": "Product is eligible",
+                    "value": {
+                      "isApplicable": true
+                    }
+                  },
+                  "not_eligible": {
+                    "summary": "Product is not eligible",
+                    "value": {
+                      "isApplicable": false,
+                      "message": "Product A conflicts with SAVE10 coupon. Remove the coupon first."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

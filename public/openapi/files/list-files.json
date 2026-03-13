@@ -1,16 +1,73 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/files": {
       "get": {
         "operationId": "listFiles",
         "summary": "GET List Files",
-        "description": "Retrieve a list of uploaded files.",
+        "description": "Retrieve a list of files from the specified storage driver. Returns file metadata including name, size, driver, and bucket information.",
         "tags": [
           "Files"
         ],
         "security": [
           {
             "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "driver",
+            "in": "query",
+            "required": false,
+            "description": "Storage driver to use (default: `local`). Supported values depend on configured storage drivers (e.g., `local`, `s3`).",
+            "schema": {
+              "type": "string",
+              "default": "local",
+              "example": "local"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Filter files by name (case-insensitive substring match).",
+            "schema": {
+              "type": "string",
+              "example": "ebook"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of files to return (default: `10`).",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "example": 20
+            }
           }
         ],
         "responses": {
@@ -32,14 +89,14 @@
                 "example": {
                   "files": [
                     {
-                      "name": "10000-assets.png.zip__fluent-cart__.1761039177.zip",
-                      "size": 1345778,
+                      "name": "ebook__fluent-cart__.1710345600.pdf",
+                      "size": 2048576,
                       "driver": "local",
                       "bucket": ""
                     },
                     {
-                      "name": "2000-assets.png.zip__fluent-cart__.1761039120.zip",
-                      "size": 1354215,
+                      "name": "software-v2__fluent-cart__.1710345700.zip",
+                      "size": 10485760,
                       "driver": "local",
                       "bucket": ""
                     }
@@ -54,29 +111,18 @@
   },
   "components": {
     "schemas": {
-      "FileListResponse": {
-        "type": "object",
-        "properties": {
-          "files": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/File"
-            }
-          }
-        }
-      },
       "File": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "description": "File name",
-            "example": "10000-assets.png.zip__fluent-cart__.1761039177.zip"
+            "description": "File name with timestamp suffix",
+            "example": "ebook__fluent-cart__.1710345600.pdf"
           },
           "size": {
             "type": "integer",
             "description": "File size in bytes",
-            "example": 1345778
+            "example": 2048576
           },
           "driver": {
             "type": "string",
@@ -89,6 +135,14 @@
             "example": ""
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

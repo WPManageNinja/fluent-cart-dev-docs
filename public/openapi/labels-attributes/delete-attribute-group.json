@@ -1,0 +1,139 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group/{group_id}": {
+      "delete": {
+        "operationId": "deleteAttributeGroup",
+        "summary": "DELETE Delete Attribute Group",
+        "description": "Delete an attribute group. The group can only be deleted if none of its terms are currently in use by any product variations. Deleting a group also deletes all its terms.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "The attribute group ID to delete.",
+            "schema": {
+              "type": "integer",
+              "example": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attribute group deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string",
+                      "example": ""
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Attribute group successfully deleted!"
+                    }
+                  }
+                },
+                "example": {
+                  "data": "",
+                  "message": "Attribute group successfully deleted!"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Group is in use by product variations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "This group is already in use, can not be deleted."
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 403
+                    }
+                  }
+                },
+                "example": {
+                  "message": "This group is already in use, can not be deleted.",
+                  "code": 403
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attribute group not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Attribute group not found in database, failed to remove."
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 404
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Attribute group not found in database, failed to remove.",
+                  "code": 404
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings/eu-vat/oss/override": {
+      "delete": {
+        "operationId": "deleteOssTaxOverride",
+        "summary": "DELETE Delete OSS Tax Override",
+        "description": "Delete all EU tax rate overrides for a specific country. Optionally filter by state/region.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "description": "ISO 3166-1 alpha-2 country code",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "FR"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "State/region code to narrow the deletion scope",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "IDF"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OSS tax override deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "OSS tax override deleted successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "OSS tax override deleted successfully"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Validation failed or no matching records found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No matching OSS tax override found to delete"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "No matching OSS tax override found to delete"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

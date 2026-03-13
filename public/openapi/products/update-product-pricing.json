@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/products/{postId}/pricing": {
       "post": {
         "operationId": "updateProductPricing",
         "summary": "POST Update Product Pricing",
-        "description": "Update product pricing information.",
+        "description": "Update a product's pricing, details, variants, and other metadata.",
         "tags": [
           "Products"
         ],
@@ -17,11 +40,11 @@
           {
             "name": "postId",
             "in": "path",
-            "required": true,
             "schema": {
               "type": "integer"
             },
-            "description": "Product ID"
+            "description": "The product post ID",
+            "required": true
           }
         ],
         "requestBody": {
@@ -30,141 +53,189 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "description": "Request body for updating product pricing. Uses ProductUpdateRequest validation rules.",
+                "required": [
+                  "post_title",
+                  "post_status",
+                  "detail"
+                ],
                 "properties": {
-                  "detail": {
-                    "type": "object",
-                    "description": "Product detail updates",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "description": "Product detail ID"
-                      },
-                      "min_price": {
-                        "type": "number",
-                        "description": "Minimum price in cents"
-                      },
-                      "max_price": {
-                        "type": "number",
-                        "description": "Maximum price in cents"
-                      },
-                      "variation_type": {
-                        "type": "string",
-                        "enum": [
-                          "simple",
-                          "simple_variations"
-                        ],
-                        "description": "Variation type (required if updating)"
-                      },
-                      "fulfillment_type": {
-                        "type": "string",
-                        "enum": [
-                          "digital",
-                          "physical"
-                        ],
-                        "description": "Fulfillment type"
-                      },
-                      "other_info": {
-                        "type": "object",
-                        "description": "Additional product information"
-                      }
-                    }
-                  },
-                  "variants": {
-                    "type": "array",
-                    "description": "Array of variant updates. Required if detail.variation_type is 'simple'.",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "post_id"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "description": "Variant ID (required)"
-                        },
-                        "post_id": {
-                          "type": "integer",
-                          "description": "Product post ID (required)"
-                        },
-                        "variation_title": {
-                          "type": "string",
-                          "maxLength": 200,
-                          "description": "Variant title"
-                        },
-                        "item_price": {
-                          "type": "number",
-                          "minimum": 0,
-                          "description": "Variant price in cents"
-                        },
-                        "compare_price": {
-                          "type": "number",
-                          "description": "Compare price in cents"
-                        },
-                        "item_cost": {
-                          "type": "number",
-                          "description": "Item cost in cents"
-                        },
-                        "other_info": {
-                          "type": "object",
-                          "description": "Additional variant information"
-                        }
-                      }
-                    }
-                  },
                   "post_title": {
                     "type": "string",
-                    "maxLength": 200,
-                    "description": "Product title"
+                    "description": "Product title (max 200 characters)"
                   },
                   "post_status": {
                     "type": "string",
                     "enum": [
                       "draft",
                       "publish",
-                      "private"
+                      "future"
                     ],
-                    "description": "Post status"
+                    "description": "Product status"
                   },
-                  "post_content": {
+                  "post_date": {
                     "type": "string",
-                    "description": "Product description"
+                    "description": "Required when post_status is future. Must be a future date (GMT)"
                   },
                   "post_excerpt": {
                     "type": "string",
-                    "description": "Product excerpt"
+                    "description": "Product short description"
                   },
-                  "gallery": {
+                  "post_content": {
+                    "type": "string",
+                    "description": "Product long description (HTML allowed)"
+                  },
+                  "post_name": {
+                    "type": "string",
+                    "description": "Product URL slug"
+                  },
+                  "comment_status": {
+                    "type": "string",
+                    "description": "Comment status (max 100 chars)"
+                  },
+                  "detail": {
+                    "type": "object",
+                    "required": [
+                      "fulfillment_type",
+                      "variation_type"
+                    ],
+                    "properties": {
+                      "fulfillment_type": {
+                        "type": "string",
+                        "enum": [
+                          "physical",
+                          "digital"
+                        ]
+                      },
+                      "variation_type": {
+                        "type": "string",
+                        "enum": [
+                          "simple",
+                          "simple_variations"
+                        ]
+                      },
+                      "manage_stock": {
+                        "type": "integer",
+                        "enum": [
+                          0,
+                          1
+                        ]
+                      },
+                      "manage_downloadable": {
+                        "type": "integer",
+                        "enum": [
+                          0,
+                          1
+                        ]
+                      },
+                      "default_variation_id": {
+                        "type": "integer"
+                      },
+                      "stock_availability": {
+                        "type": "string"
+                      },
+                      "other_info": {
+                        "type": "object",
+                        "properties": {
+                          "group_pricing_by": {
+                            "type": "string",
+                            "enum": [
+                              "payment_type",
+                              "repeat_interval",
+                              "none"
+                            ]
+                          },
+                          "sold_individually": {
+                            "type": "string",
+                            "enum": [
+                              "yes",
+                              "no"
+                            ]
+                          },
+                          "use_pricing_table": {
+                            "type": "string"
+                          },
+                          "shipping_class": {
+                            "type": "integer"
+                          },
+                          "tax_class": {
+                            "type": "integer"
+                          },
+                          "active_editor": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "variants": {
                     "type": "array",
-                    "description": "Gallery images",
                     "items": {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "integer",
-                          "description": "Media ID"
+                        "variation_title": {
+                          "type": "string"
+                        },
+                        "post_id": {
+                          "type": "integer"
+                        },
+                        "item_price": {
+                          "type": "number"
+                        },
+                        "compare_price": {
+                          "type": "number"
+                        },
+                        "manage_cost": {
+                          "type": "string"
+                        },
+                        "item_cost": {
+                          "type": "number"
+                        },
+                        "serial_index": {
+                          "type": "integer"
+                        },
+                        "sku": {
+                          "type": "string"
+                        },
+                        "fulfillment_type": {
+                          "type": "string"
+                        },
+                        "other_info": {
+                          "type": "object"
                         }
                       }
                     }
                   },
                   "product_terms": {
                     "type": "object",
-                    "description": "Product taxonomy terms"
+                    "description": "Taxonomy term IDs"
+                  },
+                  "gallery": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "metaValue": {
+                    "description": "Additional metadata"
                   }
                 }
               },
               "example": {
+                "post_title": "Updated Product",
+                "post_status": "publish",
                 "detail": {
-                  "min_price": 500,
-                  "max_price": 600
+                  "fulfillment_type": "digital",
+                  "variation_type": "simple"
                 },
                 "variants": [
                   {
-                    "id": 59,
-                    "post_id": 7529088,
-                    "item_price": 500,
-                    "compare_price": 600
+                    "id": 789,
+                    "post_id": 123,
+                    "variation_title": "Default Plan",
+                    "item_price": 1999,
+                    "other_info": {
+                      "payment_type": "onetime"
+                    }
                   }
                 ]
               }
@@ -173,60 +244,12 @@
         },
         "responses": {
           "200": {
-            "description": "Product pricing updated successfully. Returns the updated product with variants.",
+            "description": "Successful response.",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Success message",
-                      "example": "Product has been updated"
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/Product"
-                    }
-                  }
-                },
                 "example": {
-                  "message": "Product has been updated",
-                  "data": {
-                    "ID": 7529088,
-                    "post_title": "Modern Sweatshirt",
-                    "post_status": "publish",
-                    "variants": [
-                      {
-                        "id": 59,
-                        "post_id": 7529088,
-                        "item_price": 500,
-                        "compare_price": 600,
-                        "variation_title": "Orange"
-                      }
-                    ],
-                    "detail": {
-                      "id": 13,
-                      "post_id": 7529088,
-                      "min_price": 500,
-                      "max_price": 600,
-                      "fulfillment_type": "physical"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request - validation error or variation info missing",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": 400,
-                  "message": "Variation info is not present",
-                  "data": ""
+                  "data": {},
+                  "message": "Product updated successfully"
                 }
               }
             }
@@ -236,145 +259,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "UpdateProductPricingRequest": {
-        "type": "object",
-        "description": "Request body for updating product pricing. Uses ProductUpdateRequest validation rules.",
-        "properties": {
-          "detail": {
-            "type": "object",
-            "description": "Product detail updates",
-            "properties": {
-              "id": {
-                "type": "integer",
-                "description": "Product detail ID"
-              },
-              "min_price": {
-                "type": "number",
-                "description": "Minimum price in cents"
-              },
-              "max_price": {
-                "type": "number",
-                "description": "Maximum price in cents"
-              },
-              "variation_type": {
-                "type": "string",
-                "enum": [
-                  "simple",
-                  "simple_variations"
-                ],
-                "description": "Variation type (required if updating)"
-              },
-              "fulfillment_type": {
-                "type": "string",
-                "enum": [
-                  "digital",
-                  "physical"
-                ],
-                "description": "Fulfillment type"
-              },
-              "other_info": {
-                "type": "object",
-                "description": "Additional product information"
-              }
-            }
-          },
-          "variants": {
-            "type": "array",
-            "description": "Array of variant updates. Required if detail.variation_type is 'simple'.",
-            "items": {
-              "type": "object",
-              "required": [
-                "id",
-                "post_id"
-              ],
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "description": "Variant ID (required)"
-                },
-                "post_id": {
-                  "type": "integer",
-                  "description": "Product post ID (required)"
-                },
-                "variation_title": {
-                  "type": "string",
-                  "maxLength": 200,
-                  "description": "Variant title"
-                },
-                "item_price": {
-                  "type": "number",
-                  "minimum": 0,
-                  "description": "Variant price in cents"
-                },
-                "compare_price": {
-                  "type": "number",
-                  "description": "Compare price in cents"
-                },
-                "item_cost": {
-                  "type": "number",
-                  "description": "Item cost in cents"
-                },
-                "other_info": {
-                  "type": "object",
-                  "description": "Additional variant information"
-                }
-              }
-            }
-          },
-          "post_title": {
-            "type": "string",
-            "maxLength": 200,
-            "description": "Product title"
-          },
-          "post_status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "publish",
-              "private"
-            ],
-            "description": "Post status"
-          },
-          "post_content": {
-            "type": "string",
-            "description": "Product description"
-          },
-          "post_excerpt": {
-            "type": "string",
-            "description": "Product excerpt"
-          },
-          "gallery": {
-            "type": "array",
-            "description": "Gallery images",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "description": "Media ID"
-                }
-              }
-            }
-          },
-          "product_terms": {
-            "type": "object",
-            "description": "Product taxonomy terms"
-          }
-        }
-      },
-      "UpdateProductPricingResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "Product has been updated"
-          },
-          "data": {
-            "$ref": "#/components/schemas/Product"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

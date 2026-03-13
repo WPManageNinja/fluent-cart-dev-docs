@@ -1,0 +1,204 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings": {
+      "get": {
+        "operationId": "getTaxSettings",
+        "summary": "GET Get Tax Settings",
+        "description": "Retrieve the current global tax configuration settings.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the current tax settings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "$ref": "#/components/schemas/TaxSettings"
+                    }
+                  }
+                },
+                "example": {
+                  "settings": {
+                    "tax_inclusion": "included",
+                    "tax_calculation_basis": "shipping",
+                    "tax_rounding": "item",
+                    "enable_tax": "yes",
+                    "price_suffix": "",
+                    "eu_vat_settings": {
+                      "require_vat_number": "no",
+                      "local_reverse_charge": "yes",
+                      "vat_reverse_excluded_categories": [],
+                      "method": "oss",
+                      "oss_country": "DE",
+                      "oss_vat": "DE123456789"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TaxSettings": {
+        "type": "object",
+        "properties": {
+          "enable_tax": {
+            "type": "string",
+            "description": "Whether tax calculation is enabled",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "yes"
+          },
+          "tax_inclusion": {
+            "type": "string",
+            "description": "Whether product prices include tax",
+            "enum": [
+              "included",
+              "excluded"
+            ],
+            "example": "included"
+          },
+          "tax_calculation_basis": {
+            "type": "string",
+            "description": "Address used for tax calculation",
+            "enum": [
+              "shipping",
+              "billing",
+              "store"
+            ],
+            "example": "shipping"
+          },
+          "tax_rounding": {
+            "type": "string",
+            "description": "Whether rounding is applied per item or on the subtotal",
+            "enum": [
+              "item",
+              "subtotal"
+            ],
+            "example": "item"
+          },
+          "price_suffix": {
+            "type": "string",
+            "description": "Text appended after product prices",
+            "example": ""
+          },
+          "eu_vat_settings": {
+            "$ref": "#/components/schemas/EuVatSettings"
+          }
+        }
+      },
+      "EuVatSettings": {
+        "type": "object",
+        "properties": {
+          "require_vat_number": {
+            "type": "string",
+            "description": "Whether EU VAT number field is shown at checkout",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "local_reverse_charge": {
+            "type": "string",
+            "description": "Whether reverse charge applies for domestic B2B",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "yes"
+          },
+          "vat_reverse_excluded_categories": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Product category IDs excluded from VAT reverse charge",
+            "example": []
+          },
+          "method": {
+            "type": "string",
+            "description": "Cross-border method",
+            "enum": [
+              "oss",
+              "home",
+              "specific"
+            ],
+            "example": "oss"
+          },
+          "oss_country": {
+            "type": "string",
+            "description": "Country of OSS registration (when method is oss)",
+            "example": "DE"
+          },
+          "oss_vat": {
+            "type": "string",
+            "description": "OSS VAT number (when method is oss)",
+            "example": "DE123456789"
+          },
+          "home_country": {
+            "type": "string",
+            "description": "Home country (when method is home)"
+          },
+          "home_vat": {
+            "type": "string",
+            "description": "Home VAT number (when method is home)"
+          },
+          "country_wise_vat": {
+            "type": "array",
+            "description": "Country-specific VAT settings (when method is specific)",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

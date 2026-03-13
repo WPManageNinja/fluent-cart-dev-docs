@@ -1,8 +1,7 @@
 ---
-title: List Notifications
-description: "Retrieve all available email notifications."
+title: List All Notifications
+description: "Retrieve all registered email notification templates with their current configuration."
 outline: false
 aside: false
 ---
-<OAOperation operationId="listEmailNotifications" />
-
+<OAOperation operationId="listEmailNotifications" specUrl="/openapi/public/email-notification/list-notifications.json" />

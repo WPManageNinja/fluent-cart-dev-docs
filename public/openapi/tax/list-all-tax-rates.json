@@ -1,0 +1,189 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/rates": {
+      "get": {
+        "operationId": "listAllTaxRates",
+        "summary": "GET List All Tax Rates",
+        "description": "Retrieve all tax rates from the database, grouped by continent/region and country.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns tax rates grouped by geographic region.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaxRateGroup"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rates": [
+                    {
+                      "group_name": "European Union",
+                      "group_code": "EU",
+                      "countries": [
+                        {
+                          "country_code": "DE",
+                          "country_name": "Germany",
+                          "rates": [
+                            {
+                              "class_id": 1,
+                              "name": "DE Standard Tax",
+                              "rate": "19.0000",
+                              "for_shipping": null
+                            },
+                            {
+                              "class_id": 2,
+                              "name": "DE Reduced Tax",
+                              "rate": "7.0000",
+                              "for_shipping": null
+                            }
+                          ],
+                          "total_rates": 2
+                        }
+                      ],
+                      "total_countries": 1
+                    },
+                    {
+                      "group_name": "North America",
+                      "group_code": "NA",
+                      "countries": [
+                        {
+                          "country_code": "US",
+                          "country_name": "United States",
+                          "rates": [
+                            {
+                              "class_id": 1,
+                              "name": "US Standard Tax",
+                              "rate": "10.0000",
+                              "for_shipping": null
+                            }
+                          ],
+                          "total_rates": 1
+                        }
+                      ],
+                      "total_countries": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TaxRateGroup": {
+        "type": "object",
+        "properties": {
+          "group_name": {
+            "type": "string",
+            "description": "Name of the geographic group",
+            "example": "European Union"
+          },
+          "group_code": {
+            "type": "string",
+            "description": "Code of the geographic group",
+            "example": "EU"
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "country_code": {
+                  "type": "string",
+                  "example": "DE"
+                },
+                "country_name": {
+                  "type": "string",
+                  "example": "Germany"
+                },
+                "rates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "class_id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "DE Standard Tax"
+                      },
+                      "rate": {
+                        "type": "string",
+                        "example": "19.0000"
+                      },
+                      "for_shipping": {
+                        "type": "integer",
+                        "nullable": true,
+                        "example": null
+                      }
+                    }
+                  }
+                },
+                "total_rates": {
+                  "type": "integer",
+                  "example": 2
+                }
+              }
+            }
+          },
+          "total_countries": {
+            "type": "integer",
+            "description": "Total number of countries in this group",
+            "example": 1
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/get-short-codes": {
+      "get": {
+        "operationId": "getEmailShortcodes",
+        "summary": "GET Get Shortcodes",
+        "description": "Retrieve available shortcodes, email template files, and editor buttons for the email notification editor.",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "email_templates": {
+                          "type": "array",
+                          "description": "Available email template files",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "path": {
+                                "type": "string",
+                                "description": "Template path identifier",
+                                "example": "fluent_cart_order_paid"
+                              },
+                              "label": {
+                                "type": "string",
+                                "description": "Human-readable template label",
+                                "example": "Order Paid"
+                              }
+                            }
+                          }
+                        },
+                        "shortcodes": {
+                          "type": "object",
+                          "description": "Available shortcode groups keyed by group name",
+                          "additionalProperties": {
+                            "$ref": "#/components/schemas/ShortcodeGroup"
+                          }
+                        },
+                        "buttons": {
+                          "type": "object",
+                          "description": "Pre-built HTML button snippets for the email editor, keyed by button label",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "email_templates": [
+                      {
+                        "path": "fluent_cart_order_paid",
+                        "label": "Order Paid"
+                      },
+                      {
+                        "path": "fluent_cart_subscription_renewal",
+                        "label": "Subscription Renewal"
+                      }
+                    ],
+                    "shortcodes": {
+                      "order": {
+                        "title": "Order",
+                        "key": "order",
+                        "shortcodes": {
+                          "{{order.id}}": "Order ID",
+                          "{{order.customer_dashboard_link}}": "Customer Dashboard Link",
+                          "{{order.status}}": "Order Status",
+                          "{{order.invoice_no}}": "Order Number",
+                          "{{order.total_amount_formatted}}": "Order Total Amount (Formatted)",
+                          "{{order.created_at}}": "Order Create Date"
+                        }
+                      },
+                      "general": {
+                        "title": "General",
+                        "key": "wp",
+                        "shortcodes": {
+                          "{{wp.admin_email}}": "Admin Email",
+                          "{{wp.site_url}}": "Site URL",
+                          "{{wp.site_title}}": "Site Title",
+                          "{{user.display_name}}": "User Display Name",
+                          "{{user.user_email}}": "User Email"
+                        }
+                      },
+                      "customer": {
+                        "title": "Customer",
+                        "key": "customer",
+                        "shortcodes": {
+                          "{{order.billing.first_name}}": "First Name",
+                          "{{order.billing.last_name}}": "Last Name",
+                          "{{order.billing.email}}": "Email",
+                          "{{order.billing.city}}": "City",
+                          "{{order.billing.state}}": "State",
+                          "{{order.billing.country}}": "Country"
+                        }
+                      },
+                      "transaction": {
+                        "title": "transaction",
+                        "key": "settings",
+                        "shortcodes": {
+                          "{{transaction.total}}": "Total Amount",
+                          "{{transaction.total_formatted}}": "Total Amount (Formatted)",
+                          "{{transaction.refund_amount}}": "Refund Amount",
+                          "{{transaction.refund_amount_formatted}}": "Refund Amount (Formatted)",
+                          "{{transaction.payment_method}}": "Payment Method",
+                          "{{transaction.card_last_4}}": "Card Last 4",
+                          "{{transaction.card_brand}}": "Card Brand",
+                          "{{transaction.status}}": "Status",
+                          "{{transaction.currency}}": "Currency"
+                        }
+                      },
+                      "settings": {
+                        "title": "Settings",
+                        "key": "settings",
+                        "shortcodes": {
+                          "{{settings.store_name}}": "Store Name",
+                          "{{settings.store_logo}}": "Store Logo",
+                          "{{settings.store_address}}": "Store Address Line 1",
+                          "{{settings.store_address2}}": "Store Address Line 2",
+                          "{{settings.store_country}}": "Store Country",
+                          "{{settings.store_state}}": "Store State",
+                          "{{settings.store_city}}": "Store City",
+                          "{{settings.store_postcode}}": "Store Postcode"
+                        }
+                      },
+                      "license": {
+                        "title": "License (Loop)",
+                        "key": "license",
+                        "shortcodes": {
+                          "{{license.sl}}": "Serial Number",
+                          "{{license.key}}": "License Key",
+                          "{{license.status}}": "Status",
+                          "{{license.product_name}}": "Product Name",
+                          "{{license.variant}}": "Variant",
+                          "{{license.limit}}": "Activation Limit",
+                          "{{license.activation_count}}": "Activation Count",
+                          "{{license.expiration_date}}": "Expiration Date"
+                        }
+                      }
+                    },
+                    "buttons": {
+                      "View Order": "<a href=\"https://example.com/wp-admin/admin.php?page=fluent-cart#/orders/{{order.id}}/view\" style=\"background-color: green; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px;\">View Order</a>"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShortcodeGroup": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Group title",
+            "example": "Order"
+          },
+          "key": {
+            "type": "string",
+            "description": "Group key",
+            "example": "order"
+          },
+          "shortcodes": {
+            "type": "object",
+            "description": "Shortcodes in this group, keyed by shortcode pattern with description as value",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

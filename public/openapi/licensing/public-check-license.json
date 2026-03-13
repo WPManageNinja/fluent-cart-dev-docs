@@ -1,0 +1,201 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/?fluent-cart=check_license": {
+      "get": {
+        "operationId": "publicCheckLicense",
+        "summary": "GET Check License",
+        "description": "Verify the validity of a license key and check its activation status for a specific site. This is a public endpoint that does not use the WordPress REST API -- it uses query parameter-based URLs on the site's front end. No authentication required.",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "license_key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The license key to check. Required if `activation_hash` is not provided"
+          },
+          {
+            "name": "activation_hash",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The activation hash from a previous activation. Required if `license_key` is not provided"
+          },
+          {
+            "name": "item_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The product ID (must match the license's product)"
+          },
+          {
+            "name": "site_url",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The site URL making the request"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "valid",
+                        "expired",
+                        "invalid"
+                      ],
+                      "description": "License status"
+                    },
+                    "activation_limit": {
+                      "type": "integer",
+                      "description": "Maximum allowed site activations (0 = unlimited)"
+                    },
+                    "activation_hash": {
+                      "type": "string",
+                      "description": "Unique hash for this site's activation (empty if not activated)"
+                    },
+                    "activations_count": {
+                      "type": "integer",
+                      "description": "Current number of active site activations"
+                    },
+                    "license_key": {
+                      "type": "string"
+                    },
+                    "expiration_date": {
+                      "type": "string",
+                      "description": "Expiration date in GMT, or `lifetime` for non-expiring licenses"
+                    },
+                    "product_id": {
+                      "type": "string"
+                    },
+                    "variation_id": {
+                      "type": "integer"
+                    },
+                    "variation_title": {
+                      "type": "string"
+                    },
+                    "product_title": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "status": "valid",
+                  "activation_limit": 5,
+                  "activation_hash": "abc123def456...",
+                  "activations_count": 2,
+                  "license_key": "XXXX-XXXX-XXXX-XXXX",
+                  "expiration_date": "2026-01-15 00:00:00",
+                  "product_id": 10,
+                  "variation_id": 15,
+                  "variation_title": "Pro License",
+                  "product_title": "My Plugin",
+                  "created_at": "2025-01-15 10:30:00",
+                  "updated_at": "2025-06-15 10:35:00"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation or license error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "error_type": {
+                      "type": "string",
+                      "enum": [
+                        "validation_error",
+                        "invalid_license",
+                        "invalid_activation",
+                        "key_mismatch"
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "status": "invalid",
+                  "error_type": "validation_error",
+                  "message": "license_key, site_url and item_id is required"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

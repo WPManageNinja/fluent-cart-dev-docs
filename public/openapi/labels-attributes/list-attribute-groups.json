@@ -1,0 +1,258 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/groups": {
+      "get": {
+        "operationId": "listAttributeGroups",
+        "summary": "GET List Attribute Groups",
+        "description": "Retrieve a paginated list of attribute groups with optional search, filtering, and sorting. Attribute groups represent product attribute categories (e.g., Color, Size, Material) used to create product variations.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search criteria. Each key is a column name with `column`, `operator`, and `value` fields. Searchable columns: `title`, `slug`.",
+            "schema": {
+              "type": "object"
+            }
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "required": false,
+            "description": "Filter criteria. Same format as `search`. Supports `terms_count` with comparison operators.",
+            "schema": {
+              "type": "object"
+            }
+          },
+          {
+            "name": "with[]",
+            "in": "query",
+            "required": false,
+            "description": "Relations to eager load (e.g., `terms`).",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "terms"
+                ]
+              }
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "description": "Column to sort by: `title`, `id`, `slug`, `created_at` (default: `title`).",
+            "schema": {
+              "type": "string",
+              "default": "title",
+              "enum": [
+                "title",
+                "id",
+                "slug",
+                "created_at"
+              ]
+            }
+          },
+          {
+            "name": "order_type",
+            "in": "query",
+            "required": false,
+            "description": "Sort direction: `ASC` or `DESC` (default: `ASC`).",
+            "schema": {
+              "type": "string",
+              "default": "ASC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page (default: `10`).",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "example": 20
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns paginated attribute groups.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "groups": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer",
+                          "example": 3
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "current_page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AttributeGroup"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "groups": {
+                    "total": 3,
+                    "per_page": 10,
+                    "current_page": 1,
+                    "last_page": 1,
+                    "data": [
+                      {
+                        "id": 1,
+                        "title": "Color",
+                        "slug": "color",
+                        "description": "Product color options",
+                        "settings": null,
+                        "created_at": "2025-01-10 08:30:00",
+                        "updated_at": "2025-01-10 08:30:00",
+                        "terms_count": 5
+                      },
+                      {
+                        "id": 2,
+                        "title": "Size",
+                        "slug": "size",
+                        "description": "Product size options",
+                        "settings": null,
+                        "created_at": "2025-01-10 08:35:00",
+                        "updated_at": "2025-01-10 08:35:00",
+                        "terms_count": 4
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AttributeGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Attribute group ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Group title",
+            "example": "Color"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Group slug identifier",
+            "example": "color"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Group description",
+            "example": "Product color options"
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional group settings (stored as JSON)",
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (UTC)",
+            "example": "2025-01-10 08:30:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (UTC)",
+            "example": "2025-01-10 08:30:00"
+          },
+          "terms_count": {
+            "type": "integer",
+            "description": "Number of terms in this group",
+            "example": 5
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

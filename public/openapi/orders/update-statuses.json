@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/orders/{order}/statuses": {
       "put": {
         "operationId": "updateOrderStatuses",
-        "summary": "PUT Update Order Statuses",
-        "description": "Update order statuses (payment status, shipping status, order status).",
+        "summary": "PUT Update Statuses",
+        "description": "Update the order status or shipping status for an order.",
         "tags": [
           "Orders"
         ],
@@ -25,84 +48,93 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "action",
+                  "statuses"
+                ],
                 "properties": {
+                  "action": {
+                    "type": "string",
+                    "description": "Status change type: `change_order_status` or `change_shipping_status`",
+                    "enum": [
+                      "change_order_status",
+                      "change_shipping_status"
+                    ]
+                  },
                   "statuses": {
                     "type": "object",
-                    "description": "Statuses to update",
+                    "description": "Status values object",
                     "properties": {
-                      "payment_status": {
+                      "order_status": {
                         "type": "string",
-                        "description": "Payment status",
-                        "example": "paid"
+                        "description": "New order status. Required when action is `change_order_status`. One of: `completed`, `processing`, `on-hold`, `canceled`"
                       },
                       "shipping_status": {
                         "type": "string",
-                        "description": "Shipping status",
-                        "example": "shipped"
-                      },
-                      "status": {
-                        "type": "string",
-                        "description": "Order status (note: field name is 'status', not 'order_status')",
-                        "example": "processing"
+                        "description": "New shipping status. Required when action is `change_shipping_status`"
                       }
                     }
                   },
                   "manage_stock": {
                     "type": "boolean",
-                    "description": "Whether to manage stock",
-                    "example": true
-                  },
-                  "action": {
-                    "type": "string",
-                    "description": "Action to perform",
-                    "example": "update"
+                    "description": "Whether to adjust stock levels on status change"
                   }
                 }
               },
               "example": {
+                "action": "change_order_status",
                 "statuses": {
-                  "payment_status": "paid",
-                  "shipping_status": "shipped",
-                  "status": "processing"
+                  "order_status": "processing"
                 },
-                "manage_stock": true,
-                "action": "update"
+                "manage_stock": true
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Order statuses updated successfully. Returns the updated order data.",
+            "description": "Status updated successfully.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Response contains the updated order data",
                   "properties": {
-                    "order": {
-                      "$ref": "#/components/schemas/Order"
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
                     },
-                    "discount_meta": {
-                      "type": "string"
-                    },
-                    "shipping_meta": {
-                      "type": "string"
-                    },
-                    "order_settings": {
-                      "type": "array"
-                    },
-                    "selected_labels": {
-                      "type": "array"
-                    },
-                    "tax_id": {
+                    "data": {
+                      "type": "object",
+                      "description": "Updated data"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Status has been updated",
+                  "data": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
                       "type": "string"
                     }
                   }
+                },
+                "example": {
+                  "message": "Order already has the same status"
                 }
               }
             }
@@ -112,185 +144,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "Order": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Order ID",
-            "example": 1
-          },
-          "uuid": {
-            "type": "string",
-            "description": "Unique order identifier",
-            "example": "abc123"
-          },
-          "status": {
-            "type": "string",
-            "description": "Order status",
-            "example": "completed"
-          },
-          "payment_status": {
-            "type": "string",
-            "description": "Payment status",
-            "example": "paid"
-          },
-          "customer_id": {
-            "type": "integer",
-            "description": "Customer ID",
-            "example": 123
-          },
-          "total_amount": {
-            "type": "integer",
-            "description": "Total amount in cents",
-            "example": 5000
-          },
-          "currency": {
-            "type": "string",
-            "description": "Currency code",
-            "example": "USD"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Order creation timestamp",
-            "example": "2024-01-01T10:00:00Z"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Order last update timestamp",
-            "example": "2024-01-01T11:00:00Z"
-          },
-          "customer": {
-            "$ref": "#/components/schemas/Customer"
-          },
-          "order_items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OrderItem"
-            }
-          },
-          "transactions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Transaction"
-            }
-          }
-        }
-      },
-      "OrderItem": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "product_id": {
-            "type": "integer",
-            "example": 456
-          },
-          "variation_id": {
-            "type": "integer",
-            "example": 789
-          },
-          "quantity": {
-            "type": "integer",
-            "example": 2
-          },
-          "price": {
-            "type": "integer",
-            "description": "Price in cents",
-            "example": 2500
-          },
-          "product": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "integer"
-              },
-              "title": {
-                "type": "string"
-              },
-              "sku": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
-      "Customer": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 123
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "customer@example.com"
-          },
-          "first_name": {
-            "type": "string",
-            "example": "John"
-          },
-          "last_name": {
-            "type": "string",
-            "example": "Doe"
-          }
-        }
-      },
-      "Transaction": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "payment_method": {
-            "type": "string",
-            "example": "stripe"
-          },
-          "status": {
-            "type": "string",
-            "example": "succeeded"
-          },
-          "amount": {
-            "type": "integer",
-            "description": "Amount in cents",
-            "example": 5000
-          },
-          "transaction_id": {
-            "type": "string",
-            "example": "txn_123456"
-          }
-        }
-      },
-      "UpdateStatusesResponse": {
-        "type": "object",
-        "description": "Response contains the updated order data",
-        "properties": {
-          "order": {
-            "$ref": "#/components/schemas/Order"
-          },
-          "discount_meta": {
-            "type": "string"
-          },
-          "shipping_meta": {
-            "type": "string"
-          },
-          "order_settings": {
-            "type": "array"
-          },
-          "selected_labels": {
-            "type": "array"
-          },
-          "tax_id": {
-            "type": "string"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

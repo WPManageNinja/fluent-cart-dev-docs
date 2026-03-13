@@ -1,0 +1,141 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/onboarding/create-pages": {
+      "post": {
+        "operationId": "createAllPages",
+        "summary": "POST Create All Pages",
+        "description": "Create all required store pages (shop, checkout, customer profile, etc.) in bulk. Skips pages that already have valid page IDs assigned. After creation, returns the updated onboarding settings.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response - returns updated onboarding settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "link": {
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        }
+                      }
+                    },
+                    "currencies": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    },
+                    "default_settings": {
+                      "type": "object",
+                      "properties": {
+                        "store_name": {
+                          "type": "string"
+                        },
+                        "store_logo": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "shop_page_id": {
+                          "type": "string"
+                        },
+                        "checkout_page_id": {
+                          "type": "string"
+                        },
+                        "customer_profile_page_id": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "pages": [
+                    {
+                      "id": 10,
+                      "title": "Shop",
+                      "link": "https://example.com/shop/"
+                    },
+                    {
+                      "id": 12,
+                      "title": "Checkout",
+                      "link": "https://example.com/checkout/"
+                    }
+                  ],
+                  "currencies": {
+                    "USD": "United States Dollar ($)",
+                    "EUR": "Euro (EUR)",
+                    "GBP": "British Pound (GBP)"
+                  },
+                  "default_settings": {
+                    "store_name": "My Store",
+                    "store_logo": "",
+                    "currency": "USD",
+                    "shop_page_id": "10",
+                    "checkout_page_id": "12",
+                    "customer_profile_page_id": ""
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

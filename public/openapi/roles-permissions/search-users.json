@@ -1,0 +1,155 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/roles/user-list": {
+      "get": {
+        "operationId": "searchUsers",
+        "summary": "GET Search Users",
+        "description": "Search for WordPress users who can be assigned a FluentCart role. Returns users matching the search query, excluding those who already have a WordPress administrator role.",
+        "tags": [
+          "Roles"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by display name or email address. Partial matches supported."
+          },
+          {
+            "name": "user_ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated user IDs to include in results regardless of search filter."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of matching users"
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "description": "Number of users per page"
+                        },
+                        "current_page": {
+                          "type": "integer",
+                          "description": "Current page number"
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "description": "Last page number"
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/UserListItem"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "users": {
+                    "total": 25,
+                    "per_page": 15,
+                    "current_page": 1,
+                    "last_page": 2,
+                    "data": [
+                      {
+                        "ID": 10,
+                        "name": "Alice Johnson",
+                        "email": "alice@example.com"
+                      },
+                      {
+                        "ID": 15,
+                        "name": "Bob Wilson",
+                        "email": "bob@example.com"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserListItem": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "integer",
+            "description": "WordPress user ID",
+            "example": 10
+          },
+          "name": {
+            "type": "string",
+            "description": "WordPress display name",
+            "example": "Alice Johnson"
+          },
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "alice@example.com"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/coupons/{id}": {
       "get": {
         "operationId": "getCoupon",
-        "summary": "GET Get Coupon Details",
-        "description": "Retrieve detailed information about a specific coupon including activities.",
+        "summary": "GET Coupon Details",
+        "description": "Retrieve detailed information about a specific coupon, including its activity log. The coupon status is automatically updated to expired if its end_date has passed.",
         "tags": [
           "Coupons"
         ],
@@ -21,12 +44,13 @@
             "schema": {
               "type": "integer"
             },
-            "description": "Coupon ID"
+            "description": "The coupon ID",
+            "example": 1
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Successful response. Returns the coupon details with activity log.",
             "content": {
               "application/json": {
                 "schema": {
@@ -39,55 +63,48 @@
                 },
                 "example": {
                   "coupon": {
-                    "id": 196,
-                    "title": "BFCM SALE",
-                    "code": "BFCM25",
-                    "priority": "5",
+                    "id": 1,
+                    "parent": null,
+                    "title": "10% Off Everything",
+                    "code": "SAVE10",
+                    "status": "active",
                     "type": "percentage",
                     "conditions": {
-                      "max_uses": 0,
-                      "buy_quantity": null,
-                      "get_quantity": null,
-                      "max_per_customer": 0,
+                      "min_purchase_amount": 5000,
+                      "max_discount_amount": 10000,
+                      "max_purchase_amount": 0,
+                      "apply_to_whole_cart": "no",
                       "apply_to_quantity": "no",
-                      "excluded_products": [],
-                      "included_products": [],
-                      "apply_to_whole_cart": "yes",
+                      "max_uses": 100,
+                      "max_per_customer": 1,
                       "excluded_categories": [],
                       "included_categories": [],
-                      "max_discount_amount": 5000,
-                      "max_purchase_amount": 0,
-                      "min_purchase_amount": 0
+                      "excluded_products": [],
+                      "included_products": [],
+                      "email_restrictions": "",
+                      "is_recurring": "no"
                     },
-                    "amount": "20",
-                    "use_count": null,
-                    "status": "active",
-                    "notes": "",
-                    "stackable": "no",
-                    "show_on_checkout": "no",
-                    "start_date": null,
-                    "end_date": null,
-                    "created_at": "2025-10-22T06:24:52+00:00",
-                    "updated_at": "2025-10-22T06:24:52+00:00",
+                    "amount": 10,
+                    "stackable": "yes",
+                    "priority": 1,
+                    "use_count": 12,
+                    "notes": "Internal note about this coupon",
+                    "show_on_checkout": "yes",
+                    "start_date": "2025-01-01 00:00:00",
+                    "end_date": "2025-12-31 23:59:59",
+                    "created_at": "2025-01-01 10:00:00",
+                    "updated_at": "2025-06-15 14:30:00",
                     "activities": [
                       {
-                        "id": 111144,
-                        "status": "success",
-                        "log_type": "activity",
-                        "module_type": "FluentCart\\App\\Models\\Coupon",
-                        "module_id": 196,
-                        "module_name": "coupon",
-                        "user_id": "5",
+                        "id": 1,
                         "title": "Coupon Created",
-                        "content": "Coupon \"BFCM SALE\" created by Robert",
-                        "read_status": "unread",
-                        "created_by": "Robert",
-                        "created_at": "2025-10-22T06:24:52+00:00",
-                        "updated_at": "2025-10-22T06:24:52+00:00",
+                        "content": "Coupon \"SAVE10\" created by Admin",
+                        "status": "success",
+                        "user_id": 1,
+                        "created_at": "2025-01-01 10:00:00",
                         "user": {
-                          "ID": 5,
-                          "display_name": "Robert",
-                          "user_email": "reachkamrul@gmail.com"
+                          "ID": 1,
+                          "display_name": "Admin"
                         }
                       }
                     ]
@@ -102,163 +119,28 @@
   },
   "components": {
     "schemas": {
-      "CouponDetailResponse": {
-        "type": "object",
-        "properties": {
-          "coupon": {
-            "$ref": "#/components/schemas/CouponDetail"
-          }
-        }
-      },
       "CouponDetail": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Coupon"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "activities": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Activity"
-                },
-                "description": "Coupon activity history"
-              }
-            }
-          }
-        ]
-      },
-      "Coupon": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
             "description": "Coupon ID",
-            "example": 196
+            "example": 1
+          },
+          "parent": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Parent coupon ID"
           },
           "title": {
             "type": "string",
-            "description": "Coupon title",
-            "example": "BFCM SALE"
+            "description": "Coupon display name",
+            "example": "10% Off Everything"
           },
           "code": {
             "type": "string",
-            "description": "Coupon code",
-            "example": "BFCM25"
-          },
-          "priority": {
-            "type": "string",
-            "description": "Coupon priority",
-            "example": "5"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "fixed",
-              "percentage",
-              "free_shipping",
-              "buy_x_get_y"
-            ],
-            "description": "Coupon type",
-            "example": "percentage"
-          },
-          "conditions": {
-            "type": "object",
-            "description": "Coupon conditions",
-            "properties": {
-              "max_uses": {
-                "type": "integer",
-                "description": "Maximum number of uses",
-                "example": 0
-              },
-              "buy_quantity": {
-                "type": "integer",
-                "nullable": true,
-                "description": "Buy quantity (for buy_x_get_y type)"
-              },
-              "get_quantity": {
-                "type": "integer",
-                "nullable": true,
-                "description": "Get quantity (for buy_x_get_y type)"
-              },
-              "max_per_customer": {
-                "type": "integer",
-                "description": "Maximum uses per customer",
-                "example": 0
-              },
-              "apply_to_quantity": {
-                "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
-                "description": "Apply to quantity",
-                "example": "no"
-              },
-              "excluded_products": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Excluded product IDs"
-              },
-              "included_products": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Included product IDs"
-              },
-              "apply_to_whole_cart": {
-                "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
-                "description": "Apply to whole cart",
-                "example": "yes"
-              },
-              "excluded_categories": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Excluded category IDs"
-              },
-              "included_categories": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Included category IDs"
-              },
-              "max_discount_amount": {
-                "type": "number",
-                "description": "Maximum discount amount in cents",
-                "example": 5000
-              },
-              "max_purchase_amount": {
-                "type": "number",
-                "description": "Maximum purchase amount in cents",
-                "example": 0
-              },
-              "min_purchase_amount": {
-                "type": "number",
-                "description": "Minimum purchase amount in cents",
-                "example": 0
-              }
-            }
-          },
-          "amount": {
-            "type": "string",
-            "description": "Coupon amount (percentage or fixed amount in cents)",
-            "example": "20"
-          },
-          "use_count": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Number of times used"
+            "description": "Unique coupon code",
+            "example": "SAVE10"
           },
           "status": {
             "type": "string",
@@ -271,10 +153,25 @@
             "description": "Coupon status",
             "example": "active"
           },
-          "notes": {
+          "type": {
             "type": "string",
-            "description": "Coupon notes",
-            "example": ""
+            "enum": [
+              "fixed",
+              "percentage",
+              "free_shipping",
+              "buy_x_get_y"
+            ],
+            "description": "Discount type",
+            "example": "percentage"
+          },
+          "conditions": {
+            "type": "object",
+            "description": "Coupon conditions and restrictions"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Discount amount",
+            "example": 10
           },
           "stackable": {
             "type": "string",
@@ -282,8 +179,24 @@
               "yes",
               "no"
             ],
-            "description": "Whether coupon is stackable",
-            "example": "no"
+            "description": "Whether coupon can be combined with others",
+            "example": "yes"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Sort priority",
+            "example": 1
+          },
+          "use_count": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Current usage count",
+            "example": 12
+          },
+          "notes": {
+            "type": "string",
+            "description": "Internal notes",
+            "example": "Internal note about this coupon"
           },
           "show_on_checkout": {
             "type": "string",
@@ -291,34 +204,37 @@
               "yes",
               "no"
             ],
-            "description": "Whether to show on checkout",
-            "example": "no"
+            "description": "Whether to display on checkout",
+            "example": "yes"
           },
           "start_date": {
             "type": "string",
             "nullable": true,
             "format": "date-time",
-            "description": "Start date",
-            "example": null
+            "description": "Start date (GMT)"
           },
           "end_date": {
             "type": "string",
             "nullable": true,
             "format": "date-time",
-            "description": "End date",
-            "example": null
+            "description": "End date (GMT)"
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2025-10-22T06:24:52+00:00"
+            "description": "Creation timestamp"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
-            "description": "Last update timestamp",
-            "example": "2025-10-22T06:24:52+00:00"
+            "description": "Last update timestamp"
+          },
+          "activities": {
+            "type": "array",
+            "description": "Activity log entries",
+            "items": {
+              "$ref": "#/components/schemas/Activity"
+            }
           }
         }
       },
@@ -328,37 +244,7 @@
           "id": {
             "type": "integer",
             "description": "Activity ID",
-            "example": 111144
-          },
-          "status": {
-            "type": "string",
-            "description": "Activity status",
-            "example": "success"
-          },
-          "log_type": {
-            "type": "string",
-            "description": "Log type",
-            "example": "activity"
-          },
-          "module_type": {
-            "type": "string",
-            "description": "Module type",
-            "example": "FluentCart\\App\\Models\\Coupon"
-          },
-          "module_id": {
-            "type": "integer",
-            "description": "Module ID",
-            "example": 196
-          },
-          "module_name": {
-            "type": "string",
-            "description": "Module name",
-            "example": "coupon"
-          },
-          "user_id": {
-            "type": "string",
-            "description": "User ID",
-            "example": "5"
+            "example": 1
           },
           "title": {
             "type": "string",
@@ -367,50 +253,48 @@
           },
           "content": {
             "type": "string",
-            "description": "Activity content",
-            "example": "Coupon \"BFCM SALE\" created by Robert"
+            "description": "Activity description",
+            "example": "Coupon \"SAVE10\" created by Admin"
           },
-          "read_status": {
+          "status": {
             "type": "string",
-            "description": "Read status",
-            "example": "unread"
+            "description": "Activity status",
+            "example": "success"
           },
-          "created_by": {
-            "type": "string",
-            "description": "Created by",
-            "example": "Robert"
+          "user_id": {
+            "type": "integer",
+            "description": "User ID who performed the action",
+            "example": 1
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2025-10-22T06:24:52+00:00"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp",
-            "example": "2025-10-22T06:24:52+00:00"
+            "description": "Activity timestamp"
           },
           "user": {
             "type": "object",
             "properties": {
               "ID": {
                 "type": "integer",
-                "example": 5
+                "description": "WordPress user ID",
+                "example": 1
               },
               "display_name": {
                 "type": "string",
-                "example": "Robert"
-              },
-              "user_email": {
-                "type": "string",
-                "format": "email",
-                "example": "reachkamrul@gmail.com"
+                "description": "User display name",
+                "example": "Admin"
               }
             }
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

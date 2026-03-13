@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/orders/{order}/subscriptions/{subscription}/reactivate": {
       "put": {
         "operationId": "reactivateSubscription",
         "summary": "PUT Reactivate Subscription",
-        "description": "Reactivate a cancelled subscription. Note: This feature is not available yet.",
+        "description": "Reactivate a previously canceled or paused subscription. Note: This endpoint is registered but currently returns a 'Not available yet' error. It is reserved for future implementation.",
         "tags": [
           "Subscriptions"
         ],
@@ -21,7 +44,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "Order ID"
+            "description": "The parent order ID"
           },
           {
             "name": "subscription",
@@ -30,21 +53,19 @@
             "schema": {
               "type": "integer"
             },
-            "description": "Subscription ID"
+            "description": "The subscription ID"
           }
         ],
         "responses": {
-          "400": {
-            "description": "Not available",
+          "200": {
+            "description": "Not yet available",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string",
-                      "description": "Error message",
-                      "example": "Not available yet"
+                      "type": "string"
                     }
                   }
                 },
@@ -59,16 +80,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "Error": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Error message",
-            "example": "Not available yet"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

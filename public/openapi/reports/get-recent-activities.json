@@ -1,0 +1,130 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/get-recent-activities": {
+      "get": {
+        "operationId": "getRecentActivities",
+        "summary": "GET Get Recent Activities",
+        "description": "Retrieve the 10 most recent activity log entries, optionally filtered by time period.",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "groupKey",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "yesterday",
+                "this_week",
+                "all"
+              ],
+              "default": "all"
+            },
+            "description": "Time filter for activities.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recentActivities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "description": "Activity title"
+                          },
+                          "content": {
+                            "type": "string",
+                            "description": "Activity description"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "description": "Activity timestamp"
+                          },
+                          "created_by": {
+                            "type": "integer",
+                            "description": "User ID who performed the action"
+                          },
+                          "module_name": {
+                            "type": "string",
+                            "description": "Module name (e.g., orders)"
+                          },
+                          "module_id": {
+                            "type": "integer",
+                            "description": "Related module entity ID"
+                          }
+                        }
+                      },
+                      "description": "List of recent activity log entries"
+                    }
+                  }
+                },
+                "example": {
+                  "recentActivities": [
+                    {
+                      "title": "Order #150 created",
+                      "content": "New order placed by John Doe",
+                      "created_at": "2025-06-15 14:30:00",
+                      "created_by": 1,
+                      "module_name": "orders",
+                      "module_id": 150
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

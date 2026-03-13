@@ -1,0 +1,132 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/enable-notification/{name}": {
+      "post": {
+        "operationId": "enableEmailNotification",
+        "summary": "POST Enable/Disable Notification",
+        "description": "Toggle a notification template on or off without modifying other settings.",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The notification key (e.g., order_paid_admin)",
+            "example": "order_refunded_admin"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "active"
+                ],
+                "properties": {
+                  "active": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "description": "Set to yes to enable or no to disable the notification",
+                    "example": "yes"
+                  }
+                }
+              },
+              "example": {
+                "active": "yes"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Notification updated successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Notification updated successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request or update failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to update notification"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Failed to update notification"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

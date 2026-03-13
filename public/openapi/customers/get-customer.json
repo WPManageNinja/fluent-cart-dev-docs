@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/customers/{customerId}": {
       "get": {
         "operationId": "getCustomer",
-        "summary": "GET Get Customer Details",
-        "description": "Retrieve detailed information about a specific customer.",
+        "summary": "GET Get Customer",
+        "description": "Retrieve a single customer by ID with optional eager-loaded relationships.",
         "tags": [
           "Customers"
         ],
@@ -21,10 +44,10 @@
             "schema": {
               "type": "integer"
             },
-            "description": "Customer ID"
+            "description": "The customer ID"
           },
           {
-            "name": "with[]",
+            "name": "with",
             "in": "query",
             "schema": {
               "type": "array",
@@ -32,71 +55,73 @@
                 "type": "string"
               }
             },
-            "description": "Related data to include (e.g., orders, addresses)",
-            "required": false,
-            "style": "form",
-            "explode": true
+            "description": "Relationships to eager-load (e.g., `orders`, `labels`, `billing_address`, `shipping_address`, `subscriptions`, `wpUser`)",
+            "required": false
           },
           {
-            "name": "params.customer_only",
+            "name": "params[customer_only]",
             "in": "query",
             "schema": {
               "type": "string"
             },
-            "description": "Set to 'yes' to return only customer data without labels",
+            "description": "Set to `yes` to return the customer without labels processing",
             "required": false
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response. Returns detailed customer information.",
+            "description": "Successful response. Returns the customer object.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "customer": {
-                      "$ref": "#/components/schemas/CustomerDetail"
+                      "type": "object"
                     }
                   }
                 },
                 "example": {
                   "customer": {
-                    "id": 63195,
-                    "user_id": "5",
-                    "contact_id": "0",
-                    "email": "reachkamrul@gmail.com",
-                    "first_name": "Robert",
-                    "last_name": "Team",
-                    "status": null,
-                    "purchase_value": null,
-                    "purchase_count": "19",
-                    "ltv": "89788",
-                    "first_purchase_date": "2025-10-13 07:17:52",
-                    "last_purchase_date": "2025-11-12 11:40:06",
-                    "aov": "4725.68",
+                    "id": 1,
+                    "user_id": 5,
+                    "contact_id": null,
+                    "email": "john@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "status": "active",
+                    "purchase_value": {},
+                    "purchase_count": 3,
+                    "ltv": 15000,
+                    "first_purchase_date": "2025-01-15 10:30:00",
+                    "last_purchase_date": "2025-06-20 14:00:00",
+                    "aov": 5000,
                     "notes": "",
-                    "uuid": "78cb6de19c8d084d921c4bff0bcb3dbe",
+                    "uuid": "a1b2c3d4...",
                     "country": "US",
                     "city": "New York",
                     "state": "NY",
-                    "postcode": "10022",
-                    "created_at": "2025-10-09T05:45:54+00:00",
-                    "updated_at": "2025-11-12T11:40:10+00:00",
-                    "selected_labels": [],
-                    "full_name": "Robert Team",
-                    "photo": "https://secure.gravatar.com/avatar/...",
-                    "country_name": "United States (US)",
+                    "postcode": "10001",
+                    "created_at": "2025-01-10 08:00:00",
+                    "updated_at": "2025-06-20 14:00:00",
+                    "full_name": "John Doe",
+                    "photo": "https://gravatar.com/avatar/...",
+                    "country_name": "United States",
                     "formatted_address": {
-                      "country": "United States (US)",
+                      "country": "United States",
                       "state": "New York",
                       "city": "New York",
-                      "postcode": "10022",
-                      "first_name": "Robert",
-                      "last_name": "Team",
-                      "full_name": "Robert Team"
+                      "postcode": "10001",
+                      "first_name": "John",
+                      "last_name": "Doe",
+                      "full_name": "John Doe"
                     },
-                    "user_link": "https://YourWebsite.com/wp-admin/user-edit.php?user_id=5",
+                    "user_link": "https://example.com/wp-admin/user-edit.php?user_id=5",
+                    "selected_labels": [
+                      1,
+                      3,
+                      7
+                    ],
                     "labels": []
                   }
                 }
@@ -104,14 +129,13 @@
             }
           },
           "404": {
-            "description": "Customer not found",
+            "description": "Customer not found.",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
                 "example": {
-                  "customer": null
+                  "message": "Customer not found",
+                  "back_text": "Back to Customer List",
+                  "back_url": "/customers"
                 }
               }
             }
@@ -121,236 +145,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "CustomerDetailResponse": {
-        "type": "object",
-        "properties": {
-          "customer": {
-            "$ref": "#/components/schemas/CustomerDetail"
-          }
-        }
-      },
-      "CustomerDetail": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Customer"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "selected_labels": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Selected label IDs",
-                "example": []
-              },
-              "labels": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/CustomerLabel"
-                },
-                "description": "Customer labels"
-              }
-            }
-          }
-        ]
-      },
-      "Customer": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Customer ID",
-            "example": 63195
-          },
-          "user_id": {
-            "type": "string",
-            "nullable": true,
-            "description": "WordPress user ID",
-            "example": "5"
-          },
-          "contact_id": {
-            "type": "string",
-            "description": "Contact ID",
-            "example": "0"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "description": "Customer email address",
-            "example": "reachkamrul@gmail.com"
-          },
-          "first_name": {
-            "type": "string",
-            "description": "Customer first name",
-            "example": "Robert"
-          },
-          "last_name": {
-            "type": "string",
-            "description": "Customer last name",
-            "example": "Team"
-          },
-          "full_name": {
-            "type": "string",
-            "description": "Customer full name",
-            "example": "Robert Team"
-          },
-          "status": {
-            "type": "string",
-            "nullable": true,
-            "description": "Customer status",
-            "example": null
-          },
-          "purchase_value": {
-            "type": "array",
-            "nullable": true,
-            "description": "Purchase value array",
-            "example": null
-          },
-          "purchase_count": {
-            "type": "string",
-            "description": "Number of purchases",
-            "example": "19"
-          },
-          "ltv": {
-            "type": "string",
-            "description": "Lifetime value",
-            "example": "89788"
-          },
-          "first_purchase_date": {
-            "type": "string",
-            "nullable": true,
-            "description": "First purchase date",
-            "example": "2025-10-13 07:17:52"
-          },
-          "last_purchase_date": {
-            "type": "string",
-            "nullable": true,
-            "description": "Last purchase date",
-            "example": "2025-11-12 11:40:06"
-          },
-          "aov": {
-            "type": "string",
-            "nullable": true,
-            "description": "Average order value",
-            "example": "4725.68"
-          },
-          "notes": {
-            "type": "string",
-            "description": "Customer notes",
-            "example": ""
-          },
-          "uuid": {
-            "type": "string",
-            "description": "Customer UUID",
-            "example": "78cb6de19c8d084d921c4bff0bcb3dbe"
-          },
-          "country": {
-            "type": "string",
-            "nullable": true,
-            "description": "Country code",
-            "example": "US"
-          },
-          "city": {
-            "type": "string",
-            "nullable": true,
-            "description": "City",
-            "example": "New York"
-          },
-          "state": {
-            "type": "string",
-            "nullable": true,
-            "description": "State",
-            "example": "NY"
-          },
-          "postcode": {
-            "type": "string",
-            "nullable": true,
-            "description": "Postal code",
-            "example": "10022"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2025-10-09T05:45:54+00:00"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp",
-            "example": "2025-11-12T11:40:10+00:00"
-          },
-          "photo": {
-            "type": "string",
-            "format": "uri",
-            "description": "Customer photo URL (Gravatar)",
-            "example": "https://secure.gravatar.com/avatar/..."
-          },
-          "country_name": {
-            "type": "string",
-            "description": "Country name",
-            "example": "United States (US)"
-          },
-          "formatted_address": {
-            "type": "object",
-            "description": "Formatted address object",
-            "properties": {
-              "country": {
-                "type": "string"
-              },
-              "state": {
-                "type": "string",
-                "nullable": true
-              },
-              "city": {
-                "type": "string",
-                "nullable": true
-              },
-              "postcode": {
-                "type": "string",
-                "nullable": true
-              },
-              "first_name": {
-                "type": "string"
-              },
-              "last_name": {
-                "type": "string"
-              },
-              "full_name": {
-                "type": "string"
-              }
-            }
-          },
-          "user_link": {
-            "type": "string",
-            "format": "uri",
-            "description": "Link to WordPress user edit page",
-            "example": "https://YourWebsite.com/wp-admin/user-edit.php?user_id=5"
-          }
-        }
-      },
-      "CustomerLabel": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Label ID",
-            "example": 1
-          },
-          "label_id": {
-            "type": "integer",
-            "description": "Label ID",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "Label name",
-            "example": "VIP"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -1,0 +1,136 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/licenses/{license_key}/activations": {
+      "get": {
+        "operationId": "getLicenseActivations",
+        "summary": "GET Get License Activations",
+        "description": "Retrieve all site activations for a specific license belonging to the currently logged-in customer.",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "license_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The license key (alphanumeric with dashes)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "activations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "site_url": {
+                            "type": "string",
+                            "description": "The activated site URL (without protocol)"
+                          },
+                          "is_local": {
+                            "type": "integer",
+                            "description": "Whether this is a local/staging site (1) or production site (0). Local sites do not count toward the activation limit"
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "Activation status"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "description": "When the activation was created"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "activations": [
+                    {
+                      "site_url": "example.com",
+                      "is_local": 0,
+                      "status": "active",
+                      "created_at": "2025-03-10 14:22:00"
+                    },
+                    {
+                      "site_url": "staging.example.com",
+                      "is_local": 1,
+                      "status": "active",
+                      "created_at": "2025-03-12 09:15:00"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "License not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "License not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/rates/country/override": {
+      "post": {
+        "operationId": "saveShippingTaxOverride",
+        "summary": "POST Save Shipping Tax Override",
+        "description": "Set a shipping-specific tax override on an existing tax rate.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "override_tax_rate"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "Tax rate ID to apply the shipping override to",
+                    "example": 5
+                  },
+                  "override_tax_rate": {
+                    "type": "integer",
+                    "description": "The override tax rate value to use for shipping",
+                    "example": 7
+                  }
+                }
+              },
+              "example": {
+                "id": 5,
+                "override_tax_rate": 7
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipping tax override saved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Tax override has been saved successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Tax override has been saved successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tax rate not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Tax rate not found"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Tax rate not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

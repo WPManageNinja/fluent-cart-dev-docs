@@ -1,0 +1,210 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group": {
+      "post": {
+        "operationId": "createAttributeGroup",
+        "summary": "POST Create Attribute Group",
+        "description": "Create a new attribute group for product variations.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAttributeGroupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attribute group created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AttributeGroup"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully created!"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "id": 3,
+                    "title": "Material",
+                    "slug": "material",
+                    "description": "Product material type",
+                    "settings": null,
+                    "created_at": "2025-01-15 12:00:00",
+                    "updated_at": "2025-01-15 12:00:00"
+                  },
+                  "message": "Successfully created!"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error - duplicate title or slug.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "slug": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": {
+                    "title": [
+                      "Group title can not be empty and must be unique."
+                    ],
+                    "slug": [
+                      "Group slug can not be empty and must be unique."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateAttributeGroupRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "slug"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Group title (max 50 characters). Must be unique.",
+            "example": "Material"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Group slug (max 50 characters). Must be unique. Used as an identifier in variation data.",
+            "example": "material"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Group description.",
+            "example": "Product material type"
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional group settings (stored as JSON)."
+          }
+        }
+      },
+      "AttributeGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Attribute group ID",
+            "example": 3
+          },
+          "title": {
+            "type": "string",
+            "description": "Group title",
+            "example": "Material"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Group slug identifier",
+            "example": "material"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Group description",
+            "example": "Product material type"
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional group settings",
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (UTC)",
+            "example": "2025-01-15 12:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (UTC)",
+            "example": "2025-01-15 12:00:00"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

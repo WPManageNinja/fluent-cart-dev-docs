@@ -1,0 +1,103 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/public/product-search": {
+      "get": {
+        "operationId": "searchProducts",
+        "summary": "GET Search Products",
+        "description": "Search for published products by title and return server-rendered HTML search result items. Designed for use with the storefront search bar component.",
+        "tags": [
+          "Public Shop"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "post_title",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The search query string to match against product titles"
+          },
+          {
+            "name": "url_mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "URL mode passed to the SearchBarRenderer to control how product links are generated"
+          },
+          {
+            "name": "termId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter search results to products within a specific taxonomy term (category) ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "htmlView": {
+                      "type": "string",
+                      "description": "Pre-rendered HTML for direct insertion into the search results dropdown"
+                    }
+                  }
+                },
+                "example": {
+                  "htmlView": "<div class=\"fct-search-result-item\"><a href=\"https://example.com/product/premium-t-shirt\">Premium T-Shirt</a></div>..."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

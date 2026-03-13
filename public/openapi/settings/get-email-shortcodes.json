@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/confirmation/shortcode": {
+      "get": {
+        "operationId": "getEmailShortcodes",
+        "summary": "GET Get Email Shortcodes",
+        "description": "Retrieve available shortcodes/merge tags that can be used in email notification templates and confirmation messages.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Shortcode categories with available merge tags",
+                      "properties": {
+                        "order": {
+                          "type": "object",
+                          "properties": {
+                            "title": {
+                              "type": "string",
+                              "example": "Order"
+                            },
+                            "shortcodes": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "customer": {
+                          "type": "object",
+                          "properties": {
+                            "title": {
+                              "type": "string",
+                              "example": "Customer"
+                            },
+                            "shortcodes": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "store": {
+                          "type": "object",
+                          "properties": {
+                            "title": {
+                              "type": "string",
+                              "example": "Store"
+                            },
+                            "shortcodes": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "order": {
+                      "title": "Order",
+                      "shortcodes": {
+                        "{{order.id}}": "Order ID",
+                        "{{order.total}}": "Order Total",
+                        "{{order.status}}": "Order Status"
+                      }
+                    },
+                    "customer": {
+                      "title": "Customer",
+                      "shortcodes": {
+                        "{{customer.first_name}}": "First Name",
+                        "{{customer.email}}": "Email"
+                      }
+                    },
+                    "store": {
+                      "title": "Store",
+                      "shortcodes": {
+                        "{{store.name}}": "Store Name"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

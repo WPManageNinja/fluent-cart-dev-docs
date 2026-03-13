@@ -1,0 +1,88 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customers/get-stats/{customer}": {
+      "get": {
+        "operationId": "getCustomerStats",
+        "summary": "GET Get Customer Stats",
+        "description": "Retrieve widget/stats data for a specific customer. Results are extensible via the fluent_cart/widgets/single_customer filter.",
+        "tags": [
+          "Customers"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The customer ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns customer widget data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "widgets": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Array of widget data populated by modules and extensions"
+                    }
+                  }
+                },
+                "example": {
+                  "widgets": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

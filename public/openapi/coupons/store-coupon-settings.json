@@ -1,0 +1,132 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/coupons/storeCouponSettings": {
+      "post": {
+        "operationId": "storeCouponSettings",
+        "summary": "POST Store Coupon Settings",
+        "description": "Update the global coupon settings. Currently controls whether the coupon input field is displayed on the checkout page.",
+        "tags": [
+          "Coupons"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "show_on_checkout": {
+                    "type": "boolean",
+                    "description": "Whether to show the coupon input on the checkout page. Any truthy value sets it to 1, falsy sets to 0."
+                  }
+                }
+              },
+              "example": {
+                "show_on_checkout": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings saved successfully. Response varies based on whether the setting already existed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "boolean",
+                      "description": "Returns true when updating an existing setting"
+                    },
+                    {
+                      "type": "object",
+                      "description": "Returns the created meta record when creating the setting for the first time",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Meta record ID"
+                        },
+                        "meta_key": {
+                          "type": "string",
+                          "description": "Meta key name"
+                        },
+                        "meta_value": {
+                          "type": "integer",
+                          "description": "Meta value"
+                        },
+                        "object_id": {
+                          "type": "integer",
+                          "description": "Object ID"
+                        },
+                        "object_type": {
+                          "type": "string",
+                          "description": "Object type"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "existing_setting": {
+                    "summary": "Updating an existing setting",
+                    "value": true
+                  },
+                  "new_setting": {
+                    "summary": "Creating the setting for the first time",
+                    "value": {
+                      "id": 1,
+                      "meta_key": "fluent_cart_coupon_settings",
+                      "meta_value": 1,
+                      "object_id": 0,
+                      "object_type": ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

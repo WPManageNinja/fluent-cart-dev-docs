@@ -1,0 +1,273 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/licensing/products/{id}/settings": {
+      "post": {
+        "operationId": "saveProductLicenseSettings",
+        "summary": "POST Save Product License Settings",
+        "description": "Update the license configuration for a specific product.",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The product ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "settings"
+                ],
+                "properties": {
+                  "settings": {
+                    "type": "object",
+                    "required": [
+                      "enabled",
+                      "variations"
+                    ],
+                    "properties": {
+                      "enabled": {
+                        "type": "string",
+                        "enum": [
+                          "yes",
+                          "no"
+                        ],
+                        "description": "Enable licensing: `yes` or `no`"
+                      },
+                      "version": {
+                        "type": "string",
+                        "description": "Software version (required when `enabled` is `yes`)"
+                      },
+                      "global_update_file": {
+                        "type": "string",
+                        "description": "ID of the downloadable file to use for auto-updates"
+                      },
+                      "prefix": {
+                        "type": "string",
+                        "description": "License key prefix"
+                      },
+                      "variations": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "variation_id",
+                            "validity"
+                          ],
+                          "properties": {
+                            "variation_id": {
+                              "type": "integer",
+                              "description": "The variation ID"
+                            },
+                            "activation_limit": {
+                              "oneOf": [
+                                {
+                                  "type": "integer"
+                                },
+                                {
+                                  "type": "string"
+                                }
+                              ],
+                              "description": "Max site activations (empty or 0 = unlimited, must be >= 0)"
+                            },
+                            "validity": {
+                              "type": "object",
+                              "properties": {
+                                "unit": {
+                                  "type": "string",
+                                  "enum": [
+                                    "day",
+                                    "week",
+                                    "month",
+                                    "year",
+                                    "lifetime"
+                                  ],
+                                  "description": "Validity unit (required when `enabled` is `yes`)"
+                                },
+                                "value": {
+                                  "type": "integer",
+                                  "description": "Number of validity units (default: 1)"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "wp": {
+                        "type": "object",
+                        "description": "WordPress update API settings",
+                        "properties": {
+                          "is_wp": {
+                            "type": "string",
+                            "enum": [
+                              "yes",
+                              "no"
+                            ],
+                            "description": "Whether this is a WordPress plugin/theme"
+                          },
+                          "readme_url": {
+                            "type": "string",
+                            "description": "URL to the changelog/readme page"
+                          },
+                          "banner_url": {
+                            "type": "string",
+                            "description": "URL to the plugin banner image"
+                          },
+                          "icon_url": {
+                            "type": "string",
+                            "description": "URL to the plugin icon"
+                          },
+                          "required_php": {
+                            "type": "string",
+                            "description": "Minimum required PHP version"
+                          },
+                          "required_wp": {
+                            "type": "string",
+                            "description": "Minimum required WordPress version"
+                          }
+                        }
+                      },
+                      "changelog": {
+                        "type": "string",
+                        "description": "HTML changelog content"
+                      },
+                      "license_keys": {
+                        "type": "string",
+                        "description": "Pre-defined license keys"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "settings": {
+                  "enabled": "yes",
+                  "version": "1.3.0",
+                  "global_update_file": "file_abc123",
+                  "variations": [
+                    {
+                      "variation_id": 15,
+                      "activation_limit": 1,
+                      "validity": {
+                        "unit": "year",
+                        "value": 1
+                      }
+                    },
+                    {
+                      "variation_id": 16,
+                      "activation_limit": "",
+                      "validity": {
+                        "unit": "lifetime",
+                        "value": 1
+                      }
+                    }
+                  ],
+                  "wp": {
+                    "is_wp": "yes",
+                    "readme_url": "https://example.com/changelog",
+                    "banner_url": "https://example.com/banner.png",
+                    "icon_url": "https://example.com/icon.png",
+                    "required_php": "7.4",
+                    "required_wp": "5.6"
+                  },
+                  "changelog": "<h4>1.3.0</h4><ul><li>Performance improvements</li></ul>",
+                  "license_keys": ""
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Settings has been updated successfully."
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error or bundle product",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "License settings cannot be saved for bundle products. Licenses are generated according to bundle items' license settings."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

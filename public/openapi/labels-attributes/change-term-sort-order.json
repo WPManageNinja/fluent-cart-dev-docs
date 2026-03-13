@@ -1,0 +1,152 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group/{group_id}/term/{term_id}/serial": {
+      "post": {
+        "operationId": "changeTermSortOrder",
+        "summary": "POST Change Term Sort Order",
+        "description": "Move a term up or down in the sort order by incrementing or decrementing its `serial` value.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "The attribute group ID.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "term_id",
+            "in": "path",
+            "required": true,
+            "description": "The term ID to reorder.",
+            "schema": {
+              "type": "integer",
+              "example": 2
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeTermSortOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Serial updated successfully. The `data` field contains the new serial value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "integer",
+                      "description": "The new serial value after the change.",
+                      "example": 2
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Serial updated."
+                    }
+                  }
+                },
+                "example": {
+                  "data": 2,
+                  "message": "Serial updated."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Term not found or group mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Info mismatch."
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 404
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Info mismatch.",
+                  "code": 404
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChangeTermSortOrderRequest": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string",
+            "description": "Direction to move: `up` (decrements serial) or `down` (increments serial). Default: `up`.",
+            "enum": [
+              "up",
+              "down"
+            ],
+            "default": "up",
+            "example": "up"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

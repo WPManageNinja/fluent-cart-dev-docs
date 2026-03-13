@@ -1,8 +1,7 @@
 ---
 title: List Orders
-description: "Retrieve a paginated list of orders with optional filtering and searching. You can filter by status, payment status, customer ID, and use search queries."
+description: "Retrieve a paginated list of orders with optional filtering, sorting, and search."
 outline: false
 aside: false
 ---
-<OAOperation operationId="listOrders" />
-
+<OAOperation operationId="listOrders" specUrl="/openapi/public/orders/list-orders.json" />

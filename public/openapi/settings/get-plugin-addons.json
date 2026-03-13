@@ -1,0 +1,130 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/modules/plugin-addons": {
+      "get": {
+        "operationId": "getPluginAddons",
+        "summary": "GET Get Plugin Addons",
+        "description": "List all registered plugin addons (e.g., Elementor Blocks) with their installation and activation status.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "addons": {
+                      "type": "object",
+                      "description": "Map of addon keys to addon details",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "logo": {
+                            "type": "string"
+                          },
+                          "dark_logo": {
+                            "type": "string"
+                          },
+                          "plugin_slug": {
+                            "type": "string"
+                          },
+                          "plugin_file": {
+                            "type": "string"
+                          },
+                          "source_type": {
+                            "type": "string"
+                          },
+                          "source_link": {
+                            "type": "string"
+                          },
+                          "upcoming": {
+                            "type": "boolean"
+                          },
+                          "repo_link": {
+                            "type": "string"
+                          },
+                          "is_installed": {
+                            "type": "boolean"
+                          },
+                          "is_active": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "addons": {
+                    "elementor-block": {
+                      "title": "Elementor Blocks",
+                      "description": "Enable to get Elementor Blocks for FluentCart. Minimum Requirement: Elementor V3.34",
+                      "logo": "https://...",
+                      "dark_logo": "https://...",
+                      "plugin_slug": "fluent-cart-elementor-blocks",
+                      "plugin_file": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php",
+                      "source_type": "cdn",
+                      "source_link": "https://addons-cdn.fluentcart.com/fluent-cart-elementor-blocks.zip",
+                      "upcoming": false,
+                      "repo_link": "https://fluentcart.com/fluentcart-addons",
+                      "is_installed": false,
+                      "is_active": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

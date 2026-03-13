@@ -1,0 +1,135 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/labels/update-label-selections": {
+      "post": {
+        "operationId": "updateLabelSelections",
+        "summary": "POST Update Label Selections",
+        "description": "Update the labels attached to a specific entity. This endpoint syncs the label assignments -- labels in `selectedLabels` are attached, and previously attached labels not in the list are detached.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLabelSelectionsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Labels updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Labels Updated Successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Labels Updated Successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to update labels.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Failed To Update Labels"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Failed To Update Labels"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateLabelSelectionsRequest": {
+        "type": "object",
+        "required": [
+          "bind_to_type",
+          "bind_to_id"
+        ],
+        "properties": {
+          "bind_to_type": {
+            "type": "string",
+            "description": "The model class name (e.g., `Order`, `Customer`). Short class name or fully-qualified namespace.",
+            "example": "Order"
+          },
+          "bind_to_id": {
+            "type": "string",
+            "description": "The ID of the entity to update labels for.",
+            "example": "42"
+          },
+          "selectedLabels": {
+            "type": "array",
+            "description": "Array of label IDs to attach. Omit or pass empty array to remove all labels.",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "1",
+              "3",
+              "4"
+            ]
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

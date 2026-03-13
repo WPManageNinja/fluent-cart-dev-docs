@@ -1,0 +1,137 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/onboarding/create-page": {
+      "post": {
+        "operationId": "createSinglePage",
+        "summary": "POST Create Single Page",
+        "description": "Create a single store page (e.g., shop, checkout, customer profile) and optionally save the page ID to store settings.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content",
+                  "page_name"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "The page key identifier with _page_id suffix (e.g., shop_page_id, checkout_page_id, customer_profile_page_id)"
+                  },
+                  "page_name": {
+                    "type": "string",
+                    "description": "The title for the new WordPress page"
+                  },
+                  "save_settings": {
+                    "type": "boolean",
+                    "description": "Whether to save the new page ID to store settings. When true, also flushes rewrite rules.",
+                    "default": false
+                  }
+                }
+              },
+              "example": {
+                "content": "shop_page_id",
+                "page_name": "Shop",
+                "save_settings": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "page_id": {
+                      "type": "string",
+                      "description": "The created WordPress page ID"
+                    },
+                    "page_name": {
+                      "type": "string",
+                      "description": "The page title"
+                    },
+                    "link": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "The page permalink"
+                    }
+                  }
+                },
+                "example": {
+                  "page_id": "156",
+                  "page_name": "Shop",
+                  "link": "https://example.com/shop/"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Unable to create page"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

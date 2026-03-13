@@ -1,0 +1,181 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/address/{id}": {
+      "put": {
+        "operationId": "updateOrderAddress",
+        "summary": "PUT Update Order Address",
+        "description": "Update an existing order address (billing or shipping) with new address data.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order address ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "order_id"
+                ],
+                "properties": {
+                  "order_id": {
+                    "type": "integer",
+                    "description": "Order ID (must match the path parameter)"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Full name"
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "description": "First name"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "description": "Last name"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "description": "Full name"
+                  },
+                  "address_1": {
+                    "type": "string",
+                    "description": "Address line 1"
+                  },
+                  "address_2": {
+                    "type": "string",
+                    "description": "Address line 2"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "State/province"
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Postal/ZIP code"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Country code"
+                  }
+                }
+              },
+              "example": {
+                "order_id": 42,
+                "first_name": "John",
+                "last_name": "Doe",
+                "address_1": "123 Main St",
+                "city": "New York",
+                "state": "NY",
+                "postcode": "10001",
+                "country": "US"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Address updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Address updated successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Address information does not match.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "The address information does not match"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

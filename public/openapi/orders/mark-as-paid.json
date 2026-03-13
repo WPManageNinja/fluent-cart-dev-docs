@@ -1,11 +1,36 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/orders/{order}/mark-as-paid": {
       "post": {
         "operationId": "markOrderAsPaid",
         "summary": "POST Mark Order as Paid",
-        "description": "Mark an order as paid manually.",
-        "tags": ["Orders"],
+        "description": "Mark a pending order as paid, creating or updating the transaction record.",
+        "tags": [
+          "Orders"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -23,6 +48,7 @@
           }
         ],
         "requestBody": {
+          "required": false,
           "content": {
             "application/json": {
               "schema": {
@@ -30,38 +56,33 @@
                 "properties": {
                   "payment_method": {
                     "type": "string",
-                    "description": "Payment method",
-                    "example": "manual"
+                    "description": "Payment method used (e.g., `offline_payment`, `stripe`)"
                   },
                   "vendor_charge_id": {
                     "type": "string",
-                    "description": "Vendor charge/transaction ID",
-                    "example": "manual_123"
+                    "description": "External payment reference/charge ID"
                   },
                   "transaction_type": {
                     "type": "string",
-                    "description": "Transaction type",
-                    "example": "charge"
+                    "description": "Transaction type identifier"
                   },
                   "mark_paid_note": {
                     "type": "string",
-                    "description": "Note for marking as paid",
-                    "example": "Manual payment confirmation"
+                    "description": "Note to attach to the order"
                   }
                 }
               },
               "example": {
-                "payment_method": "manual",
-                "vendor_charge_id": "manual_123",
-                "transaction_type": "charge",
-                "mark_paid_note": "Manual payment confirmation"
+                "payment_method": "offline_payment",
+                "vendor_charge_id": "CHK-12345",
+                "mark_paid_note": "Payment received via bank transfer"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Order marked as paid successfully",
+            "description": "Order marked as paid successfully.",
             "content": {
               "application/json": {
                 "schema": {
@@ -69,8 +90,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "description": "Success message",
-                      "example": "Order has been marked as paid"
+                      "description": "Success message"
                     }
                   }
                 },
@@ -81,31 +101,19 @@
             }
           },
           "423": {
-            "description": "Order cannot be marked as paid (already paid or canceled)",
+            "description": "Order cannot be marked as paid.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "examples": {
-                  "alreadyPaid": {
-                    "value": {
-                      "code": "rest_invalid_param",
-                      "message": "Order has already been paid",
-                      "data": {
-                        "status": 423
-                      }
-                    }
-                  },
-                  "canceled": {
-                    "value": {
-                      "code": "rest_invalid_param",
-                      "message": "Unable to mark paid for canceled order",
-                      "data": {
-                        "status": 423
-                      }
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
                     }
                   }
+                },
+                "example": {
+                  "message": "Order has already been paid"
                 }
               }
             }
@@ -115,173 +123,14 @@
     }
   },
   "components": {
-    "schemas": {
-      "Order": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Order ID",
-            "example": 1
-          },
-          "uuid": {
-            "type": "string",
-            "description": "Unique order identifier",
-            "example": "abc123"
-          },
-          "status": {
-            "type": "string",
-            "description": "Order status",
-            "example": "completed"
-          },
-          "payment_status": {
-            "type": "string",
-            "description": "Payment status",
-            "example": "paid"
-          },
-          "customer_id": {
-            "type": "integer",
-            "description": "Customer ID",
-            "example": 123
-          },
-          "total_amount": {
-            "type": "integer",
-            "description": "Total amount in cents",
-            "example": 5000
-          },
-          "currency": {
-            "type": "string",
-            "description": "Currency code",
-            "example": "USD"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Order creation timestamp",
-            "example": "2024-01-01T10:00:00Z"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Order last update timestamp",
-            "example": "2024-01-01T11:00:00Z"
-          },
-          "customer": {
-            "$ref": "#/components/schemas/Customer"
-          },
-          "order_items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OrderItem"
-            }
-          },
-          "transactions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Transaction"
-            }
-          }
-        }
-      },
-      "OrderItem": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "product_id": {
-            "type": "integer",
-            "example": 456
-          },
-          "variation_id": {
-            "type": "integer",
-            "example": 789
-          },
-          "quantity": {
-            "type": "integer",
-            "example": 2
-          },
-          "price": {
-            "type": "integer",
-            "description": "Price in cents",
-            "example": 2500
-          },
-          "product": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "integer"
-              },
-              "title": {
-                "type": "string"
-              },
-              "sku": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
-      "Customer": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 123
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "customer@example.com"
-          },
-          "first_name": {
-            "type": "string",
-            "example": "John"
-          },
-          "last_name": {
-            "type": "string",
-            "example": "Doe"
-          }
-        }
-      },
-      "Transaction": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "payment_method": {
-            "type": "string",
-            "example": "stripe"
-          },
-          "status": {
-            "type": "string",
-            "example": "succeeded"
-          },
-          "amount": {
-            "type": "integer",
-            "description": "Amount in cents",
-            "example": 5000
-          },
-          "transaction_id": {
-            "type": "string",
-            "example": "txn_123456"
-          }
-        }
-      },
-      "MarkAsPaidResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "Order has been marked as paid"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }
 }
-

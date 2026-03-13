@@ -1,0 +1,168 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/save-settings": {
+      "post": {
+        "operationId": "saveEmailSettings",
+        "summary": "POST Save Global Email Settings",
+        "description": "Update the global email configuration settings for all notification emails.",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "from_name",
+                  "from_email",
+                  "admin_email"
+                ],
+                "properties": {
+                  "from_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Sender name displayed in emails (max 255 characters)",
+                    "example": "My Store"
+                  },
+                  "from_email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "description": "Sender email address (must be valid email, max 255 characters)",
+                    "example": "noreply@example.com"
+                  },
+                  "reply_to_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "nullable": true,
+                    "description": "Reply-to name (max 255 characters)",
+                    "example": "Support"
+                  },
+                  "reply_to_email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "nullable": true,
+                    "description": "Reply-to email address (must be valid email, max 255 characters)",
+                    "example": "support@example.com"
+                  },
+                  "email_footer": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "HTML content for the email footer. Sanitized with wp_kses_post",
+                    "example": "<p>Thank you for shopping with us!</p>"
+                  },
+                  "admin_email": {
+                    "type": "string",
+                    "description": "Admin notification recipient email(s). Supports shortcodes like {{wp.admin_email}}",
+                    "example": "admin@example.com"
+                  },
+                  "show_email_footer": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "nullable": true,
+                    "description": "Show or hide the email footer. On free plans, this is always forced to yes",
+                    "example": "yes"
+                  }
+                }
+              },
+              "example": {
+                "from_name": "My Store",
+                "from_email": "noreply@example.com",
+                "reply_to_name": "Support",
+                "reply_to_email": "support@example.com",
+                "email_footer": "<p>Thank you for shopping with us!</p>",
+                "admin_email": "admin@example.com",
+                "show_email_footer": "yes"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email settings saved successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Email settings saved successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request or save failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to save email settings"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Failed to save email settings"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

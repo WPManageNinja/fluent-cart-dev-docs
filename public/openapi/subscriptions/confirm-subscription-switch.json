@@ -1,0 +1,147 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/subscriptions/{subscription_uuid}/confirm-subscription-switch": {
+      "post": {
+        "operationId": "confirmSubscriptionSwitch",
+        "summary": "POST Confirm Subscription Switch",
+        "description": "Confirm a two-step payment method switch. After the initial switch-payment-method call creates a new subscription on the target gateway, this endpoint finalizes the switch by confirming the new subscription and deactivating the old one.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscription_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The subscription UUID (alphanumeric with dashes)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "newVendorSubscriptionId",
+                      "method"
+                    ],
+                    "properties": {
+                      "newVendorSubscriptionId": {
+                        "type": "string",
+                        "description": "The new subscription ID from the target payment gateway",
+                        "example": "I-ABC123DEF456"
+                      },
+                      "method": {
+                        "type": "string",
+                        "description": "The target payment gateway slug",
+                        "example": "paypal"
+                      }
+                    },
+                    "description": "Confirmation data. Additional fields depend on the specific payment gateway implementation."
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "newVendorSubscriptionId": "I-ABC123DEF456",
+                  "method": "paypal"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription switch confirmed successfully. Response depends on the gateway's confirmSubscriptionSwitch implementation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Subscription switch confirmed successfully"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Could not confirm subscription switch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Could not confirm subscription switch"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

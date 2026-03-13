@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customers/{customerId}/address": {
+      "delete": {
+        "operationId": "deleteCustomerAddress",
+        "summary": "DELETE Delete Address",
+        "description": "Delete a customer address. Primary addresses and the last remaining address cannot be deleted.",
+        "tags": [
+          "Customers"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The customer ID"
+          },
+          {
+            "name": "address[id]",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The address record ID to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Address successfully deleted.",
+                  "data": ""
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Cannot delete primary or last address.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "primaryAddress": {
+                    "value": {
+                      "code": 403,
+                      "message": "Primary address cannot be deleted!",
+                      "data": ""
+                    }
+                  },
+                  "lastAddress": {
+                    "value": {
+                      "code": 403,
+                      "message": "At least one address must remain. Address deletion failed!",
+                      "data": ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

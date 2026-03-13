@@ -1,0 +1,112 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/get-unfulfilled-orders": {
+      "get": {
+        "operationId": "getUnfulfilledOrders",
+        "summary": "GET Get Unfulfilled Orders",
+        "description": "Retrieve all orders that are not yet completed, canceled, or failed. Useful for dashboard fulfillment queues.",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "unfulfilledOrders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Order ID"
+                          },
+                          "customer_id": {
+                            "type": "integer",
+                            "description": "Customer ID"
+                          },
+                          "customer_name": {
+                            "type": "string",
+                            "description": "Customer name"
+                          },
+                          "total_amount": {
+                            "type": "number",
+                            "description": "Total amount in decimal (dollars)"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "description": "Order creation timestamp"
+                          },
+                          "order_items_count": {
+                            "type": "integer",
+                            "description": "Number of items in the order"
+                          }
+                        }
+                      },
+                      "description": "List of unfulfilled orders, excluding canceled, failed, and completed"
+                    }
+                  }
+                },
+                "example": {
+                  "unfulfilledOrders": [
+                    {
+                      "id": 148,
+                      "customer_id": 38,
+                      "customer_name": "Jane Smith",
+                      "total_amount": 49.99,
+                      "created_at": "2025-06-14 10:15:00",
+                      "order_items_count": 1
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

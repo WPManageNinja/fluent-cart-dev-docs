@@ -1,0 +1,175 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/shipping_methods": {
+      "get": {
+        "operationId": "getShippingMethods",
+        "summary": "GET Get Shipping Methods",
+        "description": "Retrieve available shipping methods, optionally filtered by country and state. Returns methods applicable to the specified location and all other enabled methods separately.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "country_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Country code to filter applicable shipping methods (e.g., `US`, `GB`)",
+            "required": false
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "State/province code for more specific filtering",
+            "required": false
+          },
+          {
+            "name": "order_items",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "quantity": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "description": "Array of order items (each with `id` and `quantity`) to calculate shipping charges",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns shipping methods.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_methods": {
+                      "type": "array",
+                      "description": "Shipping methods applicable to the specified location",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Shipping method ID"
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Shipping method title"
+                          },
+                          "is_enabled": {
+                            "type": "string",
+                            "description": "Whether the method is enabled"
+                          },
+                          "shipping_charge": {
+                            "type": "integer",
+                            "description": "Shipping charge in cents"
+                          }
+                        }
+                      }
+                    },
+                    "other_shipping_methods": {
+                      "type": "array",
+                      "description": "All other enabled shipping methods",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Shipping method ID"
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Shipping method title"
+                          },
+                          "is_enabled": {
+                            "type": "string",
+                            "description": "Whether the method is enabled"
+                          },
+                          "shipping_charge": {
+                            "type": "integer",
+                            "description": "Shipping charge in cents"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_methods": [
+                    {
+                      "id": 1,
+                      "title": "Standard Shipping",
+                      "is_enabled": "1",
+                      "shipping_charge": 500
+                    }
+                  ],
+                  "other_shipping_methods": [
+                    {
+                      "id": 2,
+                      "title": "International Shipping",
+                      "is_enabled": "1",
+                      "shipping_charge": 1500
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

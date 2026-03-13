@@ -1,0 +1,346 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/checkout/place-order": {
+      "post": {
+        "operationId": "placeOrder",
+        "summary": "POST Place Order",
+        "description": "Submit a checkout order with billing/shipping details and payment method. This endpoint validates the cart, creates a customer (or matches an existing one), creates a draft order, and initiates the payment flow with the selected gateway.",
+        "tags": [
+          "Checkout"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "billing_email",
+                  "payment_method"
+                ],
+                "properties": {
+                  "billing_email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Customer email address. Auto-populated for logged-in users"
+                  },
+                  "billing_full_name": {
+                    "type": "string",
+                    "description": "Full name of the customer. Required when the store uses full name mode. Auto-populated for logged-in users if available"
+                  },
+                  "billing_first_name": {
+                    "type": "string",
+                    "description": "Customer first name. Required when the store uses separate first/last name mode"
+                  },
+                  "billing_last_name": {
+                    "type": "string",
+                    "description": "Customer last name. Required when the store uses separate name mode and last name is configured as required"
+                  },
+                  "billing_country": {
+                    "type": "string",
+                    "description": "ISO country code (e.g., `US`, `GB`). Required based on checkout field configuration. Defaults to store country if not provided"
+                  },
+                  "billing_address_1": {
+                    "type": "string",
+                    "description": "Street address line 1. Required based on checkout field configuration"
+                  },
+                  "billing_address_2": {
+                    "type": "string",
+                    "description": "Street address line 2 (apt, suite, unit)"
+                  },
+                  "billing_city": {
+                    "type": "string",
+                    "description": "City name. Required based on checkout field configuration"
+                  },
+                  "billing_state": {
+                    "type": "string",
+                    "description": "State/province code. Required if the selected country has states"
+                  },
+                  "billing_postcode": {
+                    "type": "string",
+                    "description": "Postal/ZIP code. Required based on checkout field configuration"
+                  },
+                  "billing_phone": {
+                    "type": "string",
+                    "description": "Phone number"
+                  },
+                  "billing_tax_id": {
+                    "type": "string",
+                    "description": "Customer tax ID / VAT number"
+                  },
+                  "billing_address_id": {
+                    "type": "integer",
+                    "description": "ID of a saved customer billing address (for returning customers)"
+                  },
+                  "ship_to_different": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "default": "no",
+                    "description": "Set to `yes` to use a different shipping address. Default: `no`"
+                  },
+                  "shipping_full_name": {
+                    "type": "string",
+                    "description": "Shipping recipient name. Required when `ship_to_different` is `yes`"
+                  },
+                  "shipping_country": {
+                    "type": "string",
+                    "description": "Shipping country code. Required when `ship_to_different` is `yes`"
+                  },
+                  "shipping_address_1": {
+                    "type": "string",
+                    "description": "Shipping street address. Required when `ship_to_different` is `yes`"
+                  },
+                  "shipping_address_2": {
+                    "type": "string",
+                    "description": "Shipping address line 2"
+                  },
+                  "shipping_city": {
+                    "type": "string",
+                    "description": "Shipping city. Required when `ship_to_different` is `yes`"
+                  },
+                  "shipping_state": {
+                    "type": "string",
+                    "description": "Shipping state/province code"
+                  },
+                  "shipping_postcode": {
+                    "type": "string",
+                    "description": "Shipping postal code"
+                  },
+                  "shipping_phone": {
+                    "type": "string",
+                    "description": "Shipping phone number"
+                  },
+                  "shipping_address_id": {
+                    "type": "integer",
+                    "description": "ID of a saved customer shipping address"
+                  },
+                  "fc_selected_shipping_method": {
+                    "type": "integer",
+                    "description": "ID of the selected shipping method. Required for orders containing physical products"
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "description": "Payment gateway slug (e.g., `stripe`, `paypal`, `cod`, `square`)"
+                  },
+                  "order_notes": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "description": "Optional order notes from the customer. Max 200 characters"
+                  },
+                  "agree_terms": {
+                    "type": "string",
+                    "description": "Terms agreement flag. Required if terms acceptance is enabled in store settings"
+                  },
+                  "allow_create_account": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "description": "Set to `yes` to create a WordPress user account (when store setting is `user_choice`)"
+                  },
+                  "user_tz": {
+                    "type": "string",
+                    "default": "UTC",
+                    "description": "Customer timezone (e.g., `America/New_York`). Default: `UTC`"
+                  }
+                }
+              },
+              "example": {
+                "billing_email": "john@example.com",
+                "billing_full_name": "John Doe",
+                "billing_country": "US",
+                "billing_address_1": "123 Main St",
+                "billing_city": "New York",
+                "billing_state": "NY",
+                "billing_postcode": "10001",
+                "payment_method": "stripe",
+                "user_tz": "America/New_York"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. The response structure varies by payment gateway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "Result status (`success` or `failed`)"
+                    },
+                    "redirect_url": {
+                      "type": "string",
+                      "description": "URL to redirect the customer to (for redirect-based gateways or completed orders)"
+                    },
+                    "payment_args": {
+                      "type": "object",
+                      "description": "Payment gateway-specific arguments (for on-site gateways like Stripe Elements)",
+                      "properties": {
+                        "client_secret": {
+                          "type": "string",
+                          "description": "Stripe PaymentIntent client secret"
+                        },
+                        "checkout_mode": {
+                          "type": "string",
+                          "description": "Payment checkout mode (`onsite` or `hosted`)"
+                        }
+                      }
+                    },
+                    "order_id": {
+                      "type": "integer",
+                      "description": "The created order ID (for on-site payment flows)"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable result message"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "description": "Validation errors keyed by field name (when status is `failed`)"
+                    }
+                  }
+                },
+                "examples": {
+                  "redirect_gateway": {
+                    "summary": "Redirect-based gateway (PayPal, hosted Stripe)",
+                    "value": {
+                      "status": "success",
+                      "redirect_url": "https://checkout.stripe.com/pay/cs_...",
+                      "message": "Order placed successfully"
+                    }
+                  },
+                  "onsite_gateway": {
+                    "summary": "On-site gateway (Stripe Elements)",
+                    "value": {
+                      "status": "success",
+                      "payment_args": {
+                        "client_secret": "pi_..._secret_...",
+                        "checkout_mode": "onsite"
+                      },
+                      "order_id": 42,
+                      "message": "Order placed successfully"
+                    }
+                  },
+                  "free_order": {
+                    "summary": "Free / COD orders",
+                    "value": {
+                      "status": "success",
+                      "redirect_url": "https://your-site.com/checkout/order-received/?order=abc123",
+                      "message": "Order placed successfully"
+                    }
+                  },
+                  "validation_error": {
+                    "summary": "Validation errors",
+                    "value": {
+                      "status": "failed",
+                      "errors": {
+                        "billing_email": {
+                          "invalid": "Email must be a valid email address."
+                        },
+                        "billing_country": {
+                          "required": "Country is required."
+                        },
+                        "shipping_method": {
+                          "required": "You must select a shipping method."
+                        }
+                      }
+                    }
+                  },
+                  "empty_cart": {
+                    "summary": "Empty or completed cart",
+                    "value": {
+                      "status": "failed",
+                      "message": "Cart is empty or already completed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Product validation failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Product is out of stock"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (5 requests per 60 seconds per IP/user).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Too many requests. Please try again later."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

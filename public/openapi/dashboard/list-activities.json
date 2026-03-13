@@ -1,0 +1,259 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/activity": {
+      "get": {
+        "operationId": "listActivities",
+        "summary": "GET List Activities",
+        "description": "Retrieve a paginated list of activity log entries with filtering and sorting support.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by ID (prefix with #), title, content, or module name"
+          },
+          {
+            "name": "active_view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "success",
+                "warning",
+                "error",
+                "failed",
+                "info",
+                "api"
+              ]
+            },
+            "description": "Filter by tab"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "id"
+            },
+            "description": "Column to sort by"
+          },
+          {
+            "name": "sort_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": "Sort direction"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "maximum": 200
+            },
+            "description": "Results per page (max 200)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "filter_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "simple",
+                "advanced"
+              ],
+              "default": "simple"
+            },
+            "description": "Filter mode"
+          },
+          {
+            "name": "advanced_filters",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "JSON-encoded advanced filter groups (requires filter_type=advanced and Pro)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "activities": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": "integer"
+                        },
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "last_page": {
+                          "type": "integer"
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ActivityLogEntry"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "activities": {
+                    "total": 156,
+                    "per_page": 10,
+                    "current_page": 1,
+                    "last_page": 16,
+                    "data": [
+                      {
+                        "id": 42,
+                        "title": "Order #1024 status changed",
+                        "content": "Order status changed from pending to completed",
+                        "status": "success",
+                        "log_type": "activity",
+                        "module_name": "orders",
+                        "read_status": "unread",
+                        "created_at": "2025-06-15 14:30:00",
+                        "updated_at": "2025-06-15 14:30:00"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActivityLogEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Activity log entry ID",
+            "example": 42
+          },
+          "title": {
+            "type": "string",
+            "description": "Activity title",
+            "example": "Order #1024 status changed"
+          },
+          "content": {
+            "type": "string",
+            "description": "Activity description",
+            "example": "Order status changed from pending to completed"
+          },
+          "status": {
+            "type": "string",
+            "description": "Activity status",
+            "example": "success"
+          },
+          "log_type": {
+            "type": "string",
+            "description": "Log type",
+            "example": "activity"
+          },
+          "module_name": {
+            "type": "string",
+            "description": "Module name",
+            "example": "orders"
+          },
+          "read_status": {
+            "type": "string",
+            "description": "Read status",
+            "example": "unread"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2025-06-15 14:30:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-06-15 14:30:00"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

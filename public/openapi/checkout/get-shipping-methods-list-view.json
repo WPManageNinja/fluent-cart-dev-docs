@@ -1,0 +1,134 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/checkout/get-shipping-methods-list-view": {
+      "get": {
+        "operationId": "getShippingMethodsListView",
+        "summary": "GET Get Shipping Methods List View",
+        "description": "Retrieve a server-rendered HTML view of available shipping methods for the checkout page. This endpoint wraps get-available-shipping-methods and returns a pre-rendered HTML list suitable for direct insertion into the checkout form.",
+        "tags": [
+          "Checkout"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "timezone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "IANA timezone string (e.g., `America/New_York`). Used to auto-detect the country. Either `timezone` or `country_code` must be provided",
+            "required": false
+          },
+          {
+            "name": "country_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ISO 3166-1 alpha-2 country code (e.g., `US`, `GB`). Used when `timezone` is not provided",
+            "required": false
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "State/province code to further filter applicable shipping methods",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns rendered HTML of shipping methods.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Response data wrapper",
+                      "properties": {
+                        "status": {
+                          "type": "boolean",
+                          "description": "Whether shipping methods were found"
+                        },
+                        "view": {
+                          "type": "string",
+                          "description": "Server-rendered HTML of the shipping method list"
+                        },
+                        "country_code": {
+                          "type": "string",
+                          "description": "The resolved country code"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Shipping methods available",
+                    "value": {
+                      "data": {
+                        "status": true,
+                        "view": "<div class=\"fct-shipping-methods\">...rendered shipping method list HTML...</div>",
+                        "country_code": "US"
+                      }
+                    }
+                  },
+                  "no_methods": {
+                    "summary": "No methods available",
+                    "value": {
+                      "status": false,
+                      "country_code": "XX",
+                      "view": "<div class=\"fct-empty-state\">No shipping methods available for this address.</div>"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

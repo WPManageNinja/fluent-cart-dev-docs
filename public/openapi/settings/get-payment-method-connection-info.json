@@ -1,0 +1,121 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/payment-methods/connect/info": {
+      "get": {
+        "operationId": "getPaymentMethodConnectionInfo",
+        "summary": "GET Get Payment Method Connection Info",
+        "description": "Retrieve connection information (OAuth URLs, account status) for a connectable payment gateway.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "method",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "paypal"
+            },
+            "description": "The payment method key (e.g., `stripe`, `paypal`)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "connect_config": {
+                      "type": "object",
+                      "properties": {
+                        "test_redirect": {
+                          "type": "string",
+                          "example": "https://example.com/wp-admin/?fluent-cart=..."
+                        },
+                        "live_redirect": {
+                          "type": "string",
+                          "example": "https://example.com/wp-admin/?fluent-cart=..."
+                        },
+                        "disconnect_note": {
+                          "type": "string",
+                          "example": "Disconnecting will prevent..."
+                        }
+                      }
+                    },
+                    "test_account": {
+                      "type": "object",
+                      "description": "Test account information",
+                      "additionalProperties": true
+                    },
+                    "live_account": {
+                      "type": "object",
+                      "description": "Live account information",
+                      "additionalProperties": true
+                    },
+                    "settings": {
+                      "type": "object",
+                      "description": "Current payment method settings",
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "example": {
+                  "connect_config": {
+                    "test_redirect": "https://example.com/wp-admin/?fluent-cart=...",
+                    "live_redirect": "https://example.com/wp-admin/?fluent-cart=...",
+                    "disconnect_note": "Disconnecting will prevent..."
+                  },
+                  "test_account": {},
+                  "live_account": {},
+                  "settings": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

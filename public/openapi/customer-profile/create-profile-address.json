@@ -1,0 +1,206 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/create-address": {
+      "post": {
+        "operationId": "createProfileAddress",
+        "summary": "POST Create Profile Address",
+        "description": "Create a new address for the authenticated customer from the profile management page.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "name",
+                  "postcode",
+                  "country",
+                  "email"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "billing",
+                      "shipping"
+                    ],
+                    "description": "Address type: `billing` or `shipping`"
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Contact name. Max 255 characters."
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 15,
+                    "description": "Short label for the address (max 15 characters, e.g., `Home`, `Work`)"
+                  },
+                  "address_1": {
+                    "type": "string",
+                    "description": "Primary street address"
+                  },
+                  "address_2": {
+                    "type": "string",
+                    "description": "Secondary address line"
+                  },
+                  "city": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "City. Max 255 characters."
+                  },
+                  "state": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "State/province code. Max 255 characters."
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Postal/zip code"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Country code (e.g., `US`, `GB`)"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "Phone number"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Email address"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Company name. Max 255 characters."
+                  },
+                  "is_primary": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "description": "Set to `1` to make this the primary address. Defaults to `0`. Automatically set to `1` if no primary address exists."
+                  }
+                }
+              },
+              "example": {
+                "type": "billing",
+                "name": "John Doe",
+                "address_1": "123 Main St",
+                "city": "New York",
+                "state": "NY",
+                "postcode": "10001",
+                "country": "US",
+                "phone": "+1234567890",
+                "email": "john@example.com",
+                "label": "Home"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Address created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "is_created": {
+                          "type": "object"
+                        },
+                        "total_address_count": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Customer address created successfully!",
+                  "data": {
+                    "is_created": {
+                      "id": 10,
+                      "customer_id": 1,
+                      "type": "billing",
+                      "name": "John Doe",
+                      "address_1": "123 Main St",
+                      "city": "New York",
+                      "state": "NY",
+                      "postcode": "10001",
+                      "country": "US",
+                      "is_primary": "1",
+                      "status": "active"
+                    },
+                    "total_address_count": 2
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Name field is required."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

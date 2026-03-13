@@ -1,0 +1,241 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/user/login": {
+      "post": {
+        "operationId": "userLogin",
+        "summary": "POST Login",
+        "description": "Authenticate a user during the checkout process. On success, sets the WordPress authentication cookie and returns a redirect URL to the customer profile page.",
+        "tags": [
+          "Checkout"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-WP-Nonce",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "description": "WordPress REST API nonce for `wp_rest` action. Required to prevent CSRF attacks",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_login",
+                  "password"
+                ],
+                "properties": {
+                  "user_login": {
+                    "type": "string",
+                    "description": "WordPress username or email address"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Account password"
+                  },
+                  "remember_me": {
+                    "type": "string",
+                    "enum": [
+                      "on"
+                    ],
+                    "description": "Set to `on` to persist the login session (\"Remember Me\"). Default: not remembered"
+                  }
+                }
+              },
+              "example": {
+                "user_login": "john@example.com",
+                "password": "securepassword123",
+                "remember_me": "on"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful. Returns redirect URL.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Whether the login was successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "description": "Human-readable result message"
+                        },
+                        "redirect_url": {
+                          "type": "string",
+                          "description": "URL to redirect the user to after login"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "message": "Login successful",
+                    "redirect_url": "https://your-site.com/customer-profile/#/profile"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_login": {
+                    "summary": "Missing username",
+                    "value": {
+                      "success": false,
+                      "data": {
+                        "message": "Email or username is required",
+                        "code": "missing_login"
+                      }
+                    }
+                  },
+                  "missing_password": {
+                    "summary": "Missing password",
+                    "value": {
+                      "success": false,
+                      "data": {
+                        "message": "Password is required",
+                        "code": "missing_password"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "The password you entered for the username john@example.com is incorrect.",
+                    "code": "login_failed"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid security nonce.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Invalid security token. Please refresh the page and try again.",
+                  "code": "invalid_nonce"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

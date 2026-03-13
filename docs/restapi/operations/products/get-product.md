@@ -1,8 +1,7 @@
 ---
-title: Get Product Details
-description: "Retrieve detailed information about a specific product."
+title: Get Product
+description: "Retrieve a single product by ID."
 outline: false
 aside: false
 ---
-<OAOperation operationId="getProduct" />
-
+<OAOperation operationId="getProduct" specUrl="/openapi/public/products/get-product.json" />

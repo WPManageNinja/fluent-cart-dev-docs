@@ -1,0 +1,153 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/variants/{variantId}": {
+      "post": {
+        "operationId": "updateVariation",
+        "summary": "POST Update Variation",
+        "description": "Update an existing product variation.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "variantId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The variation ID to update",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "variants"
+                ],
+                "properties": {
+                  "variants": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "post_id": {
+                        "type": "integer"
+                      },
+                      "variation_title": {
+                        "type": "string"
+                      },
+                      "item_price": {
+                        "type": "number"
+                      },
+                      "compare_price": {
+                        "type": "number"
+                      },
+                      "sku": {
+                        "type": "string"
+                      },
+                      "fulfillment_type": {
+                        "type": "string",
+                        "enum": [
+                          "physical",
+                          "digital"
+                        ]
+                      },
+                      "total_stock": {
+                        "type": "integer"
+                      },
+                      "available": {
+                        "type": "integer"
+                      },
+                      "committed": {
+                        "type": "integer"
+                      },
+                      "on_hold": {
+                        "type": "integer"
+                      },
+                      "other_info": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "variants": {
+                  "id": 460,
+                  "post_id": 123,
+                  "variation_title": "Pro Plan - Updated",
+                  "item_price": 3999,
+                  "fulfillment_type": "digital",
+                  "total_stock": 1,
+                  "available": 1,
+                  "committed": 0,
+                  "on_hold": 0,
+                  "other_info": {
+                    "payment_type": "onetime"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "variant": {},
+                  "message": "Variation updated successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

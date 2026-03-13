@@ -1,0 +1,106 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/{productId}/duplicate": {
+      "post": {
+        "operationId": "duplicateProduct",
+        "summary": "POST Duplicate Product",
+        "description": "Duplicate a product with options to include or exclude certain settings. The new product is saved as a draft.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The product ID to duplicate",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "import_stock_management": {
+                    "type": "string",
+                    "description": "Include stock management settings (true/false)"
+                  },
+                  "import_license_settings": {
+                    "type": "string",
+                    "description": "Include license settings (true/false)"
+                  },
+                  "import_downloadable_files": {
+                    "type": "string",
+                    "description": "Include downloadable files (true/false)"
+                  }
+                }
+              },
+              "example": {
+                "import_stock_management": "true",
+                "import_license_settings": "true",
+                "import_downloadable_files": "false"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "product_id": 125,
+                  "message": "Product duplicated successfully. The new product has been saved as a draft."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

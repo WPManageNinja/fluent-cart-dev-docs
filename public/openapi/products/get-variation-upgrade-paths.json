@@ -1,0 +1,85 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/variation/{variantId}/upgrade-paths": {
+      "get": {
+        "operationId": "getVariationUpgradePaths",
+        "summary": "GET Get Variation Upgrade Paths",
+        "description": "Retrieve available upgrade paths for a specific variation (used in customer-facing upgrade flows).",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "variantId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The variation ID",
+            "required": true
+          },
+          {
+            "name": "params[order_hash]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The order hash to determine applicable upgrades",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "upgradePaths": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

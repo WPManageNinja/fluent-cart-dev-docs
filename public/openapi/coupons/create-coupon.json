@@ -1,4 +1,27 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/coupons": {
       "post": {
@@ -13,6 +36,7 @@
             "ApplicationPasswords": []
           }
         ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -32,14 +56,12 @@
                   "title": {
                     "type": "string",
                     "maxLength": 200,
-                    "description": "Coupon title (required)",
-                    "example": "20% Off Discount"
+                    "description": "Coupon display name"
                   },
                   "code": {
                     "type": "string",
                     "maxLength": 50,
-                    "description": "Coupon code (required, must be unique)",
-                    "example": "SAVE20"
+                    "description": "Unique coupon code. Must be unique across all coupons."
                   },
                   "type": {
                     "type": "string",
@@ -49,14 +71,12 @@
                       "free_shipping",
                       "buy_x_get_y"
                     ],
-                    "description": "Coupon type (required)",
-                    "example": "percentage"
+                    "description": "Discount type"
                   },
                   "amount": {
                     "type": "number",
                     "minimum": 0,
-                    "description": "Coupon amount (required). For percentage type, must be between 0-100. For fixed type, amount in cents.",
-                    "example": 20
+                    "description": "Discount amount. For percentage: value 0-100. For fixed: amount in store currency (auto-converted to cents)."
                   },
                   "status": {
                     "type": "string",
@@ -66,8 +86,7 @@
                       "disabled",
                       "scheduled"
                     ],
-                    "description": "Coupon status (required)",
-                    "example": "active"
+                    "description": "Coupon status"
                   },
                   "stackable": {
                     "type": "string",
@@ -76,8 +95,7 @@
                       "no"
                     ],
                     "maxLength": 50,
-                    "description": "Whether coupon is stackable (required)",
-                    "example": "no"
+                    "description": "Whether coupon can be combined with others"
                   },
                   "show_on_checkout": {
                     "type": "string",
@@ -86,41 +104,42 @@
                       "no"
                     ],
                     "maxLength": 50,
-                    "description": "Whether to show on checkout (required)",
-                    "example": "no"
+                    "description": "Whether to display the coupon on checkout"
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Sort priority for discount calculation order. Lower numbers are applied first."
                   },
                   "notes": {
                     "type": "string",
-                    "description": "Coupon notes (should be empty string if not provided)",
-                    "example": ""
+                    "description": "Internal notes about the coupon"
                   },
-                  "priority": {
-                    "type": "number",
-                    "minimum": 0,
-                    "description": "Coupon priority",
-                    "example": 5
+                  "start_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Start date in any parseable datetime format. Required if end_date is provided. Automatically converted to GMT."
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "End date in any parseable datetime format. Must be after start_date."
                   },
                   "conditions": {
                     "type": "object",
-                    "description": "Coupon conditions",
+                    "description": "Coupon conditions and restrictions",
                     "properties": {
                       "min_purchase_amount": {
                         "type": "number",
-                        "minimum": 0,
-                        "description": "Minimum purchase amount in cents",
-                        "example": 0
+                        "description": "Minimum purchase amount in store currency (auto-converted to cents)"
                       },
                       "max_discount_amount": {
                         "type": "number",
-                        "minimum": 0,
-                        "description": "Maximum discount amount in cents",
-                        "example": 0
+                        "description": "Maximum discount cap in store currency (auto-converted to cents)"
                       },
                       "max_purchase_amount": {
                         "type": "number",
-                        "minimum": 0,
-                        "description": "Maximum purchase amount in cents",
-                        "example": 0
+                        "description": "Maximum purchase amount allowed"
                       },
                       "apply_to_whole_cart": {
                         "type": "string",
@@ -128,8 +147,7 @@
                           "yes",
                           "no"
                         ],
-                        "description": "Apply to whole cart",
-                        "example": "yes"
+                        "description": "Apply discount to the entire cart"
                       },
                       "apply_to_quantity": {
                         "type": "string",
@@ -137,113 +155,92 @@
                           "yes",
                           "no"
                         ],
-                        "description": "Apply to quantity",
-                        "example": "no"
+                        "description": "Apply discount per quantity"
                       },
                       "max_uses": {
                         "type": "integer",
-                        "minimum": 0,
-                        "description": "Maximum number of uses (must be >= max_per_customer if both are set)",
-                        "example": 0
+                        "description": "Maximum total uses across all customers. Must be >= max_per_customer."
                       },
                       "max_per_customer": {
                         "type": "integer",
-                        "minimum": 0,
-                        "description": "Maximum uses per customer",
-                        "example": 0
-                      },
-                      "excluded_categories": {
-                        "type": "array",
-                        "items": {
-                          "type": "integer"
-                        },
-                        "description": "Excluded category IDs"
-                      },
-                      "included_categories": {
-                        "type": "array",
-                        "items": {
-                          "type": "integer"
-                        },
-                        "description": "Included category IDs"
-                      },
-                      "excluded_products": {
-                        "type": "array",
-                        "items": {
-                          "type": "integer"
-                        },
-                        "description": "Excluded product IDs"
+                        "description": "Maximum uses per individual customer"
                       },
                       "included_products": {
                         "type": "array",
                         "items": {
                           "type": "integer"
                         },
-                        "description": "Included product IDs"
+                        "description": "Product IDs the coupon is limited to"
                       },
-                      "buy_quantity": {
-                        "type": "integer",
-                        "nullable": true,
-                        "description": "Buy quantity (for buy_x_get_y type)"
+                      "excluded_products": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        },
+                        "description": "Product IDs excluded from the coupon"
                       },
-                      "get_quantity": {
-                        "type": "integer",
-                        "nullable": true,
-                        "description": "Get quantity (for buy_x_get_y type)"
+                      "included_categories": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        },
+                        "description": "Category IDs the coupon is limited to"
+                      },
+                      "excluded_categories": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        },
+                        "description": "Category IDs excluded from the coupon"
+                      },
+                      "email_restrictions": {
+                        "type": "string",
+                        "description": "Email-based restriction"
+                      },
+                      "is_recurring": {
+                        "type": "string",
+                        "enum": [
+                          "yes",
+                          "no"
+                        ],
+                        "description": "Whether the coupon applies to subscription renewals"
                       },
                       "buy_products": {
                         "type": "array",
                         "items": {
                           "type": "integer"
                         },
-                        "description": "Buy products (for buy_x_get_y type)"
+                        "description": "Product IDs for the buy part of buy-x-get-y coupons"
                       },
                       "get_products": {
                         "type": "array",
                         "items": {
                           "type": "integer"
                         },
-                        "description": "Get products (for buy_x_get_y type)"
+                        "description": "Product IDs for the get part of buy-x-get-y coupons"
                       }
                     }
-                  },
-                  "start_date": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "Start date (required if end_date is provided)",
-                    "example": "2024-01-01T00:00:00Z"
-                  },
-                  "end_date": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "End date (must be after start_date if both are provided)",
-                    "example": "2024-12-31T23:59:59Z"
                   }
                 }
               },
               "example": {
-                "title": "20% Off Discount",
-                "code": "SAVE20",
+                "title": "Summer Sale 20%",
+                "code": "SUMMER20",
                 "type": "percentage",
-                "amount": "20",
+                "amount": 20,
                 "status": "active",
-                "stackable": "no",
-                "show_on_checkout": "no",
-                "notes": "",
-                "priority": "5",
+                "stackable": "yes",
+                "show_on_checkout": "yes",
+                "priority": 1,
+                "start_date": "2025-06-01 00:00:00",
+                "end_date": "2025-08-31 23:59:59",
                 "conditions": {
-                  "min_purchase_amount": 0,
-                  "max_discount_amount": 0,
-                  "max_purchase_amount": 0,
+                  "min_purchase_amount": 20.0,
+                  "max_discount_amount": 50.0,
+                  "max_uses": 500,
+                  "max_per_customer": 2,
                   "apply_to_whole_cart": "yes",
-                  "apply_to_quantity": "no",
-                  "max_uses": 0,
-                  "max_per_customer": 0,
-                  "excluded_categories": [],
-                  "included_categories": [],
-                  "excluded_products": [],
-                  "included_products": [],
-                  "buy_quantity": null,
-                  "get_quantity": null
+                  "is_recurring": "no"
                 }
               }
             }
@@ -251,7 +248,7 @@
         },
         "responses": {
           "200": {
-            "description": "Coupon created successfully",
+            "description": "Coupon created successfully.",
             "content": {
               "application/json": {
                 "schema": {
@@ -259,64 +256,66 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "description": "Success message",
                       "example": "Coupon created successfully!"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/Coupon"
+                      "type": "object",
+                      "description": "The created coupon object"
                     }
                   }
                 },
                 "example": {
                   "message": "Coupon created successfully!",
                   "data": {
-                    "id": 197,
-                    "title": "20% Off Discount",
-                    "code": "SAVE20",
-                    "priority": "5",
+                    "id": 5,
+                    "parent": null,
+                    "title": "Summer Sale 20%",
+                    "code": "SUMMER20",
+                    "status": "active",
                     "type": "percentage",
                     "conditions": {
-                      "max_uses": 0,
-                      "buy_quantity": null,
-                      "get_quantity": null,
-                      "max_per_customer": 0,
-                      "apply_to_quantity": "no",
-                      "excluded_products": [],
-                      "included_products": [],
+                      "min_purchase_amount": 2000,
+                      "max_discount_amount": 5000,
+                      "max_purchase_amount": 0,
                       "apply_to_whole_cart": "yes",
+                      "apply_to_quantity": "no",
+                      "max_uses": 500,
+                      "max_per_customer": 2,
                       "excluded_categories": [],
                       "included_categories": [],
-                      "max_discount_amount": 0,
-                      "max_purchase_amount": 0,
-                      "min_purchase_amount": 0
+                      "excluded_products": [],
+                      "included_products": [],
+                      "email_restrictions": "",
+                      "is_recurring": "no"
                     },
-                    "amount": "20",
-                    "use_count": null,
-                    "status": "active",
+                    "amount": 20,
+                    "stackable": "yes",
+                    "priority": 1,
+                    "use_count": 0,
                     "notes": "",
-                    "stackable": "no",
-                    "show_on_checkout": "no",
-                    "start_date": null,
-                    "end_date": null,
-                    "created_at": "2025-11-14T09:00:00+00:00",
-                    "updated_at": "2025-11-14T09:00:00+00:00"
+                    "show_on_checkout": "yes",
+                    "start_date": "2025-06-01 00:00:00",
+                    "end_date": "2025-08-31 23:59:59",
+                    "created_at": "2025-05-25 10:00:00",
+                    "updated_at": "2025-05-25 10:00:00"
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad request - validation error or coupon code already exists",
+          "422": {
+            "description": "Validation error.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "rest_invalid_param",
-                  "message": "This coupon code is already in use.",
-                  "data": {
-                    "status": 400
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object"
+                    }
                   }
                 }
               }
@@ -327,415 +326,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "CreateCouponRequest": {
-        "type": "object",
-        "required": [
-          "title",
-          "code",
-          "type",
-          "amount",
-          "status",
-          "stackable",
-          "show_on_checkout"
-        ],
-        "properties": {
-          "title": {
-            "type": "string",
-            "maxLength": 200,
-            "description": "Coupon title (required)",
-            "example": "20% Off Discount"
-          },
-          "code": {
-            "type": "string",
-            "maxLength": 50,
-            "description": "Coupon code (required, must be unique)",
-            "example": "SAVE20"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "fixed",
-              "percentage",
-              "free_shipping",
-              "buy_x_get_y"
-            ],
-            "description": "Coupon type (required)",
-            "example": "percentage"
-          },
-          "amount": {
-            "type": "number",
-            "minimum": 0,
-            "description": "Coupon amount (required). For percentage type, must be between 0-100. For fixed type, amount in cents.",
-            "example": 20
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "active",
-              "expired",
-              "disabled",
-              "scheduled"
-            ],
-            "description": "Coupon status (required)",
-            "example": "active"
-          },
-          "stackable": {
-            "type": "string",
-            "enum": [
-              "yes",
-              "no"
-            ],
-            "maxLength": 50,
-            "description": "Whether coupon is stackable (required)",
-            "example": "no"
-          },
-          "show_on_checkout": {
-            "type": "string",
-            "enum": [
-              "yes",
-              "no"
-            ],
-            "maxLength": 50,
-            "description": "Whether to show on checkout (required)",
-            "example": "no"
-          },
-          "notes": {
-            "type": "string",
-            "description": "Coupon notes (should be empty string if not provided)",
-            "example": ""
-          },
-          "priority": {
-            "type": "number",
-            "minimum": 0,
-            "description": "Coupon priority",
-            "example": 5
-          },
-          "conditions": {
-            "type": "object",
-            "description": "Coupon conditions",
-            "properties": {
-              "min_purchase_amount": {
-                "type": "number",
-                "minimum": 0,
-                "description": "Minimum purchase amount in cents",
-                "example": 0
-              },
-              "max_discount_amount": {
-                "type": "number",
-                "minimum": 0,
-                "description": "Maximum discount amount in cents",
-                "example": 0
-              },
-              "max_purchase_amount": {
-                "type": "number",
-                "minimum": 0,
-                "description": "Maximum purchase amount in cents",
-                "example": 0
-              },
-              "apply_to_whole_cart": {
-                "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
-                "description": "Apply to whole cart",
-                "example": "yes"
-              },
-              "apply_to_quantity": {
-                "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
-                "description": "Apply to quantity",
-                "example": "no"
-              },
-              "max_uses": {
-                "type": "integer",
-                "minimum": 0,
-                "description": "Maximum number of uses (must be >= max_per_customer if both are set)",
-                "example": 0
-              },
-              "max_per_customer": {
-                "type": "integer",
-                "minimum": 0,
-                "description": "Maximum uses per customer",
-                "example": 0
-              },
-              "excluded_categories": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Excluded category IDs"
-              },
-              "included_categories": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Included category IDs"
-              },
-              "excluded_products": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Excluded product IDs"
-              },
-              "included_products": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Included product IDs"
-              },
-              "buy_quantity": {
-                "type": "integer",
-                "nullable": true,
-                "description": "Buy quantity (for buy_x_get_y type)"
-              },
-              "get_quantity": {
-                "type": "integer",
-                "nullable": true,
-                "description": "Get quantity (for buy_x_get_y type)"
-              },
-              "buy_products": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Buy products (for buy_x_get_y type)"
-              },
-              "get_products": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Get products (for buy_x_get_y type)"
-              }
-            }
-          },
-          "start_date": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Start date (required if end_date is provided)",
-            "example": "2024-01-01T00:00:00Z"
-          },
-          "end_date": {
-            "type": "string",
-            "format": "date-time",
-            "description": "End date (must be after start_date if both are provided)",
-            "example": "2024-12-31T23:59:59Z"
-          }
-        }
-      },
-      "CreateCouponResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "Coupon created successfully!"
-          },
-          "data": {
-            "$ref": "#/components/schemas/Coupon"
-          }
-        }
-      },
-      "Coupon": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Coupon ID",
-            "example": 197
-          },
-          "title": {
-            "type": "string",
-            "description": "Coupon title",
-            "example": "20% Off Discount"
-          },
-          "code": {
-            "type": "string",
-            "description": "Coupon code",
-            "example": "SAVE20"
-          },
-          "priority": {
-            "type": "string",
-            "description": "Coupon priority",
-            "example": "5"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "fixed",
-              "percentage",
-              "free_shipping",
-              "buy_x_get_y"
-            ],
-            "description": "Coupon type",
-            "example": "percentage"
-          },
-          "conditions": {
-            "type": "object",
-            "description": "Coupon conditions",
-            "properties": {
-              "max_uses": {
-                "type": "integer",
-                "description": "Maximum number of uses",
-                "example": 0
-              },
-              "buy_quantity": {
-                "type": "integer",
-                "nullable": true,
-                "description": "Buy quantity (for buy_x_get_y type)"
-              },
-              "get_quantity": {
-                "type": "integer",
-                "nullable": true,
-                "description": "Get quantity (for buy_x_get_y type)"
-              },
-              "max_per_customer": {
-                "type": "integer",
-                "description": "Maximum uses per customer",
-                "example": 0
-              },
-              "apply_to_quantity": {
-                "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
-                "description": "Apply to quantity",
-                "example": "no"
-              },
-              "excluded_products": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Excluded product IDs"
-              },
-              "included_products": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Included product IDs"
-              },
-              "apply_to_whole_cart": {
-                "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
-                "description": "Apply to whole cart",
-                "example": "yes"
-              },
-              "excluded_categories": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Excluded category IDs"
-              },
-              "included_categories": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Included category IDs"
-              },
-              "max_discount_amount": {
-                "type": "number",
-                "description": "Maximum discount amount in cents",
-                "example": 0
-              },
-              "max_purchase_amount": {
-                "type": "number",
-                "description": "Maximum purchase amount in cents",
-                "example": 0
-              },
-              "min_purchase_amount": {
-                "type": "number",
-                "description": "Minimum purchase amount in cents",
-                "example": 0
-              }
-            }
-          },
-          "amount": {
-            "type": "string",
-            "description": "Coupon amount (percentage or fixed amount in cents)",
-            "example": "20"
-          },
-          "use_count": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Number of times used"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "active",
-              "expired",
-              "disabled",
-              "scheduled"
-            ],
-            "description": "Coupon status",
-            "example": "active"
-          },
-          "notes": {
-            "type": "string",
-            "description": "Coupon notes",
-            "example": ""
-          },
-          "stackable": {
-            "type": "string",
-            "enum": [
-              "yes",
-              "no"
-            ],
-            "description": "Whether coupon is stackable",
-            "example": "no"
-          },
-          "show_on_checkout": {
-            "type": "string",
-            "enum": [
-              "yes",
-              "no"
-            ],
-            "description": "Whether to show on checkout",
-            "example": "no"
-          },
-          "start_date": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time",
-            "description": "Start date",
-            "example": null
-          },
-          "end_date": {
-            "type": "string",
-            "nullable": true,
-            "format": "date-time",
-            "description": "End date",
-            "example": null
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2025-11-14T09:00:00+00:00"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp",
-            "example": "2025-11-14T09:00:00+00:00"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

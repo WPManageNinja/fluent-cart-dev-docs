@@ -1,0 +1,119 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/files/bucket-list": {
+      "get": {
+        "operationId": "getBucketList",
+        "summary": "GET Get Bucket List",
+        "description": "Retrieve the list of available storage buckets for a given driver. Useful for cloud storage drivers (e.g., S3) that organize files into buckets.",
+        "tags": [
+          "Files"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "driver",
+            "in": "query",
+            "required": false,
+            "description": "Storage driver to query (default: uses the first active driver).",
+            "schema": {
+              "type": "string",
+              "example": "s3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns default bucket and list of available buckets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "default_bucket": {
+                      "type": "string",
+                      "description": "The default bucket name",
+                      "example": "my-store-files"
+                    },
+                    "buckets": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Bucket"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "default_bucket": "my-store-files",
+                  "buckets": [
+                    {
+                      "label": "my-store-files",
+                      "value": "my-store-files"
+                    },
+                    {
+                      "label": "my-store-backups",
+                      "value": "my-store-backups"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Bucket": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Display label for the bucket",
+            "example": "my-store-files"
+          },
+          "value": {
+            "type": "string",
+            "description": "Bucket identifier value",
+            "example": "my-store-files"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

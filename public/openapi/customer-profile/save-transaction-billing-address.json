@@ -1,0 +1,177 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/orders/{transaction_uuid}/billing-address": {
+      "put": {
+        "operationId": "saveTransactionBillingAddress",
+        "summary": "PUT Save Transaction Billing Address",
+        "description": "Create or update the billing address for a specific transaction's order. Also stores the VAT/Tax ID as order metadata. Validates address fields against country-specific rules.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "transaction_uuid",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The UUID of the transaction (alphanumeric with dashes)",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "country"
+                ],
+                "properties": {
+                  "address_id": {
+                    "type": "string",
+                    "description": "Existing order address ID to update. If empty, a new address is created."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Contact name"
+                  },
+                  "address_1": {
+                    "type": "string",
+                    "description": "Primary street address. Required based on country validation rules."
+                  },
+                  "address_2": {
+                    "type": "string",
+                    "description": "Secondary address line"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City. Required based on country validation rules."
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "State/province code. Required for countries with states."
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Postal/zip code. Validated against country-specific format."
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Country code (e.g., `US`, `GB`)"
+                  },
+                  "vat_tax_id": {
+                    "type": "string",
+                    "description": "VAT or Tax ID. Stored as order meta."
+                  }
+                }
+              },
+              "example": {
+                "address_id": "15",
+                "name": "John Doe",
+                "address_1": "123 Main St",
+                "city": "New York",
+                "state": "NY",
+                "postcode": "10001",
+                "country": "US",
+                "vat_tax_id": "EU123456789"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Address created or updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "address_id": {
+                      "type": "integer"
+                    },
+                    "formatted_address": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Billing address updated successfully",
+                  "formatted_address": "John Doe, 123 Main St, New York, NY 10001, US"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Order not found"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "errors": {
+                    "country": [
+                      "The country field is required."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

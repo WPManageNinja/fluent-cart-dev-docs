@@ -1,0 +1,168 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group/{group_id}/term/{term_id}": {
+      "post": {
+        "operationId": "updateAttributeTerm",
+        "summary": "POST Update Attribute Term",
+        "description": "Update an existing attribute term.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "The attribute group ID.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "term_id",
+            "in": "path",
+            "required": true,
+            "description": "The term ID to update.",
+            "schema": {
+              "type": "integer",
+              "example": 6
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAttributeTermRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attribute term updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully updated!"
+                    }
+                  }
+                },
+                "example": {
+                  "data": true,
+                  "message": "Successfully updated!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Term not found or group mismatch.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Information mismatch."
+                    },
+                    "code": {
+                      "type": "integer",
+                      "example": 404
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Information mismatch.",
+                  "code": 404
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateAttributeTermRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "slug"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Updated term title (max 50 characters). Must be unique (excluding the current term).",
+            "example": "Forest Green"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Updated term slug (max 50 characters). Must be unique (excluding the current term).",
+            "example": "forest-green"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Updated term description.",
+            "example": "A deep green color"
+          },
+          "serial": {
+            "type": "integer",
+            "description": "Updated sort order position.",
+            "example": 3
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

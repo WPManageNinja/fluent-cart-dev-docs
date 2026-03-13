@@ -1,0 +1,138 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/classes/{id}": {
+      "put": {
+        "operationId": "updateTaxClass",
+        "summary": "PUT Update Tax Class",
+        "description": "Update an existing tax class. The slug is automatically regenerated if the title changes.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tax class ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 4
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Tax class title (max 192 characters)",
+                    "example": "Digital Goods Updated"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description of the tax class",
+                    "example": "Updated description"
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of product category IDs associated with this tax class",
+                    "example": [
+                      12,
+                      15,
+                      20
+                    ]
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "description": "Sort priority (higher values appear first, default: 0)",
+                    "example": 8
+                  }
+                }
+              },
+              "example": {
+                "title": "Digital Goods Updated",
+                "description": "Updated description",
+                "categories": [
+                  12,
+                  15,
+                  20
+                ],
+                "priority": 8
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tax class updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Tax class has been updated successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Tax class has been updated successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

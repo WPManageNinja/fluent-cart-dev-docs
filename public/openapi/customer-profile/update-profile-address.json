@@ -1,0 +1,189 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/edit-address": {
+      "post": {
+        "operationId": "updateProfileAddress",
+        "summary": "POST Update Profile Address",
+        "description": "Update an existing address from the profile management page. The address must belong to the authenticated customer.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "type",
+                  "name",
+                  "postcode",
+                  "country",
+                  "email"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "The address record ID to update"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "billing",
+                      "shipping"
+                    ],
+                    "description": "Address type: `billing` or `shipping`"
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Contact name. Max 255 characters."
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 15,
+                    "description": "Short label (max 15 characters)"
+                  },
+                  "address_1": {
+                    "type": "string",
+                    "description": "Primary street address"
+                  },
+                  "address_2": {
+                    "type": "string",
+                    "description": "Secondary address line"
+                  },
+                  "city": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "City. Max 255 characters."
+                  },
+                  "state": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "State/province code. Max 255 characters."
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Postal/zip code"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Country code (e.g., `US`, `GB`)"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "description": "Phone number"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Email address"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Company name. Max 255 characters."
+                  }
+                }
+              },
+              "example": {
+                "id": 5,
+                "type": "billing",
+                "name": "John Smith",
+                "address_1": "456 Oak Ave",
+                "city": "Boston",
+                "state": "MA",
+                "postcode": "02101",
+                "country": "US",
+                "email": "john@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Address updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Customer address updated successfully!",
+                  "data": {
+                    "id": 5,
+                    "customer_id": 1,
+                    "type": "billing",
+                    "name": "John Smith",
+                    "address_1": "456 Oak Ave",
+                    "city": "Boston",
+                    "state": "MA",
+                    "postcode": "02101",
+                    "country": "US"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. The authenticated user does not own this address.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not authorized to update this address"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

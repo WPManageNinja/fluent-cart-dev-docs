@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/coupons/apply": {
       "post": {
         "operationId": "applyCoupon",
         "summary": "POST Apply Coupon",
-        "description": "Apply a coupon to an order or cart. Returns calculated items and applied coupons.",
+        "description": "Apply a coupon code to a set of order line items. This endpoint validates the coupon, checks eligibility for each line item, and returns the recalculated discount breakdown.",
         "tags": [
           "Coupons"
         ],
@@ -13,6 +36,7 @@
             "ApplicationPasswords": []
           }
         ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -26,159 +50,47 @@
                 "properties": {
                   "coupon_code": {
                     "type": "string",
-                    "description": "Coupon code to apply (required)",
-                    "example": "WINTER20"
+                    "description": "The coupon code to apply"
+                  },
+                  "order_items": {
+                    "type": "array",
+                    "description": "Array of order line item objects",
+                    "items": {
+                      "$ref": "#/components/schemas/OrderItem"
+                    }
                   },
                   "order_uuid": {
                     "type": "string",
                     "maxLength": 100,
-                    "nullable": true,
-                    "description": "Order UUID (if applying to existing order)",
-                    "example": null
-                  },
-                  "order_items": {
-                    "type": "array",
-                    "description": "Order items (required)",
-                    "minItems": 1,
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "id",
-                        "order_id",
-                        "post_id",
-                        "variation_id"
-                      ],
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "minimum": 1,
-                          "description": "Order item ID"
-                        },
-                        "order_id": {
-                          "type": "integer",
-                          "minimum": 1,
-                          "description": "Order ID"
-                        },
-                        "post_id": {
-                          "type": "integer",
-                          "minimum": 1,
-                          "description": "Product post ID"
-                        },
-                        "variation_id": {
-                          "type": "integer",
-                          "minimum": 1,
-                          "description": "Product variation ID"
-                        },
-                        "type": {
-                          "type": "string",
-                          "maxLength": 100,
-                          "nullable": true,
-                          "description": "Item type"
-                        },
-                        "quantity": {
-                          "type": "number",
-                          "minimum": 1,
-                          "description": "Quantity"
-                        },
-                        "title": {
-                          "type": "string",
-                          "maxLength": 100,
-                          "nullable": true,
-                          "description": "Item title"
-                        },
-                        "price": {
-                          "type": "number",
-                          "description": "Item price"
-                        },
-                        "unit_price": {
-                          "type": "number",
-                          "description": "Unit price"
-                        },
-                        "item_price": {
-                          "type": "number",
-                          "description": "Item price"
-                        },
-                        "item_cost": {
-                          "type": "number",
-                          "nullable": true,
-                          "description": "Item cost"
-                        },
-                        "item_total": {
-                          "type": "number",
-                          "description": "Item total"
-                        },
-                        "tax_amount": {
-                          "type": "number",
-                          "nullable": true,
-                          "description": "Tax amount"
-                        },
-                        "discount_total": {
-                          "type": "number",
-                          "nullable": true,
-                          "description": "Discount total"
-                        },
-                        "total": {
-                          "type": "number",
-                          "nullable": true,
-                          "description": "Total"
-                        },
-                        "line_total": {
-                          "type": "number",
-                          "description": "Line total"
-                        },
-                        "cart_index": {
-                          "type": "integer",
-                          "nullable": true,
-                          "description": "Cart index"
-                        },
-                        "rate": {
-                          "type": "number",
-                          "nullable": true,
-                          "description": "Exchange rate"
-                        },
-                        "line_meta": {
-                          "type": "string",
-                          "nullable": true,
-                          "description": "Line metadata"
-                        },
-                        "other_info": {
-                          "type": "object",
-                          "nullable": true,
-                          "description": "Additional item information"
-                        }
-                      }
-                    }
+                    "description": "UUID of an existing order to apply the coupon to. When provided, previously applied coupons from the order are included."
                   },
                   "applied_coupons": {
                     "type": "array",
-                    "description": "Array of previously applied coupon IDs",
                     "items": {
                       "type": "integer"
                     },
-                    "example": []
+                    "description": "Array of coupon IDs that are already applied (but not yet persisted to the order)"
                   },
                   "customer_email": {
                     "type": "string",
                     "format": "email",
-                    "nullable": true,
-                    "description": "Customer email"
+                    "description": "Customer email for email-based coupon restrictions"
                   }
                 }
               },
               "example": {
-                "coupon_code": "WINTER20",
-                "order_uuid": null,
+                "coupon_code": "SAVE10",
                 "order_items": [
                   {
-                    "id": 1,
-                    "order_id": 7536300,
-                    "post_id": 7529088,
-                    "variation_id": 59,
-                    "quantity": 1,
-                    "unit_price": 500,
-                    "item_price": 500,
-                    "item_total": 500,
-                    "line_total": 500
+                    "post_id": 42,
+                    "quantity": 2,
+                    "price": 2500,
+                    "unit_price": 2500,
+                    "item_total": 5000,
+                    "line_total": 5000,
+                    "other_info": {
+                      "payment_type": "onetime"
+                    }
                   }
                 ],
                 "applied_coupons": []
@@ -188,7 +100,7 @@
         },
         "responses": {
           "200": {
-            "description": "Coupon applied successfully",
+            "description": "Coupon applied successfully. Returns the applied coupons and recalculated items.",
             "content": {
               "application/json": {
                 "schema": {
@@ -196,231 +108,42 @@
                   "properties": {
                     "applied_coupons": {
                       "type": "object",
-                      "description": "Applied coupons with discount information",
+                      "description": "Map of coupon codes to their applied details",
                       "additionalProperties": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer",
-                            "description": "Coupon ID",
-                            "example": 195
-                          },
-                          "title": {
-                            "type": "string",
-                            "description": "Coupon title",
-                            "example": "Winter Sale"
-                          },
-                          "amount": {
-                            "type": "number",
-                            "description": "Coupon amount",
-                            "example": 0
-                          },
-                          "formatted_discount": {
-                            "type": "string",
-                            "description": "Formatted discount amount",
-                            "example": "&#36;1.00"
-                          },
-                          "unit_amount": {
-                            "type": "number",
-                            "description": "Unit discount amount in cents",
-                            "example": 100
-                          },
-                          "actual_quantity": {
-                            "type": "integer",
-                            "description": "Actual quantity",
-                            "example": 1
-                          },
-                          "discount": {
-                            "type": "number",
-                            "description": "Total discount in cents",
-                            "example": 100
-                          },
-                          "type": {
-                            "type": "string",
-                            "description": "Coupon type",
-                            "example": "percentage"
-                          },
-                          "actual_amount": {
-                            "type": "string",
-                            "description": "Actual coupon amount",
-                            "example": "20"
-                          },
-                          "actual_formatted_discount": {
-                            "type": "string",
-                            "description": "Actual formatted discount",
-                            "example": "&#36;1.00"
-                          },
-                          "formatted_title": {
-                            "type": "string",
-                            "description": "Formatted coupon title",
-                            "example": "WINTER20 (20%)"
-                          }
-                        }
+                        "$ref": "#/components/schemas/AppliedCoupon"
                       }
                     },
                     "calculated_items": {
-                      "type": "object",
-                      "description": "Calculated order items with applied discounts",
-                      "additionalProperties": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer",
-                            "description": "Order item ID",
-                            "example": 1
-                          },
-                          "order_id": {
-                            "type": "integer",
-                            "description": "Order ID",
-                            "example": 7536300
-                          },
-                          "post_id": {
-                            "type": "integer",
-                            "description": "Product post ID",
-                            "example": 7529088
-                          },
-                          "variation_id": {
-                            "type": "integer",
-                            "description": "Product variation ID",
-                            "example": 59
-                          },
-                          "type": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Item type"
-                          },
-                          "quantity": {
-                            "type": "number",
-                            "description": "Quantity",
-                            "example": 1
-                          },
-                          "title": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Item title"
-                          },
-                          "price": {
-                            "type": "number",
-                            "description": "Item price",
-                            "example": 500
-                          },
-                          "unit_price": {
-                            "type": "number",
-                            "description": "Unit price",
-                            "example": 500
-                          },
-                          "item_cost": {
-                            "type": "number",
-                            "nullable": true,
-                            "description": "Item cost"
-                          },
-                          "item_total": {
-                            "type": "number",
-                            "description": "Item total",
-                            "example": 500
-                          },
-                          "tax_amount": {
-                            "type": "number",
-                            "nullable": true,
-                            "description": "Tax amount"
-                          },
-                          "discount_total": {
-                            "type": "number",
-                            "nullable": true,
-                            "description": "Discount total",
-                            "example": 100
-                          },
-                          "total": {
-                            "type": "number",
-                            "nullable": true,
-                            "description": "Total"
-                          },
-                          "line_total": {
-                            "type": "number",
-                            "description": "Line total",
-                            "example": 500
-                          },
-                          "cart_index": {
-                            "type": "integer",
-                            "nullable": true,
-                            "description": "Cart index"
-                          },
-                          "rate": {
-                            "type": "number",
-                            "nullable": true,
-                            "description": "Exchange rate"
-                          },
-                          "line_meta": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Line metadata"
-                          },
-                          "other_info": {
-                            "type": "object",
-                            "nullable": true,
-                            "description": "Additional item information"
-                          }
-                        }
+                      "type": "array",
+                      "description": "Recalculated order items with discounts",
+                      "items": {
+                        "$ref": "#/components/schemas/CalculatedItem"
                       }
                     }
                   }
                 },
                 "example": {
                   "applied_coupons": {
-                    "WINTER20": {
-                      "id": 195,
-                      "title": "Winter Sale",
-                      "amount": 0,
-                      "formatted_discount": "&#36;1.00",
-                      "unit_amount": 100,
-                      "actual_quantity": 1,
-                      "discount": 100,
+                    "SAVE10": {
+                      "id": 1,
+                      "title": "10% Off",
+                      "code": "SAVE10",
                       "type": "percentage",
-                      "actual_amount": "20",
-                      "actual_formatted_discount": "&#36;1.00",
-                      "formatted_title": "WINTER20 (20%)"
+                      "amount": 10,
+                      "discount_amount": 500,
+                      "stackable": "yes",
+                      "priority": 1
                     }
                   },
-                  "calculated_items": {
-                    "1": {
-                      "id": 1,
-                      "order_id": 7536300,
-                      "post_id": 7529088,
-                      "variation_id": 59,
-                      "type": null,
-                      "quantity": 1,
-                      "title": null,
-                      "price": 500,
-                      "unit_price": 500,
-                      "item_cost": null,
-                      "item_total": 500,
-                      "tax_amount": null,
-                      "discount_total": 100,
-                      "total": null,
-                      "line_total": 500,
-                      "cart_index": null,
-                      "rate": null,
-                      "line_meta": null,
-                      "other_info": null
+                  "calculated_items": [
+                    {
+                      "post_id": 42,
+                      "quantity": 2,
+                      "price": 2500,
+                      "discounted_price": 2250,
+                      "discount_total": 500
                     }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request - coupon cannot be applied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "rest_invalid_param",
-                  "message": "Coupon code is invalid or expired.",
-                  "data": {
-                    "status": 400
-                  }
+                  ]
                 }
               }
             }
@@ -431,327 +154,163 @@
   },
   "components": {
     "schemas": {
-      "ApplyCouponRequest": {
+      "OrderItem": {
         "type": "object",
-        "required": [
-          "coupon_code",
-          "order_items"
-        ],
         "properties": {
-          "coupon_code": {
-            "type": "string",
-            "description": "Coupon code to apply (required)",
-            "example": "WINTER20"
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Line item ID (for existing orders)"
           },
-          "order_uuid": {
+          "order_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Parent order ID"
+          },
+          "post_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Product post ID"
+          },
+          "variation_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Variation ID"
+          },
+          "type": {
             "type": "string",
             "maxLength": 100,
-            "nullable": true,
-            "description": "Order UUID (if applying to existing order)",
-            "example": null
+            "description": "Item type"
           },
-          "order_items": {
-            "type": "array",
-            "description": "Order items (required)",
-            "minItems": 1,
-            "items": {
-              "type": "object",
-              "required": [
-                "id",
-                "order_id",
-                "post_id",
-                "variation_id"
-              ],
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "minimum": 1,
-                  "description": "Order item ID"
-                },
-                "order_id": {
-                  "type": "integer",
-                  "minimum": 1,
-                  "description": "Order ID"
-                },
-                "post_id": {
-                  "type": "integer",
-                  "minimum": 1,
-                  "description": "Product post ID"
-                },
-                "variation_id": {
-                  "type": "integer",
-                  "minimum": 1,
-                  "description": "Product variation ID"
-                },
-                "type": {
-                  "type": "string",
-                  "maxLength": 100,
-                  "nullable": true,
-                  "description": "Item type"
-                },
-                "quantity": {
-                  "type": "number",
-                  "minimum": 1,
-                  "description": "Quantity"
-                },
-                "title": {
-                  "type": "string",
-                  "maxLength": 100,
-                  "nullable": true,
-                  "description": "Item title"
-                },
-                "price": {
-                  "type": "number",
-                  "description": "Item price"
-                },
-                "unit_price": {
-                  "type": "number",
-                  "description": "Unit price"
-                },
-                "item_price": {
-                  "type": "number",
-                  "description": "Item price"
-                },
-                "item_cost": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Item cost"
-                },
-                "item_total": {
-                  "type": "number",
-                  "description": "Item total"
-                },
-                "tax_amount": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Tax amount"
-                },
-                "discount_total": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Discount total"
-                },
-                "total": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Total"
-                },
-                "line_total": {
-                  "type": "number",
-                  "description": "Line total"
-                },
-                "cart_index": {
-                  "type": "integer",
-                  "nullable": true,
-                  "description": "Cart index"
-                },
-                "rate": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Exchange rate"
-                },
-                "line_meta": {
-                  "type": "string",
-                  "nullable": true,
-                  "description": "Line metadata"
-                },
-                "other_info": {
-                  "type": "object",
-                  "nullable": true,
-                  "description": "Additional item information"
-                }
-              }
-            }
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Item quantity"
           },
-          "applied_coupons": {
-            "type": "array",
-            "description": "Array of previously applied coupon IDs",
-            "items": {
-              "type": "integer"
-            },
-            "example": []
-          },
-          "customer_email": {
+          "title": {
             "type": "string",
-            "format": "email",
-            "nullable": true,
-            "description": "Customer email"
+            "maxLength": 100,
+            "description": "Item title"
+          },
+          "price": {
+            "type": "number",
+            "description": "Item price in cents"
+          },
+          "unit_price": {
+            "type": "number",
+            "description": "Unit price in cents"
+          },
+          "item_cost": {
+            "type": "number",
+            "description": "Item cost in cents"
+          },
+          "item_total": {
+            "type": "number",
+            "description": "Item total in cents"
+          },
+          "tax_amount": {
+            "type": "number",
+            "description": "Tax amount in cents"
+          },
+          "discount_total": {
+            "type": "number",
+            "description": "Discount total in cents"
+          },
+          "total": {
+            "type": "number",
+            "description": "Total in cents"
+          },
+          "line_total": {
+            "type": "number",
+            "description": "Line total in cents"
+          },
+          "cart_index": {
+            "type": "integer",
+            "description": "Position in cart"
+          },
+          "rate": {
+            "type": "number",
+            "description": "Tax rate"
+          },
+          "line_meta": {
+            "type": "string",
+            "description": "Line item metadata"
+          },
+          "other_info": {
+            "type": "object",
+            "description": "Additional item info (e.g., payment_type, manage_setup_fee, signup_fee)"
           }
         }
       },
-      "ApplyCouponResponse": {
+      "AppliedCoupon": {
         "type": "object",
         "properties": {
-          "applied_coupons": {
-            "type": "object",
-            "description": "Applied coupons with discount information",
-            "additionalProperties": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "description": "Coupon ID",
-                  "example": 195
-                },
-                "title": {
-                  "type": "string",
-                  "description": "Coupon title",
-                  "example": "Winter Sale"
-                },
-                "amount": {
-                  "type": "number",
-                  "description": "Coupon amount",
-                  "example": 0
-                },
-                "formatted_discount": {
-                  "type": "string",
-                  "description": "Formatted discount amount",
-                  "example": "&#36;1.00"
-                },
-                "unit_amount": {
-                  "type": "number",
-                  "description": "Unit discount amount in cents",
-                  "example": 100
-                },
-                "actual_quantity": {
-                  "type": "integer",
-                  "description": "Actual quantity",
-                  "example": 1
-                },
-                "discount": {
-                  "type": "number",
-                  "description": "Total discount in cents",
-                  "example": 100
-                },
-                "type": {
-                  "type": "string",
-                  "description": "Coupon type",
-                  "example": "percentage"
-                },
-                "actual_amount": {
-                  "type": "string",
-                  "description": "Actual coupon amount",
-                  "example": "20"
-                },
-                "actual_formatted_discount": {
-                  "type": "string",
-                  "description": "Actual formatted discount",
-                  "example": "&#36;1.00"
-                },
-                "formatted_title": {
-                  "type": "string",
-                  "description": "Formatted coupon title",
-                  "example": "WINTER20 (20%)"
-                }
-              }
-            }
+          "id": {
+            "type": "integer",
+            "description": "Coupon ID"
           },
-          "calculated_items": {
-            "type": "object",
-            "description": "Calculated order items with applied discounts",
-            "additionalProperties": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "description": "Order item ID",
-                  "example": 1
-                },
-                "order_id": {
-                  "type": "integer",
-                  "description": "Order ID",
-                  "example": 7536300
-                },
-                "post_id": {
-                  "type": "integer",
-                  "description": "Product post ID",
-                  "example": 7529088
-                },
-                "variation_id": {
-                  "type": "integer",
-                  "description": "Product variation ID",
-                  "example": 59
-                },
-                "type": {
-                  "type": "string",
-                  "nullable": true,
-                  "description": "Item type"
-                },
-                "quantity": {
-                  "type": "number",
-                  "description": "Quantity",
-                  "example": 1
-                },
-                "title": {
-                  "type": "string",
-                  "nullable": true,
-                  "description": "Item title"
-                },
-                "price": {
-                  "type": "number",
-                  "description": "Item price",
-                  "example": 500
-                },
-                "unit_price": {
-                  "type": "number",
-                  "description": "Unit price",
-                  "example": 500
-                },
-                "item_cost": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Item cost"
-                },
-                "item_total": {
-                  "type": "number",
-                  "description": "Item total",
-                  "example": 500
-                },
-                "tax_amount": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Tax amount"
-                },
-                "discount_total": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Discount total",
-                  "example": 100
-                },
-                "total": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Total"
-                },
-                "line_total": {
-                  "type": "number",
-                  "description": "Line total",
-                  "example": 500
-                },
-                "cart_index": {
-                  "type": "integer",
-                  "nullable": true,
-                  "description": "Cart index"
-                },
-                "rate": {
-                  "type": "number",
-                  "nullable": true,
-                  "description": "Exchange rate"
-                },
-                "line_meta": {
-                  "type": "string",
-                  "nullable": true,
-                  "description": "Line metadata"
-                },
-                "other_info": {
-                  "type": "object",
-                  "nullable": true,
-                  "description": "Additional item information"
-                }
-              }
-            }
+          "title": {
+            "type": "string",
+            "description": "Coupon title"
+          },
+          "code": {
+            "type": "string",
+            "description": "Coupon code"
+          },
+          "type": {
+            "type": "string",
+            "description": "Discount type"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Discount amount"
+          },
+          "discount_amount": {
+            "type": "number",
+            "description": "Calculated discount amount in cents"
+          },
+          "stackable": {
+            "type": "string",
+            "description": "Whether coupon is stackable"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Coupon priority"
           }
         }
+      },
+      "CalculatedItem": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "description": "Product post ID"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Item quantity"
+          },
+          "price": {
+            "type": "number",
+            "description": "Original price in cents"
+          },
+          "discounted_price": {
+            "type": "number",
+            "description": "Price after discount in cents"
+          },
+          "discount_total": {
+            "type": "number",
+            "description": "Total discount amount in cents"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -1,0 +1,113 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/storage-drivers": {
+      "get": {
+        "operationId": "listAllStorageDrivers",
+        "summary": "GET List All Storage Drivers",
+        "description": "Retrieve all registered file storage drivers and their current status.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "drivers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "example": "local"
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Local Storage"
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "Store files on your server"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "logo": {
+                            "type": "string",
+                            "example": "https://..."
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "drivers": [
+                    {
+                      "key": "local",
+                      "title": "Local Storage",
+                      "description": "Store files on your server",
+                      "is_active": true,
+                      "logo": "https://..."
+                    },
+                    {
+                      "key": "s3",
+                      "title": "Amazon S3",
+                      "description": "Store files on Amazon S3",
+                      "is_active": false,
+                      "logo": "https://..."
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

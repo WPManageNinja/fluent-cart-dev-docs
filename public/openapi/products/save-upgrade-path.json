@@ -1,0 +1,127 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/{id}/upgrade-path": {
+      "post": {
+        "operationId": "saveUpgradePath",
+        "summary": "POST Save Upgrade Path",
+        "description": "Create a new upgrade path for a product.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The product ID",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "from_variant",
+                  "to_variants"
+                ],
+                "properties": {
+                  "from_variant": {
+                    "type": "integer",
+                    "description": "Source variation ID (must exist in fct_product_variations)"
+                  },
+                  "to_variants": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of target variation IDs"
+                  },
+                  "discount_amount": {
+                    "type": "number",
+                    "description": "Discount amount for the upgrade"
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Upgrade path title"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Upgrade path description"
+                  },
+                  "slug": {
+                    "type": "string",
+                    "description": "Upgrade path slug"
+                  }
+                }
+              },
+              "example": {
+                "from_variant": 456,
+                "to_variants": [
+                  457,
+                  458
+                ],
+                "discount_amount": 500
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Settings saved successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

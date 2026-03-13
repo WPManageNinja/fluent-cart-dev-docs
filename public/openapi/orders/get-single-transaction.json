@@ -1,0 +1,131 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{id}/transactions/{transaction_id}": {
+      "get": {
+        "operationId": "getSingleTransaction",
+        "summary": "GET Get Single Transaction",
+        "description": "Retrieve details of a specific transaction within an order. Returns the full order details (same as Get Order Details).",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          },
+          {
+            "name": "transaction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Transaction ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns full order details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order": {
+                      "type": "object",
+                      "description": "Full order object with relations"
+                    },
+                    "discount_meta": {
+                      "type": "object",
+                      "description": "Discount metadata"
+                    },
+                    "shipping_meta": {
+                      "type": "object",
+                      "description": "Shipping metadata"
+                    },
+                    "order_settings": {
+                      "type": "object",
+                      "description": "Order settings"
+                    },
+                    "selected_labels": {
+                      "type": "array",
+                      "description": "Array of selected label IDs",
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "tax_id": {
+                      "type": "integer",
+                      "nullable": true,
+                      "description": "Tax ID if applicable"
+                    }
+                  }
+                },
+                "example": {
+                  "order": {
+                    "id": 42,
+                    "uuid": "abc123-def456",
+                    "status": "completed",
+                    "payment_status": "paid",
+                    "transactions": [],
+                    "created_at": "2025-01-15 10:30:00",
+                    "updated_at": "2025-01-15 10:35:00"
+                  },
+                  "discount_meta": {},
+                  "shipping_meta": {},
+                  "order_settings": {},
+                  "selected_labels": [],
+                  "tax_id": null
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

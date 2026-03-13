@@ -1,0 +1,199 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/refund-data-by-group": {
+      "get": {
+        "operationId": "getRefundDataByGroup",
+        "summary": "GET Get Refund Data by Group",
+        "description": "Retrieve refund data broken down by a grouping dimension (e.g., payment method, country).",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "Start date for the report period.",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-12-31"
+            },
+            "description": "End date for the report period.",
+            "required": false
+          },
+          {
+            "name": "params[groupKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "default",
+                "monthly",
+                "yearly",
+                "billing_country",
+                "shipping_country",
+                "payment_method",
+                "payment_status"
+              ]
+            },
+            "description": "Grouping interval for data aggregation.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "Currency code to filter by.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Payment mode filter.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Array of product variation IDs to filter by.",
+            "required": false
+          },
+          {
+            "name": "params[compareType]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "previous_period",
+                "previous_month",
+                "previous_quarter",
+                "previous_year",
+                "custom"
+              ]
+            },
+            "description": "Comparison period type.",
+            "required": false
+          },
+          {
+            "name": "params[compareDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2024-01-01"
+            },
+            "description": "Custom comparison start date. Required when compareType is custom.",
+            "required": false
+          },
+          {
+            "name": "params[paymentStatus]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Payment status filter.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Order type filter (e.g., one-time, subscription).",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "Refund data grouped by the specified dimension"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

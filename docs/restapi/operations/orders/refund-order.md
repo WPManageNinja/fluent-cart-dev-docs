@@ -1,8 +1,7 @@
 ---
 title: Refund Order
-description: "Process a refund for an order. You can specify the refund amount and reason."
+description: "Process a full or partial refund for an order. Supports both gateway refunds and manual refunds, with optional subscription cancellation."
 outline: false
 aside: false
 ---
-<OAOperation operationId="refundOrder" />
-
+<OAOperation operationId="refundOrder" specUrl="/openapi/public/orders/refund-order.json" />

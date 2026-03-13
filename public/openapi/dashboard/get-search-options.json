@@ -1,0 +1,123 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/forms/search_options": {
+      "get": {
+        "operationId": "getSearchOptions",
+        "summary": "GET Get Search Options",
+        "description": "Retrieve dynamic search/autocomplete options for form fields. Options are resolved via the fluent_cart/get_dynamic_search_{search_for} WordPress filter, allowing modules to provide context-specific search data.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search_for",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The type of search options to retrieve (used as the filter key suffix)"
+          },
+          {
+            "name": "search_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Additional search context or query string passed to the filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "options": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SearchOption"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "options": [
+                    {
+                      "id": "option_1",
+                      "label": "Option Label",
+                      "value": "option_value"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SearchOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Option identifier",
+            "example": "option_1"
+          },
+          "label": {
+            "type": "string",
+            "description": "Option display label",
+            "example": "Option Label"
+          },
+          "value": {
+            "type": "string",
+            "description": "Option value",
+            "example": "option_value"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

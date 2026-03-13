@@ -1,0 +1,147 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/subscriptions/{subscription_uuid}/switch-payment-method": {
+      "post": {
+        "operationId": "switchPaymentMethod",
+        "summary": "POST Switch Payment Method",
+        "description": "Switch a subscription's payment method from one gateway to another (e.g., from Stripe to PayPal). This initiates the switch process, which may require a confirmation step depending on the target gateway.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscription_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The subscription UUID (alphanumeric with dashes)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "newPaymentMethod",
+                      "currentPaymentMethod"
+                    ],
+                    "properties": {
+                      "newPaymentMethod": {
+                        "type": "string",
+                        "description": "Target payment gateway slug",
+                        "example": "paypal"
+                      },
+                      "currentPaymentMethod": {
+                        "type": "string",
+                        "description": "Current payment gateway slug",
+                        "example": "stripe"
+                      }
+                    },
+                    "description": "Payment method switch data. Additional fields depend on the specific payment gateway implementation."
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "newPaymentMethod": "paypal",
+                  "currentPaymentMethod": "stripe"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Switch initiated successfully. Response depends on the gateway's switchPaymentMethod implementation. May return a redirect URL or client secret for the new gateway.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Payment method switch initiated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Could not switch payment method",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Could not switch payment method"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

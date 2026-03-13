@@ -1,0 +1,160 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/shipping/methods": {
+      "post": {
+        "operationId": "createShippingMethod",
+        "summary": "POST Create Shipping Method",
+        "description": "Create a new shipping method within a shipping zone.",
+        "tags": [
+          "Shipping"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "zone_id",
+                  "title",
+                  "type"
+                ],
+                "properties": {
+                  "zone_id": {
+                    "type": "integer",
+                    "description": "ID of the parent shipping zone"
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 192,
+                    "description": "Method display title (max 192 characters)"
+                  },
+                  "type": {
+                    "type": "string",
+                    "maxLength": 192,
+                    "description": "Shipping method type (e.g., flat_rate, free_shipping, local_pickup)"
+                  },
+                  "amount": {
+                    "type": "string",
+                    "description": "Shipping cost in cents (e.g., 500 for $5.00)"
+                  },
+                  "is_enabled": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "default": 1,
+                    "description": "Enable/disable the method: 1 (enabled) or 0 (disabled)"
+                  },
+                  "states": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of state/province codes to restrict this method to (e.g., [\"CA\", \"NY\"]). Empty array means all states."
+                  },
+                  "settings": {
+                    "type": "object",
+                    "properties": {
+                      "configure_rate": {
+                        "type": "string",
+                        "description": "Rate configuration type"
+                      },
+                      "class_aggregation": {
+                        "type": "string",
+                        "description": "How shipping classes are aggregated"
+                      }
+                    },
+                    "description": "Additional settings for the method"
+                  },
+                  "meta": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Additional metadata key-value pairs (string values only)"
+                  }
+                }
+              },
+              "example": {
+                "zone_id": 1,
+                "title": "Standard Shipping",
+                "type": "flat_rate",
+                "amount": "500",
+                "is_enabled": 1,
+                "states": [
+                  "CA",
+                  "NY"
+                ],
+                "settings": {
+                  "configure_rate": "per_order",
+                  "class_aggregation": "per_class"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipping method created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Shipping method has been created successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

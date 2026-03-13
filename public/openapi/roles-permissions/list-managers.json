@@ -1,0 +1,164 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/roles/managers": {
+      "get": {
+        "operationId": "listManagers",
+        "summary": "GET List Managers",
+        "description": "Retrieve a list of all WordPress users who have been assigned a FluentCart shop role. Returns user details along with their assigned role and resolved permissions.",
+        "tags": [
+          "Roles"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "managers": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Manager"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "managers": [
+                    {
+                      "id": 5,
+                      "email": "manager@example.com",
+                      "display_name": "Jane Manager",
+                      "username": "janemanager",
+                      "shop_role": "manager",
+                      "description": "With All Permissions Except Sensitive Settings",
+                      "registered_at": "2025-03-10 08:00:00",
+                      "role_permissions": [
+                        "store/settings",
+                        "products/view",
+                        "products/create",
+                        "products/edit",
+                        "products/delete",
+                        "customers/view",
+                        "customers/manage",
+                        "customers/delete",
+                        "orders/view",
+                        "orders/manage_statuses",
+                        "orders/can_refund",
+                        "orders/manage",
+                        "orders/export",
+                        "orders/delete",
+                        "subscriptions/view",
+                        "subscriptions/manage",
+                        "subscriptions/delete",
+                        "licenses/view",
+                        "licenses/manage",
+                        "licenses/delete",
+                        "coupons/view",
+                        "coupons/manage",
+                        "coupons/delete",
+                        "reports/view",
+                        "reports/export",
+                        "integrations/view",
+                        "integrations/manage",
+                        "integrations/delete"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Manager": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "WordPress user ID",
+            "example": 5
+          },
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "manager@example.com"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "WordPress display name",
+            "example": "Jane Manager"
+          },
+          "username": {
+            "type": "string",
+            "description": "WordPress login username",
+            "example": "janemanager"
+          },
+          "shop_role": {
+            "type": "string",
+            "description": "Assigned FluentCart role key (e.g., manager, worker, accountant)",
+            "example": "manager"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the role",
+            "example": "With All Permissions Except Sensitive Settings"
+          },
+          "registered_at": {
+            "type": "string",
+            "description": "WordPress user registration date",
+            "example": "2025-03-10 08:00:00"
+          },
+          "role_permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Resolved list of permission strings for this user's role"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

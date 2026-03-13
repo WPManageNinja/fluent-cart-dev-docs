@@ -1,0 +1,260 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/coupons/re-apply": {
+      "post": {
+        "operationId": "reApplyCoupons",
+        "summary": "POST Re-apply Coupons",
+        "description": "Recalculate all previously applied coupons against the current order items. This is used when order items change (e.g., quantity update, item added/removed) and discounts need to be recalculated. If order_items is empty, all applied coupons on the order are deleted.",
+        "tags": [
+          "Coupons"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_uuid": {
+                    "type": "string",
+                    "description": "UUID of the existing order whose applied coupons should be reapplied"
+                  },
+                  "order_items": {
+                    "type": "array",
+                    "description": "Array of current order line item objects. If empty, all applied coupons on the order are removed.",
+                    "items": {
+                      "$ref": "#/components/schemas/OrderItem"
+                    }
+                  },
+                  "applied_coupons": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of coupon IDs to include (in addition to those already on the order). Values are cast to integers."
+                  }
+                }
+              },
+              "example": {
+                "order_uuid": "abc123-def456",
+                "order_items": [
+                  {
+                    "post_id": 42,
+                    "quantity": 1,
+                    "price": 2500,
+                    "unit_price": 2500,
+                    "item_total": 2500,
+                    "line_total": 2500
+                  },
+                  {
+                    "post_id": 55,
+                    "quantity": 1,
+                    "price": 2000,
+                    "unit_price": 2000,
+                    "item_total": 2000,
+                    "line_total": 2000
+                  }
+                ],
+                "applied_coupons": [
+                  1
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Coupons re-applied successfully. Returns the recalculated applied coupons and items.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "applied_coupons": {
+                      "type": "object",
+                      "description": "Map of coupon codes to their re-applied details",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/AppliedCoupon"
+                      }
+                    },
+                    "calculated_items": {
+                      "type": "array",
+                      "description": "Recalculated order items with discounts",
+                      "items": {
+                        "$ref": "#/components/schemas/CalculatedItem"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "applied_coupons": {
+                    "SAVE10": {
+                      "id": 1,
+                      "title": "10% Off",
+                      "code": "SAVE10",
+                      "type": "percentage",
+                      "amount": 10,
+                      "discount_amount": 450,
+                      "stackable": "yes",
+                      "priority": 1
+                    }
+                  },
+                  "calculated_items": [
+                    {
+                      "post_id": 42,
+                      "quantity": 1,
+                      "price": 2500,
+                      "discounted_price": 2250,
+                      "discount_total": 250
+                    },
+                    {
+                      "post_id": 55,
+                      "quantity": 1,
+                      "price": 2000,
+                      "discounted_price": 1800,
+                      "discount_total": 200
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Product post ID"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Item quantity"
+          },
+          "price": {
+            "type": "number",
+            "description": "Item price in cents"
+          },
+          "unit_price": {
+            "type": "number",
+            "description": "Unit price in cents"
+          },
+          "item_total": {
+            "type": "number",
+            "description": "Item total in cents"
+          },
+          "line_total": {
+            "type": "number",
+            "description": "Line total in cents"
+          }
+        }
+      },
+      "AppliedCoupon": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Coupon ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Coupon title"
+          },
+          "code": {
+            "type": "string",
+            "description": "Coupon code"
+          },
+          "type": {
+            "type": "string",
+            "description": "Discount type"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Discount amount"
+          },
+          "discount_amount": {
+            "type": "number",
+            "description": "Calculated discount amount in cents"
+          },
+          "stackable": {
+            "type": "string",
+            "description": "Whether coupon is stackable"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Coupon priority"
+          }
+        }
+      },
+      "CalculatedItem": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "description": "Product post ID"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Item quantity"
+          },
+          "price": {
+            "type": "number",
+            "description": "Original price in cents"
+          },
+          "discounted_price": {
+            "type": "number",
+            "description": "Price after discount in cents"
+          },
+          "discount_total": {
+            "type": "number",
+            "description": "Total discount amount in cents"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

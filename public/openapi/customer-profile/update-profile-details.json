@@ -1,0 +1,129 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/update": {
+      "post": {
+        "operationId": "updateProfileDetails",
+        "summary": "POST Update Profile Details",
+        "description": "Update the authenticated customer's profile name. Also updates the associated WordPress user's first_name, last_name, and display_name.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "first_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Customer first name. Max 255 characters."
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "description": "Customer last name. Max 255 characters."
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Customer email address. Must be valid."
+                  },
+                  "current_password": {
+                    "type": "string",
+                    "description": "Current password (for password change flow)"
+                  },
+                  "new_password": {
+                    "type": "string",
+                    "description": "New password (for password change flow)"
+                  },
+                  "confirm_new_password": {
+                    "type": "string",
+                    "description": "Confirm new password (for password change flow)"
+                  }
+                }
+              },
+              "example": {
+                "first_name": "John",
+                "last_name": "Smith",
+                "email": "john@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Profile updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Profile updated successfully"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not logged in or customer not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not logged in"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

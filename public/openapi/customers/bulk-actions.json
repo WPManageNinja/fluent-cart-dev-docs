@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customers/do-bulk-action": {
+      "post": {
+        "operationId": "bulkActionCustomers",
+        "summary": "POST Bulk Actions",
+        "description": "Perform bulk operations on multiple customers such as deletion or status change.",
+        "tags": [
+          "Customers"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action",
+                  "customer_ids"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "delete_customers",
+                      "change_customer_status"
+                    ],
+                    "description": "The action to perform."
+                  },
+                  "customer_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of customer IDs to act upon"
+                  },
+                  "new_status": {
+                    "type": "string",
+                    "description": "Required when action is change_customer_status. The new status to apply to the selected customers."
+                  }
+                }
+              },
+              "example": {
+                "action": "change_customer_status",
+                "customer_ids": [
+                  1,
+                  2,
+                  3
+                ],
+                "new_status": "archived"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bulk action completed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "delete": {
+                    "value": {
+                      "message": "Selected Customers has been deleted permanently",
+                      "data": ""
+                    }
+                  },
+                  "statusChange": {
+                    "value": {
+                      "message": "Customer Status has been changed",
+                      "data": ""
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing customer selection.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 403,
+                  "message": "Customers selection is required",
+                  "data": ""
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

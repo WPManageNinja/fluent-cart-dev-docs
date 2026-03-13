@@ -1,0 +1,125 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/payment-methods": {
+      "get": {
+        "operationId": "getPaymentMethodSettings",
+        "summary": "GET Get Payment Method Settings",
+        "description": "Retrieve the configuration and settings for a specific payment method gateway (e.g., Stripe, PayPal).",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "method",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "stripe"
+            },
+            "description": "The payment method key to retrieve settings for (e.g., `stripe`, `paypal`, `cod`)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "description": "Payment method settings object",
+                      "properties": {
+                        "is_active": {
+                          "type": "string",
+                          "example": "yes"
+                        },
+                        "payment_mode": {
+                          "type": "string",
+                          "example": "live"
+                        },
+                        "checkout_label": {
+                          "type": "string",
+                          "example": "Pay with Stripe"
+                        },
+                        "checkout_logo": {
+                          "type": "string",
+                          "example": "https://example.com/stripe-logo.png"
+                        },
+                        "checkout_instructions": {
+                          "type": "string",
+                          "example": ""
+                        },
+                        "thank_you_page_instructions": {
+                          "type": "string",
+                          "example": ""
+                        }
+                      }
+                    },
+                    "fields": {
+                      "type": "object",
+                      "description": "Settings fields schema",
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "example": {
+                  "settings": {
+                    "is_active": "yes",
+                    "payment_mode": "live",
+                    "checkout_label": "Pay with Stripe",
+                    "checkout_logo": "https://example.com/stripe-logo.png",
+                    "checkout_instructions": "",
+                    "thank_you_page_instructions": ""
+                  },
+                  "fields": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

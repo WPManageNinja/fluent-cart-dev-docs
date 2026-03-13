@@ -1,0 +1,126 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/payment-methods/design": {
+      "post": {
+        "operationId": "savePaymentMethodDesign",
+        "summary": "POST Save Payment Method Design",
+        "description": "Customize the checkout appearance for a specific payment method, including its label, logo, and instructions.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "method"
+                ],
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "description": "The payment method key (e.g., `stripe`, `paypal`, `cod`).",
+                    "example": "stripe"
+                  },
+                  "checkout_label": {
+                    "type": "string",
+                    "description": "Custom label displayed on the checkout form for this method.",
+                    "example": "Credit / Debit Card"
+                  },
+                  "checkout_logo": {
+                    "type": "string",
+                    "description": "URL to a custom logo image for the checkout form.",
+                    "example": "https://example.com/card-icon.png"
+                  },
+                  "checkout_instructions": {
+                    "type": "string",
+                    "description": "HTML instructions shown on the checkout page when this method is selected.",
+                    "example": "<p>You will be charged securely via Stripe.</p>"
+                  },
+                  "thank_you_page_instructions": {
+                    "type": "string",
+                    "description": "HTML instructions shown on the thank-you/receipt page.",
+                    "example": ""
+                  }
+                }
+              },
+              "example": {
+                "method": "stripe",
+                "checkout_label": "Credit / Debit Card",
+                "checkout_logo": "https://example.com/card-icon.png",
+                "checkout_instructions": "<p>You will be charged securely via Stripe.</p>"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Checkout design settings saved"
+                    },
+                    "settings": {
+                      "type": "object",
+                      "description": "Updated payment method settings",
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Checkout design settings saved",
+                  "settings": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

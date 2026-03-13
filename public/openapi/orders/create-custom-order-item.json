@@ -1,0 +1,138 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/create-custom": {
+      "post": {
+        "operationId": "createCustomOrderItem",
+        "summary": "POST Create Custom Order Item",
+        "description": "Add a custom product/item to an existing order.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product"
+                ],
+                "properties": {
+                  "product": {
+                    "type": "object",
+                    "description": "Product data to add as a custom item",
+                    "properties": {
+                      "title": {
+                        "type": "string",
+                        "description": "Custom item title"
+                      },
+                      "price": {
+                        "type": "number",
+                        "description": "Item price in cents"
+                      },
+                      "quantity": {
+                        "type": "integer",
+                        "description": "Item quantity"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "product": {
+                  "title": "Custom Service",
+                  "price": 1500,
+                  "quantity": 1
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Custom item added successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Returns the result of processing the custom item addition"
+                },
+                "example": {
+                  "message": "Custom item added successfully"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Error processing custom item.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Error processing custom item"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -4,5 +4,4 @@ description: "Update an existing coupon."
 outline: false
 aside: false
 ---
-<OAOperation operationId="updateCoupon" />
-
+<OAOperation operationId="updateCoupon" specUrl="/openapi/public/coupons/update-coupon.json" />

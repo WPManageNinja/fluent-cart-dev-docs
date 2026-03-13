@@ -1,0 +1,136 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/subscriptions/{subscription_uuid}/initiate-early-payment": {
+      "post": {
+        "operationId": "initiateEarlyPayment",
+        "summary": "POST Initiate Early Payment",
+        "description": "Generate a checkout URL for paying remaining installments early on an installment-based subscription. Requires Pro license, early payment feature enabled, finite installments with remaining payments, and active or trialing status.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscription_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The subscription UUID (alphanumeric with dashes)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Early payment URL generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "checkout_url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL for early installment payment checkout"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Early payment URL generated.",
+                  "checkout_url": "https://your-site.com/?fluent-cart=early-installment-payment&subscription_hash=abc123-def456"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Early payment not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Early payment is not available for this subscription."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer or subscription not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "customer_not_found": {
+                    "summary": "Customer not found",
+                    "value": {
+                      "message": "Customer not found"
+                    }
+                  },
+                  "subscription_not_found": {
+                    "summary": "Subscription not found",
+                    "value": {
+                      "message": "Subscription not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,190 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/?fluent-cart=activate_license": {
+      "post": {
+        "operationId": "publicActivateLicense",
+        "summary": "POST Activate License",
+        "description": "Activate a license key on a specific site URL. If the site is already activated for this license, the existing activation details are returned. Local/staging sites are detected automatically and do not count toward the activation limit. This is a public endpoint that does not use the WordPress REST API. No authentication required.",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "license_key",
+                  "item_id",
+                  "site_url"
+                ],
+                "properties": {
+                  "license_key": {
+                    "type": "string",
+                    "description": "The license key to activate"
+                  },
+                  "item_id": {
+                    "type": "string",
+                    "description": "The product ID (must match the license's product)"
+                  },
+                  "site_url": {
+                    "type": "string",
+                    "description": "The site URL to activate"
+                  },
+                  "server_version": {
+                    "type": "string",
+                    "description": "The server software version (e.g., PHP version)"
+                  },
+                  "platform_version": {
+                    "type": "string",
+                    "description": "The platform version (e.g., WordPress version)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "activation_limit": {
+                      "type": "integer"
+                    },
+                    "activation_hash": {
+                      "type": "string"
+                    },
+                    "activations_count": {
+                      "type": "integer"
+                    },
+                    "license_key": {
+                      "type": "string"
+                    },
+                    "expiration_date": {
+                      "type": "string"
+                    },
+                    "product_id": {
+                      "type": "integer"
+                    },
+                    "variation_id": {
+                      "type": "integer"
+                    },
+                    "variation_title": {
+                      "type": "string"
+                    },
+                    "product_title": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "status": "valid",
+                  "activation_limit": 5,
+                  "activation_hash": "abc123def456...",
+                  "activations_count": 3,
+                  "license_key": "XXXX-XXXX-XXXX-XXXX",
+                  "expiration_date": "2026-01-15 00:00:00",
+                  "product_id": 10,
+                  "variation_id": 15,
+                  "variation_title": "Pro License",
+                  "product_title": "My Plugin",
+                  "created_at": "2025-01-15 10:30:00",
+                  "updated_at": "2025-06-15 10:35:00"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Activation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_type": {
+                      "type": "string",
+                      "enum": [
+                        "validation_error",
+                        "license_not_found",
+                        "key_mismatch",
+                        "license_expired",
+                        "license_not_active",
+                        "activation_limit_exceeded",
+                        "activation_error"
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "message": "license_key, site_url and item_id is required",
+                  "error_type": "validation_error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group/{group_id}": {
+      "get": {
+        "operationId": "getAttributeGroup",
+        "summary": "GET Get Attribute Group",
+        "description": "Retrieve a single attribute group by ID, optionally with its terms.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "The attribute group ID.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "with[]",
+            "in": "query",
+            "required": false,
+            "description": "Relations to eager load. Supported: `terms`.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "terms"
+                ]
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the attribute group with optional terms.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "group": {
+                      "$ref": "#/components/schemas/AttributeGroupWithTerms"
+                    }
+                  }
+                },
+                "example": {
+                  "group": {
+                    "id": 1,
+                    "title": "Color",
+                    "slug": "color",
+                    "description": "Product color options",
+                    "settings": null,
+                    "created_at": "2025-01-10 08:30:00",
+                    "updated_at": "2025-01-10 08:30:00",
+                    "terms": [
+                      {
+                        "id": 1,
+                        "group_id": 1,
+                        "title": "Red",
+                        "slug": "red",
+                        "serial": 1,
+                        "description": null,
+                        "settings": null
+                      },
+                      {
+                        "id": 2,
+                        "group_id": 1,
+                        "title": "Blue",
+                        "slug": "blue",
+                        "serial": 2,
+                        "description": null,
+                        "settings": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AttributeGroupWithTerms": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Attribute group ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Group title",
+            "example": "Color"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Group slug identifier",
+            "example": "color"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Group description",
+            "example": "Product color options"
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional group settings",
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (UTC)",
+            "example": "2025-01-10 08:30:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (UTC)",
+            "example": "2025-01-10 08:30:00"
+          },
+          "terms": {
+            "type": "array",
+            "description": "Attribute terms belonging to this group (loaded when `with[]=terms`)",
+            "items": {
+              "$ref": "#/components/schemas/AttributeTerm"
+            }
+          }
+        }
+      },
+      "AttributeTerm": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Term ID",
+            "example": 1
+          },
+          "group_id": {
+            "type": "integer",
+            "description": "Parent attribute group ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Term title",
+            "example": "Red"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Term slug identifier",
+            "example": "red"
+          },
+          "serial": {
+            "type": "integer",
+            "description": "Sort order position",
+            "example": 1
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Term description",
+            "example": null
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional term settings",
+            "example": null
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,12 +1,35 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/integration/addons": {
       "get": {
         "operationId": "listIntegrationAddons",
-        "summary": "GET List Addons",
-        "description": "Retrieve a list of available integration addons.",
+        "summary": "GET List Available Add-ons",
+        "description": "Retrieve the list of all available integration add-ons, including their installation status and metadata.",
         "tags": [
-          "Integration"
+          "Integrations"
         ],
         "security": [
           {
@@ -23,7 +46,7 @@
                   "properties": {
                     "addons": {
                       "type": "object",
-                      "description": "Object of addons keyed by addon identifier",
+                      "description": "Object of add-ons keyed by add-on identifier",
                       "additionalProperties": {
                         "$ref": "#/components/schemas/IntegrationAddon"
                       }
@@ -34,26 +57,37 @@
                   "addons": {
                     "fluent-crm": {
                       "installable": "fluent-crm",
-                      "enabled": false,
+                      "enabled": true,
                       "title": "FluentCRM",
-                      "logo": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
                       "categories": [
                         "crm",
                         "core",
                         "marketing"
                       ],
-                      "description": "The most powerful and user-friendly email marketing automation plugin for WordPress. Send newsletters, marketing emails, customer onboard emails, Automations with FluentCart + FluentCRM integration."
+                      "description": "The most powerful email marketing automation plugin for WordPress."
                     },
                     "fluent-smtp": {
                       "installable": "fluent-smtp",
-                      "logo": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluent-smtp.svg",
                       "enabled": false,
                       "title": "FluentSMTP",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluent-smtp.svg",
                       "categories": [
                         "core",
                         "marketing"
                       ],
-                      "description": "A free and open-source WordPress SMTP plugin to send emails via multiple SMTP providers. Ensure email deliverability for your WooCommerce and FluentCart emails with FluentSMTP."
+                      "description": "A free WordPress SMTP plugin to send emails via multiple providers."
+                    },
+                    "webhook": {
+                      "title": "Webhook",
+                      "description": "Send data anywhere via webhook",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/webhook.svg",
+                      "enabled": true,
+                      "is_pro": true,
+                      "is_pro_active": true,
+                      "categories": [
+                        "core"
+                      ]
                     }
                   }
                 }
@@ -66,48 +100,36 @@
   },
   "components": {
     "schemas": {
-      "AddonsResponse": {
-        "type": "object",
-        "properties": {
-          "addons": {
-            "type": "object",
-            "description": "Object of addons keyed by addon identifier",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/IntegrationAddon"
-            }
-          }
-        }
-      },
       "IntegrationAddon": {
         "type": "object",
         "properties": {
           "installable": {
             "type": "string",
-            "description": "Installable plugin slug",
+            "description": "Plugin slug for WordPress.org installation (absent for pro add-ons)",
             "example": "fluent-crm"
           },
           "enabled": {
             "type": "boolean",
-            "description": "Whether the addon is enabled",
-            "example": false
+            "description": "Whether the add-on's underlying plugin is active",
+            "example": true
           },
           "title": {
             "type": "string",
-            "description": "Addon title",
+            "description": "Display name of the add-on",
             "example": "FluentCRM"
           },
           "logo": {
             "type": "string",
             "format": "uri",
-            "description": "Addon logo URL",
-            "example": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg"
+            "description": "URL to the add-on's logo image",
+            "example": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg"
           },
           "categories": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "Addon categories",
+            "description": "Category tags (e.g., core, crm, marketing, community, lms)",
             "example": [
               "crm",
               "core",
@@ -116,10 +138,28 @@
           },
           "description": {
             "type": "string",
-            "description": "Addon description",
-            "example": "The most powerful and user-friendly email marketing automation plugin for WordPress."
+            "description": "Human-readable description",
+            "example": "The most powerful email marketing automation plugin for WordPress."
+          },
+          "is_pro": {
+            "type": "boolean",
+            "description": "Whether the add-on requires a Pro license (only present for premium add-ons)",
+            "example": true
+          },
+          "is_pro_active": {
+            "type": "boolean",
+            "description": "Whether the Pro license is currently active (only present for premium add-ons)",
+            "example": true
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

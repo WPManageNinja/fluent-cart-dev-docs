@@ -1,0 +1,112 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/get-recent-orders": {
+      "get": {
+        "operationId": "getRecentOrders",
+        "summary": "GET Get Recent Orders",
+        "description": "Retrieve the 10 most recent orders for the dashboard with basic customer and order information.",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recentOrders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Order ID"
+                          },
+                          "customer_id": {
+                            "type": "integer",
+                            "description": "Customer ID"
+                          },
+                          "customer_name": {
+                            "type": "string",
+                            "description": "Customer name"
+                          },
+                          "total_amount": {
+                            "type": "number",
+                            "description": "Total amount in decimal (dollars)"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "description": "Order creation timestamp"
+                          },
+                          "order_items_count": {
+                            "type": "integer",
+                            "description": "Number of items in the order"
+                          }
+                        }
+                      },
+                      "description": "List of 10 most recent orders"
+                    }
+                  }
+                },
+                "example": {
+                  "recentOrders": [
+                    {
+                      "id": 150,
+                      "customer_id": 42,
+                      "customer_name": "John Doe",
+                      "total_amount": 99.99,
+                      "created_at": "2025-06-15 14:30:00",
+                      "order_items_count": 3
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

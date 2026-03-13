@@ -1,16 +1,51 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/integration/global-settings": {
       "get": {
-        "operationId": "getIntegrationGlobalSettings",
-        "summary": "GET Get Global Settings",
-        "description": "Retrieve global settings for integrations.",
+        "operationId": "getGlobalIntegrationSettings",
+        "summary": "GET Global Integration Settings",
+        "description": "Retrieve global configuration settings for a specific integration provider. Used to get API key configuration, authentication fields, and current saved values.",
         "tags": [
-          "Integration"
+          "Integrations"
         ],
         "security": [
           {
             "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "settings_key",
+            "in": "query",
+            "required": true,
+            "description": "The integration provider key (e.g., `fluent-crm`, `webhook`)",
+            "schema": {
+              "type": "string",
+              "example": "fluent-crm"
+            }
           }
         ],
         "responses": {
@@ -21,30 +56,52 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "integration": {
+                      "type": "object",
+                      "description": "Current saved integration settings values"
+                    },
                     "settings": {
-                      "type": "array",
-                      "description": "Global integration settings",
-                      "items": {
-                        "type": "object"
-                      },
-                      "example": []
-                    },
-                    "settings_key": {
-                      "type": "string",
-                      "description": "Settings key",
-                      "example": ""
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Response message",
-                      "example": "Sorry! No integration failed found with: "
+                      "type": "object",
+                      "description": "Form schema defining the settings fields",
+                      "properties": {
+                        "fields": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SettingsField"
+                          }
+                        },
+                        "save_button_text": {
+                          "type": "string"
+                        },
+                        "valid_message": {
+                          "type": "string"
+                        },
+                        "invalid_message": {
+                          "type": "string"
+                        }
+                      }
                     }
                   }
                 },
                 "example": {
-                  "settings": [],
-                  "settings_key": "",
-                  "message": "Sorry! No integration failed found with: "
+                  "integration": {
+                    "api_key": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+                    "api_url": "https://example.com",
+                    "status": true
+                  },
+                  "settings": {
+                    "fields": [
+                      {
+                        "key": "api_key",
+                        "label": "API Key",
+                        "type": "password",
+                        "required": true
+                      }
+                    ],
+                    "save_button_text": "Save Settings",
+                    "valid_message": "Your API Key is valid",
+                    "invalid_message": "Your API Key is not valid"
+                  }
                 }
               }
             }
@@ -55,28 +112,34 @@
   },
   "components": {
     "schemas": {
-      "GlobalSettingsResponse": {
+      "SettingsField": {
         "type": "object",
         "properties": {
-          "settings": {
-            "type": "array",
-            "description": "Global integration settings",
-            "items": {
-              "type": "object"
-            },
-            "example": []
-          },
-          "settings_key": {
+          "key": {
             "type": "string",
-            "description": "Settings key",
-            "example": ""
+            "description": "Field identifier"
           },
-          "message": {
+          "label": {
             "type": "string",
-            "description": "Response message",
-            "example": "Sorry! No integration failed found with: "
+            "description": "Display label"
+          },
+          "type": {
+            "type": "string",
+            "description": "Field type (e.g., text, password, select)"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether the field is required"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

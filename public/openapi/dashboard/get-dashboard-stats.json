@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/dashboard/stats": {
       "get": {
         "operationId": "getDashboardStats",
         "summary": "GET Get Dashboard Stats",
-        "description": "Retrieve dashboard statistics and widgets.",
+        "description": "Retrieve dashboard statistics widgets including total products, orders, net revenue, and refunds for the last 30 days.",
         "tags": [
           "Dashboard"
         ],
@@ -33,28 +56,28 @@
                   "stats": [
                     {
                       "title": "Total Products",
-                      "current_count": "54",
+                      "current_count": 45,
                       "icon": "Frame",
-                      "url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/products/?active_view=all"
+                      "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products?active_view=all"
                     },
                     {
                       "title": "Orders",
-                      "current_count": "26",
+                      "current_count": 128,
                       "icon": "AllOrdersIcon",
-                      "url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/orders"
+                      "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/orders"
                     },
                     {
                       "title": "Revenue",
-                      "current_count": "2340.5000",
+                      "current_count": 15420.5,
                       "icon": "Currency",
-                      "url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
+                      "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
                       "has_currency": true
                     },
                     {
                       "title": "Refund",
-                      "current_count": "0.0000",
+                      "current_count": 350.0,
                       "icon": "Failed",
-                      "url": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
+                      "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
                       "has_currency": true
                     }
                   ]
@@ -68,17 +91,6 @@
   },
   "components": {
     "schemas": {
-      "DashboardStatsResponse": {
-        "type": "object",
-        "properties": {
-          "stats": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/StatWidget"
-            }
-          }
-        }
-      },
       "StatWidget": {
         "type": "object",
         "properties": {
@@ -88,9 +100,9 @@
             "example": "Total Products"
           },
           "current_count": {
-            "type": "string",
+            "type": "number",
             "description": "Stat value/count",
-            "example": "54"
+            "example": 45
           },
           "icon": {
             "type": "string",
@@ -101,7 +113,7 @@
             "type": "string",
             "format": "uri",
             "description": "URL to view details",
-            "example": "https://YourWebsite.com/wp-admin/admin.php?page=fluent-cart#/products/?active_view=all"
+            "example": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products?active_view=all"
           },
           "has_currency": {
             "type": "boolean",
@@ -109,6 +121,14 @@
             "example": true
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -1,0 +1,202 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/reminders": {
+      "get": {
+        "operationId": "getSchedulingSettings",
+        "summary": "GET Get Scheduling Settings",
+        "description": "Retrieve reminder/scheduling settings for automated email notifications such as payment reminders, renewal reminders, and trial-end reminders. Returns both the current settings and the form field definitions for the reminders tab.",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "description": "Current reminder/scheduling settings",
+                      "properties": {
+                        "reminders_enabled": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Master toggle for all reminders",
+                          "example": "yes"
+                        },
+                        "invoice_reminders_enabled": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Enable invoice payment reminders",
+                          "example": "yes"
+                        },
+                        "invoice_reminder_due_days": {
+                          "type": "integer",
+                          "description": "Days before due date to send invoice reminder (0-365)",
+                          "example": 3
+                        },
+                        "invoice_reminder_overdue_days": {
+                          "type": "string",
+                          "description": "Comma-separated day intervals for overdue reminders",
+                          "example": "1,3,7"
+                        },
+                        "yearly_renewal_reminders_enabled": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Enable yearly subscription renewal reminders",
+                          "example": "yes"
+                        },
+                        "yearly_renewal_reminder_days": {
+                          "type": "integer",
+                          "description": "Days before renewal to send reminder (7-90)",
+                          "example": 30
+                        },
+                        "trial_end_reminders_enabled": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Enable trial ending reminders",
+                          "example": "yes"
+                        },
+                        "trial_end_reminder_days": {
+                          "type": "integer",
+                          "description": "Days before trial ends to send reminder (1-14)",
+                          "example": 3
+                        },
+                        "monthly_renewal_reminders_enabled": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Enable monthly renewal reminders",
+                          "example": "no"
+                        },
+                        "monthly_renewal_reminder_days": {
+                          "type": "integer",
+                          "description": "Days before renewal to send reminder (3-28)",
+                          "example": 7
+                        },
+                        "quarterly_renewal_reminders_enabled": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Enable quarterly renewal reminders",
+                          "example": "no"
+                        },
+                        "quarterly_renewal_reminder_days": {
+                          "type": "integer",
+                          "description": "Days before renewal to send reminder (7-60)",
+                          "example": 14
+                        },
+                        "half_yearly_renewal_reminders_enabled": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Enable half-yearly renewal reminders",
+                          "example": "no"
+                        },
+                        "half_yearly_renewal_reminder_days": {
+                          "type": "integer",
+                          "description": "Days before renewal to send reminder (7-60)",
+                          "example": 14
+                        }
+                      }
+                    },
+                    "fields": {
+                      "type": "object",
+                      "description": "Form field definitions for the reminders settings tab",
+                      "properties": {
+                        "reminders": {
+                          "type": "object",
+                          "description": "Reminder field configurations"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "settings": {
+                    "reminders_enabled": "yes",
+                    "invoice_reminders_enabled": "yes",
+                    "invoice_reminder_due_days": 3,
+                    "invoice_reminder_overdue_days": "1,3,7",
+                    "yearly_renewal_reminders_enabled": "yes",
+                    "yearly_renewal_reminder_days": 30,
+                    "trial_end_reminders_enabled": "yes",
+                    "trial_end_reminder_days": 3,
+                    "monthly_renewal_reminders_enabled": "no",
+                    "monthly_renewal_reminder_days": 7,
+                    "quarterly_renewal_reminders_enabled": "no",
+                    "quarterly_renewal_reminder_days": 14,
+                    "half_yearly_renewal_reminders_enabled": "no",
+                    "half_yearly_renewal_reminder_days": 14
+                  },
+                  "fields": {
+                    "reminders": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

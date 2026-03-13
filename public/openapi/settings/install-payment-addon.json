@@ -1,0 +1,118 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/payment-methods/install-addon": {
+      "post": {
+        "operationId": "installPaymentAddon",
+        "summary": "POST Install Payment Addon",
+        "description": "Install a payment gateway addon plugin from a remote source (WordPress.org or GitHub).",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "plugin_slug",
+                  "source_type"
+                ],
+                "properties": {
+                  "plugin_slug": {
+                    "type": "string",
+                    "description": "The slug of the plugin to install (e.g., `fluent-cart-pro`).",
+                    "example": "fluent-cart-pro"
+                  },
+                  "source_type": {
+                    "type": "string",
+                    "description": "Source type: `wordpress` (WordPress.org) or `github`.",
+                    "enum": [
+                      "wordpress",
+                      "github"
+                    ],
+                    "example": "wordpress"
+                  },
+                  "source_link": {
+                    "type": "string",
+                    "description": "The URL to the plugin source. Required when `source_type` is `github`.",
+                    "example": ""
+                  }
+                }
+              },
+              "example": {
+                "plugin_slug": "fluent-cart-pro",
+                "source_type": "wordpress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Payment addon installed successfully!"
+                    },
+                    "plugin_file": {
+                      "type": "string",
+                      "example": "fluent-cart-pro/fluent-cart-pro.php"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Payment addon installed successfully!",
+                  "plugin_file": "fluent-cart-pro/fluent-cart-pro.php"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

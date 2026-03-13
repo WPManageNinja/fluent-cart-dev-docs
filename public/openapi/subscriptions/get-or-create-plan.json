@@ -1,0 +1,146 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/subscriptions/{subscription_uuid}/get-or-create-plan": {
+      "post": {
+        "operationId": "getOrCreatePlan",
+        "summary": "POST Get or Create Plan",
+        "description": "Get or create a subscription plan on the remote payment gateway. Typically used during the payment method switch flow to ensure the target gateway has a matching plan configured.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscription_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The subscription UUID (alphanumeric with dashes)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "required": [
+                      "method"
+                    ],
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "description": "Target payment gateway slug (e.g., stripe, paypal)",
+                        "example": "stripe"
+                      },
+                      "reason": {
+                        "type": "string",
+                        "description": "Reason for creating the plan",
+                        "example": "switching_payment_method"
+                      }
+                    },
+                    "description": "Plan data object"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "method": "stripe",
+                  "reason": "switching_payment_method"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plan retrieved or created successfully. Response depends on the gateway's getOrCreateNewPlan implementation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Plan created successfully"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Could not get or create plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Could not get or create plan"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

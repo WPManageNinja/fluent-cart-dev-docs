@@ -1,16 +1,51 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/settings/store": {
       "get": {
         "operationId": "getStoreSettings",
         "summary": "GET Get Store Settings",
-        "description": "Retrieve store settings.",
+        "description": "Retrieve all store configuration settings along with the field schema for a given settings tab.",
         "tags": [
           "Settings"
         ],
         "security": [
           {
             "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "settings_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "store_setup"
+            },
+            "description": "The settings tab to return fields for (e.g., `store_setup`, `checkout`, `pages`)."
           }
         ],
         "responses": {
@@ -27,11 +62,19 @@
                       "properties": {
                         "store_name": {
                           "type": "string",
-                          "example": "FluentCart Store"
+                          "example": "My Store"
                         },
-                        "note_for_user_account_creation": {
+                        "currency": {
                           "type": "string",
-                          "example": "An user account will be created"
+                          "example": "USD"
+                        },
+                        "currency_position": {
+                          "type": "string",
+                          "example": "before"
+                        },
+                        "decimal_separator": {
+                          "type": "string",
+                          "example": "dot"
                         },
                         "checkout_button_text": {
                           "type": "string",
@@ -51,19 +94,15 @@
                         },
                         "out_of_stock_button_text": {
                           "type": "string",
-                          "example": "Out of stock"
-                        },
-                        "currency_position": {
-                          "type": "string",
-                          "example": "before"
-                        },
-                        "decimal_separator": {
-                          "type": "string",
-                          "example": "dot"
+                          "example": "Not Available"
                         },
                         "checkout_method_style": {
                           "type": "string",
                           "example": "logo"
+                        },
+                        "enable_modal_checkout": {
+                          "type": "string",
+                          "example": "no"
                         },
                         "require_logged_in": {
                           "type": "string",
@@ -91,31 +130,47 @@
                         },
                         "checkout_page_id": {
                           "type": "string",
-                          "example": "7529347"
+                          "example": ""
                         },
-                        "currency": {
+                        "cart_page_id": {
                           "type": "string",
-                          "example": "USD"
+                          "example": ""
+                        },
+                        "receipt_page_id": {
+                          "type": "string",
+                          "example": ""
+                        },
+                        "shop_page_id": {
+                          "type": "string",
+                          "example": ""
+                        },
+                        "customer_profile_page_id": {
+                          "type": "string",
+                          "example": ""
                         },
                         "store_address1": {
                           "type": "string",
-                          "example": "2035 Sunset Lake Road, Suite B-2"
+                          "example": ""
+                        },
+                        "store_address2": {
+                          "type": "string",
+                          "example": ""
                         },
                         "store_city": {
                           "type": "string",
-                          "example": "Newark"
+                          "example": ""
                         },
                         "store_country": {
                           "type": "string",
-                          "example": "US"
+                          "example": ""
                         },
                         "store_postcode": {
                           "type": "string",
-                          "example": "19702"
+                          "example": ""
                         },
                         "store_state": {
                           "type": "string",
-                          "example": "DE"
+                          "example": ""
                         },
                         "order_mode": {
                           "type": "string",
@@ -129,13 +184,6 @@
                           "type": "string",
                           "example": "masonry"
                         },
-                        "modules_settings": {
-                          "type": "array",
-                          "items": {
-                            "type": "object"
-                          },
-                          "example": []
-                        },
                         "min_receipt_number": {
                           "type": "string",
                           "example": "1"
@@ -144,44 +192,7 @@
                           "type": "string",
                           "example": "INV-"
                         },
-                        "thousand_separator": {
-                          "type": "string",
-                          "example": "comma"
-                        },
-                        "store_logo": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "string",
-                              "example": "7529370"
-                            },
-                            "url": {
-                              "type": "string",
-                              "format": "uri",
-                              "example": "https://YourWebsite.com/wp-content/uploads/2025/10/FluentCart-Logo.webp"
-                            },
-                            "title": {
-                              "type": "string",
-                              "example": "FluentCart-Logo"
-                            }
-                          }
-                        },
-                        "product_slug": {
-                          "type": "string",
-                          "example": "items"
-                        },
-                        "theme_setup": {
-                          "type": "object",
-                          "description": "Theme customization settings",
-                          "additionalProperties": {
-                            "type": "string"
-                          }
-                        },
-                        "enable_image_zoom_in_single_product": {
-                          "type": "string",
-                          "example": "yes"
-                        },
-                        "enable_image_zoom_in_modal": {
+                        "show_email_footer": {
                           "type": "string",
                           "example": "yes"
                         }
@@ -189,77 +200,50 @@
                     },
                     "fields": {
                       "type": "object",
-                      "description": "Settings fields schema",
+                      "description": "Settings fields schema for the requested tab",
                       "additionalProperties": true
                     }
                   }
                 },
                 "example": {
                   "settings": {
-                    "store_name": "FluentCart Store",
-                    "note_for_user_account_creation": "An user account will be created",
+                    "store_name": "My Store",
+                    "currency": "USD",
+                    "currency_position": "before",
+                    "decimal_separator": "dot",
                     "checkout_button_text": "Checkout",
                     "view_cart_button_text": "View Cart",
                     "cart_button_text": "Add To Cart",
                     "popup_button_text": "View Product",
-                    "out_of_stock_button_text": "Out of stock",
-                    "currency_position": "before",
-                    "decimal_separator": "dot",
+                    "out_of_stock_button_text": "Not Available",
                     "checkout_method_style": "logo",
+                    "enable_modal_checkout": "no",
                     "require_logged_in": "no",
                     "show_cart_icon_in_nav": "no",
                     "show_cart_icon_in_body": "yes",
                     "additional_address_field": "yes",
                     "hide_coupon_field": "no",
                     "user_account_creation_mode": "all",
-                    "checkout_page_id": "7529347",
-                    "custom_payment_page_id": "",
-                    "registration_page_id": "",
-                    "login_page_id": "",
-                    "cart_page_id": "7529345",
-                    "receipt_page_id": "7529346",
-                    "shop_page_id": "7529343",
-                    "customer_profile_page_id": "7529344",
-                    "customer_profile_page_slug": "account",
-                    "currency": "USD",
-                    "store_address1": "2035 Sunset Lake Road, Suite B-2",
+                    "checkout_page_id": "",
+                    "cart_page_id": "",
+                    "receipt_page_id": "",
+                    "shop_page_id": "",
+                    "customer_profile_page_id": "",
+                    "store_address1": "",
                     "store_address2": "",
-                    "store_city": "Newark",
-                    "store_country": "US",
-                    "store_postcode": "19702",
-                    "store_state": "DE",
-                    "show_relevant_product_in_single_page": "yes",
-                    "show_relevant_product_in_modal": "yes",
+                    "store_city": "",
+                    "store_country": "",
+                    "store_postcode": "",
+                    "store_state": "",
                     "order_mode": "test",
                     "variation_view": "both",
                     "variation_columns": "masonry",
-                    "modules_settings": [],
                     "min_receipt_number": "1",
                     "inv_prefix": "INV-",
-                    "thousand_separator": "comma",
-                    "store_logo": {
-                      "id": "7529370",
-                      "url": "https://YourWebsite.com/wp-content/uploads/2025/10/FluentCart-Logo.webp",
-                      "title": "FluentCart-Logo"
-                    },
-                    "product_slug": "items",
-                    "theme_setup": {
-                      "--fluent-cart-primary-color": "",
-                      "--fluent-cart-title-color": "",
-                      "--fluent-cart-sub-title-color": "",
-                      "--fluent-cart-text-color": "",
-                      "--fluent-cart-border-outline": "",
-                      "--fluent-cart-border-divider": "",
-                      "--fluent-cart-pricing-active-card-bg": "",
-                      "--fluent-cart-price-color": "",
-                      "--fluent-cart-secondary-button-bg": "",
-                      "--fluent-cart-secondary-button-color": ""
-                    },
-                    "enable_image_zoom_in_single_product": "yes",
-                    "enable_image_zoom_in_modal": "yes"
+                    "show_email_footer": "yes"
                   },
                   "fields": {
-                    "": null
+                    "store_setup": {}
                   }
                 }
               }
@@ -270,182 +254,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "StoreSettingsResponse": {
-        "type": "object",
-        "properties": {
-          "settings": {
-            "type": "object",
-            "description": "Store settings object",
-            "properties": {
-              "store_name": {
-                "type": "string",
-                "example": "FluentCart Store"
-              },
-              "note_for_user_account_creation": {
-                "type": "string",
-                "example": "An user account will be created"
-              },
-              "checkout_button_text": {
-                "type": "string",
-                "example": "Checkout"
-              },
-              "view_cart_button_text": {
-                "type": "string",
-                "example": "View Cart"
-              },
-              "cart_button_text": {
-                "type": "string",
-                "example": "Add To Cart"
-              },
-              "popup_button_text": {
-                "type": "string",
-                "example": "View Product"
-              },
-              "out_of_stock_button_text": {
-                "type": "string",
-                "example": "Out of stock"
-              },
-              "currency_position": {
-                "type": "string",
-                "example": "before"
-              },
-              "decimal_separator": {
-                "type": "string",
-                "example": "dot"
-              },
-              "checkout_method_style": {
-                "type": "string",
-                "example": "logo"
-              },
-              "require_logged_in": {
-                "type": "string",
-                "example": "no"
-              },
-              "show_cart_icon_in_nav": {
-                "type": "string",
-                "example": "no"
-              },
-              "show_cart_icon_in_body": {
-                "type": "string",
-                "example": "yes"
-              },
-              "additional_address_field": {
-                "type": "string",
-                "example": "yes"
-              },
-              "hide_coupon_field": {
-                "type": "string",
-                "example": "no"
-              },
-              "user_account_creation_mode": {
-                "type": "string",
-                "example": "all"
-              },
-              "checkout_page_id": {
-                "type": "string",
-                "example": "7529347"
-              },
-              "currency": {
-                "type": "string",
-                "example": "USD"
-              },
-              "store_address1": {
-                "type": "string",
-                "example": "2035 Sunset Lake Road, Suite B-2"
-              },
-              "store_city": {
-                "type": "string",
-                "example": "Newark"
-              },
-              "store_country": {
-                "type": "string",
-                "example": "US"
-              },
-              "store_postcode": {
-                "type": "string",
-                "example": "19702"
-              },
-              "store_state": {
-                "type": "string",
-                "example": "DE"
-              },
-              "order_mode": {
-                "type": "string",
-                "example": "test"
-              },
-              "variation_view": {
-                "type": "string",
-                "example": "both"
-              },
-              "variation_columns": {
-                "type": "string",
-                "example": "masonry"
-              },
-              "modules_settings": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                },
-                "example": []
-              },
-              "min_receipt_number": {
-                "type": "string",
-                "example": "1"
-              },
-              "inv_prefix": {
-                "type": "string",
-                "example": "INV-"
-              },
-              "thousand_separator": {
-                "type": "string",
-                "example": "comma"
-              },
-              "store_logo": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "example": "7529370"
-                  },
-                  "url": {
-                    "type": "string",
-                    "format": "uri",
-                    "example": "https://YourWebsite.com/wp-content/uploads/2025/10/FluentCart-Logo.webp"
-                  },
-                  "title": {
-                    "type": "string",
-                    "example": "FluentCart-Logo"
-                  }
-                }
-              },
-              "product_slug": {
-                "type": "string",
-                "example": "items"
-              },
-              "theme_setup": {
-                "type": "object",
-                "description": "Theme customization settings",
-                "additionalProperties": {
-                  "type": "string"
-                }
-              },
-              "enable_image_zoom_in_single_product": {
-                "type": "string",
-                "example": "yes"
-              },
-              "enable_image_zoom_in_modal": {
-                "type": "string",
-                "example": "yes"
-              }
-            }
-          },
-          "fields": {
-            "type": "object",
-            "description": "Settings fields schema",
-            "additionalProperties": true
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

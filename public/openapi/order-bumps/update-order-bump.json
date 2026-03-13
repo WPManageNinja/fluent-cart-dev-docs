@@ -1,0 +1,205 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/order_bump/{id}": {
+      "put": {
+        "operationId": "updateOrderBump",
+        "summary": "PUT Update Order Bump",
+        "description": "Update an existing order bump's configuration, conditions, status, and display settings.",
+        "tags": [
+          "Order Bumps"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The order bump ID."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "src_object_id"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 194,
+                    "description": "Display title. Max 194 characters."
+                  },
+                  "src_object_id": {
+                    "type": "integer",
+                    "description": "Product variation ID for the bump offer."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "draft"
+                    ],
+                    "maxLength": 50,
+                    "description": "Order bump status."
+                  },
+                  "src_object_type": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "Source object type identifier."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "HTML description displayed to the customer. Sanitized with wp_kses_post."
+                  },
+                  "config": {
+                    "type": "object",
+                    "description": "Configuration object.",
+                    "properties": {
+                      "discount": {
+                        "type": "object",
+                        "properties": {
+                          "discount_type": {
+                            "type": "string",
+                            "enum": [
+                              "percentage",
+                              "fixed"
+                            ],
+                            "description": "Discount type."
+                          },
+                          "discount_amount": {
+                            "type": "number",
+                            "description": "Discount amount. For percentage: value 0-100. For fixed: amount in cents."
+                          }
+                        }
+                      },
+                      "display_conditions_if": {
+                        "type": "string",
+                        "description": "Logical operator for combining conditions."
+                      },
+                      "call_to_action": {
+                        "type": "string",
+                        "description": "Button or checkbox text shown to the customer."
+                      }
+                    }
+                  },
+                  "conditions": {
+                    "type": "array",
+                    "description": "Array of display condition objects that control when the order bump is displayed during checkout.",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Display priority. Lower numbers appear first."
+                  }
+                }
+              },
+              "example": {
+                "title": "Add Extended Warranty",
+                "src_object_id": 42,
+                "status": "active",
+                "description": "<p>Protect your purchase with our 2-year extended warranty.</p>",
+                "priority": 1,
+                "config": {
+                  "discount": {
+                    "discount_type": "percentage",
+                    "discount_amount": 10
+                  },
+                  "display_conditions_if": "",
+                  "call_to_action": "Yes, add warranty!"
+                },
+                "conditions": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Order bump updated successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Failed to update order bump"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

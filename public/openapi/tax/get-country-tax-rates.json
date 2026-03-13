@@ -1,0 +1,218 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/rates/country/rates/{country_code}": {
+      "get": {
+        "operationId": "getCountryTaxRates",
+        "summary": "GET Get Country Tax Rates",
+        "description": "Retrieve all tax rates for a specific country, including the associated tax class and country-level configuration settings.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "country_code",
+            "in": "path",
+            "description": "ISO 3166-1 alpha-2 country code (e.g., US, DE, GB)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "DE"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns tax rates for the specified country.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TaxRate"
+                      }
+                    },
+                    "settings": {
+                      "type": "object",
+                      "properties": {
+                        "compound_tax": {
+                          "type": "boolean"
+                        },
+                        "tax_id_label": {
+                          "type": "string"
+                        },
+                        "states": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rates": [
+                    {
+                      "id": 5,
+                      "class_id": 1,
+                      "country": "DE",
+                      "state": "",
+                      "postcode": "",
+                      "city": "",
+                      "rate": "19.0000",
+                      "name": "DE Standard Tax",
+                      "group": "EU",
+                      "priority": 1,
+                      "is_compound": 0,
+                      "for_shipping": null,
+                      "for_order": 0,
+                      "formatted_state": "",
+                      "tax_class": {
+                        "id": 1,
+                        "title": "Standard"
+                      }
+                    }
+                  ],
+                  "settings": {
+                    "compound_tax": true,
+                    "tax_id_label": "VAT",
+                    "states": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TaxRate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Tax rate ID",
+            "example": 5
+          },
+          "class_id": {
+            "type": "integer",
+            "description": "Associated tax class ID",
+            "example": 1
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code",
+            "example": "DE"
+          },
+          "state": {
+            "type": "string",
+            "description": "State/province code",
+            "example": ""
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Postcode/ZIP code",
+            "example": ""
+          },
+          "city": {
+            "type": "string",
+            "description": "City name",
+            "example": ""
+          },
+          "rate": {
+            "type": "string",
+            "description": "Tax rate percentage",
+            "example": "19.0000"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the tax rate",
+            "example": "DE Standard Tax"
+          },
+          "group": {
+            "type": "string",
+            "description": "Geographic group/continent code",
+            "example": "EU"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Priority for rate application order",
+            "example": 1
+          },
+          "is_compound": {
+            "type": "integer",
+            "description": "Whether this rate is compound (0 or 1)",
+            "example": 0
+          },
+          "for_shipping": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Shipping tax override rate",
+            "example": null
+          },
+          "for_order": {
+            "type": "integer",
+            "description": "Whether this rate applies at order level (0 or 1)",
+            "example": 0
+          },
+          "formatted_state": {
+            "type": "string",
+            "description": "Formatted state name",
+            "example": ""
+          },
+          "tax_class": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "example": 1
+              },
+              "title": {
+                "type": "string",
+                "example": "Standard"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

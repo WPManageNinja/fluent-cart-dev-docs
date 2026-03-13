@@ -1,0 +1,165 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings/eu-vat/rates": {
+      "get": {
+        "operationId": "getEuTaxRates",
+        "summary": "GET Get EU Tax Rates",
+        "description": "Retrieve all tax rates in the EU group from the database, grouped by region and country.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns EU tax rates grouped by region and country.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "group_name": {
+                            "type": "string"
+                          },
+                          "group_code": {
+                            "type": "string"
+                          },
+                          "countries": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "country_code": {
+                                  "type": "string"
+                                },
+                                "country_name": {
+                                  "type": "string"
+                                },
+                                "rates": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "class_id": {
+                                        "type": "integer"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "rate": {
+                                        "type": "string"
+                                      },
+                                      "for_shipping": {
+                                        "type": "integer",
+                                        "nullable": true
+                                      }
+                                    }
+                                  }
+                                },
+                                "total_rates": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          },
+                          "total_countries": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rates": [
+                    {
+                      "group_name": "European Union",
+                      "group_code": "EU",
+                      "countries": [
+                        {
+                          "country_code": "DE",
+                          "country_name": "Germany",
+                          "rates": [
+                            {
+                              "class_id": 1,
+                              "name": "standard",
+                              "rate": "19.0000",
+                              "for_shipping": null
+                            },
+                            {
+                              "class_id": 2,
+                              "name": "reduced",
+                              "rate": "7.0000",
+                              "for_shipping": null
+                            }
+                          ],
+                          "total_rates": 2
+                        },
+                        {
+                          "country_code": "FR",
+                          "country_name": "France",
+                          "rates": [
+                            {
+                              "class_id": 1,
+                              "name": "standard",
+                              "rate": "20.0000",
+                              "for_shipping": null
+                            }
+                          ],
+                          "total_rates": 1
+                        }
+                      ],
+                      "total_countries": 2
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

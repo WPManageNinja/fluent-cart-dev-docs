@@ -1,0 +1,228 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/shipping/zones/{id}": {
+      "get": {
+        "operationId": "getShippingZone",
+        "summary": "GET Get Shipping Zone",
+        "description": "Retrieve a single shipping zone by ID, including its associated shipping methods.",
+        "tags": [
+          "Shipping"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The shipping zone ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the shipping zone with its methods.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_zone": {
+                      "$ref": "#/components/schemas/ShippingZoneWithMethods"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_zone": {
+                    "id": 1,
+                    "name": "Domestic",
+                    "region": "US",
+                    "order": 0,
+                    "formatted_region": "United States",
+                    "created_at": "2025-01-15 12:00:00",
+                    "updated_at": "2025-01-15 12:00:00",
+                    "methods": [
+                      {
+                        "id": 10,
+                        "zone_id": 1,
+                        "title": "Standard Shipping",
+                        "type": "flat_rate",
+                        "amount": 500,
+                        "is_enabled": true,
+                        "states": [],
+                        "settings": {},
+                        "meta": {},
+                        "order": 0,
+                        "formatted_states": [],
+                        "created_at": "2025-01-15 12:30:00",
+                        "updated_at": "2025-01-15 12:30:00"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShippingZoneWithMethods": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique zone identifier",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Zone display name",
+            "example": "Domestic"
+          },
+          "region": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code or 'all'",
+            "example": "US"
+          },
+          "order": {
+            "type": "integer",
+            "description": "Sort order for display priority",
+            "example": 0
+          },
+          "formatted_region": {
+            "type": "string",
+            "description": "Human-readable region name",
+            "example": "United States"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (UTC)"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (UTC)"
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShippingMethod"
+            }
+          }
+        }
+      },
+      "ShippingMethod": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique method identifier",
+            "example": 10
+          },
+          "zone_id": {
+            "type": "integer",
+            "description": "Parent shipping zone ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Method display title",
+            "example": "Standard Shipping"
+          },
+          "type": {
+            "type": "string",
+            "description": "Method type (e.g., flat_rate, free_shipping, local_pickup)",
+            "example": "flat_rate"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Shipping cost in cents",
+            "example": 500
+          },
+          "is_enabled": {
+            "type": "boolean",
+            "description": "Whether the method is active",
+            "example": true
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "State/province codes this method applies to"
+          },
+          "settings": {
+            "type": "object",
+            "description": "Additional configuration settings"
+          },
+          "meta": {
+            "type": "object",
+            "description": "Additional metadata"
+          },
+          "order": {
+            "type": "integer",
+            "description": "Sort order within the zone",
+            "example": 0
+          },
+          "formatted_states": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Human-readable state names"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (UTC)"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (UTC)"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

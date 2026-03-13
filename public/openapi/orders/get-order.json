@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/orders/{order_id}": {
       "get": {
         "operationId": "getOrder",
         "summary": "GET Get Order Details",
-        "description": "Retrieve detailed information about a specific order.",
+        "description": "Retrieve detailed information about a specific order, including items, transactions, addresses, subscriptions, and activities.",
         "tags": [
           "Orders"
         ],
@@ -26,89 +49,88 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful response. Returns detailed order information including customer, order items, transactions, addresses, and activities.",
+            "description": "Successful response. Returns detailed order information.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "order": {
-                      "$ref": "#/components/schemas/OrderDetail"
+                      "type": "object",
+                      "description": "Full order object with relations"
                     },
                     "discount_meta": {
-                      "type": "string",
-                      "description": "Discount metadata",
-                      "example": ""
+                      "type": "object",
+                      "description": "Discount metadata"
                     },
                     "shipping_meta": {
-                      "type": "string",
-                      "description": "Shipping metadata",
-                      "example": ""
+                      "type": "object",
+                      "description": "Shipping metadata"
                     },
                     "order_settings": {
-                      "type": "array",
-                      "description": "Order settings",
-                      "items": {
-                        "type": "object"
-                      }
+                      "type": "object",
+                      "description": "Order settings"
                     },
                     "selected_labels": {
                       "type": "array",
-                      "description": "Selected order labels",
+                      "description": "Array of selected label IDs",
                       "items": {
-                        "type": "object"
+                        "type": "integer"
                       }
                     },
                     "tax_id": {
-                      "type": "string",
-                      "description": "Tax ID",
-                      "example": ""
+                      "type": "integer",
+                      "nullable": true,
+                      "description": "Tax ID if applicable"
                     }
                   }
                 },
                 "example": {
                   "order": {
-                    "id": 7536300,
-                    "status": "processing",
-                    "parent_id": "0",
-                    "receipt_number": "163762",
-                    "invoice_no": "INV-163762",
-                    "fulfillment_type": "physical",
-                    "type": "payment",
-                    "mode": "test",
-                    "shipping_status": "unshipped",
-                    "customer_id": "63195",
-                    "payment_method": "stripe",
+                    "id": 42,
+                    "uuid": "abc123-def456",
+                    "invoice_no": "INV-042",
+                    "status": "completed",
                     "payment_status": "paid",
+                    "payment_method": "stripe",
+                    "type": "payment",
+                    "fulfillment_type": "digital",
                     "currency": "USD",
-                    "subtotal": 500,
-                    "shipping_total": 11200,
+                    "subtotal": 5000,
+                    "total_amount": 5000,
+                    "total_paid": 5000,
+                    "total_refund": 0,
+                    "shipping_total": 0,
                     "tax_total": 0,
-                    "total_amount": 11700,
-                    "total_paid": "11700",
-                    "total_refund": "0",
-                    "uuid": "f19e07f3bfe28124d5c6a3e2ed548d2f",
-                    "created_at": "2025-11-12T11:40:06+00:00",
-                    "updated_at": "2025-11-12T11:40:10+00:00",
-                    "parent_order": null,
+                    "manual_discount_total": 0,
+                    "coupon_discount_total": 0,
+                    "customer_id": 1,
+                    "customer": {},
+                    "order_items": [],
+                    "transactions": [],
+                    "billing_address": {},
+                    "shipping_address": {},
                     "subscriptions": [],
                     "activities": [],
                     "labels": [],
-                    "customer": {},
-                    "children": [],
-                    "order_items": [],
-                    "transactions": [],
-                    "order_addresses": [],
-                    "billing_address": {},
-                    "shipping_address": {},
                     "applied_coupons": [],
-                    "has_missing_licenses": false
+                    "children": [],
+                    "parent_order": null,
+                    "order_operation": {},
+                    "receipt_url": "https://example.com/receipt/?order_hash=abc123",
+                    "custom_checkout_url": "https://example.com/checkout/?payment_hash=...",
+                    "has_missing_licenses": false,
+                    "created_at": "2025-01-15 10:30:00",
+                    "updated_at": "2025-01-15 10:35:00"
                   },
-                  "discount_meta": "",
-                  "shipping_meta": "",
-                  "order_settings": [],
-                  "selected_labels": [],
-                  "tax_id": ""
+                  "discount_meta": {},
+                  "shipping_meta": {},
+                  "order_settings": {},
+                  "selected_labels": [
+                    1,
+                    2
+                  ],
+                  "tax_id": null
                 }
               }
             }
@@ -118,677 +140,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "Order": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Order ID",
-            "example": 1
-          },
-          "uuid": {
-            "type": "string",
-            "description": "Unique order identifier",
-            "example": "abc123"
-          },
-          "status": {
-            "type": "string",
-            "description": "Order status",
-            "example": "completed"
-          },
-          "payment_status": {
-            "type": "string",
-            "description": "Payment status",
-            "example": "paid"
-          },
-          "customer_id": {
-            "type": "integer",
-            "description": "Customer ID",
-            "example": 123
-          },
-          "total_amount": {
-            "type": "integer",
-            "description": "Total amount in cents",
-            "example": 5000
-          },
-          "currency": {
-            "type": "string",
-            "description": "Currency code",
-            "example": "USD"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Order creation timestamp",
-            "example": "2024-01-01T10:00:00Z"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Order last update timestamp",
-            "example": "2024-01-01T11:00:00Z"
-          },
-          "customer": {
-            "$ref": "#/components/schemas/Customer"
-          },
-          "order_items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/OrderItem"
-            }
-          },
-          "transactions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Transaction"
-            }
-          }
-        }
-      },
-      "OrderItem": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "product_id": {
-            "type": "integer",
-            "example": 456
-          },
-          "variation_id": {
-            "type": "integer",
-            "example": 789
-          },
-          "quantity": {
-            "type": "integer",
-            "example": 2
-          },
-          "price": {
-            "type": "integer",
-            "description": "Price in cents",
-            "example": 2500
-          },
-          "product": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "integer"
-              },
-              "title": {
-                "type": "string"
-              },
-              "sku": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      },
-      "Customer": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 123
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "customer@example.com"
-          },
-          "first_name": {
-            "type": "string",
-            "example": "John"
-          },
-          "last_name": {
-            "type": "string",
-            "example": "Doe"
-          }
-        }
-      },
-      "Transaction": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "payment_method": {
-            "type": "string",
-            "example": "stripe"
-          },
-          "status": {
-            "type": "string",
-            "example": "succeeded"
-          },
-          "amount": {
-            "type": "integer",
-            "description": "Amount in cents",
-            "example": 5000
-          },
-          "transaction_id": {
-            "type": "string",
-            "example": "txn_123456"
-          }
-        }
-      },
-      "OrderDetailResponse": {
-        "type": "object",
-        "properties": {
-          "order": {
-            "$ref": "#/components/schemas/OrderDetail"
-          },
-          "discount_meta": {
-            "type": "string",
-            "description": "Discount metadata",
-            "example": ""
-          },
-          "shipping_meta": {
-            "type": "string",
-            "description": "Shipping metadata",
-            "example": ""
-          },
-          "order_settings": {
-            "type": "array",
-            "description": "Order settings",
-            "items": {
-              "type": "object"
-            }
-          },
-          "selected_labels": {
-            "type": "array",
-            "description": "Selected order labels",
-            "items": {
-              "type": "object"
-            }
-          },
-          "tax_id": {
-            "type": "string",
-            "description": "Tax ID",
-            "example": ""
-          }
-        }
-      },
-      "OrderDetail": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Order"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "parent_order": {
-                "type": "object",
-                "nullable": true,
-                "description": "Parent order if this is a child order"
-              },
-              "subscriptions": {
-                "type": "array",
-                "description": "Associated subscriptions",
-                "items": {
-                  "type": "object"
-                }
-              },
-              "activities": {
-                "type": "array",
-                "description": "Order activity log",
-                "items": {
-                  "$ref": "#/components/schemas/Activity"
-                }
-              },
-              "labels": {
-                "type": "array",
-                "description": "Order labels",
-                "items": {
-                  "type": "object"
-                }
-              },
-              "customer": {
-                "$ref": "#/components/schemas/CustomerDetail"
-              },
-              "children": {
-                "type": "array",
-                "description": "Child orders",
-                "items": {
-                  "type": "object"
-                }
-              },
-              "order_items": {
-                "type": "array",
-                "description": "Order items with full details",
-                "items": {
-                  "$ref": "#/components/schemas/OrderItemDetail"
-                }
-              },
-              "transactions": {
-                "type": "array",
-                "description": "Order transactions",
-                "items": {
-                  "$ref": "#/components/schemas/TransactionDetail"
-                }
-              },
-              "order_addresses": {
-                "type": "array",
-                "description": "Order addresses",
-                "items": {
-                  "$ref": "#/components/schemas/OrderAddress"
-                }
-              },
-              "billing_address": {
-                "$ref": "#/components/schemas/OrderAddress"
-              },
-              "shipping_address": {
-                "$ref": "#/components/schemas/OrderAddress"
-              },
-              "applied_coupons": {
-                "type": "array",
-                "description": "Applied coupons",
-                "items": {
-                  "type": "object"
-                }
-              },
-              "has_missing_licenses": {
-                "type": "boolean",
-                "description": "Whether order has missing licenses"
-              },
-              "order_operation": {
-                "type": "object",
-                "description": "Order operation metadata",
-                "properties": {
-                  "id": {
-                    "type": "integer"
-                  },
-                  "order_id": {
-                    "type": "string"
-                  },
-                  "sales_recorded": {
-                    "type": "string"
-                  },
-                  "created_at": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updated_at": {
-                    "type": "string",
-                    "format": "date-time"
-                  }
-                }
-              },
-              "receipt_url": {
-                "type": "string",
-                "format": "uri",
-                "description": "Receipt URL"
-              },
-              "custom_checkout_url": {
-                "type": "string",
-                "format": "uri",
-                "description": "Custom checkout URL"
-              }
-            }
-          }
-        ]
-      },
-      "Activity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "status": {
-            "type": "string",
-            "example": "success"
-          },
-          "log_type": {
-            "type": "string",
-            "example": "activity"
-          },
-          "module_type": {
-            "type": "string"
-          },
-          "module_id": {
-            "type": "integer"
-          },
-          "module_name": {
-            "type": "string"
-          },
-          "user_id": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string"
-          },
-          "read_status": {
-            "type": "string",
-            "example": "unread"
-          },
-          "created_by": {
-            "type": "string"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "user": {
-            "type": "object",
-            "properties": {
-              "ID": {
-                "type": "integer"
-              },
-              "display_name": {
-                "type": "string"
-              },
-              "user_email": {
-                "type": "string",
-                "format": "email"
-              }
-            }
-          }
-        }
-      },
-      "CustomerDetail": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Customer"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "user_id": {
-                "type": "string"
-              },
-              "contact_id": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string",
-                "nullable": true
-              },
-              "purchase_value": {
-                "type": "string",
-                "nullable": true
-              },
-              "purchase_count": {
-                "type": "string"
-              },
-              "ltv": {
-                "type": "string",
-                "description": "Lifetime value"
-              },
-              "first_purchase_date": {
-                "type": "string"
-              },
-              "last_purchase_date": {
-                "type": "string"
-              },
-              "aov": {
-                "type": "string",
-                "description": "Average order value"
-              },
-              "notes": {
-                "type": "string"
-              },
-              "uuid": {
-                "type": "string"
-              },
-              "country": {
-                "type": "string"
-              },
-              "city": {
-                "type": "string"
-              },
-              "state": {
-                "type": "string"
-              },
-              "postcode": {
-                "type": "string"
-              },
-              "full_name": {
-                "type": "string"
-              },
-              "photo": {
-                "type": "string",
-                "format": "uri"
-              },
-              "country_name": {
-                "type": "string"
-              },
-              "formatted_address": {
-                "type": "object"
-              },
-              "user_link": {
-                "type": "string",
-                "format": "uri"
-              }
-            }
-          }
-        ]
-      },
-      "OrderItemDetail": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/OrderItem"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "order_id": {
-                "type": "string"
-              },
-              "post_id": {
-                "type": "string"
-              },
-              "fulfillment_type": {
-                "type": "string"
-              },
-              "payment_type": {
-                "type": "string"
-              },
-              "post_title": {
-                "type": "string"
-              },
-              "title": {
-                "type": "string"
-              },
-              "object_id": {
-                "type": "string"
-              },
-              "cart_index": {
-                "type": "string"
-              },
-              "unit_price": {
-                "type": "string"
-              },
-              "cost": {
-                "type": "string"
-              },
-              "subtotal": {
-                "type": "string"
-              },
-              "tax_amount": {
-                "type": "string"
-              },
-              "shipping_charge": {
-                "type": "string"
-              },
-              "discount_total": {
-                "type": "string"
-              },
-              "line_total": {
-                "type": "string"
-              },
-              "refund_total": {
-                "type": "string"
-              },
-              "rate": {
-                "type": "string"
-              },
-              "other_info": {
-                "type": "object"
-              },
-              "line_meta": {
-                "type": "array"
-              },
-              "fulfilled_quantity": {
-                "type": "string"
-              },
-              "referrer": {
-                "type": "string",
-                "nullable": true
-              },
-              "payment_info": {
-                "type": "string"
-              },
-              "setup_info": {
-                "type": "string"
-              },
-              "formatted_total": {
-                "type": "string"
-              },
-              "variants": {
-                "type": "object",
-                "description": "Product variant details"
-              }
-            }
-          }
-        ]
-      },
-      "TransactionDetail": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Transaction"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "order_id": {
-                "type": "string"
-              },
-              "order_type": {
-                "type": "string"
-              },
-              "transaction_type": {
-                "type": "string",
-                "example": "charge"
-              },
-              "subscription_id": {
-                "type": "string",
-                "nullable": true
-              },
-              "card_last_4": {
-                "type": "string"
-              },
-              "card_brand": {
-                "type": "string",
-                "example": "visa"
-              },
-              "vendor_charge_id": {
-                "type": "string"
-              },
-              "payment_mode": {
-                "type": "string",
-                "example": "test"
-              },
-              "payment_method_type": {
-                "type": "string",
-                "example": "card"
-              },
-              "currency": {
-                "type": "string"
-              },
-              "total": {
-                "type": "string"
-              },
-              "rate": {
-                "type": "string"
-              },
-              "uuid": {
-                "type": "string"
-              },
-              "meta": {
-                "type": "array"
-              },
-              "url": {
-                "type": "string",
-                "format": "uri"
-              }
-            }
-          }
-        ]
-      },
-      "OrderAddress": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "order_id": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "billing",
-              "shipping"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "address_1": {
-            "type": "string"
-          },
-          "address_2": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "state": {
-            "type": "string"
-          },
-          "postcode": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
-          },
-          "meta": {
-            "type": "object"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "first_name": {
-            "type": "string"
-          },
-          "last_name": {
-            "type": "string"
-          },
-          "full_name": {
-            "type": "string"
-          },
-          "formatted_address": {
-            "type": "object"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -1,8 +1,7 @@
 ---
 title: Upload File
-description: "Upload a new file to the storage system."
+description: "Upload a downloadable file to the specified storage driver."
 outline: false
 aside: false
 ---
-<OAOperation operationId="uploadFile" />
-
+<OAOperation operationId="uploadFile" specUrl="/openapi/public/files/upload-file.json" />

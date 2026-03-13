@@ -1,0 +1,149 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/shipping/zone/states": {
+      "get": {
+        "operationId": "getZoneStates",
+        "summary": "GET Get Zone States",
+        "description": "Retrieve state/province options and address locale configuration for a given country. Useful for populating state selectors when configuring shipping methods within a zone.",
+        "tags": [
+          "Shipping"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "country_code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ISO 3166-1 alpha-2 country code (e.g., US, CA, GB)",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns states and address locale configuration for the given country.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "country_code": {
+                          "type": "string",
+                          "description": "The country code queried"
+                        },
+                        "states": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "description": "Map of state/province codes to names"
+                            },
+                            {
+                              "type": "array",
+                              "items": {},
+                              "description": "Empty array when no states available"
+                            }
+                          ]
+                        },
+                        "address_locale": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "object",
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "required": {
+                                    "type": "boolean"
+                                  }
+                                }
+                              },
+                              "description": "Address locale configuration"
+                            },
+                            {
+                              "type": "array",
+                              "items": {},
+                              "description": "Empty array when no locale configuration available"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "country_code": "US",
+                    "states": {
+                      "AL": "Alabama",
+                      "AK": "Alaska",
+                      "AZ": "Arizona",
+                      "CA": "California",
+                      "NY": "New York"
+                    },
+                    "address_locale": {
+                      "state": {
+                        "label": "State",
+                        "required": true
+                      },
+                      "postcode": {
+                        "label": "ZIP Code",
+                        "required": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

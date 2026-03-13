@@ -1,0 +1,179 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings": {
+      "post": {
+        "operationId": "saveTaxSettings",
+        "summary": "POST Save Tax Settings",
+        "description": "Save the global tax configuration settings. If tax is enabled for the first time, initial tax classes are automatically created.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "settings"
+                ],
+                "properties": {
+                  "settings": {
+                    "type": "object",
+                    "properties": {
+                      "enable_tax": {
+                        "type": "string",
+                        "description": "Enable or disable tax calculation",
+                        "enum": [
+                          "yes",
+                          "no"
+                        ],
+                        "example": "yes"
+                      },
+                      "tax_inclusion": {
+                        "type": "string",
+                        "description": "Whether prices include tax",
+                        "enum": [
+                          "included",
+                          "excluded"
+                        ],
+                        "example": "excluded"
+                      },
+                      "tax_calculation_basis": {
+                        "type": "string",
+                        "description": "Address basis for tax calculation",
+                        "enum": [
+                          "shipping",
+                          "billing",
+                          "store"
+                        ],
+                        "example": "billing"
+                      },
+                      "tax_rounding": {
+                        "type": "string",
+                        "description": "Rounding method",
+                        "enum": [
+                          "item",
+                          "subtotal"
+                        ],
+                        "example": "subtotal"
+                      },
+                      "price_suffix": {
+                        "type": "string",
+                        "description": "Text appended after product prices",
+                        "example": "excl. VAT"
+                      },
+                      "eu_vat_settings": {
+                        "type": "object",
+                        "description": "EU VAT configuration object",
+                        "properties": {
+                          "require_vat_number": {
+                            "type": "string",
+                            "enum": [
+                              "yes",
+                              "no"
+                            ]
+                          },
+                          "local_reverse_charge": {
+                            "type": "string",
+                            "enum": [
+                              "yes",
+                              "no"
+                            ]
+                          },
+                          "vat_reverse_excluded_categories": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "settings": {
+                  "enable_tax": "yes",
+                  "tax_inclusion": "excluded",
+                  "tax_calculation_basis": "billing",
+                  "tax_rounding": "subtotal",
+                  "price_suffix": "excl. VAT",
+                  "eu_vat_settings": {
+                    "require_vat_number": "yes",
+                    "local_reverse_charge": "yes",
+                    "vat_reverse_excluded_categories": [
+                      12,
+                      15
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings saved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Settings saved successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Settings saved successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/bulk-insert": {
+      "post": {
+        "operationId": "bulkInsertProducts",
+        "summary": "POST Bulk Insert Products",
+        "description": "Insert multiple products at once. Maximum 10 products per request.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "products"
+                ],
+                "properties": {
+                  "products": {
+                    "type": "array",
+                    "maxItems": 10,
+                    "items": {
+                      "type": "object"
+                    },
+                    "description": "Array of product data objects (max 10)"
+                  }
+                }
+              },
+              "example": {
+                "products": [
+                  {
+                    "post_title": "Product A",
+                    "detail": {
+                      "fulfillment_type": "digital"
+                    }
+                  },
+                  {
+                    "post_title": "Product B",
+                    "detail": {
+                      "fulfillment_type": "physical"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "3 product(s) created successfully",
+                  "created": [],
+                  "errors": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/retention-snapshots/status": {
+      "get": {
+        "operationId": "getRetentionSnapshotStatus",
+        "summary": "GET Check Retention Snapshot Status",
+        "description": "Check the status of a previously queued retention snapshot generation job.",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[job_id]",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "example": 1718456789
+            },
+            "description": "The job ID returned from the retention-snapshots/generate endpoint.",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Whether the lookup was successful"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "running",
+                        "completed"
+                      ],
+                      "description": "Job status"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Status message"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Job details"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "status": "running",
+                  "message": "Job is still running",
+                  "data": {
+                    "status": "pending",
+                    "started_at": "2025-06-15 14:30:00",
+                    "product_id": 42
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

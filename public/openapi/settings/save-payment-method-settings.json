@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/payment-methods": {
+      "post": {
+        "operationId": "savePaymentMethodSettings",
+        "summary": "POST Save Payment Method Settings",
+        "description": "Create or update the configuration for a specific payment method gateway.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "method",
+                  "settings"
+                ],
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "description": "The payment method key (e.g., `stripe`, `paypal`, `cod`).",
+                    "example": "cod"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "description": "Key-value object of gateway-specific settings to save. Fields vary by payment method.",
+                    "additionalProperties": true,
+                    "example": {
+                      "is_active": "yes",
+                      "checkout_label": "Cash on Delivery"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "method": "cod",
+                "settings": {
+                  "is_active": "yes",
+                  "checkout_label": "Cash on Delivery"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "description": "Updated payment method settings",
+                      "additionalProperties": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Settings saved successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "settings": {
+                    "is_active": "yes",
+                    "payment_mode": "live"
+                  },
+                  "message": "Settings saved successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/checkout/get-order-info": {
+      "get": {
+        "operationId": "getOrderInfo",
+        "summary": "GET Get Order Info",
+        "description": "Retrieve payment-gateway-specific order information needed by the frontend to initialize payment UI elements. This is typically called after the checkout page loads to set up payment forms (e.g., Stripe Elements configuration, PayPal button setup).",
+        "tags": [
+          "Checkout"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "method",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Payment gateway slug (e.g., `stripe`, `paypal`, `square`, `airwallex`)",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. The response structure is gateway-specific.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "Result status"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Gateway-specific data (e.g., client_secret, publishable_key for Stripe)"
+                    },
+                    "payment_args": {
+                      "type": "object",
+                      "description": "Payment gateway arguments",
+                      "properties": {
+                        "checkout_mode": {
+                          "type": "string",
+                          "description": "Payment checkout mode (`onsite` or `hosted`)"
+                        },
+                        "appearance": {
+                          "type": "object",
+                          "description": "UI appearance configuration for the payment form"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "stripe_hosted": {
+                    "summary": "Stripe (hosted mode)",
+                    "value": {
+                      "status": "success",
+                      "message": "Order info retrieved!",
+                      "data": [],
+                      "payment_args": {
+                        "checkout_mode": "hosted"
+                      }
+                    }
+                  },
+                  "stripe_onsite": {
+                    "summary": "Stripe (on-site mode)",
+                    "value": {
+                      "status": "success",
+                      "message": "Order info retrieved!",
+                      "data": {
+                        "client_secret": "seti_..._secret_...",
+                        "publishable_key": "pk_live_..."
+                      },
+                      "payment_args": {
+                        "checkout_mode": "onsite",
+                        "appearance": {
+                          "theme": "stripe"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

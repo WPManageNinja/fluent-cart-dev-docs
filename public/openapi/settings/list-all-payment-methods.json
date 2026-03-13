@@ -1,0 +1,121 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/payment-methods/all": {
+      "get": {
+        "operationId": "listAllPaymentMethods",
+        "summary": "GET List All Payment Methods",
+        "description": "Retrieve all registered payment method gateways categorized by availability status.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "gateways": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "method_key": {
+                            "type": "string",
+                            "example": "stripe"
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Stripe"
+                          },
+                          "is_active": {
+                            "type": "string",
+                            "example": "yes"
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "Accept payments via Stripe"
+                          },
+                          "logo": {
+                            "type": "string",
+                            "example": "https://..."
+                          },
+                          "upcoming": {
+                            "type": "boolean",
+                            "example": false
+                          },
+                          "requires_pro": {
+                            "type": "boolean",
+                            "example": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "gateways": [
+                    {
+                      "method_key": "stripe",
+                      "title": "Stripe",
+                      "is_active": "yes",
+                      "description": "Accept payments via Stripe",
+                      "logo": "https://...",
+                      "upcoming": false
+                    },
+                    {
+                      "method_key": "paypal",
+                      "title": "PayPal",
+                      "is_active": "no",
+                      "requires_pro": true
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

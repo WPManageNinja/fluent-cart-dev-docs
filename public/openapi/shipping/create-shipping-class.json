@@ -1,0 +1,185 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/shipping/classes": {
+      "post": {
+        "operationId": "createShippingClass",
+        "summary": "POST Create Shipping Class",
+        "description": "Create a new shipping class.",
+        "tags": [
+          "Shipping"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "cost",
+                  "type"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 192,
+                    "description": "Class name (max 192 characters)"
+                  },
+                  "cost": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Cost value (minimum: 0). For fixed type, this is a flat amount. For percentage type, this is a percentage value."
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "fixed",
+                      "percentage"
+                    ],
+                    "description": "Cost type: fixed or percentage"
+                  },
+                  "per_item": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "default": 0,
+                    "description": "Apply cost per item (1) or per order (0). Default: 0"
+                  }
+                }
+              },
+              "example": {
+                "name": "Oversized Items",
+                "cost": 25.0,
+                "type": "fixed",
+                "per_item": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipping class created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_class": {
+                      "$ref": "#/components/schemas/ShippingClass"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_class": {
+                    "id": 3,
+                    "name": "Oversized Items",
+                    "cost": 25.0,
+                    "type": "fixed",
+                    "per_item": 1,
+                    "created_at": "2025-02-01 11:00:00",
+                    "updated_at": "2025-02-01 11:00:00"
+                  },
+                  "message": "Shipping class has been created successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShippingClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique class identifier",
+            "example": 3
+          },
+          "name": {
+            "type": "string",
+            "description": "Class display name",
+            "example": "Oversized Items"
+          },
+          "cost": {
+            "type": "number",
+            "format": "float",
+            "description": "Cost value",
+            "example": 25.0
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "percentage"
+            ],
+            "description": "Cost type",
+            "example": "fixed"
+          },
+          "per_item": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "1 = per item, 0 = per order",
+            "example": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (UTC)"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (UTC)"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

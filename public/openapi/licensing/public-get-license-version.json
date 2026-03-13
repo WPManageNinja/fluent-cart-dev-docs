@@ -1,0 +1,238 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/?fluent-cart=get_license_version": {
+      "get": {
+        "operationId": "publicGetLicenseVersion",
+        "summary": "GET Get License Version",
+        "description": "Retrieve the latest version information for a licensed product. This endpoint is designed to integrate with WordPress plugin/theme update mechanisms. It returns version data, changelog, download links, and banner/icon URLs. This is a public endpoint that does not use the WordPress REST API. No authentication required.",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The product ID"
+          },
+          {
+            "name": "license_key",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "License key for authenticated download links. Required if `activation_hash` is not provided"
+          },
+          {
+            "name": "activation_hash",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Activation hash for authenticated download links. Required if `license_key` is not provided"
+          },
+          {
+            "name": "site_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The site URL making the request"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "new_version": {
+                      "type": "string"
+                    },
+                    "stable_version": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    },
+                    "homepage": {
+                      "type": "string"
+                    },
+                    "package": {
+                      "type": "string",
+                      "description": "Download URL with time-limited token (expires after 48 hours). Empty if license is invalid"
+                    },
+                    "download_link": {
+                      "type": "string",
+                      "description": "Same as package URL"
+                    },
+                    "trunk": {
+                      "type": "string"
+                    },
+                    "license_status": {
+                      "type": "string",
+                      "enum": [
+                        "valid",
+                        "invalid",
+                        "expired"
+                      ]
+                    },
+                    "license_message": {
+                      "type": "string",
+                      "description": "Present when license is invalid"
+                    },
+                    "sections": {
+                      "type": "object",
+                      "properties": {
+                        "description": {
+                          "type": "string"
+                        },
+                        "changelog": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "banners": {
+                      "type": "object",
+                      "properties": {
+                        "low": {
+                          "type": "string"
+                        },
+                        "high": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "icons": {
+                      "type": "object",
+                      "properties": {
+                        "2x": {
+                          "type": "string"
+                        },
+                        "1x": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "new_version": "1.3.0",
+                  "stable_version": "1.3.0",
+                  "name": "My Plugin",
+                  "slug": "my-plugin",
+                  "url": "https://example.com/my-plugin",
+                  "last_updated": "2025-06-15 10:30:00",
+                  "homepage": "https://example.com/my-plugin",
+                  "package": "https://example.com/?fluent-cart=download_license_package&fct_package=...",
+                  "download_link": "https://example.com/?fluent-cart=download_license_package&fct_package=...",
+                  "trunk": "https://example.com/?fluent-cart=download_license_package&fct_package=...",
+                  "license_status": "valid",
+                  "sections": {
+                    "description": "Product description here",
+                    "changelog": "<h4>1.3.0</h4><ul><li>New feature</li></ul>"
+                  },
+                  "banners": {
+                    "low": "https://example.com/banner.png",
+                    "high": "https://example.com/banner.png"
+                  },
+                  "icons": {
+                    "2x": "https://example.com/icon.png",
+                    "1x": "https://example.com/icon.png"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Product or license settings error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "error_type": {
+                      "type": "string",
+                      "enum": [
+                        "product_not_found",
+                        "license_not_enabled",
+                        "license_settings_not_found"
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "message": "Product not found",
+                  "error_type": "product_not_found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

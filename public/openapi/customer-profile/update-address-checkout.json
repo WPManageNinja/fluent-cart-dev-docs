@@ -1,0 +1,208 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customers/{customerId}/address": {
+      "put": {
+        "operationId": "updateAddressCheckout",
+        "summary": "PUT Update Address (Checkout)",
+        "description": "Update an existing address for the authenticated customer. The address ID is passed in the request body.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The customer ID. Must belong to the authenticated user.",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "address": {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "The address record ID to update"
+                      }
+                    }
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "billing",
+                      "shipping"
+                    ],
+                    "description": "Address type: `billing` or `shipping`"
+                  },
+                  "billing_label": {
+                    "type": "string",
+                    "maxLength": 15,
+                    "description": "Short label (max 15 characters, for billing type)"
+                  },
+                  "billing_name": {
+                    "type": "string",
+                    "description": "Contact name (for billing type)"
+                  },
+                  "billing_address_1": {
+                    "type": "string",
+                    "description": "Primary street address (for billing type)"
+                  },
+                  "billing_address_2": {
+                    "type": "string",
+                    "description": "Secondary address line (for billing type)"
+                  },
+                  "billing_city": {
+                    "type": "string",
+                    "description": "City (for billing type)"
+                  },
+                  "billing_state": {
+                    "type": "string",
+                    "description": "State/province code (for billing type)"
+                  },
+                  "billing_postcode": {
+                    "type": "string",
+                    "description": "Postal/zip code (for billing type)"
+                  },
+                  "billing_country": {
+                    "type": "string",
+                    "description": "Country code (for billing type)"
+                  },
+                  "shipping_label": {
+                    "type": "string",
+                    "maxLength": 15,
+                    "description": "Short label (max 15 characters, for shipping type)"
+                  },
+                  "shipping_name": {
+                    "type": "string",
+                    "description": "Contact name (for shipping type)"
+                  },
+                  "shipping_address_1": {
+                    "type": "string",
+                    "description": "Primary street address (for shipping type)"
+                  },
+                  "shipping_address_2": {
+                    "type": "string",
+                    "description": "Secondary address line (for shipping type)"
+                  },
+                  "shipping_city": {
+                    "type": "string",
+                    "description": "City (for shipping type)"
+                  },
+                  "shipping_state": {
+                    "type": "string",
+                    "description": "State/province code (for shipping type)"
+                  },
+                  "shipping_postcode": {
+                    "type": "string",
+                    "description": "Postal/zip code (for shipping type)"
+                  },
+                  "shipping_country": {
+                    "type": "string",
+                    "description": "Country code (for shipping type)"
+                  }
+                }
+              },
+              "example": {
+                "type": "billing",
+                "address": {
+                  "id": 5
+                },
+                "billing_name": "John Doe",
+                "billing_address_1": "456 Oak Ave",
+                "billing_city": "Boston",
+                "billing_state": "MA",
+                "billing_postcode": "02101",
+                "billing_country": "US",
+                "billing_label": "Work"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Address updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Address updated successfully"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. The authenticated user does not own this address.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not authorized to update this address"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

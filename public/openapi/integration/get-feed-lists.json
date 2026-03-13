@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/integration/feed/lists": {
+      "get": {
+        "operationId": "getFeedMergeFields",
+        "summary": "GET Feed Merge Fields (Lists)",
+        "description": "Retrieve the merge fields (field mapping options) for a specific integration provider and list. Called when a user selects a target list in the feed editor to load the available mapping fields.",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "integration_name",
+            "in": "query",
+            "required": true,
+            "description": "The integration provider key (e.g., `fluent-crm`)",
+            "schema": {
+              "type": "string",
+              "example": "fluent-crm"
+            }
+          },
+          {
+            "name": "list_id",
+            "in": "query",
+            "required": false,
+            "description": "The target list ID to fetch merge fields for",
+            "schema": {
+              "type": "string",
+              "example": "2"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "merge_fields": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MergeField"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "merge_fields": [
+                    {
+                      "key": "email",
+                      "label": "Email",
+                      "type": "text",
+                      "required": true
+                    },
+                    {
+                      "key": "first_name",
+                      "label": "First Name",
+                      "type": "text",
+                      "required": false
+                    },
+                    {
+                      "key": "last_name",
+                      "label": "Last Name",
+                      "type": "text",
+                      "required": false
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MergeField": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Field identifier",
+            "example": "email"
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label",
+            "example": "Email"
+          },
+          "type": {
+            "type": "string",
+            "description": "Field type",
+            "example": "text"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether the field is required",
+            "example": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

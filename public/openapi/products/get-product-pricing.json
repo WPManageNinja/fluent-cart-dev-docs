@@ -1,0 +1,127 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/{productId}/pricing": {
+      "get": {
+        "operationId": "getProductPricing",
+        "summary": "GET Get Product Pricing",
+        "description": "Retrieve the full product details including pricing, variants, downloadable files, and taxonomy information.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The product ID",
+            "required": true
+          },
+          {
+            "name": "with[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Additional relations (e.g., product_menu)",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "product": {
+                    "ID": 123,
+                    "post_title": "Example Product",
+                    "post_status": "publish",
+                    "post_excerpt": "Short description",
+                    "featured_image_id": 456,
+                    "view_url": "https://example.com/product/example",
+                    "edit_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products/123",
+                    "detail": {
+                      "id": 1,
+                      "post_id": 123,
+                      "fulfillment_type": "digital",
+                      "variation_type": "simple",
+                      "manage_stock": 0,
+                      "manage_downloadable": 0,
+                      "other_info": {}
+                    },
+                    "variants": [
+                      {
+                        "id": 789,
+                        "post_id": 123,
+                        "variation_title": "Default Plan",
+                        "item_price": 1000,
+                        "compare_price": 0,
+                        "stock_status": "in-stock",
+                        "other_info": {},
+                        "media": []
+                      }
+                    ],
+                    "downloadable_files": []
+                  },
+                  "product_menu": "",
+                  "taxonomies": [
+                    {
+                      "name": "product-categories",
+                      "label": "Product Categories",
+                      "terms": [],
+                      "labels": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

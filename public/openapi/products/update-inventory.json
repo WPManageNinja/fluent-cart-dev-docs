@@ -1,0 +1,113 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/{postId}/update-inventory/{variantId}": {
+      "put": {
+        "operationId": "updateInventory",
+        "summary": "PUT Update Inventory",
+        "description": "Update stock levels for a specific variant. Automatically updates stock status and product-level availability.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The product post ID",
+            "required": true
+          },
+          {
+            "name": "variantId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The variant ID to update",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "total_stock",
+                  "available"
+                ],
+                "properties": {
+                  "total_stock": {
+                    "type": "integer",
+                    "description": "Total stock quantity"
+                  },
+                  "available": {
+                    "type": "integer",
+                    "description": "Available stock quantity"
+                  }
+                }
+              },
+              "example": {
+                "total_stock": 100,
+                "available": 80
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Inventory updated successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

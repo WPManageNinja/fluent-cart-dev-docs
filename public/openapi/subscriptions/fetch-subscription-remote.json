@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/subscriptions/{subscription}/fetch": {
+      "put": {
+        "operationId": "fetchSubscriptionRemote",
+        "summary": "PUT Fetch Subscription from Remote",
+        "description": "Re-sync a subscription's data from the remote payment gateway (e.g., Stripe, PayPal). Useful for resolving data inconsistencies between local records and the payment provider.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The parent order ID"
+          },
+          {
+            "name": "subscription",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The subscription ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription fetched successfully from remote gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "subscription": {
+                      "$ref": "#/components/schemas/Subscription"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Subscription fetched successfully from remote payment gateway!",
+                  "subscription": {
+                    "id": 1,
+                    "status": "active",
+                    "vendor_subscription_id": "sub_1234567890"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Gateway error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "message": "Could not fetch subscription from remote gateway"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Subscription ID",
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Subscription status",
+            "example": "active"
+          },
+          "vendor_subscription_id": {
+            "type": "string",
+            "description": "Vendor subscription ID",
+            "example": "sub_1234567890"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/{downloadableId}/update": {
+      "put": {
+        "operationId": "updateDownloadableFile",
+        "summary": "PUT Update Downloadable File",
+        "description": "Update an existing downloadable file record.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "downloadableId",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The downloadable file ID",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "type",
+                  "driver",
+                  "file_name"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "File title (max 100 chars)"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "File type (max 100 chars)"
+                  },
+                  "driver": {
+                    "type": "string",
+                    "description": "Storage driver (max 100 chars)"
+                  },
+                  "file_name": {
+                    "type": "string",
+                    "description": "File name (max 100 chars)"
+                  },
+                  "product_variation_id": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of variation IDs"
+                  },
+                  "serial": {
+                    "type": "integer",
+                    "description": "Display order serial"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "properties": {
+                      "download_limit": {
+                        "type": "integer",
+                        "description": "Maximum downloads allowed"
+                      },
+                      "download_expiry": {
+                        "type": "integer",
+                        "description": "Download expiry in days"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "title": "Software v2.0",
+                "type": "zip",
+                "driver": "local",
+                "file_name": "software-v2.zip",
+                "product_variation_id": [
+                  456,
+                  457
+                ],
+                "settings": {
+                  "download_limit": 10
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Product downloadable files updated successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

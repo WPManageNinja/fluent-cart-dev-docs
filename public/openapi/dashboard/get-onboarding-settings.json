@@ -1,0 +1,167 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/onboarding": {
+      "get": {
+        "operationId": "getOnboardingSettings",
+        "summary": "GET Get Onboarding Settings",
+        "description": "Retrieve the current store settings, available pages, and currency options for the onboarding wizard.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pages": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PageOption"
+                      }
+                    },
+                    "currencies": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "Map of currency codes to display labels"
+                    },
+                    "default_settings": {
+                      "$ref": "#/components/schemas/OnboardingDefaults"
+                    }
+                  }
+                },
+                "example": {
+                  "pages": [
+                    {
+                      "id": 10,
+                      "title": "Shop",
+                      "link": "https://example.com/shop/"
+                    },
+                    {
+                      "id": 12,
+                      "title": "Checkout",
+                      "link": "https://example.com/checkout/"
+                    }
+                  ],
+                  "currencies": {
+                    "USD": "United States Dollar ($)",
+                    "EUR": "Euro (EUR)",
+                    "GBP": "British Pound (GBP)"
+                  },
+                  "default_settings": {
+                    "store_name": "My Store",
+                    "store_logo": "",
+                    "currency": "USD",
+                    "shop_page_id": "10",
+                    "checkout_page_id": "12",
+                    "customer_profile_page_id": ""
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PageOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "WordPress page ID",
+            "example": 10
+          },
+          "title": {
+            "type": "string",
+            "description": "Page title",
+            "example": "Shop"
+          },
+          "link": {
+            "type": "string",
+            "format": "uri",
+            "description": "Page permalink",
+            "example": "https://example.com/shop/"
+          }
+        }
+      },
+      "OnboardingDefaults": {
+        "type": "object",
+        "properties": {
+          "store_name": {
+            "type": "string",
+            "description": "Store name",
+            "example": "My Store"
+          },
+          "store_logo": {
+            "type": "string",
+            "description": "Store logo URL",
+            "example": ""
+          },
+          "currency": {
+            "type": "string",
+            "description": "Store currency code",
+            "example": "USD"
+          },
+          "shop_page_id": {
+            "type": "string",
+            "description": "Shop page ID",
+            "example": "10"
+          },
+          "checkout_page_id": {
+            "type": "string",
+            "description": "Checkout page ID",
+            "example": "12"
+          },
+          "customer_profile_page_id": {
+            "type": "string",
+            "description": "Customer profile page ID",
+            "example": ""
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

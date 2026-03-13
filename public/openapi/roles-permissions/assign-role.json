@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/roles": {
+      "post": {
+        "operationId": "assignRole",
+        "summary": "POST Assign Role",
+        "description": "Assign a FluentCart role to a WordPress user. The user receives the fluent_cart_admin capability and their role is stored as user meta. If the user already has an assigned role, it is replaced.",
+        "tags": [
+          "Roles"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_id",
+                  "role_key"
+                ],
+                "properties": {
+                  "user_id": {
+                    "type": "integer",
+                    "description": "WordPress user ID. Must reference an existing user."
+                  },
+                  "role_key": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "The role key to assign. Must be one of the valid role keys returned by the List Roles endpoint (e.g., super_admin, manager, worker, accountant)."
+                  }
+                }
+              },
+              "example": {
+                "user_id": 10,
+                "role_key": "manager"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    },
+                    "is_updated": {
+                      "type": "boolean",
+                      "description": "Whether the role was updated"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Role synced successfully",
+                  "is_updated": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "userNotFound": {
+                    "summary": "User not found",
+                    "value": {
+                      "message": "User not found."
+                    }
+                  },
+                  "invalidRole": {
+                    "summary": "Invalid role key",
+                    "value": {
+                      "message": "Invalid role."
+                    }
+                  },
+                  "isAdmin": {
+                    "summary": "User is WP administrator",
+                    "value": {
+                      "message": "The user already has all the accesses as part of Administrator Role"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

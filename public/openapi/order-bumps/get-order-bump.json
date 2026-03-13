@@ -1,0 +1,287 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/order_bump/{id}": {
+      "get": {
+        "operationId": "getOrderBump",
+        "summary": "GET Get Order Bump",
+        "description": "Retrieve detailed information about a specific order bump, including its configuration, conditions, and associated product variant.",
+        "tags": [
+          "Order Bumps"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The order bump ID."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_bump": {
+                      "$ref": "#/components/schemas/OrderBumpDetail"
+                    },
+                    "variant": {
+                      "$ref": "#/components/schemas/ProductVariant"
+                    }
+                  }
+                },
+                "example": {
+                  "order_bump": {
+                    "id": 1,
+                    "hash": "a1b2c3d4e5f6...",
+                    "parent_id": null,
+                    "type": "order_bump",
+                    "status": "active",
+                    "src_object_id": 42,
+                    "src_object_type": null,
+                    "title": "Add Extended Warranty",
+                    "description": "<p>Protect your purchase with our 2-year warranty plan.</p>",
+                    "conditions": [
+                      {
+                        "type": "product",
+                        "operator": "in",
+                        "values": [
+                          10,
+                          15
+                        ]
+                      }
+                    ],
+                    "config": {
+                      "discount": {
+                        "discount_type": "percentage",
+                        "discount_amount": 10
+                      },
+                      "display_conditions_if": "",
+                      "call_to_action": "Yes, add warranty!"
+                    },
+                    "priority": 1,
+                    "created_at": "2025-06-01 10:00:00",
+                    "updated_at": "2025-06-15 14:30:00"
+                  },
+                  "variant": {
+                    "id": 42,
+                    "product_id": 10,
+                    "title": "Extended Warranty - 2 Year",
+                    "price": 2999,
+                    "product": {
+                      "id": 10,
+                      "title": "Extended Warranty",
+                      "status": "publish"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order bump not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Order bump not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrderBumpDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Auto-increment ID"
+          },
+          "hash": {
+            "type": "string",
+            "description": "Auto-generated unique hash identifier"
+          },
+          "parent_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Parent promotion ID"
+          },
+          "type": {
+            "type": "string",
+            "description": "Promotion type (always order_bump)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "draft"
+            ],
+            "description": "Order bump status"
+          },
+          "src_object_id": {
+            "type": "integer",
+            "description": "Product variation ID being offered"
+          },
+          "src_object_type": {
+            "type": "string",
+            "nullable": true,
+            "description": "Source object type identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Display title"
+          },
+          "description": {
+            "type": "string",
+            "description": "HTML description shown to customers"
+          },
+          "conditions": {
+            "type": "array",
+            "description": "Array of display condition objects",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "operator": {
+                  "type": "string"
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          },
+          "config": {
+            "type": "object",
+            "description": "Configuration object",
+            "properties": {
+              "discount": {
+                "type": "object",
+                "properties": {
+                  "discount_type": {
+                    "type": "string",
+                    "enum": [
+                      "percentage",
+                      "fixed"
+                    ]
+                  },
+                  "discount_amount": {
+                    "type": "number"
+                  }
+                }
+              },
+              "display_conditions_if": {
+                "type": "string"
+              },
+              "call_to_action": {
+                "type": "string"
+              }
+            }
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Display priority ordering"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (GMT)"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (GMT)"
+          }
+        }
+      },
+      "ProductVariant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "product_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price in cents"
+          },
+          "product": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

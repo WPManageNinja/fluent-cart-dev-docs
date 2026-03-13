@@ -1,0 +1,157 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/files/delete": {
+      "delete": {
+        "operationId": "deleteFile",
+        "summary": "DELETE Delete File",
+        "description": "Delete a file from the specified storage driver. For the local driver, this requires the `manage_options` WordPress capability.",
+        "tags": [
+          "Files"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "file_path",
+            "in": "query",
+            "required": true,
+            "description": "The path of the file to delete (relative to the storage directory).",
+            "schema": {
+              "type": "string",
+              "example": "my-ebook__fluent-cart__.1710345600.pdf"
+            }
+          },
+          {
+            "name": "driver",
+            "in": "query",
+            "required": true,
+            "description": "Storage driver where the file is stored (e.g., `local`, `s3`).",
+            "schema": {
+              "type": "string",
+              "example": "local"
+            }
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": false,
+            "description": "The bucket name (required for cloud storage drivers).",
+            "schema": {
+              "type": "string",
+              "example": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message",
+                      "example": "File Deleted Successfully"
+                    },
+                    "driver": {
+                      "type": "string",
+                      "description": "Storage driver used",
+                      "example": "local"
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Path of the deleted file",
+                      "example": "my-ebook__fluent-cart__.1710345600.pdf"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "File Deleted Successfully",
+                  "driver": "local",
+                  "path": "my-ebook__fluent-cart__.1710345600.pdf"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "You are not allowed to delete file"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "You are not allowed to delete file"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "File not found"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "File not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

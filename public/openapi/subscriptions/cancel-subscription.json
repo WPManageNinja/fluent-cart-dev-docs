@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/orders/{order}/subscriptions/{subscription}/cancel": {
       "put": {
         "operationId": "cancelSubscription",
         "summary": "PUT Cancel Subscription",
-        "description": "Cancel a subscription. Requires a cancel reason.",
+        "description": "Cancel a subscription both locally and with the remote payment gateway.",
         "tags": [
           "Subscriptions"
         ],
@@ -21,7 +44,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "Order ID"
+            "description": "The parent order ID"
           },
           {
             "name": "subscription",
@@ -30,7 +53,7 @@
             "schema": {
               "type": "integer"
             },
-            "description": "Subscription ID"
+            "description": "The subscription ID"
           }
         ],
         "requestBody": {
@@ -45,7 +68,7 @@
                 "properties": {
                   "cancel_reason": {
                     "type": "string",
-                    "description": "Cancellation reason (required)",
+                    "description": "Reason for cancellation. Sanitized with sanitize_text_field.",
                     "example": "Customer requested cancellation"
                   }
                 }
@@ -65,9 +88,7 @@
                   "type": "object",
                   "properties": {
                     "message": {
-                      "type": "string",
-                      "description": "Success message",
-                      "example": "Subscription has been cancelled successfully!"
+                      "type": "string"
                     },
                     "subscription": {
                       "$ref": "#/components/schemas/Subscription"
@@ -77,16 +98,15 @@
                 "example": {
                   "message": "Subscription has been cancelled successfully!",
                   "subscription": {
-                    "id": 13468,
-                    "status": "cancelled",
-                    "canceled_at": "2025-11-14T10:00:00+00:00"
+                    "id": 1,
+                    "status": "canceled"
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Bad request - cancel reason required",
+            "description": "Bad request - missing cancel reason or remote failure",
             "content": {
               "application/json": {
                 "schema": {
@@ -97,19 +117,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Not found - subscription not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "message": "Subscription not found!"
-                }
-              }
-            }
           }
         }
       }
@@ -117,52 +124,36 @@
   },
   "components": {
     "schemas": {
-      "CancelSubscriptionRequest": {
-        "type": "object",
-        "required": [
-          "cancel_reason"
-        ],
-        "properties": {
-          "cancel_reason": {
-            "type": "string",
-            "description": "Cancellation reason (required)",
-            "example": "Customer requested cancellation"
-          }
-        }
-      },
-      "CancelSubscriptionResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "Subscription has been cancelled successfully!"
-          },
-          "subscription": {
-            "$ref": "#/components/schemas/Subscription"
-          }
-        }
-      },
       "Subscription": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
             "description": "Subscription ID",
-            "example": 13468
+            "example": 1
           },
           "status": {
             "type": "string",
             "description": "Subscription status",
-            "example": "cancelled"
-          },
-          "canceled_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Cancellation timestamp",
-            "example": "2025-11-14T10:00:00+00:00"
+            "example": "canceled"
           }
         }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -1,0 +1,252 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/licensing/products/{id}/settings": {
+      "get": {
+        "operationId": "getProductLicenseSettings",
+        "summary": "GET Get Product License Settings",
+        "description": "Retrieve the license configuration for a specific product, including per-variation activation limits and validity periods.",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The product ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "string",
+                          "description": "Whether licensing is enabled: `yes` or `no`"
+                        },
+                        "version": {
+                          "type": "string",
+                          "description": "Current software version number"
+                        },
+                        "global_update_file": {
+                          "type": "object",
+                          "description": "The downloadable file used for auto-updates",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "driver": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "variations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "variation_id": {
+                                "type": "integer"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "activation_limit": {
+                                "oneOf": [
+                                  {
+                                    "type": "integer"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "validity": {
+                                "type": "object",
+                                "properties": {
+                                  "unit": {
+                                    "type": "string",
+                                    "enum": [
+                                      "day",
+                                      "week",
+                                      "month",
+                                      "year",
+                                      "lifetime"
+                                    ]
+                                  },
+                                  "value": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              "media": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object"
+                                }
+                              },
+                              "subscription_info": {
+                                "type": "string"
+                              },
+                              "setup_fee_info": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "wp": {
+                          "type": "object",
+                          "description": "WordPress-specific settings for plugin/theme update API",
+                          "properties": {
+                            "is_wp": {
+                              "type": "string"
+                            },
+                            "readme_url": {
+                              "type": "string"
+                            },
+                            "banner_url": {
+                              "type": "string"
+                            },
+                            "icon_url": {
+                              "type": "string"
+                            },
+                            "required_php": {
+                              "type": "string"
+                            },
+                            "required_wp": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "prefix": {
+                          "type": "string"
+                        },
+                        "changelog": {
+                          "type": "string",
+                          "description": "HTML changelog content"
+                        },
+                        "license_keys": {
+                          "type": "string",
+                          "description": "Pre-defined license keys (if applicable)"
+                        }
+                      }
+                    },
+                    "is_bundle_product": {
+                      "type": "boolean",
+                      "description": "Whether the product is a bundle (licensing is disabled for bundles)"
+                    }
+                  }
+                },
+                "example": {
+                  "settings": {
+                    "enabled": "yes",
+                    "version": "1.2.0",
+                    "global_update_file": {
+                      "id": "",
+                      "driver": "local",
+                      "path": "",
+                      "url": ""
+                    },
+                    "variations": [
+                      {
+                        "variation_id": 15,
+                        "title": "Single Site License",
+                        "activation_limit": 1,
+                        "validity": {
+                          "unit": "year",
+                          "value": 1
+                        },
+                        "media": [],
+                        "subscription_info": "Billed yearly at $49.00",
+                        "setup_fee_info": ""
+                      },
+                      {
+                        "variation_id": 16,
+                        "title": "Unlimited Sites License",
+                        "activation_limit": "",
+                        "validity": {
+                          "unit": "lifetime",
+                          "value": 1
+                        },
+                        "media": [],
+                        "subscription_info": "",
+                        "setup_fee_info": ""
+                      }
+                    ],
+                    "wp": {
+                      "is_wp": "yes",
+                      "readme_url": "https://example.com/changelog",
+                      "banner_url": "https://example.com/banner.png",
+                      "icon_url": "https://example.com/icon.png",
+                      "required_php": "7.4",
+                      "required_wp": "5.6"
+                    },
+                    "prefix": "",
+                    "changelog": "<h4>1.2.0</h4><ul><li>New feature added</li></ul>",
+                    "license_keys": ""
+                  },
+                  "is_bundle_product": false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

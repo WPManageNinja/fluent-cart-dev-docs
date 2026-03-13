@@ -1,0 +1,105 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/classes/{id}": {
+      "delete": {
+        "operationId": "deleteTaxClass",
+        "summary": "DELETE Delete Tax Class",
+        "description": "Delete a tax class by ID.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tax class ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 4
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tax class deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Tax class has been deleted successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Tax class has been deleted successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to delete tax class.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to delete tax class"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Failed to delete tax class"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

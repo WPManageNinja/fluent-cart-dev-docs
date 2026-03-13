@@ -230,6 +230,14 @@ html:not(.dark) .VPSidebarItem badge {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+[data-playground-instructions] > summary {
+    list-style: none;
+}
+
+[data-playground-instructions] > summary::-webkit-details-marker {
+    display: none;
+}
+
 [data-playground-instructions] ol {
     list-style-type: decimal;
 }

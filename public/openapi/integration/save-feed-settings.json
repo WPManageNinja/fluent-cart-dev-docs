@@ -1,0 +1,159 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/integration/global-feeds/settings": {
+      "post": {
+        "operationId": "saveFeedSettings",
+        "summary": "POST Save Feed Settings",
+        "description": "Create a new integration feed or update an existing one. Validates required fields defined by the integration provider before saving.",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "integration_name",
+                  "integration"
+                ],
+                "properties": {
+                  "integration_name": {
+                    "type": "string",
+                    "description": "The integration provider key (e.g., `fluent-crm`)",
+                    "example": "fluent-crm"
+                  },
+                  "integration_id": {
+                    "type": "integer",
+                    "description": "The existing feed ID to update. Omit to create a new feed.",
+                    "example": 42
+                  },
+                  "integration": {
+                    "type": "string",
+                    "description": "JSON-encoded feed settings data containing field mappings, conditionals, and configuration",
+                    "example": "{\"name\":\"Add to customers\",\"enabled\":\"yes\",\"list_id\":\"2\",\"list_name\":\"Customers\",\"merge_fields\":{},\"conditionals\":{\"conditions\":[],\"status\":false,\"type\":\"all\"}}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    },
+                    "integration_id": {
+                      "type": "integer",
+                      "nullable": true,
+                      "description": "The feed ID (null for newly created feeds before refresh)"
+                    },
+                    "integration_name": {
+                      "type": "string",
+                      "description": "The integration provider key"
+                    },
+                    "created": {
+                      "type": "boolean",
+                      "description": "true if a new feed was created, false if an existing one was updated"
+                    },
+                    "feedData": {
+                      "type": "object",
+                      "description": "The validated and saved feed data"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Integration has been successfully saved",
+                  "integration_id": 42,
+                  "integration_name": "fluent-crm",
+                  "created": true,
+                  "feedData": {
+                    "name": "Add to customers list",
+                    "enabled": "yes",
+                    "list_id": "2",
+                    "merge_fields": {}
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Please fill up the required fields:",
+                  "errors": {
+                    "name": "Feed Name is required.",
+                    "list_id": "Contact List is required."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

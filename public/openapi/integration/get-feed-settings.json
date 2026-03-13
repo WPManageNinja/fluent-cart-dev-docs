@@ -1,0 +1,179 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/integration/global-feeds/settings": {
+      "get": {
+        "operationId": "getFeedSettings",
+        "summary": "GET Feed Settings",
+        "description": "Retrieve the settings form schema, saved values, and available shortcodes for a specific integration feed. Used to populate the feed editor when creating or editing a global feed.",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "integration_name",
+            "in": "query",
+            "required": true,
+            "description": "The integration provider key (e.g., `fluent-crm`, `webhook`)",
+            "schema": {
+              "type": "string",
+              "example": "fluent-crm"
+            }
+          },
+          {
+            "name": "integration_id",
+            "in": "query",
+            "required": false,
+            "description": "The feed ID to load existing settings for editing. Omit to get defaults for a new feed.",
+            "schema": {
+              "type": "integer",
+              "example": 42
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "description": "Current feed settings values (defaults for new, saved values for existing)"
+                    },
+                    "settings_fields": {
+                      "type": "object",
+                      "description": "Form schema defining the feed editor fields",
+                      "properties": {
+                        "fields": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/FeedSettingsField"
+                          }
+                        }
+                      }
+                    },
+                    "shortcodes": {
+                      "type": "object",
+                      "description": "Available shortcodes for dynamic field mapping"
+                    },
+                    "inputs": {
+                      "type": "object",
+                      "description": "Checkout input fields available for mapping"
+                    },
+                    "merge_fields": {
+                      "description": "Merge fields for the selected list (if applicable)"
+                    }
+                  }
+                },
+                "example": {
+                  "settings": {
+                    "conditionals": {
+                      "conditions": [],
+                      "status": false,
+                      "type": "all"
+                    },
+                    "enabled": "yes",
+                    "list_id": "",
+                    "list_name": "",
+                    "name": "",
+                    "merge_fields": {}
+                  },
+                  "settings_fields": {
+                    "fields": [
+                      {
+                        "key": "name",
+                        "label": "Feed Name",
+                        "type": "text",
+                        "required": true
+                      },
+                      {
+                        "key": "list_id",
+                        "label": "Contact List",
+                        "type": "select",
+                        "required": true,
+                        "options": []
+                      }
+                    ]
+                  },
+                  "shortcodes": {},
+                  "inputs": {},
+                  "merge_fields": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FeedSettingsField": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Field identifier"
+          },
+          "label": {
+            "type": "string",
+            "description": "Display label"
+          },
+          "type": {
+            "type": "string",
+            "description": "Field type (e.g., text, select, password)"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether the field is required"
+          },
+          "options": {
+            "type": "array",
+            "description": "Available options for select fields",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

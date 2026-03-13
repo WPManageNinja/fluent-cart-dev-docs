@@ -1,16 +1,51 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/reports/overview": {
       "get": {
         "operationId": "getReportsOverview",
-        "summary": "GET Get Reports Overview",
-        "description": "Retrieve a comprehensive overview report with key metrics.",
+        "summary": "GET Get Revenue Overview",
+        "description": "Retrieve a comprehensive year-over-year revenue overview comparing the last 12 months against the same months in the prior year. Includes monthly breakdowns, quarterly aggregations, and top revenue-generating countries.",
         "tags": [
           "Reports"
         ],
         "security": [
           {
             "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "Currency code to filter by. Defaults to store currency.",
+            "required": false
           }
         ],
         "responses": {
@@ -23,16 +58,7 @@
                   "properties": {
                     "data": {
                       "type": "object",
-                      "description": "Report overview data",
-                      "properties": {
-                        "gross_revenue": {
-                          "type": "object",
-                          "description": "Gross revenue data grouped by period",
-                          "additionalProperties": {
-                            "$ref": "#/components/schemas/RevenuePeriod"
-                          }
-                        }
-                      },
+                      "description": "Revenue overview data with gross/net revenue, quarterly breakdowns, and top countries",
                       "additionalProperties": true
                     }
                   }
@@ -40,17 +66,44 @@
                 "example": {
                   "data": {
                     "gross_revenue": {
-                      "2024-12": {
-                        "current": 10237083,
-                        "prev": 8502914,
-                        "yoy_growth": "20.39"
-                      },
                       "2025-01": {
-                        "current": 9650355,
-                        "prev": 9750643,
-                        "yoy_growth": "-1.03"
+                        "current": 500000,
+                        "prev": 350000,
+                        "yoy_growth": "42.86"
                       }
-                    }
+                    },
+                    "gross_revenue_quarterly": {
+                      "Q1-2025": {
+                        "current": 1500000,
+                        "prev_year": 1200000,
+                        "yy_growth": "25.00"
+                      }
+                    },
+                    "net_revenue": {},
+                    "net_revenue_quarterly": {},
+                    "gross_summary": {
+                      "total": 6000000,
+                      "total_prev": 4800000,
+                      "yoy_growth": "25.00"
+                    },
+                    "net_summary": {
+                      "total": 5400000,
+                      "total_prev": 4300000,
+                      "yoy_growth": "25.58"
+                    },
+                    "top_country_net": {
+                      "by_month": {
+                        "2025-01": {
+                          "US": 300000,
+                          "GB": 150000
+                        }
+                      },
+                      "by_countries": {
+                        "US": 3600000,
+                        "GB": 1800000
+                      }
+                    },
+                    "top_country_gross": {}
                   }
                 }
               }
@@ -62,44 +115,33 @@
   },
   "components": {
     "schemas": {
-      "ReportsOverviewResponse": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "object",
-            "description": "Report overview data",
-            "properties": {
-              "gross_revenue": {
-                "type": "object",
-                "description": "Gross revenue data grouped by period",
-                "additionalProperties": {
-                  "$ref": "#/components/schemas/RevenuePeriod"
-                }
-              }
-            },
-            "additionalProperties": true
-          }
-        }
-      },
       "RevenuePeriod": {
         "type": "object",
         "properties": {
           "current": {
             "type": "integer",
             "description": "Current period revenue in cents",
-            "example": 10237083
+            "example": 500000
           },
           "prev": {
             "type": "integer",
             "description": "Previous period revenue in cents",
-            "example": 8502914
+            "example": 350000
           },
           "yoy_growth": {
             "type": "string",
             "description": "Year-over-year growth percentage",
-            "example": "20.39"
+            "example": "42.86"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

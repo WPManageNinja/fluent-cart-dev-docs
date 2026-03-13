@@ -1,11 +1,36 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/products/{product}": {
       "delete": {
         "operationId": "deleteProduct",
         "summary": "DELETE Delete Product",
-        "description": "Delete a product.",
-        "tags": ["Products"],
+        "description": "Delete a product and all associated data.",
+        "tags": [
+          "Products"
+        ],
         "security": [
           {
             "ApplicationPasswords": []
@@ -15,99 +40,37 @@
           {
             "name": "product",
             "in": "path",
-            "required": true,
             "schema": {
               "type": "integer"
             },
-            "description": "Product ID"
+            "description": "The product ID to delete",
+            "required": true
           }
         ],
         "responses": {
           "200": {
-            "description": "Product deleted successfully",
+            "description": "Successful response.",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "description": "Success message",
-                      "example": "Selected product and associated data has been deleted"
-                    },
-                    "data": {
-                      "type": "string",
-                      "description": "Response data (empty string on success)",
-                      "example": ""
-                    }
-                  }
-                },
                 "example": {
-                  "message": "Selected product and associated data has been deleted",
-                  "data": ""
+                  "message": "Product deleted successfully"
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad request - product cannot be deleted (has pending orders) or deletion failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "examples": {
-                  "pendingOrders": {
-                    "value": {
-                      "code": 400,
-                      "message": "This product cannot be deleted at the moment. There are pending orders associated with it. Deleting the product will disrupt the order processing and might cause inconvenience to our customers.",
-                      "data": ""
-                    }
-                  },
-                  "deletionFailed": {
-                    "value": {
-                      "code": 400,
-                      "message": "Product deletion failed!",
-                      "data": ""
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Product not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": 404,
-                  "message": "Product not found in database.",
-                  "data": ""
-                }
-              }
-            }
-          }
-        }
-      },
-      "DeleteProductResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "Selected product and associated data has been deleted"
-          },
-          "data": {
-            "type": "string",
-            "description": "Response data (empty string on success)",
-            "example": ""
           }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
   }
 }
-

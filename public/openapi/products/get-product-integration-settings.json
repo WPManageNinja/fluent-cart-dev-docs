@@ -1,0 +1,104 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/{product_id}/integrations/{integration_name}/settings": {
+      "get": {
+        "operationId": "getProductIntegrationSettings",
+        "summary": "GET Get Product Integration Settings",
+        "description": "Retrieve settings for a specific integration type on a product. Returns the integration form configuration, existing settings, and product variations.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The product ID",
+            "required": true
+          },
+          {
+            "name": "integration_name",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Integration provider name (e.g., fluentcrm)",
+            "required": true
+          },
+          {
+            "name": "integration_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Existing integration feed ID to load for editing",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "settings": {
+                    "conditional_variation_ids": []
+                  },
+                  "fields": [],
+                  "product_variations": [
+                    {
+                      "id": 456,
+                      "title": "Monthly Plan"
+                    }
+                  ],
+                  "scope": "product"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

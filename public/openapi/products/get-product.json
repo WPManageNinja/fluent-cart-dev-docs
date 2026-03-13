@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/products/{product}": {
       "get": {
         "operationId": "getProduct",
-        "summary": "GET Get Product Details",
-        "description": "Retrieve detailed information about a specific product.",
+        "summary": "GET Get Product",
+        "description": "Retrieve a single product by ID.",
         "tags": [
           "Products"
         ],
@@ -17,87 +40,39 @@
           {
             "name": "product",
             "in": "path",
-            "required": true,
             "schema": {
               "type": "integer"
             },
-            "description": "Product ID"
+            "description": "The product ID",
+            "required": true
+          },
+          {
+            "name": "with[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Relations to eager load (e.g., detail, variants, product_menu)",
+            "required": false
           }
         ],
         "responses": {
           "200": {
-            "description": "Successful response. Returns detailed product information.",
+            "description": "Successful response.",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "product": {
-                      "$ref": "#/components/schemas/Product"
-                    }
-                  }
-                },
                 "example": {
                   "product": {
-                    "ID": 7529088,
-                    "post_date": "2025-11-11 10:40:11",
-                    "post_date_gmt": "2025-11-11 10:40:11",
-                    "post_content": "This modern sweatshirt is designed for individuals who value comfort without compromising on style.",
-                    "post_title": "Modern Sweatshirt",
-                    "post_excerpt": "A minimalistic yet stylish sweatshirt perfect for everyday wear.",
+                    "ID": 123,
+                    "post_title": "Example Product",
                     "post_status": "publish",
-                    "comment_status": "closed",
-                    "ping_status": "closed",
-                    "post_name": "modern-sweatshirt-06-06-2025-12-51-25",
-                    "post_modified": "2025-11-11 10:40:11",
-                    "post_modified_gmt": "2025-11-11 10:40:11",
-                    "guid": "https://YourWebsite.com/?items=modern-sweatshirt-06-06-2025-12-51-25",
-                    "post_type": "fluent-products",
-                    "thumbnail": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/placeholder.svg",
-                    "detail": {
-                      "id": 13,
-                      "post_id": 7529088,
-                      "fulfillment_type": "physical",
-                      "min_price": 500,
-                      "max_price": 590,
-                      "default_variation_id": "0",
-                      "default_media": null,
-                      "manage_stock": "1",
-                      "stock_availability": "in-stock",
-                      "variation_type": "simple_variations",
-                      "manage_downloadable": "0",
-                      "other_info": {
-                        "shipping_class": 6,
-                        "group_pricing_by": "payment_type",
-                        "use_pricing_table": "no"
-                      },
-                      "created_at": "2025-06-06T12:51:25+00:00",
-                      "updated_at": "2025-11-12T11:40:06+00:00",
-                      "featured_media": null,
-                      "formatted_min_price": "&#36;5.00",
-                      "formatted_max_price": "&#36;5.90"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Product not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Product not found"
-                    },
-                    "data": {
-                      "type": "object",
-                      "nullable": true
-                    }
-                  }
+                    "post_excerpt": "Short description",
+                    "post_content": "Full description"
+                  },
+                  "product_menu": []
                 }
               }
             }
@@ -107,387 +82,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "ProductResponse": {
-        "type": "object",
-        "properties": {
-          "product": {
-            "$ref": "#/components/schemas/Product"
-          }
-        }
-      },
-      "Product": {
-        "type": "object",
-        "properties": {
-          "ID": {
-            "type": "integer",
-            "description": "Product ID",
-            "example": 7529088
-          },
-          "post_date": {
-            "type": "string",
-            "description": "Post creation date",
-            "example": "2025-11-11 10:40:11"
-          },
-          "post_date_gmt": {
-            "type": "string",
-            "description": "Post creation date (GMT)",
-            "example": "2025-11-11 10:40:11"
-          },
-          "post_content": {
-            "type": "string",
-            "description": "Product description",
-            "example": "This modern sweatshirt is designed for individuals who value comfort without compromising on style."
-          },
-          "post_title": {
-            "type": "string",
-            "description": "Product title",
-            "example": "Modern Sweatshirt"
-          },
-          "post_excerpt": {
-            "type": "string",
-            "description": "Product excerpt",
-            "example": "A minimalistic yet stylish sweatshirt perfect for everyday wear."
-          },
-          "post_status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "publish",
-              "private"
-            ],
-            "description": "Post status",
-            "example": "publish"
-          },
-          "comment_status": {
-            "type": "string",
-            "description": "Comment status",
-            "example": "closed"
-          },
-          "ping_status": {
-            "type": "string",
-            "description": "Ping status",
-            "example": "closed"
-          },
-          "post_name": {
-            "type": "string",
-            "description": "Post slug",
-            "example": "modern-sweatshirt-06-06-2025-12-51-25"
-          },
-          "post_modified": {
-            "type": "string",
-            "description": "Post last modified date",
-            "example": "2025-11-11 10:40:11"
-          },
-          "post_modified_gmt": {
-            "type": "string",
-            "description": "Post last modified date (GMT)",
-            "example": "2025-11-11 10:40:11"
-          },
-          "guid": {
-            "type": "string",
-            "format": "uri",
-            "description": "Global unique identifier",
-            "example": "https://YourWebsite.com/?items=modern-sweatshirt-06-06-2025-12-51-25"
-          },
-          "post_type": {
-            "type": "string",
-            "description": "Post type",
-            "example": "fluent-products"
-          },
-          "thumbnail": {
-            "type": "string",
-            "format": "uri",
-            "description": "Thumbnail image URL",
-            "example": "https://YourWebsite.com/wp-content/plugins/fluent-cart/assets/images/placeholder.svg"
-          },
-          "detail": {
-            "$ref": "#/components/schemas/ProductDetail"
-          }
-        }
-      },
-      "ProductDetail": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Product detail ID",
-            "example": 33
-          },
-          "post_id": {
-            "type": "integer",
-            "description": "Product post ID",
-            "example": 7529108
-          },
-          "fulfillment_type": {
-            "type": "string",
-            "enum": [
-              "digital",
-              "physical"
-            ],
-            "description": "Fulfillment type",
-            "example": "digital"
-          },
-          "min_price": {
-            "type": "integer",
-            "description": "Minimum price in cents",
-            "example": 8900
-          },
-          "max_price": {
-            "type": "integer",
-            "description": "Maximum price in cents",
-            "example": 129900
-          },
-          "default_variation_id": {
-            "type": "string",
-            "description": "Default variation ID",
-            "example": "145"
-          },
-          "default_media": {
-            "type": "object",
-            "nullable": true,
-            "description": "Default media"
-          },
-          "manage_stock": {
-            "type": "string",
-            "description": "Whether stock is managed",
-            "example": "0"
-          },
-          "stock_availability": {
-            "type": "string",
-            "description": "Stock availability status",
-            "example": "in-stock"
-          },
-          "variation_type": {
-            "type": "string",
-            "enum": [
-              "simple",
-              "simple_variations"
-            ],
-            "description": "Variation type",
-            "example": "simple_variations"
-          },
-          "manage_downloadable": {
-            "type": "string",
-            "description": "Whether downloadable files are managed",
-            "example": "1"
-          },
-          "other_info": {
-            "type": "object",
-            "description": "Additional product information",
-            "properties": {
-              "shipping_class": {
-                "type": "integer",
-                "description": "Shipping class ID",
-                "example": 6
-              },
-              "group_pricing_by": {
-                "type": "string",
-                "enum": [
-                  "payment_type",
-                  "repeat_interval",
-                  "none"
-                ],
-                "example": "payment_type"
-              },
-              "use_pricing_table": {
-                "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
-                "example": "no"
-              },
-              "tax_class": {
-                "type": "integer",
-                "description": "Tax class ID"
-              }
-            }
-          },
-          "formatted_min_price": {
-            "type": "string",
-            "description": "Formatted minimum price",
-            "example": "&#36;5.00"
-          },
-          "formatted_max_price": {
-            "type": "string",
-            "description": "Formatted maximum price",
-            "example": "&#36;5.90"
-          },
-          "gallery_image": {
-            "type": "object",
-            "nullable": true,
-            "description": "Gallery images"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2021-09-22T07:09:20+00:00"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp",
-            "example": "2025-09-24T09:09:50+00:00"
-          },
-          "featured_media": {
-            "type": "object",
-            "nullable": true,
-            "description": "Featured media"
-          },
-          "variations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProductVariation"
-            },
-            "description": "Product variations"
-          }
-        }
-      },
-      "ProductVariation": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "Variation ID",
-            "example": 145
-          },
-          "post_id": {
-            "type": "integer",
-            "description": "Product post ID",
-            "example": 7529108
-          },
-          "serial_index": {
-            "type": "integer",
-            "description": "Serial index",
-            "example": 6
-          },
-          "sold_individually": {
-            "type": "integer",
-            "description": "Whether sold individually",
-            "example": 0
-          },
-          "variation_title": {
-            "type": "string",
-            "description": "Variation title",
-            "example": "Unlimited Sites Lifetime License"
-          },
-          "variation_identifier": {
-            "type": "string",
-            "description": "Variation identifier",
-            "example": "6"
-          },
-          "manage_stock": {
-            "type": "string",
-            "description": "Whether stock is managed",
-            "example": "0"
-          },
-          "payment_type": {
-            "type": "string",
-            "description": "Payment type",
-            "example": "onetime"
-          },
-          "stock_status": {
-            "type": "string",
-            "description": "Stock status",
-            "example": "in-stock"
-          },
-          "backorders": {
-            "type": "integer",
-            "description": "Backorders allowed",
-            "example": 0
-          },
-          "total_stock": {
-            "type": "integer",
-            "description": "Total stock",
-            "example": 0
-          },
-          "on_hold": {
-            "type": "integer",
-            "description": "Stock on hold",
-            "example": 0
-          },
-          "committed": {
-            "type": "integer",
-            "description": "Committed stock",
-            "example": 0
-          },
-          "available": {
-            "type": "integer",
-            "description": "Available stock",
-            "example": 0
-          },
-          "fulfillment_type": {
-            "type": "string",
-            "description": "Fulfillment type",
-            "example": "digital"
-          },
-          "item_status": {
-            "type": "string",
-            "description": "Item status",
-            "example": "active"
-          },
-          "manage_cost": {
-            "type": "string",
-            "description": "Whether cost is managed",
-            "example": "false"
-          },
-          "item_price": {
-            "type": "integer",
-            "description": "Item price in cents",
-            "example": 129900
-          },
-          "item_cost": {
-            "type": "integer",
-            "description": "Item cost in cents",
-            "example": 0
-          },
-          "compare_price": {
-            "type": "integer",
-            "description": "Compare price in cents",
-            "example": 0
-          },
-          "shipping_class": {
-            "type": "string",
-            "description": "Shipping class",
-            "example": "0"
-          },
-          "other_info": {
-            "type": "object",
-            "description": "Additional variation information"
-          },
-          "downloadable": {
-            "type": "string",
-            "description": "Whether downloadable",
-            "example": "1"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Creation timestamp"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Last update timestamp"
-          },
-          "thumbnail": {
-            "type": "object",
-            "nullable": true,
-            "description": "Thumbnail image"
-          },
-          "formatted_total": {
-            "type": "string",
-            "description": "Formatted total price",
-            "example": "&#36;1,299.00"
-          },
-          "media": {
-            "type": "object",
-            "nullable": true,
-            "description": "Media"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -1,0 +1,201 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/{product_id}/integrations/{integration_name}/settings": {
+      "get": {
+        "operationId": "getProductIntegrationSettings",
+        "summary": "GET Product Integration Settings",
+        "description": "Retrieve the feed editor settings for a specific integration provider, scoped to a product. Returns form schema, saved values, available shortcodes, and the product's variation list for conditional targeting.",
+        "tags": [
+          "Integrations"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "description": "The product ID",
+            "schema": {
+              "type": "integer",
+              "example": 123
+            }
+          },
+          {
+            "name": "integration_name",
+            "in": "path",
+            "required": true,
+            "description": "The integration provider key (e.g., `fluent-crm`)",
+            "schema": {
+              "type": "string",
+              "example": "fluent-crm"
+            }
+          },
+          {
+            "name": "integration_id",
+            "in": "query",
+            "required": false,
+            "description": "The existing feed ID to load for editing. Omit for new feed defaults.",
+            "schema": {
+              "type": "integer",
+              "example": 15
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settings": {
+                      "type": "object",
+                      "description": "Current feed settings values (defaults for new, saved values for existing)"
+                    },
+                    "settings_fields": {
+                      "type": "object",
+                      "description": "Form schema defining the feed editor fields",
+                      "properties": {
+                        "fields": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "required": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "shortcodes": {
+                      "type": "object",
+                      "description": "Available shortcodes for dynamic field mapping"
+                    },
+                    "inputs": {
+                      "type": "object",
+                      "description": "Checkout input fields available for mapping"
+                    },
+                    "merge_fields": {
+                      "description": "Merge fields for the selected list (if applicable)"
+                    },
+                    "product_variations": {
+                      "type": "array",
+                      "description": "List of the product's variations, used for targeting specific variations",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Variation ID"
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Variation title"
+                          }
+                        }
+                      }
+                    },
+                    "scope": {
+                      "type": "string",
+                      "description": "Always 'product' for this endpoint",
+                      "example": "product"
+                    }
+                  }
+                },
+                "example": {
+                  "settings": {
+                    "conditionals": {
+                      "conditions": [],
+                      "status": false,
+                      "type": "all"
+                    },
+                    "enabled": "yes",
+                    "list_id": "",
+                    "list_name": "",
+                    "name": "",
+                    "merge_fields": {},
+                    "conditional_variation_ids": []
+                  },
+                  "settings_fields": {
+                    "fields": [
+                      {
+                        "key": "name",
+                        "label": "Feed Name",
+                        "type": "text",
+                        "required": true
+                      }
+                    ]
+                  },
+                  "shortcodes": {},
+                  "inputs": {},
+                  "merge_fields": {},
+                  "product_variations": [
+                    {
+                      "id": 101,
+                      "title": "Basic Plan"
+                    },
+                    {
+                      "id": 102,
+                      "title": "Pro Plan"
+                    }
+                  ],
+                  "scope": "product"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

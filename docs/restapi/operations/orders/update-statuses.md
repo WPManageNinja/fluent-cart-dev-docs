@@ -1,8 +1,7 @@
 ---
-title: Update Order Statuses
-description: "Update order statuses including payment status, shipping status, and order status."
+title: Update Statuses
+description: "Update the order status or shipping status for an order."
 outline: false
 aside: false
 ---
-<OAOperation operationId="updateOrderStatuses" />
-
+<OAOperation operationId="updateOrderStatuses" specUrl="/openapi/public/orders/update-statuses.json" />

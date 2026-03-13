@@ -1,0 +1,178 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/orders/{order_uuid}": {
+      "get": {
+        "operationId": "getOrderDetails",
+        "summary": "GET Get Order Details",
+        "description": "Retrieve full details for a specific order including line items, transactions, subscriptions, downloads, and addresses. The order must belong to the authenticated customer.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_uuid",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The UUID of the order (alphanumeric with dashes)",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns full order details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order": {
+                      "type": "object"
+                    },
+                    "section_parts": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "order": {
+                    "id": 101,
+                    "fulfillment_type": "digital",
+                    "type": "one-time",
+                    "created_at": "2025-06-15 10:30:00",
+                    "invoice_no": "INV-000101",
+                    "currency": "USD",
+                    "uuid": "abc-123-def",
+                    "status": "completed",
+                    "payment_status": "paid",
+                    "shipping_status": "",
+                    "billing_address_text": "John Doe, 123 Main St, New York, NY 10001, US",
+                    "shipping_address_text": "",
+                    "subtotal": 4999,
+                    "total_amount": 4999,
+                    "total_paid": 4999,
+                    "total_refund": 0,
+                    "shipping_total": 0,
+                    "coupon_discount_total": 0,
+                    "manual_discount_total": 0,
+                    "tax_total": 0,
+                    "tax_behavior": "exclusive",
+                    "shipping_tax": 0,
+                    "payment_method": "stripe",
+                    "order_items": [
+                      {
+                        "id": 1,
+                        "variation_id": 10,
+                        "product_id": 5,
+                        "post_title": "Premium Plugin",
+                        "title": "Premium Plugin - Single Site",
+                        "quantity": 1,
+                        "unit_price": 4999,
+                        "subtotal": 4999,
+                        "payment_type": "one-time",
+                        "meta_lines": [],
+                        "extra_amount": 0,
+                        "image": "https://example.com/wp-content/uploads/product.jpg",
+                        "variant_image": "",
+                        "url": "https://example.com/product/premium-plugin/",
+                        "line_meta": {}
+                      }
+                    ],
+                    "subscriptions": [],
+                    "downloads": [
+                      {
+                        "file_size": "2.5 MB",
+                        "title": "premium-plugin-v2.zip",
+                        "download_url": "https://example.com/?fct_download=..."
+                      }
+                    ],
+                    "transactions": [
+                      {
+                        "id": 50,
+                        "uuid": "txn-abc-123",
+                        "order_id": 101,
+                        "amount": 4999,
+                        "status": "succeeded",
+                        "payment_method": "stripe",
+                        "created_at": "2025-06-15 10:30:00"
+                      }
+                    ]
+                  },
+                  "section_parts": {
+                    "before_summary": "",
+                    "after_summary": "",
+                    "after_licenses": "",
+                    "after_subscriptions": "",
+                    "after_downloads": "",
+                    "after_transactions": "",
+                    "end_of_order": ""
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Order not found"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not logged in.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not logged in"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

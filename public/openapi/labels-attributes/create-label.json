@@ -1,0 +1,160 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/labels": {
+      "post": {
+        "operationId": "createLabel",
+        "summary": "POST Create Label",
+        "description": "Create a new label and optionally attach it to an entity (order, customer, etc.) in a single request.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLabelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Label created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Label"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Label created successfully!"
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "id": 4,
+                    "value": "Returning Customer"
+                  },
+                  "message": "Label created successfully!"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error - duplicate label.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": {
+                    "value": [
+                      "Label must be unique."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateLabelRequest": {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "The label name. Must be unique across all labels.",
+            "example": "Returning Customer"
+          },
+          "bind_to_type": {
+            "type": "string",
+            "description": "The model class name to attach the label to (e.g., `Order`, `Customer`). Short class name or fully-qualified namespace.",
+            "example": "Order"
+          },
+          "bind_to_id": {
+            "type": "string",
+            "description": "The ID of the entity to attach the label to. Required if `bind_to_type` is provided.",
+            "example": "42"
+          }
+        }
+      },
+      "Label": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Label ID",
+            "example": 4
+          },
+          "value": {
+            "type": "string",
+            "description": "Label name",
+            "example": "Returning Customer"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

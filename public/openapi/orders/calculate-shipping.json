@@ -1,0 +1,140 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/calculate-shipping": {
+      "post": {
+        "operationId": "calculateShipping",
+        "summary": "POST Calculate Shipping",
+        "description": "Calculate shipping charges for order items with a specific shipping method.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "order_items",
+                  "shipping_id"
+                ],
+                "properties": {
+                  "order_items": {
+                    "type": "array",
+                    "description": "Array of order items, each with `id` (variation ID) and `quantity`",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Variation ID"
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "Item quantity"
+                        }
+                      }
+                    }
+                  },
+                  "shipping_id": {
+                    "type": "integer",
+                    "description": "ID of the shipping method to calculate charges for"
+                  }
+                }
+              },
+              "example": {
+                "order_items": [
+                  {
+                    "id": 1,
+                    "quantity": 2
+                  }
+                ],
+                "shipping_id": 5
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipping calculated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    },
+                    "shipping_charge": {
+                      "type": "integer",
+                      "description": "Total shipping charge in cents"
+                    },
+                    "order_items": {
+                      "type": "object",
+                      "description": "Order items keyed by ID with calculated shipping"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Shipping updated",
+                  "shipping_charge": 500,
+                  "order_items": {
+                    "1": {
+                      "id": 1,
+                      "quantity": 2,
+                      "shipping_charge": 500,
+                      "unit_price": 2500,
+                      "other_info": {},
+                      "discount_total": 0,
+                      "fulfillment_type": "physical"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

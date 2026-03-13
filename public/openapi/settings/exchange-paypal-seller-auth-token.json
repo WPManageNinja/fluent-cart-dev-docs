@@ -1,0 +1,106 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/payment-methods/paypal/seller-auth-token": {
+      "post": {
+        "operationId": "exchangePaypalSellerAuthToken",
+        "summary": "POST Exchange PayPal Seller Auth Token",
+        "description": "Exchange the PayPal authorization code for a seller access token during the PayPal Connect onboarding flow. This retrieves merchant credentials and saves them to the gateway settings.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "authCode",
+                  "sharedId",
+                  "mode"
+                ],
+                "properties": {
+                  "authCode": {
+                    "type": "string",
+                    "description": "The authorization code received from PayPal OAuth redirect.",
+                    "example": "C21AAF..."
+                  },
+                  "sharedId": {
+                    "type": "string",
+                    "description": "The PayPal partner shared/client ID used during authentication.",
+                    "example": "AaBbCc..."
+                  },
+                  "mode": {
+                    "type": "string",
+                    "description": "Environment mode: `test` or `live`.",
+                    "enum": [
+                      "test",
+                      "live"
+                    ],
+                    "example": "live"
+                  }
+                }
+              },
+              "example": {
+                "authCode": "C21AAF...",
+                "sharedId": "AaBbCc...",
+                "mode": "live"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Credentials are saved to the PayPal gateway settings and webhooks are automatically registered.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

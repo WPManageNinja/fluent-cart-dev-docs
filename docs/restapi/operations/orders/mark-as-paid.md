@@ -1,8 +1,7 @@
 ---
 title: Mark Order as Paid
-description: "Mark an order as paid manually. This is useful for manual payment processing or offline payments."
+description: "Mark a pending order as paid, creating or updating the transaction record."
 outline: false
 aside: false
 ---
-<OAOperation operationId="markOrderAsPaid" />
-
+<OAOperation operationId="markOrderAsPaid" specUrl="/openapi/public/orders/mark-as-paid.json" />

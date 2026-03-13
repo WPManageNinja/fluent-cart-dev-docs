@@ -1,8 +1,7 @@
 ---
 title: Delete Coupon
-description: "Delete a coupon."
+description: "Permanently delete a coupon."
 outline: false
 aside: false
 ---
-<OAOperation operationId="deleteCoupon" />
-
+<OAOperation operationId="deleteCoupon" specUrl="/openapi/public/coupons/delete-coupon.json" />

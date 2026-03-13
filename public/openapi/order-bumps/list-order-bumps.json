@@ -1,0 +1,301 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/order_bump": {
+      "get": {
+        "operationId": "listOrderBumps",
+        "summary": "GET List Order Bumps",
+        "description": "Retrieve a paginated list of order bumps with optional filtering, sorting, and search.",
+        "tags": [
+          "Order Bumps"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "id"
+            },
+            "description": "Column to sort by."
+          },
+          {
+            "name": "sort_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": "Sort direction."
+          },
+          {
+            "name": "active_view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "draft"
+              ]
+            },
+            "description": "Filter by status tab."
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search by order bump title or description. Partial matches supported."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Page number for pagination."
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of records per page."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_bumps": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": "integer"
+                        },
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "last_page": {
+                          "type": "integer"
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/OrderBumpListItem"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "order_bumps": {
+                    "total": 5,
+                    "per_page": 15,
+                    "current_page": 1,
+                    "last_page": 1,
+                    "data": [
+                      {
+                        "id": 1,
+                        "hash": "a1b2c3d4e5f6...",
+                        "parent_id": null,
+                        "type": "order_bump",
+                        "status": "active",
+                        "src_object_id": 42,
+                        "src_object_type": null,
+                        "title": "Add Extended Warranty",
+                        "description": "<p>Protect your purchase with our 2-year warranty plan.</p>",
+                        "conditions": [],
+                        "config": {
+                          "discount": {
+                            "discount_type": "percentage",
+                            "discount_amount": 10
+                          },
+                          "display_conditions_if": "",
+                          "call_to_action": "Yes, add warranty!"
+                        },
+                        "priority": 1,
+                        "created_at": "2025-06-01 10:00:00",
+                        "updated_at": "2025-06-15 14:30:00",
+                        "product_variant": {
+                          "id": 42,
+                          "product_id": 10,
+                          "title": "Extended Warranty - 2 Year",
+                          "price": 2999,
+                          "product": {
+                            "id": 10,
+                            "title": "Extended Warranty",
+                            "status": "publish"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrderBumpListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Auto-increment ID"
+          },
+          "hash": {
+            "type": "string",
+            "description": "Auto-generated unique hash identifier"
+          },
+          "parent_id": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Parent promotion ID"
+          },
+          "type": {
+            "type": "string",
+            "description": "Promotion type (always order_bump for this API)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "draft"
+            ],
+            "description": "Order bump status"
+          },
+          "src_object_id": {
+            "type": "integer",
+            "description": "Product variation ID being offered"
+          },
+          "src_object_type": {
+            "type": "string",
+            "nullable": true,
+            "description": "Source object type identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Display title"
+          },
+          "description": {
+            "type": "string",
+            "description": "HTML description shown to customers"
+          },
+          "conditions": {
+            "type": "array",
+            "description": "JSON-decoded array of display conditions"
+          },
+          "config": {
+            "type": "object",
+            "description": "JSON-decoded configuration object"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Display priority ordering"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (GMT)"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (GMT)"
+          },
+          "product_variant": {
+            "type": "object",
+            "description": "Associated product variant with parent product",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "product_id": {
+                "type": "integer"
+              },
+              "title": {
+                "type": "string"
+              },
+              "price": {
+                "type": "integer",
+                "description": "Price in cents"
+              },
+              "product": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

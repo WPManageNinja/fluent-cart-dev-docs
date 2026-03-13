@@ -1,0 +1,184 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/checkout-fields/save-fields": {
+      "post": {
+        "operationId": "saveCheckoutFields",
+        "summary": "POST Save Checkout Fields",
+        "description": "Update the checkout field visibility and required settings. The endpoint enforces name field logic automatically: if `first_name` or `last_name` is enabled, `full_name` is automatically disabled; if neither is enabled, `full_name` is automatically enabled and marked as required.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "settings"
+                ],
+                "properties": {
+                  "settings": {
+                    "type": "object",
+                    "description": "Checkout field settings object. Only keys matching existing settings are accepted.",
+                    "properties": {
+                      "basic_info": {
+                        "type": "object",
+                        "description": "Basic information field settings.",
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "string",
+                              "description": "Whether the field is shown: `yes` or `no`.",
+                              "enum": [
+                                "yes",
+                                "no"
+                              ]
+                            },
+                            "required": {
+                              "type": "string",
+                              "description": "Whether the field is required: `yes` or `no`.",
+                              "enum": [
+                                "yes",
+                                "no"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "billing_address": {
+                        "type": "object",
+                        "description": "Billing address field settings (same structure as `basic_info`).",
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "string",
+                              "enum": [
+                                "yes",
+                                "no"
+                              ]
+                            },
+                            "required": {
+                              "type": "string",
+                              "enum": [
+                                "yes",
+                                "no"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "shipping_address": {
+                        "type": "object",
+                        "description": "Shipping address field settings (same structure as `basic_info`).",
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
+                              "type": "string",
+                              "enum": [
+                                "yes",
+                                "no"
+                              ]
+                            },
+                            "required": {
+                              "type": "string",
+                              "enum": [
+                                "yes",
+                                "no"
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "settings": {
+                  "basic_info": {
+                    "full_name": {
+                      "enabled": "no",
+                      "required": "no"
+                    },
+                    "first_name": {
+                      "enabled": "yes",
+                      "required": "yes"
+                    },
+                    "last_name": {
+                      "enabled": "yes",
+                      "required": "no"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Checkout fields has been updated successfully."
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Checkout fields has been updated successfully."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

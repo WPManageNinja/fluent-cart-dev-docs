@@ -1,0 +1,125 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/preview-default-template": {
+      "post": {
+        "operationId": "previewDefaultTemplate",
+        "summary": "POST Preview Default Template",
+        "description": "Generate an HTML preview of a default (built-in) email template. Unlike the custom block editor preview, this renders the PHP-based default template using dummy preview data, wrapped in the standard email layout with header and footer.",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "template"
+                ],
+                "properties": {
+                  "template": {
+                    "type": "string",
+                    "description": "The template path name to preview. Corresponds to the template_path value from the notification configuration",
+                    "enum": [
+                      "order.paid.admin",
+                      "order.paid.customer",
+                      "order.refunded.admin",
+                      "order.refunded.customer",
+                      "order.shipped.customer",
+                      "order.delivered.customer",
+                      "order.placed.admin",
+                      "order.placed.customer",
+                      "order.reminder.overdue.customer",
+                      "order.reminder.overdue.admin",
+                      "subscription.renewal.customer",
+                      "subscription.renewal.admin",
+                      "subscription.canceled.customer",
+                      "subscription.canceled.admin",
+                      "subscription.reminder.customer",
+                      "subscription.reminder.admin",
+                      "subscription.trial_end.customer",
+                      "subscription.trial_end.admin"
+                    ],
+                    "example": "order.paid.customer"
+                  }
+                }
+              },
+              "example": {
+                "template": "order.paid.customer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with rendered HTML",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string",
+                          "description": "Fully rendered email HTML with the default PHP template, dummy preview data, header, footer, and resolved shortcodes. All links and buttons are disabled via injected CSS",
+                          "example": "<!DOCTYPE html><html>...rendered email HTML...</html>"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "content": "<!DOCTYPE html><html>...rendered email HTML...</html>"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

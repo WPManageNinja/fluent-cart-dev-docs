@@ -3,7 +3,7 @@
 import DefaultTheme from 'vitepress/theme'
 import { h } from 'vue'
 import type { Theme } from 'vitepress'
-import { theme, useOpenapi } from 'vitepress-openapi/client'
+import { theme } from 'vitepress-openapi/client'
 import 'vitepress-openapi/dist/style.css'
 import Mermaid from './components/Mermaid.vue'
 import './custom.css'
@@ -48,233 +48,11 @@ export default {
   async enhanceApp({ app, router, siteData }) {
     app.component('Mermaid', Mermaid)
     
-    // Always register OpenAPI theme components (needed for OAOperation and OASpec components)
+    // Register OpenAPI theme components (OAOperation loads specs lazily via specUrl prop)
     theme.enhanceApp({ app, router, siteData })
-    
-    // Initialize OpenAPI with an empty spec IMMEDIATELY to prevent errors during SSR
-    // This ensures methods exist during server-side rendering
-    useOpenapi({
-      spec: {
-        openapi: '3.0.0',
-        info: {
-          title: 'FluentCart API',
-          version: '1.0.0',
-          description: 'Loading API documentation...'
-        },
-        paths: {},
-        components: {
-          schemas: {}
-        }
-      }
-    })
-    
-    // OpenAPI integration - load spec data for OpenAPI pages
-    // This needs to run on client side only
-    if (typeof window !== 'undefined') {
-      // Variable to track if spec is loaded
-      let specLoaded = false
-      
-      // Load spec data for any OpenAPI page
-      const loadOpenAPISpec = async () => {
-        if (specLoaded) return // Don't reload if already loaded
-        
-        // Show loading indicator on REST API pages
-        const isRestAPIPage = window.location.pathname.includes('/restapi/')
-        if (isRestAPIPage) {
-          toggleLoadingIndicator(true)
-        }
-        
-        try {
-          // Fetch the auto-generated manifest file that lists all JSON specs
-          const manifestResponse = await fetch('/openapi/public/manifest.json')
-          if (!manifestResponse.ok) {
-            console.error('Failed to load OpenAPI manifest')
-            toggleLoadingIndicator(false)
-            return
-          }
-          
-          const manifest = await manifestResponse.json()
-          const specFiles: string[] = manifest.files || []
-          
-          if (specFiles.length === 0) {
-            console.warn('No OpenAPI spec files found in manifest')
-            return
-          }
-          
-          // Fetch all spec files listed in the manifest
-          const specs = await Promise.all(
-            specFiles.map(async (file) => {
-              try {
-                const response = await fetch(file)
-                if (response.ok) {
-                  return await response.json()
-                }
-                return null
-              } catch (error) {
-                console.warn(`Failed to load ${file}:`, error)
-                return null
-              }
-            })
-          )
-          
-          // Filter out null values and merge specs
-          const validSpecs = specs.filter(spec => spec !== null)
-          
-          if (validSpecs.length > 0) {
-            // Start with base spec
-            const baseSpec = validSpecs.find(spec => spec.openapi) || validSpecs[0]
-            const mergedSpec = {
-              ...baseSpec,
-              paths: {},
-              components: {
-                ...baseSpec.components,
-                schemas: { ...baseSpec.components?.schemas }
-              }
-            }
-            
-            // First merge all schemas, then merge paths (so $ref can resolve)
-            validSpecs.forEach(spec => {
-              if (spec.components?.schemas) {
-                Object.assign(mergedSpec.components.schemas, spec.components.schemas)
-              }
-            })
-            
-            // Then merge paths after all schemas are available
-            validSpecs.forEach(spec => {
-              if (spec.paths) {
-                Object.keys(spec.paths).forEach(path => {
-                  if (!mergedSpec.paths[path]) {
-                    mergedSpec.paths[path] = {}
-                  }
-                  // Merge HTTP methods for the same path
-                  Object.assign(mergedSpec.paths[path], spec.paths[path])
-                })
-              }
-            })
-            
-            // Set the merged OpenAPI specification
-            useOpenapi({ 
-              spec: mergedSpec, 
-            })
-            specLoaded = true
-            console.log('✓ OpenAPI spec loaded successfully')
-            
-            // Hide loading indicator
-            toggleLoadingIndicator(false)
-          }
-        } catch (error) {
-          console.error('Error loading OpenAPI spec:', error)
-          specLoaded = true // Mark as attempted even if failed
-          toggleLoadingIndicator(false)
-        }
-      }
-      
-      // Function to show/hide loading indicator
-      const toggleLoadingIndicator = (show: boolean) => {
-        let loadingIndicator = document.getElementById('openapi-loading-indicator')
-        
-        if (show && !loadingIndicator) {
-          const contentContainer = document.querySelector('.vp-doc') || document.querySelector('main')
-          if (contentContainer) {
-            loadingIndicator = document.createElement('div')
-            loadingIndicator.id = 'openapi-loading-indicator'
-            loadingIndicator.innerHTML = `
-              <div style="
-                padding: 40px 20px;
-                text-align: center;
-                color: var(--vp-c-text-2);
-                font-size: 0.9rem;
-              ">
-                <div style="
-                  display: inline-block;
-                  width: 24px;
-                  height: 24px;
-                  border: 3px solid var(--vp-c-divider);
-                  border-top-color: var(--vp-c-brand-1);
-                  border-radius: 50%;
-                  animation: spin 0.8s linear infinite;
-                  margin-bottom: 12px;
-                "></div>
-                <div>Loading API documentation...</div>
-                <style>
-                  @keyframes spin {
-                    to { transform: rotate(360deg); }
-                  }
-                </style>
-              </div>
-            `
-            contentContainer.prepend(loadingIndicator)
-          }
-        } else if (!show && loadingIndicator) {
-          loadingIndicator.remove()
-        }
-      }
-      
-      // Function to add simple "Documentation in Progress" notice on REST API pages
-      const toggleProgressNotice = () => {
-        const currentPath = window.location.pathname
-        const isRestAPIPage = currentPath.includes('/restapi/')
-        
-        // Look for existing notice
-        let existingNotice = document.getElementById('restapi-progress-notice')
-        
-        if (isRestAPIPage) {
-          // Add notice if it doesn't exist
-          if (!existingNotice) {
-            // Find the main content container
-            const contentContainer = document.querySelector('.vp-doc') || document.querySelector('.content')
-            
-            if (contentContainer) {
-              // Create simple one-liner notice
-              const notice = document.createElement('div')
-              notice.id = 'restapi-progress-notice'
-              notice.innerHTML = `
-                <p style="
-                  padding: 8px 12px;
-                  margin: 0 0 20px 0;
-                  background: #fef3c7;
-                  border-left: 3px solid #f59e0b;
-                  color: #92400e;
-                  font-size: 0.875rem;
-                  border-radius: 4px;
-                ">
-                  📝 <em>Documentation in progress - some sections may be incomplete or subject to change.</em>
-                </p>
-              `
-              
-              // Insert at the beginning of content
-              contentContainer.insertBefore(notice, contentContainer.firstChild)
-            }
-          }
-        } else {
-          // Remove notice if it exists (when not on REST API pages)
-          if (existingNotice) {
-            existingNotice.remove()
-          }
-        }
-      }
-      
-      // Load spec when on REST API pages - ensure it loads before components render
-      const loadSpecIfNeeded = async () => {
-        const currentPath = window.location.pathname
-        if (currentPath.includes('/restapi/')) {
-          await loadOpenAPISpec()
-        }
-        // Update progress notice on route change
-        toggleProgressNotice()
-      }
-      
-      // CRITICAL: Start loading OpenAPI spec IMMEDIATELY (fire-and-forget)
-      // Don't await to avoid blocking app startup, but start loading ASAP
-      // The spec will be ready by the time user interacts with the page
-      loadOpenAPISpec() // No await - starts immediately in parallel
-      
-      // Add progress notice with multiple attempts to ensure DOM is ready
-      setTimeout(toggleProgressNotice, 100)
-      setTimeout(toggleProgressNotice, 300)
-      setTimeout(toggleProgressNotice, 500)
-      setTimeout(toggleProgressNotice, 1000)
 
+    // Client-side enhancements (mermaid zoom, playground, fetch interception)
+    if (typeof window !== 'undefined') {
       // Add mermaid diagram zoom functionality
       let currentZoomedElement: HTMLElement | null = null
 
@@ -349,10 +127,9 @@ export default {
         setupMermaidZoom()
       }
       
-      // Reload spec on route changes
+      // Re-setup enhancements on route changes
       if (router) {
         router.onAfterRouteChanged = async (to: string) => {
-          await loadSpecIfNeeded()
           setupMermaidZoom()
         }
       }
@@ -397,13 +174,13 @@ export default {
               ).join('')
               
               const instructionsHtml = `
-                <div data-playground-instructions style="margin-bottom: 20px; padding: 16px; background: ${PLAYGROUND_INSTRUCTIONS.style.backgroundColor}; border: 1px solid ${PLAYGROUND_INSTRUCTIONS.style.borderColor}; border-radius: 6px;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                    <div style="font-weight: 600; font-size: 0.95rem; color: ${PLAYGROUND_INSTRUCTIONS.style.titleColor}; display: flex; align-items: center; gap: 8px;">
+                <details data-playground-instructions style="margin-bottom: 20px; background: ${PLAYGROUND_INSTRUCTIONS.style.backgroundColor}; border: 1px solid ${PLAYGROUND_INSTRUCTIONS.style.borderColor}; border-radius: 6px;">
+                  <summary style="padding: 12px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; list-style: none; user-select: none;">
+                    <span style="font-weight: 600; font-size: 0.95rem; color: ${PLAYGROUND_INSTRUCTIONS.style.titleColor}; display: flex; align-items: center; gap: 8px;">
                       ${PLAYGROUND_INSTRUCTIONS.title}
-                    </div>
-                    <button 
-                      data-clear-credentials 
+                    </span>
+                    <button
+                      data-clear-credentials
                       style="padding: 4px 12px; font-size: 0.75rem; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); border-radius: 4px; cursor: pointer; color: var(--vp-c-text-2); transition: all 0.2s;"
                       onmouseover="this.style.background='var(--vp-c-bg)'; this.style.borderColor='var(--vp-c-brand-1)'; this.style.color='var(--vp-c-brand-1)'"
                       onmouseout="this.style.background='var(--vp-c-bg-soft)'; this.style.borderColor='var(--vp-c-divider)'; this.style.color='var(--vp-c-text-2)'"
@@ -411,17 +188,19 @@ export default {
                     >
                       🗑️ Clear Browser Credentials
                     </button>
+                  </summary>
+                  <div style="padding: 0 16px 16px 16px;">
+                    <p style="margin: 0 0 12px 0; color: ${PLAYGROUND_INSTRUCTIONS.style.textColor}; font-size: 0.875rem; line-height: 1.5;">
+                      ${PLAYGROUND_INSTRUCTIONS.description} <strong>Your credentials are saved in your browser</strong> and will persist across pages.
+                    </p>
+                    <ol style="margin: 0 0 12px 20px; color: ${PLAYGROUND_INSTRUCTIONS.style.textColor}; font-size: 0.875rem; line-height: 1.6;">
+                      ${instructionItems}
+                    </ol>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid ${PLAYGROUND_INSTRUCTIONS.style.borderColor}; color: ${PLAYGROUND_INSTRUCTIONS.style.warningColor}; font-size: 0.85rem; line-height: 1.5;">
+                      ${PLAYGROUND_INSTRUCTIONS.warning}
+                    </div>
                   </div>
-                  <p style="margin: 0 0 12px 0; color: ${PLAYGROUND_INSTRUCTIONS.style.textColor}; font-size: 0.875rem; line-height: 1.5;">
-                    ${PLAYGROUND_INSTRUCTIONS.description} <strong>Your credentials are saved in your browser</strong> and will persist across pages.
-                  </p>
-                  <ol style="margin: 0 0 12px 20px; color: ${PLAYGROUND_INSTRUCTIONS.style.textColor}; font-size: 0.875rem; line-height: 1.6;">
-                    ${instructionItems}
-                  </ol>
-                  <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid ${PLAYGROUND_INSTRUCTIONS.style.borderColor}; color: ${PLAYGROUND_INSTRUCTIONS.style.warningColor}; font-size: 0.85rem; line-height: 1.5;">
-                    ${PLAYGROUND_INSTRUCTIONS.warning}
-                  </div>
-                </div>
+                </details>
               `
 
               const serverUrlHtml = `

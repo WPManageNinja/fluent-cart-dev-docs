@@ -1,0 +1,120 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/search-product-variant-options": {
+      "get": {
+        "operationId": "searchProductVariantOptions",
+        "summary": "GET Search Product Variant Options",
+        "description": "Search for product variants suitable for selection (e.g., in order creation). Filters out out-of-stock items.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term for product/variant title",
+            "required": false
+          },
+          {
+            "name": "include_ids[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Variation IDs to always include in results",
+            "required": false
+          },
+          {
+            "name": "scopes[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Model scopes to apply",
+            "required": false
+          },
+          {
+            "name": "subscription_status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Use not_subscribable to exclude subscription variants",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "products": [
+                    {
+                      "value": "product_123",
+                      "label": "Example Product",
+                      "children": [
+                        {
+                          "value": 456,
+                          "label": "Monthly Plan"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

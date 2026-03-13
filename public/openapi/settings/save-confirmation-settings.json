@@ -1,0 +1,126 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/confirmation": {
+      "post": {
+        "operationId": "saveConfirmationSettings",
+        "summary": "POST Save Confirmation Settings",
+        "description": "Update the order confirmation/receipt page settings, including the confirmation type, message content, and the receipt page assignment.",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "settings"
+                ],
+                "properties": {
+                  "settings": {
+                    "type": "object",
+                    "description": "Confirmation settings object.",
+                    "properties": {
+                      "confirmation_type": {
+                        "type": "string",
+                        "description": "Confirmation behavior: `same_page` (show confirmation on same page) or `custom_page` (redirect to a custom page).",
+                        "enum": [
+                          "same_page",
+                          "custom_page"
+                        ],
+                        "example": "custom_page"
+                      },
+                      "message_to_show": {
+                        "type": "string",
+                        "description": "HTML content to display as the order confirmation message. Sanitized with `wp_kses_post`.",
+                        "example": "<h2>Order Confirmed!</h2><p>Thank you for your purchase.</p>"
+                      },
+                      "confirmation_page_id": {
+                        "type": "integer",
+                        "description": "WordPress page ID for a custom confirmation/receipt page. Also updates the store's `receipt_page_id`.",
+                        "example": 42
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "settings": {
+                  "confirmation_type": "custom_page",
+                  "confirmation_page_id": 42,
+                  "message_to_show": "<h2>Order Confirmed!</h2><p>Thank you for your purchase.</p>"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "confirmation_type": {
+                      "type": "string",
+                      "example": "same_page"
+                    },
+                    "message_to_show": {
+                      "type": "string",
+                      "example": "<p>Thank you for your order!</p>"
+                    }
+                  }
+                },
+                "example": {
+                  "confirmation_type": "same_page",
+                  "message_to_show": "<p>Thank you for your order!</p>"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,227 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customers/add-address": {
+      "post": {
+        "operationId": "createAddressCheckout",
+        "summary": "POST Create Address (Checkout)",
+        "description": "Create a new address for the currently authenticated customer. Used during checkout to add a new billing or shipping address. After creation, returns updated address selector HTML for the checkout form.",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "billing",
+                      "shipping"
+                    ],
+                    "description": "Address type: `billing` or `shipping`"
+                  },
+                  "product_type": {
+                    "type": "string",
+                    "description": "Product fulfillment type (e.g., `physical`, `digital`). Used for field validation rules."
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 15,
+                    "description": "Short label for the address (max 15 characters, e.g., `Home`, `Office`)"
+                  },
+                  "billing_name": {
+                    "type": "string",
+                    "description": "Contact name (for billing type)"
+                  },
+                  "billing_address_1": {
+                    "type": "string",
+                    "description": "Primary street address (for billing type)"
+                  },
+                  "billing_address_2": {
+                    "type": "string",
+                    "description": "Secondary address line (for billing type)"
+                  },
+                  "billing_city": {
+                    "type": "string",
+                    "description": "City (for billing type)"
+                  },
+                  "billing_state": {
+                    "type": "string",
+                    "description": "State/province code (for billing type)"
+                  },
+                  "billing_postcode": {
+                    "type": "string",
+                    "description": "Postal/zip code (for billing type)"
+                  },
+                  "billing_country": {
+                    "type": "string",
+                    "description": "Country code (for billing type)"
+                  },
+                  "billing_phone": {
+                    "type": "string",
+                    "description": "Phone number (for billing type)"
+                  },
+                  "billing_email": {
+                    "type": "string",
+                    "description": "Email address (for billing type)"
+                  },
+                  "shipping_name": {
+                    "type": "string",
+                    "description": "Contact name (for shipping type)"
+                  },
+                  "shipping_address_1": {
+                    "type": "string",
+                    "description": "Primary street address (for shipping type)"
+                  },
+                  "shipping_address_2": {
+                    "type": "string",
+                    "description": "Secondary address line (for shipping type)"
+                  },
+                  "shipping_city": {
+                    "type": "string",
+                    "description": "City (for shipping type)"
+                  },
+                  "shipping_state": {
+                    "type": "string",
+                    "description": "State/province code (for shipping type)"
+                  },
+                  "shipping_postcode": {
+                    "type": "string",
+                    "description": "Postal/zip code (for shipping type)"
+                  },
+                  "shipping_country": {
+                    "type": "string",
+                    "description": "Country code (for shipping type)"
+                  },
+                  "shipping_phone": {
+                    "type": "string",
+                    "description": "Phone number (for shipping type)"
+                  },
+                  "shipping_email": {
+                    "type": "string",
+                    "description": "Email address (for shipping type)"
+                  }
+                }
+              },
+              "example": {
+                "type": "billing",
+                "billing_name": "John Doe",
+                "billing_address_1": "123 Main St",
+                "billing_city": "New York",
+                "billing_state": "NY",
+                "billing_postcode": "10001",
+                "billing_country": "US",
+                "billing_phone": "+1234567890",
+                "label": "Home"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns success message and updated address selector fragment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "fragment": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "selector": {
+                            "type": "string"
+                          },
+                          "content": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Customer address created successfully!",
+                  "fragment": [
+                    {
+                      "selector": "[data-fluent-cart-checkout-page-form-address-modal-address-selector-button-wrapper]",
+                      "content": "<div>...updated address selector HTML...</div>",
+                      "type": "replace"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "failed",
+                  "errors": {
+                    "billing_country": {
+                      "required": "Country is required."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/country/rate/{id}": {
+      "put": {
+        "operationId": "updateTaxRate",
+        "summary": "PUT Update Tax Rate",
+        "description": "Update an existing tax rate.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Tax rate ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "class_id"
+                ],
+                "properties": {
+                  "class_id": {
+                    "type": "integer",
+                    "description": "ID of the tax class this rate belongs to",
+                    "example": 1
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "ISO 3166-1 alpha-2 country code (max 45 characters)",
+                    "example": "FR"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "State/province code (max 45 characters)",
+                    "example": ""
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Postcode/ZIP code (max 45 characters)",
+                    "example": ""
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City name (max 45 characters)",
+                    "example": ""
+                  },
+                  "rate": {
+                    "type": "string",
+                    "description": "Tax rate percentage (e.g., \"19.0000\")",
+                    "example": "21.0000"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Display name for the tax rate (max 45 characters)",
+                    "example": "FR Standard Tax (Updated)"
+                  },
+                  "group": {
+                    "type": "string",
+                    "description": "Geographic group/continent code (max 45 characters)",
+                    "example": "EU"
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "description": "Priority for rate application order (min: 1)",
+                    "minimum": 1,
+                    "example": 1
+                  },
+                  "is_compound": {
+                    "type": "integer",
+                    "description": "Whether this rate is compound (0 or 1)",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "example": 0
+                  },
+                  "for_shipping": {
+                    "type": "integer",
+                    "nullable": true,
+                    "description": "Shipping tax override rate"
+                  },
+                  "for_order": {
+                    "type": "integer",
+                    "description": "Whether this rate applies at order level (0 or 1)",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "example": 0
+                  }
+                }
+              },
+              "example": {
+                "class_id": 1,
+                "rate": "21.0000",
+                "name": "FR Standard Tax (Updated)"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tax rate updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_rate": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "class_id": {
+                          "type": "integer"
+                        },
+                        "country": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "type": "string"
+                        },
+                        "postcode": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "type": "string"
+                        },
+                        "rate": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "group": {
+                          "type": "string"
+                        },
+                        "priority": {
+                          "type": "integer"
+                        },
+                        "is_compound": {
+                          "type": "integer"
+                        },
+                        "for_shipping": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "for_order": {
+                          "type": "integer"
+                        },
+                        "formatted_state": {
+                          "type": "string"
+                        },
+                        "tax_class": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "title": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "tax_rate": {
+                    "id": 10,
+                    "class_id": 1,
+                    "country": "FR",
+                    "state": "",
+                    "postcode": "",
+                    "city": "",
+                    "rate": "20.0000",
+                    "name": "FR Standard Tax",
+                    "group": "EU",
+                    "priority": 1,
+                    "is_compound": 0,
+                    "for_shipping": null,
+                    "for_order": 0,
+                    "formatted_state": "",
+                    "tax_class": {
+                      "id": 1,
+                      "title": "Standard"
+                    }
+                  },
+                  "message": "Tax rate has been updated successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

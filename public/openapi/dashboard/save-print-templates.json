@@ -1,0 +1,116 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/templates/print-templates": {
+      "put": {
+        "operationId": "savePrintTemplates",
+        "summary": "PUT Save Print Templates",
+        "description": "Save customized print templates. Each template's content is sanitized with wp_kses_post before saving.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "templates"
+                ],
+                "properties": {
+                  "templates": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "key",
+                        "content"
+                      ],
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "description": "Template identifier (e.g., invoice_template, packing_slip)"
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "HTML template content with shortcodes"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "templates": [
+                  {
+                    "key": "invoice_template",
+                    "content": "<html><body><h1>Invoice #{order_id}</h1>...</body></html>"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Template saved successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

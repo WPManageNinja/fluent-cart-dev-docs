@@ -1,0 +1,189 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/app/init": {
+      "get": {
+        "operationId": "initializeApp",
+        "summary": "GET Initialize App",
+        "description": "Initialize the admin application by loading REST API configuration, asset URLs, translation strings, and shop configuration. This is the first call made when the admin SPA loads.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rest": {
+                      "$ref": "#/components/schemas/RestConfig"
+                    },
+                    "asset_url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Base URL for plugin assets"
+                    },
+                    "trans": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "Translation strings map"
+                    },
+                    "shop": {
+                      "$ref": "#/components/schemas/ShopConfig"
+                    }
+                  }
+                },
+                "example": {
+                  "rest": {
+                    "base_url": "https://example.com/wp-json/",
+                    "url": "https://example.com/wp-json/fluent-cart/v2/",
+                    "nonce": "abc123def456",
+                    "namespace": "fluent-cart",
+                    "version": "v2"
+                  },
+                  "asset_url": "https://example.com/wp-content/plugins/fluent-cart/assets/",
+                  "trans": {
+                    "Dashboard": "Dashboard",
+                    "Products": "Products",
+                    "Orders": "Orders"
+                  },
+                  "shop": {
+                    "currency": "USD",
+                    "currency_sign": "$",
+                    "currency_sign_position": "left",
+                    "decimal_separator": ".",
+                    "thousands_separator": ",",
+                    "number_of_decimals": 2,
+                    "store_name": "My Store",
+                    "store_logo": "https://example.com/wp-content/uploads/logo.png"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RestConfig": {
+        "type": "object",
+        "properties": {
+          "base_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "WordPress REST API base URL",
+            "example": "https://example.com/wp-json/"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "FluentCart REST API URL",
+            "example": "https://example.com/wp-json/fluent-cart/v2/"
+          },
+          "nonce": {
+            "type": "string",
+            "description": "WordPress REST nonce",
+            "example": "abc123def456"
+          },
+          "namespace": {
+            "type": "string",
+            "description": "REST API namespace",
+            "example": "fluent-cart"
+          },
+          "version": {
+            "type": "string",
+            "description": "REST API version",
+            "example": "v2"
+          }
+        }
+      },
+      "ShopConfig": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Store currency code",
+            "example": "USD"
+          },
+          "currency_sign": {
+            "type": "string",
+            "description": "Currency symbol",
+            "example": "$"
+          },
+          "currency_sign_position": {
+            "type": "string",
+            "description": "Currency sign position",
+            "example": "left"
+          },
+          "decimal_separator": {
+            "type": "string",
+            "description": "Decimal separator character",
+            "example": "."
+          },
+          "thousands_separator": {
+            "type": "string",
+            "description": "Thousands separator character",
+            "example": ","
+          },
+          "number_of_decimals": {
+            "type": "integer",
+            "description": "Number of decimal places",
+            "example": 2
+          },
+          "store_name": {
+            "type": "string",
+            "description": "Store name",
+            "example": "My Store"
+          },
+          "store_logo": {
+            "type": "string",
+            "format": "uri",
+            "description": "Store logo URL",
+            "example": "https://example.com/wp-content/uploads/logo.png"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

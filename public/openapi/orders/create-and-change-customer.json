@@ -1,0 +1,168 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order_id}/create-and-change-customer": {
+      "post": {
+        "operationId": "createAndChangeCustomer",
+        "summary": "POST Create and Change Customer",
+        "description": "Create a new customer and immediately assign them to the order. Combines customer creation with order reassignment.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "first_name": {
+                    "type": "string",
+                    "description": "Customer first name (max 255 chars). Required if full name mode is disabled"
+                  },
+                  "last_name": {
+                    "type": "string",
+                    "description": "Customer last name (max 255 chars)"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "description": "Customer full name (max 255 chars). Required if full name mode is enabled"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Customer email address (max 255 chars, must be unique)"
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Customer city"
+                  },
+                  "user_id": {
+                    "type": "integer",
+                    "description": "WordPress user ID to link"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Customer status"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Customer country"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Customer state"
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Customer postal code"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Customer notes"
+                  }
+                }
+              },
+              "example": {
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "email": "jane@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer created and assigned successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Customer changed successfully"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Email is required"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

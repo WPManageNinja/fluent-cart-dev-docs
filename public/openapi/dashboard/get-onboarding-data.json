@@ -1,0 +1,149 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/dashboard": {
+      "get": {
+        "operationId": "getOnboardingData",
+        "summary": "GET Get Onboarding Data",
+        "description": "Retrieve the onboarding checklist with completion status for each setup step. Used to display the getting-started wizard on the dashboard.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "steps": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "$ref": "#/components/schemas/OnboardingStep"
+                          }
+                        },
+                        "completed": {
+                          "type": "integer",
+                          "description": "Number of completed steps"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "steps": {
+                      "page_setup": {
+                        "title": "Setup Pages",
+                        "text": "Customers to find what they're looking for by organising.",
+                        "icon": "Cart",
+                        "completed": false,
+                        "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/settings/store-settings/pages_setup"
+                      },
+                      "store_info": {
+                        "title": "Add Details to Store",
+                        "text": "Store details such as addresses, company info etc.",
+                        "icon": "StoreIcon",
+                        "completed": true,
+                        "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/settings/store-settings/"
+                      },
+                      "product_info": {
+                        "title": "Add Your First Product",
+                        "text": "Share your brand story and build trust with customers.",
+                        "icon": "ShoppingCartIcon",
+                        "completed": false,
+                        "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products"
+                      },
+                      "setup_payments": {
+                        "title": "Setup Payment Methods",
+                        "text": "Choose from fast & secure online and offline payment.",
+                        "icon": "PaymentIcon",
+                        "completed": true,
+                        "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/settings/payments"
+                      }
+                    },
+                    "completed": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OnboardingStep": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Step title",
+            "example": "Setup Pages"
+          },
+          "text": {
+            "type": "string",
+            "description": "Step description",
+            "example": "Customers to find what they're looking for by organising."
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon component name",
+            "example": "Cart"
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Whether the step is completed",
+            "example": false
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the step's settings page",
+            "example": "https://example.com/wp-admin/admin.php?page=fluent-cart#/settings/store-settings/pages_setup"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

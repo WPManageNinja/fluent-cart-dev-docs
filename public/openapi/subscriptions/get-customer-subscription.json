@@ -1,0 +1,342 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/subscriptions/{subscription_uuid}": {
+      "get": {
+        "operationId": "getCustomerSubscription",
+        "summary": "GET Get Customer Subscription Details",
+        "description": "Retrieve full details of a specific subscription for the currently logged-in customer, including transactions, upgrade eligibility, and payment method capabilities.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscription_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The subscription UUID (alphanumeric with dashes)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with full subscription details including transactions, upgrade eligibility, and payment method capabilities.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "subscription": {
+                      "$ref": "#/components/schemas/CustomerSubscriptionDetail"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Success",
+                  "subscription": {
+                    "uuid": "abc123-def456",
+                    "status": "active",
+                    "overridden_status": null,
+                    "vendor_subscription_id": "sub_1234567890",
+                    "next_billing_date": "2025-02-15 00:00:00",
+                    "billing_info": {
+                      "interval": "monthly",
+                      "interval_count": 1,
+                      "amount": 2999,
+                      "currency": "USD"
+                    },
+                    "current_payment_method": "stripe",
+                    "payment_method": "stripe",
+                    "payment_info": {},
+                    "bill_times": 0,
+                    "bill_count": 6,
+                    "variation_id": 7,
+                    "product_id": 3,
+                    "config": {},
+                    "reactivate_url": "https://your-site.com/?fluent-cart=reactivate&hash=abc123",
+                    "title": "Pro Plan",
+                    "subtitle": "Monthly",
+                    "can_upgrade": true,
+                    "can_switch_payment_method": true,
+                    "switchable_payment_methods": [
+                      "stripe",
+                      "paypal"
+                    ],
+                    "can_update_payment_method": true,
+                    "order": {
+                      "uuid": "order-uuid-here"
+                    },
+                    "billing_addresses": [],
+                    "recurring_amount": 2999,
+                    "can_early_pay": false,
+                    "remaining_installments": 0,
+                    "transactions": [
+                      {
+                        "id": 1,
+                        "order_id": 10,
+                        "vendor_charge_id": "ch_abc123",
+                        "amount": 2999,
+                        "status": "completed",
+                        "created_at": "2025-01-15 10:30:00",
+                        "order": {}
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CustomerSubscriptionDetail": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "description": "Unique subscription identifier",
+            "example": "abc123-def456"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status: active, trialing, canceled, paused, failing, expiring, expired, completed, past_due",
+            "example": "active"
+          },
+          "overridden_status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Overridden status if manually set"
+          },
+          "vendor_subscription_id": {
+            "type": "string",
+            "description": "Remote gateway subscription ID",
+            "example": "sub_1234567890"
+          },
+          "next_billing_date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Next billing date in GMT",
+            "example": "2025-02-15 00:00:00"
+          },
+          "billing_info": {
+            "type": "object",
+            "description": "Billing interval and amount details",
+            "properties": {
+              "interval": {
+                "type": "string",
+                "example": "monthly"
+              },
+              "interval_count": {
+                "type": "integer",
+                "example": 1
+              },
+              "amount": {
+                "type": "integer",
+                "example": 2999
+              },
+              "currency": {
+                "type": "string",
+                "example": "USD"
+              }
+            }
+          },
+          "current_payment_method": {
+            "type": "string",
+            "description": "Current payment method slug",
+            "example": "stripe"
+          },
+          "payment_method": {
+            "type": "string",
+            "description": "Original payment method slug",
+            "example": "stripe"
+          },
+          "payment_info": {
+            "type": "object",
+            "description": "Payment method details (card brand, last4, etc.)"
+          },
+          "bill_times": {
+            "type": "integer",
+            "description": "Total number of billing cycles (0 = unlimited)",
+            "example": 0
+          },
+          "bill_count": {
+            "type": "integer",
+            "description": "Number of completed billing cycles",
+            "example": 6
+          },
+          "variation_id": {
+            "type": "integer",
+            "description": "Product variation ID",
+            "example": 7
+          },
+          "product_id": {
+            "type": "integer",
+            "description": "Product ID",
+            "example": 3
+          },
+          "config": {
+            "type": "object",
+            "description": "Subscription configuration"
+          },
+          "reactivate_url": {
+            "type": "string",
+            "description": "URL for reactivating a canceled subscription",
+            "example": "https://your-site.com/?fluent-cart=reactivate&hash=abc123"
+          },
+          "title": {
+            "type": "string",
+            "description": "Product title",
+            "example": "Pro Plan"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Variation title (if applicable)",
+            "example": "Monthly"
+          },
+          "can_upgrade": {
+            "type": "boolean",
+            "description": "Whether the subscription is eligible for plan upgrade",
+            "example": true
+          },
+          "can_switch_payment_method": {
+            "type": "boolean",
+            "description": "Whether the payment method can be switched to a different gateway",
+            "example": true
+          },
+          "switchable_payment_methods": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of available payment method slugs to switch to",
+            "example": [
+              "stripe",
+              "paypal"
+            ]
+          },
+          "can_update_payment_method": {
+            "type": "boolean",
+            "description": "Whether the payment method can be updated within the same gateway",
+            "example": true
+          },
+          "order": {
+            "type": "object",
+            "properties": {
+              "uuid": {
+                "type": "string",
+                "description": "Parent order UUID",
+                "example": "order-uuid-here"
+              }
+            }
+          },
+          "billing_addresses": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Billing addresses associated with the subscription"
+          },
+          "recurring_amount": {
+            "type": "integer",
+            "description": "Recurring payment amount in cents",
+            "example": 2999
+          },
+          "can_early_pay": {
+            "type": "boolean",
+            "description": "Whether early installment payment is available",
+            "example": false
+          },
+          "remaining_installments": {
+            "type": "integer",
+            "description": "Number of remaining installments (0 if unlimited)",
+            "example": 0
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            },
+            "description": "All transactions related to this subscription and its renewal orders"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "order_id": {
+            "type": "integer",
+            "example": 10
+          },
+          "vendor_charge_id": {
+            "type": "string",
+            "example": "ch_abc123"
+          },
+          "amount": {
+            "type": "integer",
+            "description": "Amount in cents",
+            "example": 2999
+          },
+          "status": {
+            "type": "string",
+            "example": "completed"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-15 10:30:00"
+          },
+          "order": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

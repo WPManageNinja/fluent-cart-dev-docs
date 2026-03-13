@@ -1,0 +1,164 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/address-info/get-country-info": {
+      "get": {
+        "operationId": "getCountryInfo",
+        "summary": "GET Get Country Info",
+        "description": "Retrieve detailed information for a specific country including states/provinces and address locale formatting rules. Can identify the country from either a country code or a timezone string.",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "country_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Two-letter ISO country code (e.g., US, GB). Required if timezone is not provided."
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "IANA timezone string (e.g., America/New_York). Used to guess the country. Takes priority over country_code."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "country_code": {
+                      "type": "string",
+                      "description": "Two-letter ISO country code"
+                    },
+                    "country_name": {
+                      "type": "string",
+                      "description": "Country display name"
+                    },
+                    "states": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StateOption"
+                      }
+                    },
+                    "address_locale": {
+                      "type": "object",
+                      "description": "Localized address field labels and requirements",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "required": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "country_code": "US",
+                  "country_name": "United States",
+                  "states": [
+                    {
+                      "label": "Alabama",
+                      "value": "AL"
+                    },
+                    {
+                      "label": "Alaska",
+                      "value": "AK"
+                    },
+                    {
+                      "label": "California",
+                      "value": "CA"
+                    }
+                  ],
+                  "address_locale": {
+                    "state": {
+                      "label": "State",
+                      "required": true
+                    },
+                    "postcode": {
+                      "label": "ZIP Code",
+                      "required": true
+                    },
+                    "city": {
+                      "label": "City",
+                      "required": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "StateOption": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "State/province display name",
+            "example": "California"
+          },
+          "value": {
+            "type": "string",
+            "description": "State/province code",
+            "example": "CA"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

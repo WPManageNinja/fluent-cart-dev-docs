@@ -1,0 +1,97 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/get-dashboard-summary": {
+      "get": {
+        "operationId": "getDashboardSummary",
+        "summary": "GET Get Dashboard Summary",
+        "description": "Retrieve a high-level summary of the store including product counts and coupon statistics.",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "summaryData": {
+                      "type": "object",
+                      "properties": {
+                        "total_products": {
+                          "type": "integer",
+                          "description": "Total fluent-products count"
+                        },
+                        "draft_products": {
+                          "type": "integer",
+                          "description": "Draft product count"
+                        },
+                        "active_coupons": {
+                          "type": "integer",
+                          "description": "Active coupon count"
+                        },
+                        "expired_coupons": {
+                          "type": "integer",
+                          "description": "Expired coupon count"
+                        }
+                      },
+                      "description": "Store summary data"
+                    }
+                  }
+                },
+                "example": {
+                  "summaryData": {
+                    "total_products": 25,
+                    "draft_products": 3,
+                    "active_coupons": 5,
+                    "expired_coupons": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

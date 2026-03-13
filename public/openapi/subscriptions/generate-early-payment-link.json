@@ -1,0 +1,150 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/subscriptions/{subscription}/early-payment-link": {
+      "post": {
+        "operationId": "generateEarlyPaymentLink",
+        "summary": "POST Generate Early Payment Link",
+        "description": "Generate a URL that allows early payment of remaining installments on an installment-based subscription. Requires early payment feature to be enabled, the subscription must belong to the specified order, have finite installments, be active or trialing, and have remaining installments.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The parent order ID"
+          },
+          {
+            "name": "subscription",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The subscription ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Early payment link generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "payment_url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL for early installment payment"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Early payment link generated.",
+                  "payment_url": "https://your-site.com/?fluent-cart=early-installment-payment&subscription_hash=abc123-def456"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - various validation errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_enabled": {
+                    "summary": "Feature not enabled",
+                    "value": {
+                      "message": "Early payment is not enabled for this site."
+                    }
+                  },
+                  "invalid_subscription": {
+                    "summary": "Invalid subscription for order",
+                    "value": {
+                      "message": "Invalid subscription for the specified order."
+                    }
+                  },
+                  "not_installment": {
+                    "summary": "Not an installment subscription",
+                    "value": {
+                      "message": "Early payment is only available for installment subscriptions."
+                    }
+                  },
+                  "not_active": {
+                    "summary": "Subscription not active",
+                    "value": {
+                      "message": "Subscription must be active to make early payments."
+                    }
+                  },
+                  "all_paid": {
+                    "summary": "All installments already paid",
+                    "value": {
+                      "message": "All installments have already been paid."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

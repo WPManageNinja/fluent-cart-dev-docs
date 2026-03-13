@@ -1,0 +1,108 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customers/{customerId}/recalculate-ltv": {
+      "post": {
+        "operationId": "recalculateCustomerLtv",
+        "summary": "POST Recalculate Lifetime Value",
+        "description": "Recalculate a customer's lifetime value (LTV) by summing net payments from all successful orders. Also updates purchase_count, first_purchase_date, last_purchase_date, and aov (average order value).",
+        "tags": [
+          "Customers"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The customer ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lifetime value recalculated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "customer": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Lifetime value recalculated successfully",
+                  "customer": {
+                    "id": 1,
+                    "email": "john@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "purchase_count": 5,
+                    "ltv": 25000,
+                    "aov": 5000,
+                    "first_purchase_date": "2025-01-15 10:30:00",
+                    "last_purchase_date": "2025-06-20 14:00:00"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Customer not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Customer not found."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

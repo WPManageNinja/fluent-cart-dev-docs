@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/files/upload": {
       "post": {
         "operationId": "uploadFile",
         "summary": "POST Upload File",
-        "description": "Upload a new file to the storage system. The file name will be automatically prefixed with a timestamp to ensure uniqueness.",
+        "description": "Upload a downloadable file to the specified storage driver. The file is stored with a unique name appended with a timestamp to prevent collisions.",
         "tags": [
           "Files"
         ],
@@ -25,7 +48,7 @@
         },
         "responses": {
           "200": {
-            "description": "File uploaded successfully",
+            "description": "File uploaded successfully.",
             "content": {
               "application/json": {
                 "schema": {
@@ -38,44 +61,21 @@
                     },
                     "path": {
                       "type": "string",
-                      "description": "Uploaded file path (with timestamp prefix)",
-                      "example": "product-image__fluent-cart__.1763112373.jpg"
+                      "description": "Uploaded file path with timestamp",
+                      "example": "my-ebook__fluent-cart__.1710345600.pdf"
                     },
                     "file": {
-                      "type": "object",
-                      "description": "File information",
-                      "properties": {
-                        "driver": {
-                          "type": "string",
-                          "description": "Storage driver used",
-                          "example": "local"
-                        },
-                        "size": {
-                          "type": "integer",
-                          "description": "File size in bytes",
-                          "example": 1024000
-                        },
-                        "name": {
-                          "type": "string",
-                          "description": "File name (with timestamp prefix)",
-                          "example": "product-image__fluent-cart__.1763112373.jpg"
-                        },
-                        "bucket": {
-                          "type": "string",
-                          "description": "Storage bucket (empty for local driver)",
-                          "example": ""
-                        }
-                      }
+                      "$ref": "#/components/schemas/File"
                     }
                   }
                 },
                 "example": {
                   "message": "File Uploaded Successfully",
-                  "path": "product-image__fluent-cart__.1763112373.jpg",
+                  "path": "my-ebook__fluent-cart__.1710345600.pdf",
                   "file": {
                     "driver": "local",
-                    "size": 1024000,
-                    "name": "product-image__fluent-cart__.1763112373.jpg",
+                    "size": 2048576,
+                    "name": "my-ebook__fluent-cart__.1710345600.pdf",
                     "bucket": ""
                   }
                 }
@@ -83,7 +83,7 @@
             }
           },
           "400": {
-            "description": "Bad request - validation error or file empty",
+            "description": "Bad request - validation error or file empty.",
             "content": {
               "application/json": {
                 "schema": {
@@ -102,18 +102,9 @@
                     }
                   }
                 },
-                "examples": {
-                  "validationError": {
-                    "value": {
-                      "message": "Name field is required"
-                    }
-                  },
-                  "fileEmpty": {
-                    "value": {
-                      "message": "Failed To Upload File",
-                      "additional": "File is empty"
-                    }
-                  }
+                "example": {
+                  "message": "Failed To Upload File",
+                  "additional": "File is empty"
                 }
               }
             }
@@ -134,82 +125,53 @@
           "file": {
             "type": "string",
             "format": "binary",
-            "description": "The file to upload (required)"
+            "description": "The file to upload."
           },
           "name": {
             "type": "string",
             "maxLength": 160,
-            "description": "Custom file name without extension (required, max 160 characters). The extension will be automatically added from the uploaded file.",
-            "example": "product-image"
+            "description": "Display name for the file (max 160 characters). The file extension is appended automatically from the uploaded file.",
+            "example": "my-ebook"
           },
           "driver": {
             "type": "string",
-            "description": "Storage driver to use (optional, default: local)",
+            "description": "Storage driver to use (default: `local`).",
+            "example": "local"
+          }
+        }
+      },
+      "File": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "File name with timestamp suffix",
+            "example": "my-ebook__fluent-cart__.1710345600.pdf"
+          },
+          "size": {
+            "type": "integer",
+            "description": "File size in bytes",
+            "example": 2048576
+          },
+          "driver": {
+            "type": "string",
+            "description": "Storage driver",
             "example": "local"
           },
           "bucket": {
             "type": "string",
-            "description": "Bucket/folder name (optional, for cloud storage drivers)",
-            "example": "products"
+            "description": "Storage bucket (empty for local driver)",
+            "example": ""
           }
         }
-      },
-      "FileUploadResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "File Uploaded Successfully"
-          },
-          "path": {
-            "type": "string",
-            "description": "Uploaded file path (with timestamp prefix)",
-            "example": "product-image__fluent-cart__.1763112373.jpg"
-          },
-          "file": {
-            "type": "object",
-            "description": "File information",
-            "properties": {
-              "driver": {
-                "type": "string",
-                "description": "Storage driver used",
-                "example": "local"
-              },
-              "size": {
-                "type": "integer",
-                "description": "File size in bytes",
-                "example": 1024000
-              },
-              "name": {
-                "type": "string",
-                "description": "File name (with timestamp prefix)",
-                "example": "product-image__fluent-cart__.1763112373.jpg"
-              },
-              "bucket": {
-                "type": "string",
-                "description": "Storage bucket (empty for local driver)",
-                "example": ""
-              }
-            }
-          }
-        }
-      },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Error message",
-            "example": "Failed To Upload File"
-          },
-          "additional": {
-            "type": "string",
-            "nullable": true,
-            "description": "Additional error information",
-            "example": "File is empty"
-          }
-        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

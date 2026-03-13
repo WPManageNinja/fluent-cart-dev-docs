@@ -1,0 +1,320 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/upload-editor-file": {
+      "post": {
+        "operationId": "uploadEditorFile",
+        "summary": "POST Upload Editor File",
+        "description": "Upload an image file for use in the content editor (e.g., product descriptions). The image is uploaded to the WordPress Media Library via `media_handle_upload`. Only image files are accepted.",
+        "tags": [
+          "Files"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadEditorFileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image uploaded successfully. Returns WordPress attachment data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WordPressAttachment"
+                },
+                "example": {
+                  "id": 456,
+                  "title": "product-banner",
+                  "filename": "product-banner.jpg",
+                  "url": "https://example.com/wp-content/uploads/2025/01/product-banner.jpg",
+                  "link": "https://example.com/?attachment_id=456",
+                  "alt": "",
+                  "author": "1",
+                  "description": "",
+                  "caption": "",
+                  "name": "product-banner",
+                  "status": "inherit",
+                  "uploadedTo": 0,
+                  "date": "2025-01-15T12:00:00.000Z",
+                  "modified": "2025-01-15T12:00:00.000Z",
+                  "menuOrder": 0,
+                  "mime": "image/jpeg",
+                  "type": "image",
+                  "subtype": "jpeg",
+                  "icon": "https://example.com/wp-includes/images/media/default.png",
+                  "dateFormatted": "January 15, 2025",
+                  "filesizeInBytes": 204800,
+                  "filesizeHumanReadable": "200 KB",
+                  "sizes": {
+                    "thumbnail": {
+                      "url": "https://example.com/wp-content/uploads/2025/01/product-banner-150x150.jpg",
+                      "height": 150,
+                      "width": 150
+                    },
+                    "medium": {
+                      "url": "https://example.com/wp-content/uploads/2025/01/product-banner-300x200.jpg",
+                      "height": 200,
+                      "width": 300
+                    },
+                    "full": {
+                      "url": "https://example.com/wp-content/uploads/2025/01/product-banner.jpg",
+                      "height": 800,
+                      "width": 1200
+                    }
+                  },
+                  "height": 800,
+                  "width": 1200
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - non-image file or no file attached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error Uploading File"
+                    }
+                  }
+                },
+                "examples": {
+                  "nonImage": {
+                    "value": {
+                      "message": "Error Uploading File"
+                    }
+                  },
+                  "noFile": {
+                    "value": {
+                      "message": "No File Attached"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UploadEditorFileRequest": {
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "The image file to upload. Must be a valid image MIME type (e.g., `image/jpeg`, `image/png`, `image/gif`, `image/webp`)."
+          }
+        }
+      },
+      "WordPressAttachment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "WordPress attachment ID",
+            "example": 456
+          },
+          "title": {
+            "type": "string",
+            "description": "Attachment title",
+            "example": "product-banner"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Original filename",
+            "example": "product-banner.jpg"
+          },
+          "url": {
+            "type": "string",
+            "description": "Full URL to the uploaded file",
+            "example": "https://example.com/wp-content/uploads/2025/01/product-banner.jpg"
+          },
+          "link": {
+            "type": "string",
+            "description": "WordPress attachment page URL",
+            "example": "https://example.com/?attachment_id=456"
+          },
+          "alt": {
+            "type": "string",
+            "description": "Alt text for the image",
+            "example": ""
+          },
+          "author": {
+            "type": "string",
+            "description": "Author user ID",
+            "example": "1"
+          },
+          "description": {
+            "type": "string",
+            "description": "Attachment description",
+            "example": ""
+          },
+          "caption": {
+            "type": "string",
+            "description": "Attachment caption",
+            "example": ""
+          },
+          "name": {
+            "type": "string",
+            "description": "Attachment slug",
+            "example": "product-banner"
+          },
+          "status": {
+            "type": "string",
+            "description": "Post status",
+            "example": "inherit"
+          },
+          "uploadedTo": {
+            "type": "integer",
+            "description": "Parent post ID",
+            "example": 0
+          },
+          "date": {
+            "type": "string",
+            "description": "Upload date (ISO 8601)",
+            "example": "2025-01-15T12:00:00.000Z"
+          },
+          "modified": {
+            "type": "string",
+            "description": "Last modified date (ISO 8601)",
+            "example": "2025-01-15T12:00:00.000Z"
+          },
+          "menuOrder": {
+            "type": "integer",
+            "description": "Menu order",
+            "example": 0
+          },
+          "mime": {
+            "type": "string",
+            "description": "MIME type",
+            "example": "image/jpeg"
+          },
+          "type": {
+            "type": "string",
+            "description": "Media type",
+            "example": "image"
+          },
+          "subtype": {
+            "type": "string",
+            "description": "Media subtype",
+            "example": "jpeg"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Default icon URL",
+            "example": "https://example.com/wp-includes/images/media/default.png"
+          },
+          "dateFormatted": {
+            "type": "string",
+            "description": "Human-readable date",
+            "example": "January 15, 2025"
+          },
+          "filesizeInBytes": {
+            "type": "integer",
+            "description": "File size in bytes",
+            "example": 204800
+          },
+          "filesizeHumanReadable": {
+            "type": "string",
+            "description": "Human-readable file size",
+            "example": "200 KB"
+          },
+          "sizes": {
+            "type": "object",
+            "description": "Available image sizes",
+            "properties": {
+              "thumbnail": {
+                "$ref": "#/components/schemas/ImageSize"
+              },
+              "medium": {
+                "$ref": "#/components/schemas/ImageSize"
+              },
+              "full": {
+                "$ref": "#/components/schemas/ImageSize"
+              }
+            }
+          },
+          "height": {
+            "type": "integer",
+            "description": "Original image height in pixels",
+            "example": 800
+          },
+          "width": {
+            "type": "integer",
+            "description": "Original image width in pixels",
+            "example": 1200
+          }
+        }
+      },
+      "ImageSize": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to the sized image",
+            "example": "https://example.com/wp-content/uploads/2025/01/product-banner-150x150.jpg"
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels",
+            "example": 150
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels",
+            "example": 150
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

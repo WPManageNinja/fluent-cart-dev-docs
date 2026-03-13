@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/coupons/{id}": {
       "delete": {
         "operationId": "deleteCoupon",
-        "summary": "DELETE Delete Coupon",
-        "description": "Delete a coupon.",
+        "summary": "DELETE Coupon",
+        "description": "Permanently delete a coupon.",
         "tags": [
           "Coupons"
         ],
@@ -21,12 +44,13 @@
             "schema": {
               "type": "integer"
             },
-            "description": "Coupon ID"
+            "description": "The coupon ID",
+            "example": 5
           }
         ],
         "responses": {
           "200": {
-            "description": "Coupon deleted successfully",
+            "description": "Coupon deleted successfully.",
             "content": {
               "application/json": {
                 "schema": {
@@ -34,12 +58,10 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "description": "Success message",
                       "example": "Coupon successfully deleted."
                     },
                     "data": {
                       "type": "string",
-                      "description": "Empty string on success",
                       "example": ""
                     }
                   }
@@ -51,53 +73,56 @@
               }
             }
           },
-          "400": {
-            "description": "Bad request - deletion failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "rest_invalid_param",
-                  "message": "Coupon deletion failed!",
-                  "data": {
-                    "status": 400
-                  }
-                }
-              }
-            }
-          },
           "403": {
-            "description": "Forbidden - invalid coupon ID",
+            "description": "Invalid coupon ID.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "example": {
-                  "code": "rest_invalid_param",
-                  "message": "Please use a valid coupon ID!",
-                  "data": {
-                    "status": 403
-                  }
+                  "message": "Please use a valid coupon ID!"
                 }
               }
             }
           },
           "404": {
-            "description": "Not found - coupon does not exist",
+            "description": "Coupon not found.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 },
                 "example": {
-                  "code": "rest_invalid_param",
-                  "message": "Coupon not found in database, failed to remove.",
-                  "data": {
-                    "status": 404
+                  "message": "Coupon not found in database, failed to remove."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Deletion failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
                   }
+                },
+                "example": {
+                  "message": "Coupon deletion failed!"
                 }
               }
             }
@@ -107,21 +132,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "DeleteCouponResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "Coupon successfully deleted."
-          },
-          "data": {
-            "type": "string",
-            "description": "Empty string on success",
-            "example": ""
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

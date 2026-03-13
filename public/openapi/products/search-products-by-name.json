@@ -1,0 +1,100 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/searchProductByName": {
+      "get": {
+        "operationId": "searchProductsByName",
+        "summary": "GET Search Products by Name",
+        "description": "Search for published products by name. Returns products formatted for select dropdowns.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Product name to search for",
+            "required": false
+          },
+          {
+            "name": "url_mode",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "URL mode flag",
+            "required": false
+          },
+          {
+            "name": "termId",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by taxonomy term ID (product-categories)",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "products": [
+                    {
+                      "ID": 123,
+                      "post_title": "Example Product",
+                      "wpTerms": []
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

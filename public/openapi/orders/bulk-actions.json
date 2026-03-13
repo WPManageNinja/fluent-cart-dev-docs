@@ -1,0 +1,125 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/do-bulk-action": {
+      "post": {
+        "operationId": "bulkActions",
+        "summary": "POST Bulk Actions",
+        "description": "Perform bulk actions on multiple orders at once.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action",
+                  "order_ids"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "description": "Bulk action to perform",
+                    "enum": [
+                      "delete_orders",
+                      "change_shipping_status",
+                      "change_order_status",
+                      "capture_payments",
+                      "change_payment_status"
+                    ]
+                  },
+                  "order_ids": {
+                    "type": "array",
+                    "description": "Array of order IDs to act upon",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "new_status": {
+                    "type": "string",
+                    "description": "New status value. Required for `change_shipping_status`, `change_order_status`, and `change_payment_status` actions"
+                  },
+                  "manage_stock": {
+                    "type": "string",
+                    "description": "Whether to manage stock on status change (`true`/`false`)"
+                  }
+                }
+              },
+              "example": {
+                "action": "change_order_status",
+                "order_ids": [
+                  1,
+                  2,
+                  3
+                ],
+                "new_status": "processing"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bulk action performed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Order Status has been changed for the selected orders"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

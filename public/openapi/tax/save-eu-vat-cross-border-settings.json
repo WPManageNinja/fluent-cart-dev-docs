@@ -1,0 +1,178 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings/eu-vat": {
+      "post": {
+        "operationId": "saveEuVatCrossBorderSettings",
+        "summary": "POST Save EU VAT Cross-Border Settings",
+        "description": "Save EU VAT cross-border registration settings. Handles the configuration of how cross-border EU VAT is managed (OSS, home country, or specific country registrations).",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action",
+                  "eu_vat_settings"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "description": "Action identifier",
+                    "enum": [
+                      "euCrossBorderSettings"
+                    ],
+                    "example": "euCrossBorderSettings"
+                  },
+                  "eu_vat_settings": {
+                    "type": "object",
+                    "required": [
+                      "method"
+                    ],
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "description": "Cross-border method",
+                        "enum": [
+                          "oss",
+                          "home",
+                          "specific"
+                        ],
+                        "example": "oss"
+                      },
+                      "oss_country": {
+                        "type": "string",
+                        "description": "Country of OSS registration (required when method is oss)",
+                        "example": "DE"
+                      },
+                      "oss_vat": {
+                        "type": "string",
+                        "description": "OSS VAT number",
+                        "example": "DE123456789"
+                      },
+                      "home_country": {
+                        "type": "string",
+                        "description": "Home country code (required when method is home)"
+                      },
+                      "home_vat": {
+                        "type": "string",
+                        "description": "Home VAT number"
+                      }
+                    }
+                  },
+                  "reset_registration": {
+                    "type": "string",
+                    "description": "Set to yes to clear the current method (reset registration)",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "example": "no"
+                  }
+                }
+              },
+              "example": {
+                "action": "euCrossBorderSettings",
+                "eu_vat_settings": {
+                  "method": "oss",
+                  "oss_country": "DE",
+                  "oss_vat": "DE123456789"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "EU VAT settings saved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "EU VAT settings saved successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "EU VAT settings saved successfully"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Validation failed or invalid action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Validation failed for EU VAT settings",
+                  "errors": {
+                    "method": "Select a cross-border registration type"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

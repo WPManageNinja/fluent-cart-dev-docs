@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/reports/quick-order-stats": {
       "get": {
         "operationId": "getQuickOrderStats",
         "summary": "GET Get Quick Order Stats",
-        "description": "Retrieve quick statistics about orders. Note: This endpoint may have issues in some installations.",
+        "description": "Retrieve quick summary statistics for orders within a specified range, with automatic comparison against the equivalent prior period.",
         "tags": [
           "Reports"
         ],
@@ -21,12 +44,14 @@
               "type": "string",
               "enum": [
                 "-0 days",
+                "-7 days",
+                "-30 days",
                 "this_month",
                 "all_time"
               ],
               "default": "-0 days"
             },
-            "description": "Date range",
+            "description": "Date range shortcut. Accepts relative date strings, this_month, or all_time.",
             "required": false
           }
         ],
@@ -38,31 +63,24 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
+                    "stats": {
                       "type": "object",
-                      "description": "Quick order statistics"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error - class not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
+                      "description": "Order statistics"
+                    },
+                    "from_date": {
                       "type": "string",
-                      "description": "Error message",
-                      "example": "Class \"FluentCart\\App\\Modules\\ReportingModule\\Status\" not found"
+                      "description": "Start of the queried date range"
+                    },
+                    "to_date": {
+                      "type": "string",
+                      "description": "End of the queried date range"
                     }
                   }
                 },
                 "example": {
-                  "message": "Class \"FluentCart\\App\\Modules\\ReportingModule\\Status\" not found"
+                  "stats": {},
+                  "from_date": "2025-06-01 00:00:00",
+                  "to_date": "2025-06-15 23:59:59"
                 }
               }
             }
@@ -72,16 +90,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "Error": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Error message",
-            "example": "Class \"FluentCart\\App\\Modules\\ReportingModule\\Status\" not found"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

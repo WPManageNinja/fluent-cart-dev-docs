@@ -1,10 +1,33 @@
 {
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
   "paths": {
     "/products": {
       "post": {
         "operationId": "createProduct",
         "summary": "POST Create Product",
-        "description": "Create a new product.",
+        "description": "Create a new product. A default variation is automatically created with the product.",
         "tags": [
           "Products"
         ],
@@ -20,76 +43,51 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "post_title",
-                  "detail"
+                  "post_title"
                 ],
                 "properties": {
                   "post_title": {
                     "type": "string",
-                    "description": "Product title",
-                    "example": "Dynamic Product"
+                    "description": "Product title (max 200 characters)"
                   },
                   "post_status": {
                     "type": "string",
+                    "description": "Post status",
                     "enum": [
                       "draft",
-                      "publish",
-                      "private"
-                    ],
-                    "default": "draft",
-                    "description": "Post status",
-                    "example": "draft"
-                  },
-                  "post_content": {
-                    "type": "string",
-                    "description": "Product description/content",
-                    "required": false
-                  },
-                  "post_excerpt": {
-                    "type": "string",
-                    "description": "Product excerpt",
-                    "required": false
+                      "publish"
+                    ]
                   },
                   "detail": {
                     "type": "object",
-                    "required": [
-                      "fulfillment_type"
-                    ],
                     "properties": {
                       "fulfillment_type": {
                         "type": "string",
                         "enum": [
-                          "digital",
-                          "physical"
+                          "physical",
+                          "digital"
                         ],
-                        "description": "Fulfillment type for the product",
-                        "example": "digital"
+                        "description": "Fulfillment type (default: digital)"
                       },
-                      "variation_type": {
-                        "type": "string",
-                        "enum": [
-                          "simple",
-                          "simple_variations"
-                        ],
-                        "description": "Variation type",
-                        "required": false
-                      },
-                      "manage_stock": {
-                        "type": "string",
-                        "description": "Whether to manage stock",
-                        "required": false
-                      },
-                      "stock_availability": {
-                        "type": "string",
-                        "description": "Stock availability status",
-                        "required": false
+                      "other_info": {
+                        "type": "object",
+                        "properties": {
+                          "is_bundle_product": {
+                            "type": "string",
+                            "enum": [
+                              "yes",
+                              "no"
+                            ],
+                            "description": "Whether this is a bundle product (default: no)"
+                          }
+                        }
                       }
                     }
                   }
                 }
               },
               "example": {
-                "post_title": "Dynamic Product",
+                "post_title": "New Digital Product",
                 "post_status": "draft",
                 "detail": {
                   "fulfillment_type": "digital"
@@ -100,115 +98,25 @@
         },
         "responses": {
           "200": {
-            "description": "Product created successfully",
+            "description": "Successful response.",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "ID": {
-                          "type": "integer",
-                          "description": "Created product ID",
-                          "example": 7529320
-                        },
-                        "variant": {
-                          "type": "object",
-                          "description": "Created product variant",
-                          "properties": {
-                            "id": {
-                              "type": "integer",
-                              "description": "Variant ID"
-                            },
-                            "post_id": {
-                              "type": "integer",
-                              "description": "Product post ID"
-                            },
-                            "variation_title": {
-                              "type": "string",
-                              "description": "Variant title"
-                            },
-                            "item_price": {
-                              "type": "integer",
-                              "description": "Item price in cents"
-                            },
-                            "stock_status": {
-                              "type": "string",
-                              "description": "Stock status",
-                              "example": "in-stock"
-                            },
-                            "payment_type": {
-                              "type": "string",
-                              "description": "Payment type",
-                              "example": "onetime"
-                            }
-                          }
-                        },
-                        "product_details": {
-                          "type": "object",
-                          "description": "Product details",
-                          "properties": {
-                            "id": {
-                              "type": "integer",
-                              "description": "Product detail ID"
-                            },
-                            "post_id": {
-                              "type": "integer",
-                              "description": "Product post ID"
-                            },
-                            "fulfillment_type": {
-                              "type": "string",
-                              "enum": [
-                                "digital",
-                                "physical"
-                              ],
-                              "description": "Fulfillment type"
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Success message",
-                      "example": "Product has been created successfully"
-                    }
-                  }
-                },
                 "example": {
                   "data": {
-                    "ID": 7529320,
+                    "ID": 124,
                     "variant": {
-                      "id": 1,
-                      "post_id": 7529320,
-                      "variation_title": "Dynamic Product",
-                      "item_price": 0,
+                      "id": 456,
+                      "post_id": 124,
+                      "variation_title": "Example Product",
                       "stock_status": "in-stock",
-                      "payment_type": "onetime"
-                    },
-                    "product_details": {
-                      "id": 1,
-                      "post_id": 7529320,
+                      "payment_type": "onetime",
+                      "total_stock": 1,
+                      "available": 1,
                       "fulfillment_type": "digital"
-                    }
+                    },
+                    "product_details": {}
                   },
                   "message": "Product has been created successfully"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request - validation error or creation failed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": 400,
-                  "message": "Product creation failed!"
                 }
               }
             }
@@ -218,154 +126,13 @@
     }
   },
   "components": {
-    "schemas": {
-      "CreateProductRequest": {
-        "type": "object",
-        "required": [
-          "post_title",
-          "detail"
-        ],
-        "properties": {
-          "post_title": {
-            "type": "string",
-            "description": "Product title",
-            "example": "Dynamic Product"
-          },
-          "post_status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "publish",
-              "private"
-            ],
-            "default": "draft",
-            "description": "Post status",
-            "example": "draft"
-          },
-          "post_content": {
-            "type": "string",
-            "description": "Product description/content",
-            "required": false
-          },
-          "post_excerpt": {
-            "type": "string",
-            "description": "Product excerpt",
-            "required": false
-          },
-          "detail": {
-            "$ref": "#/components/schemas/ProductDetailInput"
-          }
-        }
-      },
-      "ProductDetailInput": {
-        "type": "object",
-        "required": [
-          "fulfillment_type"
-        ],
-        "properties": {
-          "fulfillment_type": {
-            "type": "string",
-            "enum": [
-              "digital",
-              "physical"
-            ],
-            "description": "Fulfillment type for the product",
-            "example": "digital"
-          },
-          "variation_type": {
-            "type": "string",
-            "enum": [
-              "simple",
-              "simple_variations"
-            ],
-            "description": "Variation type",
-            "required": false
-          },
-          "manage_stock": {
-            "type": "string",
-            "description": "Whether to manage stock",
-            "required": false
-          },
-          "stock_availability": {
-            "type": "string",
-            "description": "Stock availability status",
-            "required": false
-          }
-        }
-      },
-      "CreateProductResponse": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "object",
-            "properties": {
-              "ID": {
-                "type": "integer",
-                "description": "Created product ID",
-                "example": 7529320
-              },
-              "variant": {
-                "type": "object",
-                "description": "Created product variant",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "Variant ID"
-                  },
-                  "post_id": {
-                    "type": "integer",
-                    "description": "Product post ID"
-                  },
-                  "variation_title": {
-                    "type": "string",
-                    "description": "Variant title"
-                  },
-                  "item_price": {
-                    "type": "integer",
-                    "description": "Item price in cents"
-                  },
-                  "stock_status": {
-                    "type": "string",
-                    "description": "Stock status",
-                    "example": "in-stock"
-                  },
-                  "payment_type": {
-                    "type": "string",
-                    "description": "Payment type",
-                    "example": "onetime"
-                  }
-                }
-              },
-              "product_details": {
-                "type": "object",
-                "description": "Product details",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "description": "Product detail ID"
-                  },
-                  "post_id": {
-                    "type": "integer",
-                    "description": "Product post ID"
-                  },
-                  "fulfillment_type": {
-                    "type": "string",
-                    "enum": [
-                      "digital",
-                      "physical"
-                    ],
-                    "description": "Fulfillment type"
-                  }
-                }
-              }
-            }
-          },
-          "message": {
-            "type": "string",
-            "description": "Success message",
-            "example": "Product has been created successfully"
-          }
-        }
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

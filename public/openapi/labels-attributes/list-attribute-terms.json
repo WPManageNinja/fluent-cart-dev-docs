@@ -1,0 +1,261 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group/{group_id}/terms": {
+      "get": {
+        "operationId": "listAttributeTerms",
+        "summary": "GET List Attribute Terms",
+        "description": "Retrieve a paginated list of terms for a specific attribute group. Attribute terms are the individual values within an attribute group (e.g., \"Red\", \"Blue\", \"Green\" within the \"Color\" group).",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "The attribute group ID.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search criteria. Each key is a column name with `column`, `operator`, and `value` fields. Searchable columns: `title`, `slug`.",
+            "schema": {
+              "type": "object"
+            }
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "required": false,
+            "description": "Filter criteria. Same format as `search`. Filterable columns: `group_id`, `serial`, `title`, `slug`, `description`, `settings`.",
+            "schema": {
+              "type": "object"
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "description": "Column to sort by: `id`, `title`, `slug`, `serial`, `created_at` (default: `serial`).",
+            "schema": {
+              "type": "string",
+              "default": "serial",
+              "enum": [
+                "id",
+                "title",
+                "slug",
+                "serial",
+                "created_at"
+              ]
+            }
+          },
+          {
+            "name": "order_type",
+            "in": "query",
+            "required": false,
+            "description": "Sort direction: `ASC` or `DESC` (default: `ASC`).",
+            "schema": {
+              "type": "string",
+              "default": "ASC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ]
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "description": "Number of results per page (default: `15`).",
+            "schema": {
+              "type": "integer",
+              "default": 15,
+              "example": 15
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns paginated attribute terms.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "terms": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "integer",
+                          "example": 5
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "example": 15
+                        },
+                        "current_page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AttributeTerm"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "terms": {
+                    "total": 5,
+                    "per_page": 15,
+                    "current_page": 1,
+                    "last_page": 1,
+                    "data": [
+                      {
+                        "id": 1,
+                        "group_id": 1,
+                        "serial": 1,
+                        "title": "Red",
+                        "slug": "red",
+                        "description": null,
+                        "settings": null,
+                        "created_at": "2025-01-10 08:30:00",
+                        "updated_at": "2025-01-10 08:30:00"
+                      },
+                      {
+                        "id": 2,
+                        "group_id": 1,
+                        "serial": 2,
+                        "title": "Blue",
+                        "slug": "blue",
+                        "description": null,
+                        "settings": null,
+                        "created_at": "2025-01-10 08:35:00",
+                        "updated_at": "2025-01-10 08:35:00"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AttributeTerm": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Term ID",
+            "example": 1
+          },
+          "group_id": {
+            "type": "integer",
+            "description": "Parent attribute group ID",
+            "example": 1
+          },
+          "serial": {
+            "type": "integer",
+            "description": "Sort order position",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Term title",
+            "example": "Red"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Term slug identifier",
+            "example": "red"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Term description",
+            "example": null
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true,
+            "description": "Additional term settings",
+            "example": null
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp (UTC)",
+            "example": "2025-01-10 08:30:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update timestamp (UTC)",
+            "example": "2025-01-10 08:30:00"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

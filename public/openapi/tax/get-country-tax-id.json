@@ -1,0 +1,94 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/country-tax-id/{country_code}": {
+      "get": {
+        "operationId": "getCountryTaxId",
+        "summary": "GET Get Country Tax ID",
+        "description": "Retrieve the store's tax identification number (VAT/GST/EIN) for a specific country.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "country_code",
+            "in": "path",
+            "description": "ISO 3166-1 alpha-2 country code (e.g., US, DE)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "DE"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the tax ID for the country.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_data": {
+                      "type": "object",
+                      "properties": {
+                        "tax_id": {
+                          "type": "string",
+                          "description": "Tax identification number",
+                          "example": "DE123456789"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "tax_data": {
+                    "tax_id": "DE123456789"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

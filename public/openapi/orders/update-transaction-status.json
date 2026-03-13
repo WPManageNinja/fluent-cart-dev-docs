@@ -1,0 +1,167 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/transactions/{transaction}/status": {
+      "put": {
+        "operationId": "updateTransactionStatus",
+        "summary": "PUT Update Transaction Status",
+        "description": "Update the payment status of a specific transaction and sync the order's payment status accordingly.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID"
+          },
+          {
+            "name": "transaction",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Transaction ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "description": "New transaction status (e.g., `succeeded`, `pending`, `refunded`, `failed`)"
+                  }
+                }
+              },
+              "example": {
+                "status": "succeeded"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction status updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transaction": {
+                      "type": "object",
+                      "description": "Updated transaction object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Transaction ID"
+                        },
+                        "order_id": {
+                          "type": "integer",
+                          "description": "Order ID"
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "Updated transaction status"
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Transaction total in cents"
+                        },
+                        "payment_method": {
+                          "type": "string",
+                          "description": "Payment method"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Success message"
+                    }
+                  }
+                },
+                "example": {
+                  "transaction": {
+                    "id": 15,
+                    "order_id": 42,
+                    "status": "succeeded",
+                    "total": 5000,
+                    "payment_method": "stripe"
+                  },
+                  "message": "Payment status has been successfully updated"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Transaction already has the same status"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

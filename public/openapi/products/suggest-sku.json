@@ -1,0 +1,94 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/suggest-sku": {
+      "get": {
+        "operationId": "suggestSku",
+        "summary": "GET Suggest SKU",
+        "description": "Generate a unique SKU suggestion based on product and variant titles.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Product title to base SKU on",
+            "required": true
+          },
+          {
+            "name": "variant_title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Variant title to include in SKU",
+            "required": false
+          },
+          {
+            "name": "exclude_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Variation ID to exclude from uniqueness check",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "sku": "EXA-PRO-MON"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

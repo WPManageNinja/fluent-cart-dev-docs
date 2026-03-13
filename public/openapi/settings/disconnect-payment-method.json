@@ -1,0 +1,114 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/payment-methods/disconnect": {
+      "post": {
+        "operationId": "disconnectPaymentMethod",
+        "summary": "POST Disconnect Payment Method",
+        "description": "Disconnect a payment gateway account (e.g., revoke Stripe or PayPal connection).",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "method",
+                  "mode"
+                ],
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "description": "The payment method key to disconnect (e.g., `stripe`, `paypal`).",
+                    "example": "paypal"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "description": "The environment mode to disconnect: `test` or `live`.",
+                    "enum": [
+                      "test",
+                      "live"
+                    ],
+                    "example": "test"
+                  }
+                }
+              },
+              "example": {
+                "method": "paypal",
+                "mode": "test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "PayPal settings has been disconnected"
+                    },
+                    "settings": {
+                      "type": "object",
+                      "description": "Updated payment method settings",
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                "example": {
+                  "message": "PayPal settings has been disconnected",
+                  "settings": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

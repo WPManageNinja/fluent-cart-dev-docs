@@ -1,0 +1,129 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/taxes": {
+      "post": {
+        "operationId": "markTaxesAsFiled",
+        "summary": "POST Mark Taxes as Filed",
+        "description": "Mark one or more order tax records as filed by setting their filed_at timestamp.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of OrderTaxRate record IDs to mark as filed",
+                    "example": [
+                      1,
+                      2,
+                      3,
+                      5
+                    ]
+                  }
+                }
+              },
+              "example": {
+                "ids": [
+                  1,
+                  2,
+                  3,
+                  5
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Taxes marked as filed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Taxes marked as filed successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Taxes marked as filed successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No IDs provided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "No IDs provided to mark!"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "No IDs provided to mark!"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

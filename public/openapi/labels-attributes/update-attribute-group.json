@@ -1,0 +1,164 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group/{group_id}": {
+      "put": {
+        "operationId": "updateAttributeGroup",
+        "summary": "PUT Update Attribute Group",
+        "description": "Update an existing attribute group.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "description": "The attribute group ID.",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAttributeGroupRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Attribute group updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Group updated successfully!"
+                    }
+                  }
+                },
+                "example": {
+                  "data": true,
+                  "message": "Group updated successfully!"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error - duplicate title or slug.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "errors": {
+                    "title": [
+                      "Group title can not be empty and must be unique."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpdateAttributeGroupRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "slug"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Updated group title (max 50 characters). Must be unique (excluding the current group).",
+            "example": "Color Options"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Updated group slug (max 50 characters). Must be unique (excluding the current group).",
+            "example": "color"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Updated group description.",
+            "example": "Available color options for products"
+          },
+          "settings": {
+            "type": "object",
+            "nullable": true,
+            "description": "Updated group settings (stored as JSON)."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

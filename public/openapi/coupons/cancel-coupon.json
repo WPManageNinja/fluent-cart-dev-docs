@@ -1,0 +1,294 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/coupons/cancel": {
+      "post": {
+        "operationId": "cancelCoupon",
+        "summary": "POST Cancel Coupon",
+        "description": "Remove a coupon from an order and recalculate the remaining discounts. If an order_uuid is provided and the coupon was already persisted to the order, it is deleted from the fct_applied_coupons table and the coupon's use_count is decremented.",
+        "tags": [
+          "Coupons"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "coupon_code",
+                  "order_items"
+                ],
+                "properties": {
+                  "coupon_code": {
+                    "type": "string",
+                    "description": "The coupon code to cancel"
+                  },
+                  "order_items": {
+                    "type": "array",
+                    "description": "Array of current order line item objects",
+                    "items": {
+                      "$ref": "#/components/schemas/OrderItem"
+                    }
+                  },
+                  "id": {
+                    "type": "integer",
+                    "description": "The applied coupon record ID (from fct_applied_coupons). Required to delete the persisted record from an existing order."
+                  },
+                  "order_uuid": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "UUID of the existing order"
+                  },
+                  "applied_coupons": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "Array of remaining coupon IDs that should stay applied"
+                  },
+                  "customer_email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Customer email address"
+                  }
+                }
+              },
+              "example": {
+                "coupon_code": "SAVE10",
+                "id": 15,
+                "order_uuid": "abc123-def456",
+                "order_items": [
+                  {
+                    "post_id": 42,
+                    "quantity": 2,
+                    "price": 2500,
+                    "unit_price": 2500,
+                    "item_total": 5000,
+                    "line_total": 5000
+                  }
+                ],
+                "applied_coupons": [
+                  2
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Coupon cancelled successfully. Returns remaining applied coupons and recalculated items.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "applied_coupons": {
+                      "type": "object",
+                      "description": "Map of remaining coupon codes to their applied details",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/AppliedCoupon"
+                      }
+                    },
+                    "calculated_items": {
+                      "type": "array",
+                      "description": "Recalculated order items with remaining discounts",
+                      "items": {
+                        "$ref": "#/components/schemas/CalculatedItem"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "applied_coupons": {
+                    "WELCOME5": {
+                      "id": 2,
+                      "title": "Welcome $5 Off",
+                      "code": "WELCOME5",
+                      "type": "fixed",
+                      "amount": 500,
+                      "discount_amount": 500,
+                      "stackable": "yes",
+                      "priority": 2
+                    }
+                  },
+                  "calculated_items": [
+                    {
+                      "post_id": 42,
+                      "quantity": 2,
+                      "price": 2500,
+                      "discounted_price": 2250,
+                      "discount_total": 500
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Line item ID"
+          },
+          "order_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Parent order ID"
+          },
+          "post_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Product post ID"
+          },
+          "variation_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Variation ID"
+          },
+          "type": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Item type"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Item quantity"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Item title"
+          },
+          "price": {
+            "type": "number",
+            "description": "Item price in cents"
+          },
+          "unit_price": {
+            "type": "number",
+            "description": "Unit price in cents"
+          },
+          "item_total": {
+            "type": "number",
+            "description": "Item total in cents"
+          },
+          "line_total": {
+            "type": "number",
+            "description": "Line total in cents"
+          },
+          "other_info": {
+            "type": "object",
+            "description": "Additional item info"
+          }
+        }
+      },
+      "AppliedCoupon": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Coupon ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Coupon title"
+          },
+          "code": {
+            "type": "string",
+            "description": "Coupon code"
+          },
+          "type": {
+            "type": "string",
+            "description": "Discount type"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Discount amount"
+          },
+          "discount_amount": {
+            "type": "number",
+            "description": "Calculated discount amount in cents"
+          },
+          "stackable": {
+            "type": "string",
+            "description": "Whether coupon is stackable"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Coupon priority"
+          }
+        }
+      },
+      "CalculatedItem": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "description": "Product post ID"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Item quantity"
+          },
+          "price": {
+            "type": "number",
+            "description": "Original price in cents"
+          },
+          "discounted_price": {
+            "type": "number",
+            "description": "Price after discount in cents"
+          },
+          "discount_total": {
+            "type": "number",
+            "description": "Total discount amount in cents"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

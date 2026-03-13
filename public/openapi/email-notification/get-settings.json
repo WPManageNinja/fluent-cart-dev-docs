@@ -1,0 +1,180 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/get-settings": {
+      "get": {
+        "operationId": "getEmailSettings",
+        "summary": "GET Get Global Email Settings",
+        "description": "Retrieve the global email configuration settings used across all notification emails (sender name, email addresses, footer, etc.).",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "from_name": {
+                          "type": "string",
+                          "description": "Sender name displayed in emails",
+                          "example": "My Store"
+                        },
+                        "from_email": {
+                          "type": "string",
+                          "format": "email",
+                          "description": "Sender email address",
+                          "example": "store@example.com"
+                        },
+                        "reply_to_name": {
+                          "type": "string",
+                          "description": "Reply-to name",
+                          "example": ""
+                        },
+                        "reply_to_email": {
+                          "type": "string",
+                          "description": "Reply-to email address",
+                          "example": ""
+                        },
+                        "email_footer": {
+                          "type": "string",
+                          "description": "HTML content for the email footer",
+                          "example": "<p>Thank you for shopping with us!</p>"
+                        },
+                        "show_email_footer": {
+                          "type": "string",
+                          "enum": [
+                            "yes",
+                            "no"
+                          ],
+                          "description": "Whether to show the email footer",
+                          "example": "yes"
+                        },
+                        "admin_email": {
+                          "type": "string",
+                          "description": "Admin notification recipient email(s). Supports shortcodes",
+                          "example": "{{wp.admin_email}}"
+                        },
+                        "notification_config": {
+                          "type": "object",
+                          "description": "Notification-specific configurations"
+                        }
+                      }
+                    },
+                    "shortcodes": {
+                      "type": "array",
+                      "description": "Available shortcode groups for settings fields",
+                      "items": {
+                        "$ref": "#/components/schemas/ShortcodeGroup"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "data": {
+                    "from_name": "My Store",
+                    "from_email": "store@example.com",
+                    "reply_to_name": "",
+                    "reply_to_email": "",
+                    "email_footer": "<p>Thank you for shopping with us!</p>",
+                    "show_email_footer": "yes",
+                    "admin_email": "{{wp.admin_email}}",
+                    "notification_config": {}
+                  },
+                  "shortcodes": [
+                    {
+                      "title": "General",
+                      "key": "wp",
+                      "shortcodes": {
+                        "{{wp.admin_email}}": "Admin Email",
+                        "{{wp.site_url}}": "Site URL",
+                        "{{wp.site_title}}": "Site Title",
+                        "{{user.display_name}}": "User Display Name",
+                        "{{user.user_email}}": "User Email"
+                      }
+                    },
+                    {
+                      "title": "Settings",
+                      "key": "settings",
+                      "shortcodes": {
+                        "{{settings.store_name}}": "Store Name",
+                        "{{settings.store_logo}}": "Store Logo",
+                        "{{settings.store_address}}": "Store Address Line 1"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShortcodeGroup": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Group title",
+            "example": "General"
+          },
+          "key": {
+            "type": "string",
+            "description": "Group key",
+            "example": "wp"
+          },
+          "shortcodes": {
+            "type": "object",
+            "description": "Shortcodes in this group, keyed by shortcode pattern with description as value",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

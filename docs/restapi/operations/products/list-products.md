@@ -1,8 +1,7 @@
 ---
 title: List Products
-description: "Retrieve a paginated list of products with optional filtering and searching."
+description: "Retrieve a paginated list of products with filtering, sorting, and search capabilities."
 outline: false
 aside: false
 ---
-<OAOperation operationId="listProducts" />
-
+<OAOperation operationId="listProducts" specUrl="/openapi/public/products/list-products.json" />

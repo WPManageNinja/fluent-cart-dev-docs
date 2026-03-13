@@ -1,0 +1,175 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings/eu-vat/oss/shipping-override": {
+      "post": {
+        "operationId": "saveOssShippingTaxOverride",
+        "summary": "POST Save OSS Shipping Tax Override",
+        "description": "Save or update OSS shipping tax rate overrides for a specific EU country. Supports the for_shipping field for shipping-specific tax rates.",
+        "tags": [
+          "Tax"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "country_code",
+                  "overrides"
+                ],
+                "properties": {
+                  "country_code": {
+                    "type": "string",
+                    "description": "ISO 3166-1 alpha-2 country code of the EU member state",
+                    "example": "IT"
+                  },
+                  "overrides": {
+                    "type": "array",
+                    "description": "Array of override objects",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "rate"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Tax class slug",
+                          "enum": [
+                            "standard",
+                            "reduced",
+                            "zero"
+                          ],
+                          "example": "standard"
+                        },
+                        "rate": {
+                          "type": "string",
+                          "description": "The overridden tax rate percentage",
+                          "example": "22.0000"
+                        },
+                        "for_shipping": {
+                          "type": "integer",
+                          "description": "Shipping-specific tax rate override (default: 0)",
+                          "default": 0,
+                          "example": 10
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "country_code": "IT",
+                "overrides": [
+                  {
+                    "type": "standard",
+                    "rate": "22.0000",
+                    "for_shipping": 10
+                  },
+                  {
+                    "type": "reduced",
+                    "rate": "10.0000",
+                    "for_shipping": 5
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OSS shipping tax override saved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "OSS tax override saved successfully"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "OSS tax override saved successfully"
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Validation failed for OSS tax override"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "country_code": {
+                          "type": "string",
+                          "example": "Select country of OSS registration"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Validation failed for OSS tax override",
+                  "errors": {
+                    "country_code": "Select country of OSS registration"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

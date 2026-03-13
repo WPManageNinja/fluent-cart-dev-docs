@@ -1,0 +1,159 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/shipping/zones": {
+      "post": {
+        "operationId": "createShippingZone",
+        "summary": "POST Create Shipping Zone",
+        "description": "Create a new shipping zone.",
+        "tags": [
+          "Shipping"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 192,
+                    "description": "Zone name (max 192 characters)"
+                  },
+                  "region": {
+                    "type": "string",
+                    "description": "ISO 3166-1 alpha-2 country code (e.g., US, GB) or 'all' for worldwide. Only one 'all' zone is allowed."
+                  },
+                  "order": {
+                    "type": "integer",
+                    "description": "Sort order for display priority"
+                  }
+                }
+              },
+              "example": {
+                "name": "Europe",
+                "region": "DE",
+                "order": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipping zone created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "shipping_zone": {
+                      "$ref": "#/components/schemas/ShippingZone"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "shipping_zone": {
+                    "id": 3,
+                    "name": "Europe",
+                    "region": "DE",
+                    "order": 2,
+                    "formatted_region": "Germany",
+                    "created_at": "2025-02-01 08:00:00",
+                    "updated_at": "2025-02-01 08:00:00"
+                  },
+                  "message": "Shipping zone has been created successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShippingZone": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique zone identifier",
+            "example": 3
+          },
+          "name": {
+            "type": "string",
+            "description": "Zone display name",
+            "example": "Europe"
+          },
+          "region": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code or 'all'",
+            "example": "DE"
+          },
+          "order": {
+            "type": "integer",
+            "description": "Sort order for display priority",
+            "example": 2
+          },
+          "formatted_region": {
+            "type": "string",
+            "description": "Human-readable region name",
+            "example": "Germany"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp (UTC)"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp (UTC)"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

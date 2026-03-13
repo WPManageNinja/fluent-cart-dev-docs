@@ -74,8 +74,14 @@
                   "settings": {
                     "name": "Add to FluentCRM List",
                     "list_id": 1,
-                    "tag_ids": [5, 8],
-                    "conditional_variation_ids": [456, 457],
+                    "tag_ids": [
+                      5,
+                      8
+                    ],
+                    "conditional_variation_ids": [
+                      456,
+                      457
+                    ],
                     "enabled": "yes"
                   },
                   "fields": [
@@ -103,6 +109,48 @@
                     }
                   ],
                   "scope": "product"
+                },
+                "schema": {
+                  "example": {
+                    "settings": {
+                      "name": "Add to FluentCRM List",
+                      "list_id": 1,
+                      "tag_ids": [
+                        5,
+                        8
+                      ],
+                      "conditional_variation_ids": [
+                        456,
+                        457
+                      ],
+                      "enabled": "yes"
+                    },
+                    "fields": [
+                      {
+                        "key": "name",
+                        "label": "Feed Name",
+                        "type": "text",
+                        "required": true
+                      },
+                      {
+                        "key": "list_id",
+                        "label": "FluentCRM List",
+                        "type": "select",
+                        "required": true
+                      }
+                    ],
+                    "product_variations": [
+                      {
+                        "id": 456,
+                        "title": "Personal License"
+                      },
+                      {
+                        "id": 457,
+                        "title": "Business License - Annual"
+                      }
+                    ],
+                    "scope": "product"
+                  }
                 }
               }
             }

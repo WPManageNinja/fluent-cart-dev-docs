@@ -195,6 +195,88 @@
                       },
                       "description": "Comparison period metrics"
                     }
+                  },
+                  "example": {
+                    "summary": {
+                      "total_refunds": 8,
+                      "total_refund_amount": 70000,
+                      "average_refund": 8750,
+                      "refund_rate": 2.3
+                    },
+                    "previousSummary": {
+                      "total_refunds": 6,
+                      "total_refund_amount": 52000,
+                      "average_refund": 8667,
+                      "refund_rate": 2.1
+                    },
+                    "chartData": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01",
+                        "refund_count": 1,
+                        "refund_amount": 9900
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-02",
+                        "refund_count": 2,
+                        "refund_amount": 14800
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-03",
+                        "refund_count": 0,
+                        "refund_amount": 0
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-04",
+                        "refund_count": 1,
+                        "refund_amount": 4900
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-05",
+                        "refund_count": 2,
+                        "refund_amount": 19800
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-06",
+                        "refund_count": 2,
+                        "refund_amount": 20600
+                      }
+                    ],
+                    "fluctuations": {
+                      "total_refunds": {
+                        "value": 33.3,
+                        "direction": "up"
+                      },
+                      "total_refund_amount": {
+                        "value": 34.6,
+                        "direction": "up"
+                      }
+                    },
+                    "previousMetrics": [
+                      {
+                        "year": "2024",
+                        "group": "2024-07",
+                        "refund_count": 1,
+                        "refund_amount": 8500
+                      },
+                      {
+                        "year": "2024",
+                        "group": "2024-08",
+                        "refund_count": 2,
+                        "refund_amount": 15000
+                      },
+                      {
+                        "year": "2024",
+                        "group": "2024-09",
+                        "refund_count": 3,
+                        "refund_amount": 28500
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -293,7 +375,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

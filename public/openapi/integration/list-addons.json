@@ -51,6 +51,44 @@
                         "$ref": "#/components/schemas/IntegrationAddon"
                       }
                     }
+                  },
+                  "example": {
+                    "addons": {
+                      "fluent-crm": {
+                        "installable": "fluent-crm",
+                        "enabled": true,
+                        "title": "FluentCRM",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
+                        "categories": [
+                          "crm",
+                          "core",
+                          "marketing"
+                        ],
+                        "description": "The most powerful email marketing automation plugin for WordPress."
+                      },
+                      "fluent-smtp": {
+                        "installable": "fluent-smtp",
+                        "enabled": false,
+                        "title": "FluentSMTP",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluent-smtp.svg",
+                        "categories": [
+                          "core",
+                          "marketing"
+                        ],
+                        "description": "A free WordPress SMTP plugin to send emails via multiple providers."
+                      },
+                      "webhook": {
+                        "title": "Webhook",
+                        "description": "Send data anywhere via webhook",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/webhook.svg",
+                        "enabled": true,
+                        "is_pro": true,
+                        "is_pro_active": true,
+                        "categories": [
+                          "core"
+                        ]
+                      }
+                    }
                   }
                 },
                 "example": {

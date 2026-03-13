@@ -100,6 +100,14 @@
                     ],
                     "example": "no"
                   }
+                },
+                "example": {
+                  "action": "euCrossBorderSettings",
+                  "eu_vat_settings": {
+                    "method": "oss",
+                    "oss_country": "DE",
+                    "oss_vat": "DE123456789"
+                  }
                 }
               },
               "example": {
@@ -125,6 +133,9 @@
                       "type": "string",
                       "example": "EU VAT settings saved successfully"
                     }
+                  },
+                  "example": {
+                    "message": "EU VAT settings saved successfully"
                   }
                 },
                 "example": {
@@ -148,6 +159,12 @@
                       "additionalProperties": {
                         "type": "string"
                       }
+                    }
+                  },
+                  "example": {
+                    "message": "Validation failed for EU VAT settings",
+                    "errors": {
+                      "method": "Select a cross-border registration type"
                     }
                   }
                 },

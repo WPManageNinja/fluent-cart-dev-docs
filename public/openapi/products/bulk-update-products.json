@@ -54,6 +54,14 @@
                     },
                     "description": "Array of product data objects to update (max 10)"
                   }
+                },
+                "example": {
+                  "products": [
+                    {
+                      "ID": 123,
+                      "post_title": "Updated Title A"
+                    }
+                  ]
                 }
               },
               "example": {
@@ -82,6 +90,19 @@
                     }
                   ],
                   "errors": []
+                },
+                "schema": {
+                  "example": {
+                    "message": "1 product(s) updated successfully",
+                    "updated": [
+                      {
+                        "ID": 123,
+                        "post_title": "Updated Title A",
+                        "post_status": "publish"
+                      }
+                    ],
+                    "errors": []
+                  }
                 }
               }
             }

@@ -60,6 +60,9 @@
                       "type": "string",
                       "example": "Tax class has been deleted successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Tax class has been deleted successfully"
                   }
                 },
                 "example": {
@@ -79,6 +82,9 @@
                       "type": "string",
                       "example": "Failed to delete tax class"
                     }
+                  },
+                  "example": {
+                    "message": "Failed to delete tax class"
                   }
                 },
                 "example": {

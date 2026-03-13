@@ -53,6 +53,13 @@
                     },
                     "description": "Array of zone IDs in the desired display order"
                   }
+                },
+                "example": {
+                  "zones": [
+                    3,
+                    1,
+                    2
+                  ]
                 }
               },
               "example": {
@@ -76,6 +83,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Shipping zones order has been updated"
                   }
                 },
                 "example": {
@@ -94,6 +104,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Invalid data provided"
                   }
                 },
                 "example": {

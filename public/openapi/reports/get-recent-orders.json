@@ -77,6 +77,90 @@
                       },
                       "description": "List of 10 most recent orders"
                     }
+                  },
+                  "example": {
+                    "recentOrders": [
+                      {
+                        "id": 342,
+                        "customer_id": 105,
+                        "customer_name": "Sarah Johnson",
+                        "total_amount": 106.92,
+                        "created_at": "2025-09-20 14:25:00",
+                        "order_items_count": 2
+                      },
+                      {
+                        "id": 341,
+                        "customer_id": 98,
+                        "customer_name": "Mike Chen",
+                        "total_amount": 49,
+                        "created_at": "2025-09-20 11:10:00",
+                        "order_items_count": 1
+                      },
+                      {
+                        "id": 340,
+                        "customer_id": 112,
+                        "customer_name": "Emily Wilson",
+                        "total_amount": 199,
+                        "created_at": "2025-09-19 16:45:00",
+                        "order_items_count": 3
+                      },
+                      {
+                        "id": 339,
+                        "customer_id": 87,
+                        "customer_name": "James Rodriguez",
+                        "total_amount": 29,
+                        "created_at": "2025-09-19 14:20:00",
+                        "order_items_count": 1
+                      },
+                      {
+                        "id": 338,
+                        "customer_id": 42,
+                        "customer_name": "Lisa Anderson",
+                        "total_amount": 149,
+                        "created_at": "2025-09-19 10:05:00",
+                        "order_items_count": 2
+                      },
+                      {
+                        "id": 337,
+                        "customer_id": 73,
+                        "customer_name": "David Kim",
+                        "total_amount": 99,
+                        "created_at": "2025-09-18 16:30:00",
+                        "order_items_count": 1
+                      },
+                      {
+                        "id": 336,
+                        "customer_id": 156,
+                        "customer_name": "Anna Schmidt",
+                        "total_amount": 248,
+                        "created_at": "2025-09-18 12:15:00",
+                        "order_items_count": 4
+                      },
+                      {
+                        "id": 335,
+                        "customer_id": 91,
+                        "customer_name": "Robert Taylor",
+                        "total_amount": 49,
+                        "created_at": "2025-09-18 09:45:00",
+                        "order_items_count": 1
+                      },
+                      {
+                        "id": 334,
+                        "customer_id": 128,
+                        "customer_name": "Maria Garcia",
+                        "total_amount": 99,
+                        "created_at": "2025-09-17 15:50:00",
+                        "order_items_count": 1
+                      },
+                      {
+                        "id": 333,
+                        "customer_id": 64,
+                        "customer_name": "Thomas Brown",
+                        "total_amount": 178,
+                        "created_at": "2025-09-17 11:20:00",
+                        "order_items_count": 2
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -177,7 +261,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

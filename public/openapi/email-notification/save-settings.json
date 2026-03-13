@@ -97,6 +97,15 @@
                     "description": "Show or hide the email footer. On free plans, this is always forced to yes",
                     "example": "yes"
                   }
+                },
+                "example": {
+                  "from_name": "TechStore",
+                  "from_email": "orders@example.com",
+                  "reply_to_name": "TechStore Support",
+                  "reply_to_email": "support@example.com",
+                  "email_footer": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p>",
+                  "admin_email": "admin@techstore.com",
+                  "show_email_footer": "yes"
                 }
               },
               "example": {
@@ -123,6 +132,9 @@
                       "type": "string",
                       "example": "Email settings saved successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Email settings saved successfully"
                   }
                 },
                 "example": {
@@ -142,6 +154,9 @@
                       "type": "string",
                       "example": "Failed to save email settings"
                     }
+                  },
+                  "example": {
+                    "message": "Failed to save email settings"
                   }
                 },
                 "example": {
@@ -161,7 +176,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

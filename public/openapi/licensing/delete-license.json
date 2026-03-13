@@ -58,6 +58,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "License deleted successfully!"
                   }
                 },
                 "example": {

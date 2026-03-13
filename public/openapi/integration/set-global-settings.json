@@ -79,6 +79,10 @@
                     "status": {
                       "type": "boolean"
                     }
+                  },
+                  "example": {
+                    "message": "Settings saved successfully",
+                    "status": true
                   }
                 },
                 "example": {

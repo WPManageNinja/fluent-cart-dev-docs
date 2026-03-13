@@ -115,6 +115,18 @@
                     ],
                     "description": "Set to `1` to make this the primary address. Defaults to `0`. Automatically set to `1` if no primary address exists."
                   }
+                },
+                "example": {
+                  "type": "billing",
+                  "name": "John Doe",
+                  "address_1": "123 Main St",
+                  "city": "New York",
+                  "state": "NY",
+                  "postcode": "10001",
+                  "country": "US",
+                  "phone": "+1234567890",
+                  "email": "john@example.com",
+                  "label": "Home"
                 }
               },
               "example": {
@@ -154,6 +166,25 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "message": "Customer address created successfully!",
+                    "data": {
+                      "is_created": {
+                        "id": 10,
+                        "customer_id": 1,
+                        "type": "billing",
+                        "name": "John Doe",
+                        "address_1": "123 Main St",
+                        "city": "New York",
+                        "state": "NY",
+                        "postcode": "10001",
+                        "country": "US",
+                        "is_primary": "1",
+                        "status": "active"
+                      },
+                      "total_address_count": 2
+                    }
                   }
                 },
                 "example": {
@@ -184,6 +215,11 @@
               "application/json": {
                 "example": {
                   "message": "Name field is required."
+                },
+                "schema": {
+                  "example": {
+                    "message": "Name field is required."
+                  }
                 }
               }
             }

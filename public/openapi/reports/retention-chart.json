@@ -159,6 +159,40 @@
                       "type": "object",
                       "description": "Retention chart data"
                     }
+                  },
+                  "example": {
+                    "chartData": {
+                      "labels": [
+                        "Month 1",
+                        "Month 2",
+                        "Month 3",
+                        "Month 4",
+                        "Month 5",
+                        "Month 6",
+                        "Month 7",
+                        "Month 8",
+                        "Month 9",
+                        "Month 10",
+                        "Month 11",
+                        "Month 12"
+                      ],
+                      "data": [
+                        100,
+                        92,
+                        87,
+                        83,
+                        80,
+                        78,
+                        76,
+                        74,
+                        73,
+                        72,
+                        71,
+                        70
+                      ],
+                      "total_initial_subscribers": 183,
+                      "current_active": 128
+                    }
                   }
                 },
                 "example": {
@@ -209,7 +243,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

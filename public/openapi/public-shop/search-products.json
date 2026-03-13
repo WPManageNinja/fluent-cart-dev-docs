@@ -77,6 +77,9 @@
                       "type": "string",
                       "description": "Pre-rendered HTML for direct insertion into the search results dropdown"
                     }
+                  },
+                  "example": {
+                    "htmlView": "<div class=\"fct-search-result-item\"><a href=\"https://example.com/product/premium-t-shirt\">Premium T-Shirt</a></div>..."
                   }
                 },
                 "example": {

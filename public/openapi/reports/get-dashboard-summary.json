@@ -66,6 +66,14 @@
                       },
                       "description": "Store summary data"
                     }
+                  },
+                  "example": {
+                    "summaryData": {
+                      "total_products": 25,
+                      "draft_products": 3,
+                      "active_coupons": 8,
+                      "expired_coupons": 4
+                    }
                   }
                 },
                 "example": {
@@ -90,7 +98,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

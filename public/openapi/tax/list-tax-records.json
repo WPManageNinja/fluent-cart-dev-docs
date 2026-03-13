@@ -198,6 +198,40 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "taxes": {
+                      "current_page": 1,
+                      "data": [
+                        {
+                          "id": 1,
+                          "order_id": 42,
+                          "tax_rate_id": 5,
+                          "shipping_tax": 150,
+                          "order_tax": 1000,
+                          "total_tax": 1150,
+                          "meta": {
+                            "rates": [
+                              {
+                                "rate_id": 5,
+                                "name": "CA State Tax",
+                                "rate": "8.2500",
+                                "tax_amount": 825,
+                                "shipping_tax_amount": 150
+                              }
+                            ],
+                            "tax_country": "US",
+                            "store_vat_number": "12-3456789"
+                          },
+                          "filed_at": null,
+                          "created_at": "2025-06-01 12:00:00",
+                          "updated_at": "2025-06-01 12:00:00"
+                        }
+                      ],
+                      "per_page": 10,
+                      "total": 50,
+                      "last_page": 5
+                    }
                   }
                 },
                 "example": {

@@ -58,6 +58,13 @@
                       "cod"
                     ]
                   }
+                },
+                "example": {
+                  "order": [
+                    "stripe",
+                    "paypal",
+                    "cod"
+                  ]
                 }
               },
               "example": {
@@ -93,6 +100,14 @@
                         "cod"
                       ]
                     }
+                  },
+                  "example": {
+                    "message": "Payment methods order saved successfully",
+                    "order": [
+                      "stripe",
+                      "paypal",
+                      "cod"
+                    ]
                   }
                 },
                 "example": {

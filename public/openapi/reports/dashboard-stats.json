@@ -90,6 +90,35 @@
                       "description": "Dashboard statistics with current and comparison counts",
                       "additionalProperties": true
                     }
+                  },
+                  "example": {
+                    "dashBoardStats": {
+                      "total_orders": {
+                        "title": "All Orders",
+                        "icon": "AllOrdersIcon",
+                        "current_count": 342,
+                        "compare_count": 289
+                      },
+                      "paid_orders": {
+                        "title": "Paid Orders",
+                        "icon": "Money",
+                        "current_count": 328,
+                        "compare_count": 275
+                      },
+                      "total_paid_order_items": {
+                        "title": "Paid Order Items",
+                        "icon": "OrderItemsIcon",
+                        "current_count": 856,
+                        "compare_count": 720
+                      },
+                      "total_paid_amounts": {
+                        "title": "Order Value (Paid)",
+                        "icon": "OrderValueIcon",
+                        "current_count": 1250000,
+                        "compare_count": 1050000,
+                        "is_cents": true
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -135,7 +164,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

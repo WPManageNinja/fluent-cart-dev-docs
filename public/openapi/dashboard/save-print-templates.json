@@ -66,6 +66,14 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "templates": [
+                    {
+                      "key": "invoice_template",
+                      "content": "<html><body><h1>Invoice #{order_id}</h1>...</body></html>"
+                    }
+                  ]
                 }
               },
               "example": {
@@ -90,6 +98,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Template saved successfully"
                   }
                 },
                 "example": {

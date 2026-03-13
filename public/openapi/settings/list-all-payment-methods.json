@@ -80,6 +80,46 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "gateways": [
+                      {
+                        "method_key": "stripe",
+                        "title": "Stripe",
+                        "is_active": "yes",
+                        "description": "Accept credit and debit card payments via Stripe",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/stripe.svg",
+                        "upcoming": false,
+                        "requires_pro": false
+                      },
+                      {
+                        "method_key": "paypal",
+                        "title": "PayPal",
+                        "is_active": "yes",
+                        "description": "Accept payments via PayPal",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg",
+                        "upcoming": false,
+                        "requires_pro": true
+                      },
+                      {
+                        "method_key": "cod",
+                        "title": "Cash on Delivery",
+                        "is_active": "no",
+                        "description": "Accept cash payment upon delivery",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/cod.svg",
+                        "upcoming": false,
+                        "requires_pro": false
+                      },
+                      {
+                        "method_key": "square",
+                        "title": "Square",
+                        "is_active": "no",
+                        "description": "Accept payments via Square",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/square.svg",
+                        "upcoming": false,
+                        "requires_pro": true
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -136,7 +176,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

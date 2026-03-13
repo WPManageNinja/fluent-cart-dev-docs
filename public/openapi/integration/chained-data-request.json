@@ -52,7 +52,11 @@
                     "example": "fluent-crm"
                   }
                 },
-                "additionalProperties": true
+                "additionalProperties": true,
+                "example": {
+                  "route": "fluent-crm",
+                  "list_id": "2"
+                }
               },
               "example": {
                 "route": "fluent-crm",
@@ -83,6 +87,18 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "options": [
+                      {
+                        "id": "1",
+                        "label": "Option A"
+                      },
+                      {
+                        "id": "2",
+                        "label": "Option B"
+                      }
+                    ]
                   }
                 },
                 "example": {

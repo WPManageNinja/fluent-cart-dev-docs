@@ -51,6 +51,140 @@
                         "$ref": "#/components/schemas/EmailNotification"
                       }
                     }
+                  },
+                  "example": {
+                    "data": {
+                      "order_paid_admin": {
+                        "event": "order_paid_done",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Send mail to admin after New Order Paid",
+                        "description": "This email will be sent to the admin after an order is placed.",
+                        "recipient": "admin",
+                        "smartcode_groups": [
+                          "order",
+                          "customer",
+                          "transaction"
+                        ],
+                        "template_path": "order.paid.admin",
+                        "is_async": false,
+                        "pre_header": "You got a new order on your shop! Order #{{order.invoice_no}} totaling {{order.total_amount_formatted}}.",
+                        "name": "order_paid_admin",
+                        "settings": {
+                          "active": "yes",
+                          "subject": "New Sales On {{settings.store_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        }
+                      },
+                      "order_paid_customer": {
+                        "event": "order_paid",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Purchase receipt to customer",
+                        "description": "This email will be sent to the customer after an order is placed.",
+                        "recipient": "customer",
+                        "smartcode_groups": [
+                          "order",
+                          "customer",
+                          "transaction"
+                        ],
+                        "template_path": "order.paid.customer",
+                        "is_async": false,
+                        "name": "order_paid_customer",
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Purchase Receipt #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        }
+                      },
+                      "order_refunded_admin": {
+                        "event": "order_refunded",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Order refund notification to admin",
+                        "description": "This email will be sent to the admin when an order is refunded.",
+                        "recipient": "admin",
+                        "smartcode_groups": [
+                          "order",
+                          "customer",
+                          "transaction"
+                        ],
+                        "template_path": "order.refunded.admin",
+                        "is_async": false,
+                        "pre_header": "A refund has been processed for order #{{order.invoice_no}}.",
+                        "name": "order_refunded_admin",
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Refund Processed for Order #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        }
+                      },
+                      "order_refunded_customer": {
+                        "event": "order_refunded",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Order refund notification to customer",
+                        "description": "This email will be sent to the customer when their order is refunded.",
+                        "recipient": "customer",
+                        "smartcode_groups": [
+                          "order",
+                          "customer",
+                          "transaction"
+                        ],
+                        "template_path": "order.refunded.customer",
+                        "is_async": false,
+                        "name": "order_refunded_customer",
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Your Refund for Order #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        }
+                      },
+                      "subscription_renewal_customer": {
+                        "event": "subscription_renewal",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Subscription renewal notification to customer",
+                        "description": "This email will be sent to the customer when their subscription is renewed.",
+                        "recipient": "customer",
+                        "smartcode_groups": [
+                          "subscription"
+                        ],
+                        "template_path": "subscription.renewal.customer",
+                        "is_async": false,
+                        "name": "subscription_renewal_customer",
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Subscription Renewed - Receipt #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        }
+                      },
+                      "subscription_canceled_customer": {
+                        "event": "subscription_canceled",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Subscription canceled notification to customer",
+                        "description": "This email will be sent to the customer when their subscription is canceled.",
+                        "recipient": "customer",
+                        "smartcode_groups": [
+                          "subscription"
+                        ],
+                        "template_path": "subscription.canceled.customer",
+                        "is_async": false,
+                        "name": "subscription_canceled_customer",
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Your Subscription Has Been Canceled",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        }
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -304,7 +438,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

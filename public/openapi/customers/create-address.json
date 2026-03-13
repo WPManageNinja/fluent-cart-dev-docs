@@ -136,6 +136,20 @@
                     "type": "integer",
                     "description": "Order ID to sync this address with."
                   }
+                },
+                "example": {
+                  "name": "Sarah Johnson",
+                  "email": "sarah.johnson@example.com",
+                  "address_1": "456 Market Street",
+                  "address_2": "Suite 300",
+                  "city": "San Francisco",
+                  "state": "CA",
+                  "postcode": "94102",
+                  "country": "US",
+                  "phone": "+1-415-555-0142",
+                  "type": "billing",
+                  "label": "Office",
+                  "company_name": "TechStart Inc."
                 }
               },
               "example": {
@@ -168,6 +182,28 @@
                     },
                     "data": {
                       "type": "object"
+                    }
+                  },
+                  "example": {
+                    "message": "Billing address created successfully!",
+                    "data": {
+                      "id": 25,
+                      "customer_id": 12,
+                      "is_primary": 1,
+                      "type": "billing",
+                      "status": "active",
+                      "label": "Office",
+                      "name": "Sarah Johnson",
+                      "address_1": "456 Market Street",
+                      "address_2": "Suite 300",
+                      "city": "San Francisco",
+                      "state": "CA",
+                      "postcode": "94102",
+                      "country": "US",
+                      "phone": "+1-415-555-0142",
+                      "email": "sarah.johnson@example.com",
+                      "company": "TechStart Inc.",
+                      "meta": null
                     }
                   }
                 },

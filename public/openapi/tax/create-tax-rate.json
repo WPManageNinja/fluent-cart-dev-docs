@@ -118,6 +118,14 @@
                     "default": 0,
                     "example": 0
                   }
+                },
+                "example": {
+                  "class_id": 1,
+                  "country": "FR",
+                  "rate": "20.0000",
+                  "name": "FR Standard Tax",
+                  "group": "EU",
+                  "priority": 1
                 }
               },
               "example": {
@@ -146,6 +154,29 @@
                       "type": "string",
                       "example": "Tax rate has been created successfully"
                     }
+                  },
+                  "example": {
+                    "tax_rate": {
+                      "id": 10,
+                      "class_id": 1,
+                      "country": "FR",
+                      "state": "",
+                      "postcode": "",
+                      "city": "",
+                      "rate": "20.0000",
+                      "name": "FR Standard Tax",
+                      "group": "EU",
+                      "priority": 1,
+                      "is_compound": 0,
+                      "for_shipping": null,
+                      "for_order": 0,
+                      "formatted_state": "",
+                      "tax_class": {
+                        "id": 1,
+                        "title": "Standard"
+                      }
+                    },
+                    "message": "Tax rate has been created successfully"
                   }
                 },
                 "example": {
@@ -185,6 +216,9 @@
                       "type": "string",
                       "example": "Tax class is required"
                     }
+                  },
+                  "example": {
+                    "message": "Tax class is required"
                   }
                 },
                 "example": {

@@ -70,6 +70,15 @@
                         "$ref": "#/components/schemas/SearchOption"
                       }
                     }
+                  },
+                  "example": {
+                    "options": [
+                      {
+                        "id": "option_1",
+                        "label": "Option Label",
+                        "value": "option_value"
+                      }
+                    ]
                   }
                 },
                 "example": {

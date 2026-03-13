@@ -75,6 +75,10 @@
                     "type": "integer",
                     "description": "Available stock quantity"
                   }
+                },
+                "example": {
+                  "total_stock": 100,
+                  "available": 80
                 }
               },
               "example": {
@@ -91,6 +95,11 @@
               "application/json": {
                 "example": {
                   "message": "Inventory updated successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Inventory updated successfully"
+                  }
                 }
               }
             }

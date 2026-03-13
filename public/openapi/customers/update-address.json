@@ -141,6 +141,20 @@
                     "type": "integer",
                     "description": "Order ID to sync address changes with"
                   }
+                },
+                "example": {
+                  "id": 25,
+                  "name": "Sarah Johnson",
+                  "email": "sarah.johnson@example.com",
+                  "address_1": "456 Market Street",
+                  "address_2": "Suite 500",
+                  "city": "San Francisco",
+                  "state": "CA",
+                  "postcode": "94102",
+                  "country": "US",
+                  "phone": "+1-415-555-0142",
+                  "type": "billing",
+                  "company_name": "TechStart Inc."
                 }
               },
               "example": {
@@ -173,6 +187,26 @@
                     },
                     "data": {
                       "type": "object"
+                    }
+                  },
+                  "example": {
+                    "message": "Billing address updated successfully!",
+                    "data": {
+                      "id": 25,
+                      "customer_id": 12,
+                      "is_primary": 1,
+                      "type": "billing",
+                      "name": "Sarah Johnson",
+                      "address_1": "456 Market Street",
+                      "address_2": "Suite 500",
+                      "city": "San Francisco",
+                      "state": "CA",
+                      "postcode": "94102",
+                      "country": "US",
+                      "phone": "+1-415-555-0142",
+                      "email": "sarah.johnson@example.com",
+                      "company": "TechStart Inc.",
+                      "meta": null
                     }
                   }
                 },
@@ -207,6 +241,13 @@
                   "code": 404,
                   "message": "Address not found, please reload the page and try again!",
                   "data": ""
+                },
+                "schema": {
+                  "example": {
+                    "code": 404,
+                    "message": "Address not found, please reload the page and try again!",
+                    "data": ""
+                  }
                 }
               }
             }

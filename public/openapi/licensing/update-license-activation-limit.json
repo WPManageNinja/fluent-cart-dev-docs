@@ -68,6 +68,9 @@
                     ],
                     "description": "New activation limit. Use a positive integer for a specific limit, or `0` / `\"unlimited\"` for unlimited activations"
                   }
+                },
+                "example": {
+                  "limit": 10
                 }
               },
               "example": {
@@ -98,6 +101,13 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "license": {
+                      "id": 1,
+                      "limit": 10
+                    },
+                    "message": "License limit has been updated successfully!"
                   }
                 },
                 "example": {

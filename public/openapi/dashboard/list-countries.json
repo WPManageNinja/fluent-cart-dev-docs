@@ -50,6 +50,22 @@
                         "$ref": "#/components/schemas/CountryOption"
                       }
                     }
+                  },
+                  "example": {
+                    "data": [
+                      {
+                        "label": "United States",
+                        "value": "US"
+                      },
+                      {
+                        "label": "United Kingdom",
+                        "value": "GB"
+                      },
+                      {
+                        "label": "Canada",
+                        "value": "CA"
+                      }
+                    ]
                   }
                 },
                 "example": {

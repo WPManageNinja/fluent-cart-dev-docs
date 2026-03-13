@@ -71,6 +71,9 @@
                     "description": "GitHub release asset path (defaults to `zipball_url`).",
                     "example": "zipball_url"
                   }
+                },
+                "example": {
+                  "plugin_slug": "fluent-cart-elementor-blocks"
                 }
               },
               "example": {
@@ -95,6 +98,10 @@
                       "type": "string",
                       "example": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php"
                     }
+                  },
+                  "example": {
+                    "message": "Addon installed successfully",
+                    "plugin_file": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php"
                   }
                 },
                 "example": {

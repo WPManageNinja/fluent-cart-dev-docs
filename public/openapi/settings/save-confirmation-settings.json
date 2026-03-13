@@ -71,6 +71,13 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "settings": {
+                    "confirmation_type": "custom_page",
+                    "confirmation_page_id": 42,
+                    "message_to_show": "<h2>Order Confirmed!</h2><p>Thank you for your purchase.</p>"
+                  }
                 }
               },
               "example": {
@@ -99,6 +106,10 @@
                       "type": "string",
                       "example": "<p>Thank you for your order!</p>"
                     }
+                  },
+                  "example": {
+                    "confirmation_type": "same_page",
+                    "message_to_show": "<p>Thank you for your order!</p>"
                   }
                 },
                 "example": {

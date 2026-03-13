@@ -59,6 +59,9 @@
                       "type": "integer",
                       "description": "Number of remaining setup intent attempts"
                     }
+                  },
+                  "example": {
+                    "remaining": 5
                   }
                 },
                 "example": {
@@ -72,7 +75,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Error",
+                  "example": {
+                    "message": "Payment method not supported"
+                  }
                 },
                 "example": {
                   "message": "Payment method not supported"

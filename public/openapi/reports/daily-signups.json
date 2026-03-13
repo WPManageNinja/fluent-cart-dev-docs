@@ -170,6 +170,29 @@
                       "type": "object",
                       "description": "Daily signup count data"
                     }
+                  },
+                  "example": {
+                    "signups": {
+                      "labels": [
+                        "2025-09-14",
+                        "2025-09-15",
+                        "2025-09-16",
+                        "2025-09-17",
+                        "2025-09-18",
+                        "2025-09-19",
+                        "2025-09-20"
+                      ],
+                      "data": [
+                        3,
+                        5,
+                        2,
+                        8,
+                        4,
+                        6,
+                        3
+                      ],
+                      "total": 31
+                    }
                   }
                 },
                 "example": {
@@ -209,7 +232,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

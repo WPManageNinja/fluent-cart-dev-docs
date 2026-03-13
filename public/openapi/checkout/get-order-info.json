@@ -81,6 +81,35 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "order": {
+                      "id": 42,
+                      "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                      "status": "pending",
+                      "total": 9900,
+                      "total_formatted": "$99.00",
+                      "subtotal": 9900,
+                      "discount_total": 0,
+                      "tax_total": 0,
+                      "shipping_total": 0,
+                      "currency": "USD",
+                      "items": [
+                        {
+                          "id": 1,
+                          "product_id": 123,
+                          "product_name": "Developer Toolkit Pro",
+                          "quantity": 1,
+                          "price": 9900,
+                          "price_formatted": "$99.00"
+                        }
+                      ],
+                      "customer": {
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "john@example.com"
+                      }
+                    }
                   }
                 },
                 "examples": {

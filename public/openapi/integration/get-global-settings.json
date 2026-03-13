@@ -81,6 +81,26 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "integration": {
+                      "api_key": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+                      "api_url": "https://example.com",
+                      "status": true
+                    },
+                    "settings": {
+                      "fields": [
+                        {
+                          "key": "api_key",
+                          "label": "API Key",
+                          "type": "password",
+                          "required": true
+                        }
+                      ],
+                      "save_button_text": "Save Settings",
+                      "valid_message": "Your API Key is valid",
+                      "invalid_message": "Your API Key is not valid"
+                    }
                   }
                 },
                 "example": {

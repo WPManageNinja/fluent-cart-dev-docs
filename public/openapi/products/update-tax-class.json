@@ -61,6 +61,9 @@
                     "type": "integer",
                     "description": "Tax class ID"
                   }
+                },
+                "example": {
+                  "tax_class": 5
                 }
               },
               "example": {
@@ -76,6 +79,11 @@
               "application/json": {
                 "example": {
                   "message": "Tax Class updated successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Tax Class updated successfully"
+                  }
                 }
               }
             }

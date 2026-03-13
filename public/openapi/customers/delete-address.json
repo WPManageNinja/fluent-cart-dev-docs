@@ -70,6 +70,10 @@
                     "data": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Address successfully deleted.",
+                    "data": ""
                   }
                 },
                 "example": {
@@ -103,6 +107,14 @@
                   "success": false,
                   "data": {
                     "message": "You do not have permission to perform this action."
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "You do not have permission to perform this action."
+                    }
                   }
                 }
               }

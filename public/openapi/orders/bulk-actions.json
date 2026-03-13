@@ -73,6 +73,15 @@
                     "type": "string",
                     "description": "Whether to manage stock on status change (`true`/`false`)"
                   }
+                },
+                "example": {
+                  "action": "change_order_status",
+                  "order_ids": [
+                    1,
+                    2,
+                    3
+                  ],
+                  "new_status": "processing"
                 }
               },
               "example": {
@@ -99,6 +108,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Order Status has been changed for the selected orders"
                   }
                 },
                 "example": {

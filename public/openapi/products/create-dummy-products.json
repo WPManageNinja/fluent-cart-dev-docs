@@ -51,6 +51,10 @@
                     "type": "integer",
                     "description": "Index for dummy product generation"
                   }
+                },
+                "example": {
+                  "category": "digital",
+                  "index": 1
                 }
               },
               "example": {
@@ -81,6 +85,25 @@
                     }
                   },
                   "message": "Dummy product created successfully"
+                },
+                "schema": {
+                  "example": {
+                    "product": {
+                      "ID": 135,
+                      "post_title": "Sample Digital Product",
+                      "post_status": "publish",
+                      "post_type": "fluent-products",
+                      "post_name": "sample-digital-product",
+                      "detail": {
+                        "id": 100,
+                        "post_id": 135,
+                        "fulfillment_type": "digital",
+                        "variation_type": "single",
+                        "manage_stock": 0
+                      }
+                    },
+                    "message": "Dummy product created successfully"
+                  }
                 }
               }
             }

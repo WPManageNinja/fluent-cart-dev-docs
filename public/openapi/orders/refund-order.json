@@ -79,6 +79,13 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "refund_info": {
+                    "transaction_id": 15,
+                    "amount": 25.0,
+                    "cancelSubscription": "true"
+                  }
                 }
               },
               "example": {
@@ -135,6 +142,20 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "fluent_cart_refund": {
+                      "status": "success",
+                      "message": "Refund processed on FluentCart."
+                    },
+                    "gateway_refund": {
+                      "status": "success",
+                      "message": "Refund processed on Stripe"
+                    },
+                    "subscription_cancel": {
+                      "status": "success",
+                      "message": "Subscription cancelled successfully"
+                    }
                   }
                 },
                 "example": {
@@ -164,6 +185,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Order can not be refunded"
                   }
                 },
                 "example": {
@@ -182,6 +206,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Transaction ID is required"
                   }
                 },
                 "example": {

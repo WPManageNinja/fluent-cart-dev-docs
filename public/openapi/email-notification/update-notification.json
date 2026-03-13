@@ -98,6 +98,14 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "settings": {
+                    "subject": "Your Order #{{order.invoice_no}} is Confirmed!",
+                    "email_body": "<p>Thank you for your purchase, {{order.billing.first_name}}!</p>",
+                    "active": "yes",
+                    "is_default_body": "no"
+                  }
                 }
               },
               "example": {
@@ -123,6 +131,9 @@
                       "type": "string",
                       "example": "Notification updated successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Notification updated successfully"
                   }
                 },
                 "example": {
@@ -142,6 +153,9 @@
                       "type": "string",
                       "example": "Failed to update notification"
                     }
+                  },
+                  "example": {
+                    "message": "Failed to update notification"
                   }
                 },
                 "example": {

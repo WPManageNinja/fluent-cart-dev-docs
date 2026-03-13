@@ -63,6 +63,11 @@
               "application/json": {
                 "example": {
                   "message": "Integration deleted successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Integration deleted successfully"
+                  }
                 }
               }
             }

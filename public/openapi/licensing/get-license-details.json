@@ -101,6 +101,146 @@
                     "upgrade_path_base": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "license": {
+                      "id": 1,
+                      "status": "active",
+                      "limit": 5,
+                      "activation_count": 2,
+                      "license_key": "DTPRO-A1B2-C3D4-E5F6",
+                      "product_id": 10,
+                      "variation_id": 15,
+                      "order_id": 42,
+                      "customer_id": 7,
+                      "expiration_date": "2026-01-15 00:00:00",
+                      "subscription_id": 3,
+                      "config": {
+                        "activation_limit": 5,
+                        "validity_days": 365,
+                        "auto_renew": true
+                      },
+                      "customer": {
+                        "id": 7,
+                        "first_name": "Sarah",
+                        "last_name": "Johnson",
+                        "email": "sarah.johnson@example.com"
+                      },
+                      "product_variant": {
+                        "id": 15,
+                        "title": "Personal License",
+                        "price": 4900,
+                        "product_id": 10
+                      },
+                      "labels": [
+                        {
+                          "id": 1,
+                          "title": "VIP",
+                          "color": "#3b82f6"
+                        },
+                        {
+                          "id": 3,
+                          "title": "Enterprise",
+                          "color": "#10b981"
+                        }
+                      ]
+                    },
+                    "downloads": [
+                      {
+                        "id": 1,
+                        "post_id": 10,
+                        "product_title": "My Plugin",
+                        "variation_titles": [
+                          "Pro License"
+                        ],
+                        "download_url": "https://example.com/?fluent-cart=download&..."
+                      }
+                    ],
+                    "order": {
+                      "id": 42,
+                      "order_items": [
+                        {
+                          "id": 1,
+                          "product_id": 10,
+                          "variation_id": 15,
+                          "title": "Developer Toolkit Pro - Personal License",
+                          "quantity": 1,
+                          "unit_price": 4900,
+                          "subtotal": 4900
+                        }
+                      ],
+                      "billing_address": {
+                        "name": "Sarah Johnson",
+                        "address_1": "123 Main St",
+                        "city": "San Francisco",
+                        "state": "CA",
+                        "postcode": "94102",
+                        "country": "US"
+                      },
+                      "shipping_address": {
+                        "name": "Sarah Johnson",
+                        "address_1": "456 Oak Avenue",
+                        "city": "San Francisco",
+                        "state": "CA",
+                        "postcode": "94102",
+                        "country": "US"
+                      }
+                    },
+                    "activations": [
+                      {
+                        "id": 1,
+                        "license_id": 1,
+                        "site_id": 5,
+                        "status": "active",
+                        "is_local": 0,
+                        "activation_hash": "abc123def456...",
+                        "site": {
+                          "id": 5,
+                          "site_url": "example.com"
+                        }
+                      }
+                    ],
+                    "product": {
+                      "ID": 10,
+                      "post_title": "My Plugin",
+                      "variants": [
+                        {
+                          "id": 15,
+                          "title": "Personal License",
+                          "price": 4900
+                        },
+                        {
+                          "id": 16,
+                          "title": "Business License",
+                          "price": 9900
+                        },
+                        {
+                          "id": 17,
+                          "title": "Unlimited License",
+                          "price": 19900
+                        }
+                      ]
+                    },
+                    "selected_labels": [
+                      1,
+                      3
+                    ],
+                    "orders": [
+                      {
+                        "id": 42
+                      }
+                    ],
+                    "prev_orders": [
+                      {
+                        "id": 38,
+                        "invoice_no": "INV-038",
+                        "status": "completed",
+                        "total_amount": 4900,
+                        "created_at": "2025-08-15 09:30:00"
+                      }
+                    ],
+                    "subscription": null,
+                    "upgrade_path_base": "https://example.com/?fluent-cart=custom-payment"
                   }
                 },
                 "example": {
@@ -270,6 +410,14 @@
                     "code": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "data": {
+                      "message": "License not found",
+                      "buttonText": "Back to License List",
+                      "route": "/licenses"
+                    },
+                    "code": "fluent_cart_entity_not_found"
                   }
                 },
                 "example": {
@@ -294,7 +442,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

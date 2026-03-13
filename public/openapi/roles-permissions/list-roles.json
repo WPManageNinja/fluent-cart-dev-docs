@@ -50,6 +50,26 @@
                         "$ref": "#/components/schemas/RoleDefinition"
                       }
                     }
+                  },
+                  "example": {
+                    "roles": {
+                      "super_admin": {
+                        "title": "Super Admin",
+                        "description": "With All Permissions"
+                      },
+                      "manager": {
+                        "title": "Manager",
+                        "description": "With All Permissions Except Sensitive Settings"
+                      },
+                      "worker": {
+                        "title": "Worker",
+                        "description": "View Access for products, customers, coupons, integrations. Manage Access for Order Statuses"
+                      },
+                      "accountant": {
+                        "title": "Accountant",
+                        "description": "View Access for products, customers, orders, subscriptions, licenses, coupons, reports and integrations"
+                      }
+                    }
                   }
                 },
                 "example": {

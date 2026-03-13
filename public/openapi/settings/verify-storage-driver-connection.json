@@ -63,6 +63,15 @@
                       "region": "us-east-1"
                     }
                   }
+                },
+                "example": {
+                  "driver": "s3",
+                  "settings": {
+                    "access_key": "AKIA...",
+                    "secret_key": "wJalr...",
+                    "bucket": "my-store-files",
+                    "region": "us-east-1"
+                  }
                 }
               },
               "example": {
@@ -89,6 +98,9 @@
                       "type": "string",
                       "example": "Connection verified successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Connection verified successfully"
                   }
                 },
                 "example": {

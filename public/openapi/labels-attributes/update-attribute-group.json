@@ -74,6 +74,10 @@
                       "type": "string",
                       "example": "Group updated successfully!"
                     }
+                  },
+                  "example": {
+                    "data": true,
+                    "message": "Group updated successfully!"
                   }
                 },
                 "example": {
@@ -100,6 +104,13 @@
                           }
                         }
                       }
+                    }
+                  },
+                  "example": {
+                    "errors": {
+                      "title": [
+                        "Group title can not be empty and must be unique."
+                      ]
                     }
                   }
                 },

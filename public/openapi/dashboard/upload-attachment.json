@@ -77,6 +77,11 @@
                       "format": "uri",
                       "description": "Attachment URL"
                     }
+                  },
+                  "example": {
+                    "id": 103,
+                    "title": "new-product-photo",
+                    "url": "https://example.com/wp-content/uploads/2025/01/new-product-photo.jpg"
                   }
                 },
                 "example": {
@@ -100,6 +105,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "error": "Error Uploading File"
                   }
                 },
                 "example": {

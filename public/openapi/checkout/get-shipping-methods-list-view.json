@@ -91,6 +91,24 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "methods": [
+                      {
+                        "id": "flat_rate",
+                        "title": "Flat Rate",
+                        "cost": 500,
+                        "cost_formatted": "$5.00",
+                        "enabled": true
+                      },
+                      {
+                        "id": "free_shipping",
+                        "title": "Free Shipping",
+                        "cost": 0,
+                        "cost_formatted": "$0.00",
+                        "enabled": true
+                      }
+                    ]
                   }
                 },
                 "examples": {

@@ -173,6 +173,29 @@
                       "type": "object",
                       "description": "Comparison data for new vs returning customers"
                     }
+                  },
+                  "example": {
+                    "newVsReturning": {
+                      "new_customers": 32,
+                      "returning_customers": 183,
+                      "new_orders": 38,
+                      "returning_orders": 304,
+                      "new_revenue": 285000,
+                      "returning_revenue": 965000,
+                      "new_vs_returning_ratio": 0.175,
+                      "chart": [
+                        {
+                          "label": "New Customers",
+                          "value": 32,
+                          "percentage": 14.9
+                        },
+                        {
+                          "label": "Returning Customers",
+                          "value": 183,
+                          "percentage": 85.1
+                        }
+                      ]
+                    }
                   }
                 },
                 "example": {
@@ -212,7 +235,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

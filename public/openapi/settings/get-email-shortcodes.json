@@ -95,6 +95,41 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "data": {
+                      "order": {
+                        "title": "Order",
+                        "shortcodes": {
+                          "{{order.id}}": "Order ID",
+                          "{{order.invoice_no}}": "Invoice Number",
+                          "{{order.total_amount_formatted}}": "Total Amount (Formatted)",
+                          "{{order.status}}": "Order Status",
+                          "{{order.payment_method_title}}": "Payment Method",
+                          "{{order.receipt_url}}": "Receipt URL",
+                          "{{order.created_at}}": "Order Date",
+                          "{{order.customer_dashboard_link}}": "Customer Dashboard Link"
+                        }
+                      },
+                      "customer": {
+                        "title": "Customer",
+                        "shortcodes": {
+                          "{{customer.first_name}}": "First Name",
+                          "{{customer.last_name}}": "Last Name",
+                          "{{customer.email}}": "Email",
+                          "{{customer.full_name}}": "Full Name"
+                        }
+                      },
+                      "store": {
+                        "title": "Store",
+                        "shortcodes": {
+                          "{{store.name}}": "Store Name",
+                          "{{store.logo}}": "Store Logo",
+                          "{{store.address}}": "Store Address",
+                          "{{store.url}}": "Store URL"
+                        }
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -146,7 +181,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

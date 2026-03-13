@@ -68,6 +68,14 @@
                     },
                     "description": "Array of term IDs to sync"
                   }
+                },
+                "example": {
+                  "taxonomy": "product-categories",
+                  "terms": [
+                    1,
+                    5,
+                    10
+                  ]
                 }
               },
               "example": {
@@ -88,6 +96,11 @@
               "application/json": {
                 "example": {
                   "message": "Taxonomy terms synced successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Taxonomy terms synced successfully"
+                  }
                 }
               }
             }

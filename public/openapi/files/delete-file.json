@@ -91,6 +91,11 @@
                       "description": "Path of the deleted file",
                       "example": "my-ebook__fluent-cart__.1710345600.pdf"
                     }
+                  },
+                  "example": {
+                    "message": "File Deleted Successfully",
+                    "driver": "local",
+                    "path": "my-ebook__fluent-cart__.1710345600.pdf"
                   }
                 },
                 "example": {
@@ -112,6 +117,9 @@
                       "type": "string",
                       "example": "You are not allowed to delete file"
                     }
+                  },
+                  "example": {
+                    "message": "You are not allowed to delete file"
                   }
                 },
                 "example": {
@@ -131,6 +139,9 @@
                       "type": "string",
                       "example": "File not found"
                     }
+                  },
+                  "example": {
+                    "message": "File not found"
                   }
                 },
                 "example": {

@@ -128,6 +128,36 @@
                     "minimum": 1,
                     "description": "Display priority. Lower numbers appear first."
                   }
+                },
+                "example": {
+                  "title": "Add Extended Warranty",
+                  "src_object_id": 42,
+                  "status": "active",
+                  "description": "<p>Protect your purchase with our 2-year extended warranty.</p>",
+                  "priority": 1,
+                  "config": {
+                    "discount": {
+                      "discount_type": "percentage",
+                      "discount_amount": 10
+                    },
+                    "display_conditions_if": "",
+                    "call_to_action": "Yes, add warranty!"
+                  },
+                  "conditions": [
+                    {
+                      "type": "cart_products",
+                      "operator": "contains",
+                      "value": [
+                        123,
+                        124
+                      ]
+                    },
+                    {
+                      "type": "cart_total",
+                      "operator": "greater_than",
+                      "value": 2500
+                    }
+                  ]
                 }
               },
               "example": {
@@ -175,6 +205,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Order bump updated successfully"
                   }
                 },
                 "example": {
@@ -193,6 +226,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Failed to update order bump"
                   }
                 },
                 "example": {
@@ -212,7 +248,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

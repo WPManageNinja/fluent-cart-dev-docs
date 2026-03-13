@@ -71,6 +71,12 @@
                     "description": "HTML instructions shown on the thank-you/receipt page.",
                     "example": "<p>Your payment was processed successfully. A receipt has been sent to your email.</p>"
                   }
+                },
+                "example": {
+                  "method": "stripe",
+                  "checkout_label": "Credit / Debit Card",
+                  "checkout_logo": "https://example.com/card-icon.png",
+                  "checkout_instructions": "<p>You will be charged securely via Stripe.</p>"
                 }
               },
               "example": {
@@ -99,6 +105,17 @@
                       "description": "Updated payment method settings",
                       "additionalProperties": true
                     }
+                  },
+                  "example": {
+                    "message": "Checkout design settings saved",
+                    "settings": {
+                      "is_active": "yes",
+                      "payment_mode": "live",
+                      "checkout_label": "Credit / Debit Card",
+                      "checkout_logo": "https://example.com/wp-content/uploads/card-icon.png",
+                      "checkout_instructions": "<p>You will be charged securely via Stripe.</p>",
+                      "thank_you_page_instructions": "<p>Your payment was processed successfully. A receipt has been sent to your email.</p>"
+                    }
                   }
                 },
                 "example": {
@@ -126,7 +143,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

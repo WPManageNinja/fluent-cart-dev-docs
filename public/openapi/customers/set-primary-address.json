@@ -70,6 +70,10 @@
                     ],
                     "description": "Address type: billing or shipping"
                   }
+                },
+                "example": {
+                  "addressId": 25,
+                  "type": "billing"
                 }
               },
               "example": {
@@ -93,6 +97,10 @@
                     "data": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Address successfully set as the primary",
+                    "data": ""
                   }
                 },
                 "example": {
@@ -110,6 +118,13 @@
                   "code": 400,
                   "message": "Address set as primary failed.",
                   "data": ""
+                },
+                "schema": {
+                  "example": {
+                    "code": 400,
+                    "message": "Address set as primary failed.",
+                    "data": ""
+                  }
                 }
               }
             }

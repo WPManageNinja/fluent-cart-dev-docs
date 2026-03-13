@@ -179,6 +179,70 @@
                       "type": "boolean",
                       "description": "Whether the product is a bundle (licensing is disabled for bundles)"
                     }
+                  },
+                  "example": {
+                    "settings": {
+                      "enabled": "yes",
+                      "version": "1.2.0",
+                      "global_update_file": {
+                        "id": "",
+                        "driver": "local",
+                        "path": "",
+                        "url": ""
+                      },
+                      "variations": [
+                        {
+                          "variation_id": 15,
+                          "title": "Single Site License",
+                          "activation_limit": 1,
+                          "validity": {
+                            "unit": "year",
+                            "value": 1
+                          },
+                          "media": [
+                            {
+                              "id": "dev-toolkit-pro__fluent-cart__.1693526400.zip",
+                              "driver": "local",
+                              "path": "dev-toolkit-pro__fluent-cart__.1693526400.zip",
+                              "url": "https://example.com/wp-content/uploads/fluent-cart/dev-toolkit-pro__fluent-cart__.1693526400.zip"
+                            }
+                          ],
+                          "subscription_info": "Billed yearly at $49.00",
+                          "setup_fee_info": ""
+                        },
+                        {
+                          "variation_id": 16,
+                          "title": "Unlimited Sites License",
+                          "activation_limit": "",
+                          "validity": {
+                            "unit": "lifetime",
+                            "value": 1
+                          },
+                          "media": [
+                            {
+                              "id": "dev-toolkit-pro__fluent-cart__.1693526400.zip",
+                              "driver": "local",
+                              "path": "dev-toolkit-pro__fluent-cart__.1693526400.zip",
+                              "url": "https://example.com/wp-content/uploads/fluent-cart/dev-toolkit-pro__fluent-cart__.1693526400.zip"
+                            }
+                          ],
+                          "subscription_info": "",
+                          "setup_fee_info": ""
+                        }
+                      ],
+                      "wp": {
+                        "is_wp": "yes",
+                        "readme_url": "https://example.com/changelog",
+                        "banner_url": "https://example.com/banner.png",
+                        "icon_url": "https://example.com/icon.png",
+                        "required_php": "7.4",
+                        "required_wp": "5.6"
+                      },
+                      "prefix": "",
+                      "changelog": "<h4>1.2.0</h4><ul><li>New feature added</li></ul>",
+                      "license_keys": ""
+                    },
+                    "is_bundle_product": false
                   }
                 },
                 "example": {
@@ -259,7 +323,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

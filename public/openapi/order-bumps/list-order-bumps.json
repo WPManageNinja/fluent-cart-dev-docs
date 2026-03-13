@@ -133,6 +133,64 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "order_bumps": {
+                      "total": 5,
+                      "per_page": 15,
+                      "current_page": 1,
+                      "last_page": 1,
+                      "data": [
+                        {
+                          "id": 1,
+                          "hash": "a1b2c3d4e5f6...",
+                          "parent_id": null,
+                          "type": "order_bump",
+                          "status": "active",
+                          "src_object_id": 42,
+                          "src_object_type": null,
+                          "title": "Add Extended Warranty",
+                          "description": "<p>Protect your purchase with our 2-year warranty plan.</p>",
+                          "conditions": [
+                            {
+                              "type": "cart_products",
+                              "operator": "contains",
+                              "value": [
+                                123,
+                                124
+                              ]
+                            },
+                            {
+                              "type": "cart_total",
+                              "operator": "greater_than",
+                              "value": 2500
+                            }
+                          ],
+                          "config": {
+                            "discount": {
+                              "discount_type": "percentage",
+                              "discount_amount": 10
+                            },
+                            "display_conditions_if": "",
+                            "call_to_action": "Yes, add warranty!"
+                          },
+                          "priority": 1,
+                          "created_at": "2025-06-01 10:00:00",
+                          "updated_at": "2025-06-15 14:30:00",
+                          "product_variant": {
+                            "id": 42,
+                            "product_id": 10,
+                            "title": "Extended Warranty - 2 Year",
+                            "price": 2999,
+                            "product": {
+                              "id": 10,
+                              "title": "Extended Warranty",
+                              "status": "publish"
+                            }
+                          }
+                        }
+                      ]
+                    }
                   }
                 },
                 "example": {
@@ -308,7 +366,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

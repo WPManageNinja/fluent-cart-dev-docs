@@ -60,6 +60,9 @@
                       "type": "string",
                       "example": "Shipping override has been deleted successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Shipping override has been deleted successfully"
                   }
                 },
                 "example": {

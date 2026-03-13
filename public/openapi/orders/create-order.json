@@ -368,6 +368,26 @@
                     "type": "string",
                     "description": "Trigger source"
                   }
+                },
+                "example": {
+                  "customer_id": 1,
+                  "order_items": [
+                    {
+                      "post_id": 10,
+                      "variation_id": 5,
+                      "object_id": 5,
+                      "quantity": 1,
+                      "unit_price": 2500,
+                      "price": 2500,
+                      "item_total": 2500,
+                      "total": 2500,
+                      "line_total": 2500,
+                      "title": "Pro License"
+                    }
+                  ],
+                  "subtotal": 2500,
+                  "total_amount": 2500,
+                  "payment_method": "offline_payment"
                 }
               },
               "example": {
@@ -413,6 +433,11 @@
                       "type": "string",
                       "description": "Created order UUID"
                     }
+                  },
+                  "example": {
+                    "message": "Order created successfully!",
+                    "order_id": 42,
+                    "uuid": "abc123-def456-ghi789"
                   }
                 },
                 "example": {

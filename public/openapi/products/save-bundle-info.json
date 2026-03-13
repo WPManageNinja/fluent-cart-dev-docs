@@ -64,6 +64,13 @@
                     },
                     "description": "Array of child variation IDs"
                   }
+                },
+                "example": {
+                  "bundle_child_ids": [
+                    101,
+                    102,
+                    103
+                  ]
                 }
               },
               "example": {
@@ -85,7 +92,10 @@
                   "type": "array",
                   "items": {
                     "type": "boolean"
-                  }
+                  },
+                  "example": [
+                    true
+                  ]
                 },
                 "example": [
                   true

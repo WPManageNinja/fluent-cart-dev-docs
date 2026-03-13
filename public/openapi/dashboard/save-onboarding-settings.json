@@ -59,6 +59,11 @@
                     "type": "string",
                     "description": "Product category for generating dummy products. Excluded from saved settings but triggers async dummy product creation."
                   }
+                },
+                "example": {
+                  "store_name": "My Awesome Store",
+                  "store_logo": "https://example.com/wp-content/uploads/logo.png",
+                  "currency": "USD"
                 }
               },
               "example": {
@@ -80,6 +85,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Store has been updated successfully"
                   }
                 },
                 "example": {
@@ -98,6 +106,9 @@
                     "errors": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "errors": "Failed to update!"
                   }
                 },
                 "example": {

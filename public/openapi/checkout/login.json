@@ -73,6 +73,11 @@
                     ],
                     "description": "Set to `on` to persist the login session (\"Remember Me\"). Default: not remembered"
                   }
+                },
+                "example": {
+                  "user_login": "john@example.com",
+                  "password": "securepassword123",
+                  "remember_me": "on"
                 }
               },
               "example": {
@@ -108,6 +113,13 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "message": "Login successful",
+                      "redirect_url": "https://your-site.com/customer-profile/#/profile"
+                    }
                   }
                 },
                 "example": {
@@ -140,6 +152,12 @@
                           "type": "string"
                         }
                       }
+                    }
+                  },
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "Invalid email or password. Please try again."
                     }
                   }
                 },
@@ -195,6 +213,13 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "The password you entered for the username john@example.com is incorrect.",
+                      "code": "login_failed"
+                    }
                   }
                 },
                 "example": {
@@ -220,6 +245,10 @@
                     "code": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Invalid security token. Please refresh the page and try again.",
+                    "code": "invalid_nonce"
                   }
                 },
                 "example": {

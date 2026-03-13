@@ -58,6 +58,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Shipping method has been deleted successfully"
                   }
                 },
                 "example": {

@@ -176,6 +176,35 @@
                       },
                       "description": "Item count distribution data"
                     }
+                  },
+                  "example": {
+                    "data": [
+                      {
+                        "item_count": 1,
+                        "order_count": 185,
+                        "percentage": 54.1
+                      },
+                      {
+                        "item_count": 2,
+                        "order_count": 98,
+                        "percentage": 28.7
+                      },
+                      {
+                        "item_count": 3,
+                        "order_count": 38,
+                        "percentage": 11.1
+                      },
+                      {
+                        "item_count": 4,
+                        "order_count": 15,
+                        "percentage": 4.4
+                      },
+                      {
+                        "item_count": "5+",
+                        "order_count": 6,
+                        "percentage": 1.7
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -221,7 +250,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

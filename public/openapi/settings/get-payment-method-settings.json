@@ -91,6 +91,58 @@
                       "description": "Settings fields schema",
                       "additionalProperties": true
                     }
+                  },
+                  "example": {
+                    "settings": {
+                      "is_active": "yes",
+                      "payment_mode": "live",
+                      "checkout_label": "Pay with Stripe",
+                      "checkout_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/stripe.svg",
+                      "checkout_instructions": "Your payment information is processed securely via Stripe.",
+                      "thank_you_page_instructions": "Thank you! Your payment has been processed successfully."
+                    },
+                    "fields": {
+                      "general": {
+                        "title": "General Settings",
+                        "type": "section",
+                        "schema": {
+                          "is_active": {
+                            "label": "Active",
+                            "type": "toggle"
+                          },
+                          "payment_mode": {
+                            "label": "Payment Mode",
+                            "type": "select",
+                            "options": [
+                              "test",
+                              "live"
+                            ]
+                          }
+                        }
+                      },
+                      "api_keys": {
+                        "title": "API Keys",
+                        "type": "section",
+                        "schema": {
+                          "live_publishable_key": {
+                            "label": "Live Publishable Key",
+                            "type": "text"
+                          },
+                          "live_secret_key": {
+                            "label": "Live Secret Key",
+                            "type": "password"
+                          },
+                          "test_publishable_key": {
+                            "label": "Test Publishable Key",
+                            "type": "text"
+                          },
+                          "test_secret_key": {
+                            "label": "Test Secret Key",
+                            "type": "password"
+                          }
+                        }
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -159,7 +211,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

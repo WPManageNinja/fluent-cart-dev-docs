@@ -62,6 +62,31 @@
                     "shop": {
                       "$ref": "#/components/schemas/ShopConfig"
                     }
+                  },
+                  "example": {
+                    "rest": {
+                      "base_url": "https://example.com/wp-json/",
+                      "url": "https://example.com/wp-json/fluent-cart/v2/",
+                      "nonce": "abc123def456",
+                      "namespace": "fluent-cart",
+                      "version": "v2"
+                    },
+                    "asset_url": "https://example.com/wp-content/plugins/fluent-cart/assets/",
+                    "trans": {
+                      "Dashboard": "Dashboard",
+                      "Products": "Products",
+                      "Orders": "Orders"
+                    },
+                    "shop": {
+                      "currency": "USD",
+                      "currency_sign": "$",
+                      "currency_sign_position": "left",
+                      "decimal_separator": ".",
+                      "thousands_separator": ",",
+                      "number_of_decimals": 2,
+                      "store_name": "My Store",
+                      "store_logo": "https://example.com/wp-content/uploads/logo.png"
+                    }
                   }
                 },
                 "example": {

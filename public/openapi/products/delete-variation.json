@@ -54,6 +54,11 @@
               "application/json": {
                 "example": {
                   "message": "Variation deleted successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Variation deleted successfully"
+                  }
                 }
               }
             }

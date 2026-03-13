@@ -55,6 +55,24 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "labels": {
+                      "labels": [
+                        {
+                          "id": 1,
+                          "value": "VIP"
+                        },
+                        {
+                          "id": 2,
+                          "value": "Wholesale"
+                        },
+                        {
+                          "id": 3,
+                          "value": "Priority"
+                        }
+                      ]
+                    }
                   }
                 },
                 "example": {

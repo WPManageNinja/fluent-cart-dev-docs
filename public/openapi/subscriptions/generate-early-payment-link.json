@@ -72,6 +72,10 @@
                       "format": "uri",
                       "description": "URL for early installment payment"
                     }
+                  },
+                  "example": {
+                    "message": "Early payment link generated.",
+                    "payment_url": "https://example.com/?fluent-cart=early-installment-payment&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
                   }
                 },
                 "example": {
@@ -86,7 +90,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Error",
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "Invalid request. Please check your input and try again."
+                    }
+                  }
                 },
                 "examples": {
                   "not_enabled": {

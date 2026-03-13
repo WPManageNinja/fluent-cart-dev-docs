@@ -139,6 +139,33 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "licenses": {
+                      "data": [
+                        {
+                          "license_key": "DTPRO-A1B2-C3D4-E5F6",
+                          "status": "active",
+                          "expiration_date": "2026-01-15 00:00:00",
+                          "variation_id": 15,
+                          "activation_count": 2,
+                          "limit": 5,
+                          "product_id": 10,
+                          "created_at": "2025-01-15 10:30:00",
+                          "title": "My Plugin",
+                          "subtitle": "Pro License",
+                          "renewal_url": "",
+                          "has_upgrades": true,
+                          "order": {
+                            "uuid": "order-uuid-here"
+                          }
+                        }
+                      ],
+                      "total": 5,
+                      "per_page": 10,
+                      "current_page": 1,
+                      "last_page": 1
+                    }
                   }
                 },
                 "example": {
@@ -182,7 +209,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

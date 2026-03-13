@@ -169,7 +169,75 @@
                 "schema": {
                   "type": "object",
                   "description": "Cohort matrix data for subscription retention analysis",
-                  "additionalProperties": true
+                  "additionalProperties": true,
+                  "example": {
+                    "cohorts": [
+                      {
+                        "month": "2025-01",
+                        "initial": 12,
+                        "month_1": 11,
+                        "month_2": 10,
+                        "month_3": 10,
+                        "month_4": 9,
+                        "month_5": 9,
+                        "month_6": 9,
+                        "retention_rate": 75
+                      },
+                      {
+                        "month": "2025-02",
+                        "initial": 15,
+                        "month_1": 14,
+                        "month_2": 13,
+                        "month_3": 12,
+                        "month_4": 12,
+                        "month_5": 11,
+                        "retention_rate": 73.3
+                      },
+                      {
+                        "month": "2025-03",
+                        "initial": 18,
+                        "month_1": 17,
+                        "month_2": 16,
+                        "month_3": 15,
+                        "month_4": 15,
+                        "retention_rate": 83.3
+                      },
+                      {
+                        "month": "2025-04",
+                        "initial": 14,
+                        "month_1": 13,
+                        "month_2": 12,
+                        "month_3": 12,
+                        "retention_rate": 85.7
+                      },
+                      {
+                        "month": "2025-05",
+                        "initial": 22,
+                        "month_1": 21,
+                        "month_2": 20,
+                        "retention_rate": 90.9
+                      },
+                      {
+                        "month": "2025-06",
+                        "initial": 19,
+                        "month_1": 18,
+                        "retention_rate": 94.7
+                      },
+                      {
+                        "month": "2025-07",
+                        "initial": 25,
+                        "retention_rate": 100
+                      }
+                    ],
+                    "average_retention": {
+                      "month_1": 94.5,
+                      "month_2": 91.2,
+                      "month_3": 87.8,
+                      "month_4": 85,
+                      "month_5": 82.5,
+                      "month_6": 75
+                    }
+                  }
                 },
                 "example": {
                   "cohorts": [
@@ -253,7 +321,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

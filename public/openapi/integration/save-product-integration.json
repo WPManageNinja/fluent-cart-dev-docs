@@ -107,6 +107,20 @@
                       "type": "object",
                       "description": "The validated and saved feed data"
                     }
+                  },
+                  "example": {
+                    "message": "Integration has been successfully saved",
+                    "integration_id": 15,
+                    "integration_name": "fluent-crm",
+                    "created": true,
+                    "feedData": {
+                      "name": "Tag VIP buyers",
+                      "enabled": "yes",
+                      "list_id": "3",
+                      "conditional_variation_ids": [
+                        101
+                      ]
+                    }
                   }
                 },
                 "example": {
@@ -136,6 +150,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Product not found"
                   }
                 },
                 "example": {
@@ -159,6 +176,12 @@
                       "additionalProperties": {
                         "type": "string"
                       }
+                    }
+                  },
+                  "example": {
+                    "message": "Please fill up the required fields:",
+                    "errors": {
+                      "name": "Feed Name is required."
                     }
                   }
                 },

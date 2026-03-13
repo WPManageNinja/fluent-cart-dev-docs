@@ -66,6 +66,15 @@
                     "type": "string",
                     "description": "Required when action is change_customer_status. The new status to apply to the selected customers."
                   }
+                },
+                "example": {
+                  "action": "change_customer_status",
+                  "customer_ids": [
+                    12,
+                    15,
+                    23
+                  ],
+                  "new_status": "inactive"
                 }
               },
               "example": {
@@ -94,6 +103,11 @@
                     "data": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Bulk action completed successfully.",
+                    "affected_count": 5,
+                    "action": "delete"
                   }
                 },
                 "examples": {
@@ -126,6 +140,13 @@
                   "code": 403,
                   "message": "Customers selection is required",
                   "data": ""
+                },
+                "schema": {
+                  "example": {
+                    "code": 403,
+                    "message": "Customers selection is required",
+                    "data": ""
+                  }
                 }
               }
             }

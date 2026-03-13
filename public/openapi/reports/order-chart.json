@@ -188,6 +188,63 @@
                       "type": "object",
                       "description": "Fluctuation data"
                     }
+                  },
+                  "example": {
+                    "orderChartData": [
+                      {
+                        "year": "2025",
+                        "group": "2025-09-14",
+                        "orders": 12
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-09-15",
+                        "orders": 18
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-09-16",
+                        "orders": 8
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-09-17",
+                        "orders": 22
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-09-18",
+                        "orders": 15
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-09-19",
+                        "orders": 19
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-09-20",
+                        "orders": 14
+                      }
+                    ],
+                    "summary": {
+                      "total_orders": 342,
+                      "average_orders_per_day": 16
+                    },
+                    "previousSummary": {
+                      "total_orders": 289,
+                      "average_orders_per_day": 14
+                    },
+                    "fluctuations": {
+                      "total_orders": {
+                        "value": 18.3,
+                        "direction": "up"
+                      },
+                      "average_orders_per_day": {
+                        "value": 14.3,
+                        "direction": "up"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -261,7 +318,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

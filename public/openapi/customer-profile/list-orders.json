@@ -98,6 +98,37 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "orders": {
+                      "total": 25,
+                      "per_page": 10,
+                      "current_page": 1,
+                      "last_page": 3,
+                      "data": [
+                        {
+                          "created_at": "2025-06-15 10:30:00",
+                          "invoice_no": "INV-000101",
+                          "total_amount": 4999,
+                          "uuid": "abc-123-def",
+                          "type": "one-time",
+                          "status": "completed",
+                          "renewals_count": 0,
+                          "order_items": [
+                            {
+                              "id": 1,
+                              "post_title": "Premium Plugin",
+                              "title": "Premium Plugin - Single Site",
+                              "quantity": 1,
+                              "payment_type": "one-time",
+                              "line_meta": {
+                                "bundle_parent_item_id": null
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
                   }
                 },
                 "example": {

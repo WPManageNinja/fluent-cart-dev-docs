@@ -75,6 +75,45 @@
                         "type": "object"
                       }
                     }
+                  },
+                  "example": {
+                    "addresses": [
+                      {
+                        "id": 25,
+                        "customer_id": 12,
+                        "is_primary": 1,
+                        "type": "billing",
+                        "status": "active",
+                        "label": "Office",
+                        "name": "Sarah Johnson",
+                        "address_1": "456 Market Street",
+                        "address_2": "Suite 300",
+                        "city": "San Francisco",
+                        "state": "CA",
+                        "postcode": "94102",
+                        "country": "US",
+                        "phone": "+1-415-555-0142",
+                        "email": "sarah.johnson@example.com",
+                        "meta": null,
+                        "created_at": "2025-06-10 09:15:00",
+                        "updated_at": "2025-09-20 14:30:00",
+                        "formatted_address": {
+                          "country": "United States",
+                          "state": "California",
+                          "city": "San Francisco",
+                          "postcode": "94102",
+                          "address_1": "456 Market Street",
+                          "address_2": "Suite 300",
+                          "type": "billing",
+                          "name": "Sarah Johnson",
+                          "company_name": "TechStart Inc.",
+                          "label": "Office",
+                          "phone": "+1-415-555-0142",
+                          "full_address": "TechStart Inc., 456 Market Street, Suite 300, San Francisco, California, United States"
+                        },
+                        "company_name": "TechStart Inc."
+                      }
+                    ]
                   }
                 },
                 "example": {

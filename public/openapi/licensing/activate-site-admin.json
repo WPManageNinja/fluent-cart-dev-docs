@@ -73,6 +73,10 @@
                     "type": "string",
                     "description": "The site URL to activate"
                   }
+                },
+                "example": {
+                  "id": 1,
+                  "url": "https://my-client-site.com"
                 }
               },
               "example": {
@@ -93,6 +97,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Site has been activated successfully!"
                   }
                 },
                 "example": {
@@ -111,6 +118,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "<error message from license manager>"
                   }
                 },
                 "example": {

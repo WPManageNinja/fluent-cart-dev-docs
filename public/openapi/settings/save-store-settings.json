@@ -236,6 +236,19 @@
                       "type": "string"
                     }
                   }
+                },
+                "example": {
+                  "settings_name": "store_setup",
+                  "store_name": "TechStore Inc.",
+                  "store_country": "US",
+                  "store_state": "CA",
+                  "store_city": "San Francisco",
+                  "store_address1": "456 Market Street",
+                  "store_postcode": "94102",
+                  "currency": "USD",
+                  "currency_position": "before",
+                  "decimal_separator": "dot",
+                  "order_mode": "live"
                 }
               },
               "example": {
@@ -266,6 +279,20 @@
                       "type": "object",
                       "description": "Updated store settings",
                       "additionalProperties": true
+                    }
+                  },
+                  "example": {
+                    "data": {
+                      "store_name": "TechStore Inc.",
+                      "currency": "USD",
+                      "currency_position": "before",
+                      "decimal_separator": "dot",
+                      "store_country": "US",
+                      "store_state": "CA",
+                      "store_city": "San Francisco",
+                      "store_address1": "456 Market Street",
+                      "store_postcode": "94102",
+                      "order_mode": "live"
                     }
                   }
                 },

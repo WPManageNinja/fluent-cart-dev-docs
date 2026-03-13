@@ -143,6 +143,19 @@
                     "type": "string",
                     "description": "Country code (for shipping type)"
                   }
+                },
+                "example": {
+                  "type": "billing",
+                  "address": {
+                    "id": 5
+                  },
+                  "billing_name": "John Doe",
+                  "billing_address_1": "456 Oak Ave",
+                  "billing_city": "Boston",
+                  "billing_state": "MA",
+                  "billing_postcode": "02101",
+                  "billing_country": "US",
+                  "billing_label": "Work"
                 }
               },
               "example": {
@@ -172,6 +185,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Address updated successfully"
                   }
                 },
                 "example": {
@@ -186,6 +202,11 @@
               "application/json": {
                 "example": {
                   "message": "You are not authorized to update this address"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to update this address"
+                  }
                 }
               }
             }

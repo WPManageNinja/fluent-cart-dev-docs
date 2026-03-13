@@ -56,6 +56,10 @@
                     "maxLength": 50,
                     "description": "The role key to assign. Must be one of the valid role keys returned by the List Roles endpoint (e.g., super_admin, manager, worker, accountant)."
                   }
+                },
+                "example": {
+                  "user_id": 10,
+                  "role_key": "manager"
                 }
               },
               "example": {
@@ -81,6 +85,10 @@
                       "type": "boolean",
                       "description": "Whether the role was updated"
                     }
+                  },
+                  "example": {
+                    "message": "Role synced successfully",
+                    "is_updated": true
                   }
                 },
                 "example": {
@@ -99,6 +107,12 @@
                   "properties": {
                     "message": {
                       "type": "string"
+                    }
+                  },
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "Invalid request. Please check your input and try again."
                     }
                   }
                 },

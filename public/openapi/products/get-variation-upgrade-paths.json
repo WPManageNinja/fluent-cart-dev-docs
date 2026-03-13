@@ -92,6 +92,40 @@
                       }
                     }
                   ]
+                },
+                "schema": {
+                  "example": {
+                    "upgradePaths": [
+                      {
+                        "id": 5,
+                        "from_variation_id": 456,
+                        "to_variation_id": 457,
+                        "title": "Upgrade to Business License",
+                        "prorate": true,
+                        "to_variation": {
+                          "id": 457,
+                          "variation_title": "Business License - Annual",
+                          "item_price": 9900,
+                          "payment_type": "subscription",
+                          "sku": "DTK-BIZ-ANNUAL"
+                        }
+                      },
+                      {
+                        "id": 6,
+                        "from_variation_id": 456,
+                        "to_variation_id": 458,
+                        "title": "Upgrade to Enterprise License",
+                        "prorate": true,
+                        "to_variation": {
+                          "id": 458,
+                          "variation_title": "Enterprise License",
+                          "item_price": 19900,
+                          "payment_type": "onetime",
+                          "sku": "DTK-ENTERPRISE"
+                        }
+                      }
+                    ]
+                  }
                 }
               }
             }

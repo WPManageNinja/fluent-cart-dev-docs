@@ -102,6 +102,11 @@
                     "type": "string",
                     "description": "Customer notes"
                   }
+                },
+                "example": {
+                  "first_name": "Jane",
+                  "last_name": "Doe",
+                  "email": "jane@example.com"
                 }
               },
               "example": {
@@ -124,6 +129,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Customer changed successfully"
                   }
                 },
                 "example": {
@@ -142,6 +150,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Email is required"
                   }
                 },
                 "example": {

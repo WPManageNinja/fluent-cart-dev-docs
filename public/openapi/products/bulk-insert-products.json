@@ -54,6 +54,22 @@
                     },
                     "description": "Array of product data objects (max 10)"
                   }
+                },
+                "example": {
+                  "products": [
+                    {
+                      "post_title": "Product A",
+                      "detail": {
+                        "fulfillment_type": "digital"
+                      }
+                    },
+                    {
+                      "post_title": "Product B",
+                      "detail": {
+                        "fulfillment_type": "physical"
+                      }
+                    }
+                  ]
                 }
               },
               "example": {
@@ -107,6 +123,36 @@
                     }
                   ],
                   "errors": []
+                },
+                "schema": {
+                  "example": {
+                    "message": "2 product(s) created successfully",
+                    "created": [
+                      {
+                        "ID": 130,
+                        "post_title": "Product A",
+                        "post_status": "draft",
+                        "detail": {
+                          "id": 95,
+                          "post_id": 130,
+                          "fulfillment_type": "digital",
+                          "variation_type": "single"
+                        }
+                      },
+                      {
+                        "ID": 131,
+                        "post_title": "Product B",
+                        "post_status": "draft",
+                        "detail": {
+                          "id": 96,
+                          "post_id": 131,
+                          "fulfillment_type": "physical",
+                          "variation_type": "single"
+                        }
+                      }
+                    ],
+                    "errors": []
+                  }
                 }
               }
             }

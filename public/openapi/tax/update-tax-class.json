@@ -85,6 +85,16 @@
                     "description": "Sort priority (higher values appear first, default: 0)",
                     "example": 8
                   }
+                },
+                "example": {
+                  "title": "Digital Goods Updated",
+                  "description": "Updated description",
+                  "categories": [
+                    12,
+                    15,
+                    20
+                  ],
+                  "priority": 8
                 }
               },
               "example": {
@@ -112,6 +122,9 @@
                       "type": "string",
                       "example": "Tax class has been updated successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Tax class has been updated successfully"
                   }
                 },
                 "example": {

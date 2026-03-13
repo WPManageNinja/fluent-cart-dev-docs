@@ -99,7 +99,45 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "License chart data"
+                  "description": "License chart data",
+                  "example": {
+                    "labels": [
+                      "2024-01",
+                      "2024-02",
+                      "2024-03",
+                      "2024-04",
+                      "2024-05",
+                      "2024-06"
+                    ],
+                    "datasets": [
+                      {
+                        "label": "Licenses Issued",
+                        "data": [
+                          18,
+                          22,
+                          28,
+                          24,
+                          32,
+                          30
+                        ]
+                      },
+                      {
+                        "label": "Activations",
+                        "data": [
+                          25,
+                          30,
+                          38,
+                          35,
+                          45,
+                          42
+                        ]
+                      }
+                    ],
+                    "summary": {
+                      "total_licenses_issued": 154,
+                      "total_activations": 215
+                    }
+                  }
                 },
                 "example": {
                   "labels": [

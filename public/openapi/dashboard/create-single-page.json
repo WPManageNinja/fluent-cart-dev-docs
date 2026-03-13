@@ -60,6 +60,11 @@
                     "description": "Whether to save the new page ID to store settings. When true, also flushes rewrite rules.",
                     "default": false
                   }
+                },
+                "example": {
+                  "content": "shop_page_id",
+                  "page_name": "Shop",
+                  "save_settings": true
                 }
               },
               "example": {
@@ -91,6 +96,11 @@
                       "format": "uri",
                       "description": "The page permalink"
                     }
+                  },
+                  "example": {
+                    "page_id": "156",
+                    "page_name": "Shop",
+                    "link": "https://example.com/shop/"
                   }
                 },
                 "example": {
@@ -111,6 +121,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Unable to create page"
                   }
                 },
                 "example": {

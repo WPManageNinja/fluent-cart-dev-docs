@@ -58,6 +58,9 @@
                       "type": "string",
                       "example": "Labels Updated Successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Labels Updated Successfully"
                   }
                 },
                 "example": {
@@ -77,6 +80,9 @@
                       "type": "string",
                       "example": "Failed To Update Labels"
                     }
+                  },
+                  "example": {
+                    "message": "Failed To Update Labels"
                   }
                 },
                 "example": {

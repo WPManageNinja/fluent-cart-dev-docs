@@ -77,6 +77,12 @@
                     },
                     "description": "Payment method switch data. Additional fields depend on the specific payment gateway implementation."
                   }
+                },
+                "example": {
+                  "data": {
+                    "newPaymentMethod": "paypal",
+                    "currentPaymentMethod": "stripe"
+                  }
                 }
               },
               "example": {
@@ -99,6 +105,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Payment method switch initiated"
                   }
                 },
                 "example": {
@@ -112,7 +121,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Error",
+                  "example": {
+                    "message": "Could not switch payment method"
+                  }
                 },
                 "example": {
                   "message": "Could not switch payment method"

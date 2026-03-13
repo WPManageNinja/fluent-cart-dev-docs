@@ -54,6 +54,11 @@
               "application/json": {
                 "example": {
                   "message": "Path deleted successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Path deleted successfully"
+                  }
                 }
               }
             }

@@ -74,6 +74,26 @@
                     },
                     "description": "Array of option objects with id and variants"
                   }
+                },
+                "example": {
+                  "variation_type": "simple_variations",
+                  "product_id": 123,
+                  "options": [
+                    {
+                      "id": 1,
+                      "name": "License Type",
+                      "variants": [
+                        {
+                          "id": 456,
+                          "value": "Personal"
+                        },
+                        {
+                          "id": 457,
+                          "value": "Business"
+                        }
+                      ]
+                    }
+                  ]
                 }
               },
               "example": {
@@ -106,6 +126,11 @@
               "application/json": {
                 "example": {
                   "message": "Variant options synced successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Variant options synced successfully"
+                  }
                 }
               }
             }

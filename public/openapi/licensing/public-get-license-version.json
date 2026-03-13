@@ -158,6 +158,32 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "success": true,
+                    "new_version": "1.3.0",
+                    "stable_version": "1.3.0",
+                    "name": "My Plugin",
+                    "slug": "my-plugin",
+                    "url": "https://example.com/my-plugin",
+                    "last_updated": "2025-06-15 10:30:00",
+                    "homepage": "https://example.com/my-plugin",
+                    "package": "https://example.com/?fluent-cart=download_license_package&fct_package=...",
+                    "download_link": "https://example.com/?fluent-cart=download_license_package&fct_package=...",
+                    "trunk": "https://example.com/?fluent-cart=download_license_package&fct_package=...",
+                    "license_status": "valid",
+                    "sections": {
+                      "description": "Product description here",
+                      "changelog": "<h4>1.3.0</h4><ul><li>New feature</li></ul>"
+                    },
+                    "banners": {
+                      "low": "https://example.com/banner.png",
+                      "high": "https://example.com/banner.png"
+                    },
+                    "icons": {
+                      "2x": "https://example.com/icon.png",
+                      "1x": "https://example.com/icon.png"
+                    }
                   }
                 },
                 "example": {
@@ -210,6 +236,11 @@
                         "license_settings_not_found"
                       ]
                     }
+                  },
+                  "example": {
+                    "success": false,
+                    "message": "Product not found",
+                    "error_type": "product_not_found"
                   }
                 },
                 "example": {

@@ -80,6 +80,24 @@
                     "format": "email",
                     "description": "Customer email address"
                   }
+                },
+                "example": {
+                  "coupon_code": "WELCOME20",
+                  "id": 9,
+                  "order_uuid": "e7b3a1d4-5f2c-48e9-a6b1-c3d4e5f67890",
+                  "order_items": [
+                    {
+                      "post_id": 123,
+                      "quantity": 1,
+                      "price": 9900,
+                      "unit_price": 9900,
+                      "item_total": 9900,
+                      "line_total": 9900
+                    }
+                  ],
+                  "applied_coupons": [
+                    5
+                  ]
                 }
               },
               "example": {
@@ -125,6 +143,29 @@
                         "$ref": "#/components/schemas/CalculatedItem"
                       }
                     }
+                  },
+                  "example": {
+                    "applied_coupons": {
+                      "SUMMER15": {
+                        "id": 5,
+                        "title": "Summer Sale 15%",
+                        "code": "SUMMER15",
+                        "type": "percent",
+                        "amount": 15,
+                        "discount_amount": 1485,
+                        "stackable": "yes",
+                        "priority": 5
+                      }
+                    },
+                    "calculated_items": [
+                      {
+                        "post_id": 123,
+                        "quantity": 1,
+                        "price": 9900,
+                        "discounted_price": 8415,
+                        "discount_total": 1485
+                      }
+                    ]
                   }
                 },
                 "example": {

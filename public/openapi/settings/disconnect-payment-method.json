@@ -61,6 +61,10 @@
                     ],
                     "example": "test"
                   }
+                },
+                "example": {
+                  "method": "paypal",
+                  "mode": "test"
                 }
               },
               "example": {
@@ -86,6 +90,17 @@
                       "type": "object",
                       "description": "Updated payment method settings",
                       "additionalProperties": true
+                    }
+                  },
+                  "example": {
+                    "message": "PayPal settings has been disconnected",
+                    "settings": {
+                      "is_active": "no",
+                      "payment_mode": "test",
+                      "checkout_label": "Pay with PayPal",
+                      "checkout_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg",
+                      "checkout_instructions": "",
+                      "thank_you_page_instructions": ""
                     }
                   }
                 },
@@ -114,7 +129,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -76,6 +76,24 @@
                     "format": "email",
                     "description": "Customer email for email-based coupon restrictions"
                   }
+                },
+                "example": {
+                  "coupon_code": "WELCOME20",
+                  "order_items": [
+                    {
+                      "post_id": 123,
+                      "quantity": 1,
+                      "price": 9900,
+                      "unit_price": 9900,
+                      "item_total": 9900,
+                      "line_total": 9900,
+                      "other_info": {
+                        "payment_type": "onetime"
+                      }
+                    }
+                  ],
+                  "applied_coupons": [],
+                  "customer_email": "sarah.johnson@example.com"
                 }
               },
               "example": {
@@ -121,6 +139,29 @@
                         "$ref": "#/components/schemas/CalculatedItem"
                       }
                     }
+                  },
+                  "example": {
+                    "applied_coupons": {
+                      "WELCOME20": {
+                        "id": 3,
+                        "title": "Welcome Discount",
+                        "code": "WELCOME20",
+                        "type": "percent",
+                        "amount": 20,
+                        "discount_amount": 1980,
+                        "stackable": "no",
+                        "priority": 10
+                      }
+                    },
+                    "calculated_items": [
+                      {
+                        "post_id": 123,
+                        "quantity": 1,
+                        "price": 9900,
+                        "discounted_price": 7920,
+                        "discount_total": 1980
+                      }
+                    ]
                   }
                 },
                 "example": {

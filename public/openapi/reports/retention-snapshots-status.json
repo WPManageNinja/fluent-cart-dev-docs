@@ -76,6 +76,16 @@
                       "type": "object",
                       "description": "Job details"
                     }
+                  },
+                  "example": {
+                    "success": true,
+                    "status": "running",
+                    "message": "Job is still running",
+                    "data": {
+                      "status": "pending",
+                      "started_at": "2025-06-15 14:30:00",
+                      "product_id": 42
+                    }
                   }
                 },
                 "example": {

@@ -107,6 +107,20 @@
                     },
                     "description": "Additional metadata key-value pairs (string values only)"
                   }
+                },
+                "example": {
+                  "method_id": 10,
+                  "zone_id": 1,
+                  "title": "Express Shipping",
+                  "type": "flat_rate",
+                  "amount": "1200",
+                  "is_enabled": 1,
+                  "states": [
+                    "CA",
+                    "NY",
+                    "TX",
+                    "FL"
+                  ]
                 }
               },
               "example": {
@@ -116,7 +130,12 @@
                 "type": "flat_rate",
                 "amount": "1200",
                 "is_enabled": 1,
-                "states": ["CA", "NY", "TX", "FL"]
+                "states": [
+                  "CA",
+                  "NY",
+                  "TX",
+                  "FL"
+                ]
               }
             }
           }
@@ -132,6 +151,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Shipping method has been updated successfully"
                   }
                 },
                 "example": {

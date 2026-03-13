@@ -96,6 +96,41 @@
                       "route": "product-upgrade-paths"
                     }
                   ]
+                },
+                "schema": {
+                  "example": {
+                    "product": {
+                      "ID": 123,
+                      "post_title": "Developer Toolkit Pro",
+                      "post_status": "publish",
+                      "post_type": "fluent-products",
+                      "post_date": "2025-03-15 10:00:00",
+                      "post_modified": "2025-09-01 15:30:00",
+                      "post_name": "developer-toolkit-pro",
+                      "post_excerpt": "Professional developer tools for building modern applications.",
+                      "post_content": "A comprehensive developer toolkit with API access, code generators, and premium support.",
+                      "thumbnail": "https://example.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                      "view_url": "https://example.com/product/developer-toolkit-pro",
+                      "edit_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products/123"
+                    },
+                    "product_menu": [
+                      {
+                        "key": "pricing",
+                        "label": "Pricing",
+                        "route": "product-pricing"
+                      },
+                      {
+                        "key": "integrations",
+                        "label": "Integrations",
+                        "route": "product-integrations"
+                      },
+                      {
+                        "key": "upgrade_paths",
+                        "label": "Upgrade Paths",
+                        "route": "product-upgrade-paths"
+                      }
+                    ]
+                  }
                 }
               }
             }

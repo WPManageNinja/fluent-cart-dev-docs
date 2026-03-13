@@ -63,6 +63,9 @@
                     "description": "The tax identification number (e.g., VAT number, EIN, GST number)",
                     "example": "DE123456789"
                   }
+                },
+                "example": {
+                  "tax_id": "DE123456789"
                 }
               },
               "example": {
@@ -83,6 +86,9 @@
                       "type": "string",
                       "example": "Tax ID has been saved successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Tax ID has been saved successfully"
                   }
                 },
                 "example": {

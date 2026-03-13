@@ -60,6 +60,9 @@
                       "type": "string",
                       "example": "Tax rate has been deleted successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Tax rate has been deleted successfully"
                   }
                 },
                 "example": {

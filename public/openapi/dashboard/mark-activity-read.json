@@ -65,6 +65,9 @@
                     ],
                     "description": "New read status"
                   }
+                },
+                "example": {
+                  "status": "read"
                 }
               },
               "example": {
@@ -84,6 +87,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Activity Marked as Read"
                   }
                 },
                 "example": {

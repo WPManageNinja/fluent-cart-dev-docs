@@ -93,6 +93,18 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "items": {
+                      "views": "<div class=\"fct-checkout-items\">...rendered HTML...</div>",
+                      "subtotal": "$50.00",
+                      "has_subscriptions": false,
+                      "shipping_charge": 500,
+                      "unformatted_total": 5500,
+                      "total": "$55.00",
+                      "shipping_charge_formated": "$5.00",
+                      "shipping_method_id": "3"
+                    }
                   }
                 },
                 "example": {

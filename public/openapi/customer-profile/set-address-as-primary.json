@@ -78,6 +78,12 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "address": {
+                    "id": 5,
+                    "type": "billing"
+                  }
                 }
               },
               "example": {
@@ -100,6 +106,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Address successfully set as the primary"
                   }
                 },
                 "example": {
@@ -114,6 +123,11 @@
               "application/json": {
                 "example": {
                   "message": "You are not authorized to update this address"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to update this address"
+                  }
                 }
               }
             }

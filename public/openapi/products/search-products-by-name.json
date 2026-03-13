@@ -103,6 +103,42 @@
                       ]
                     }
                   ]
+                },
+                "schema": {
+                  "example": {
+                    "products": [
+                      {
+                        "ID": 123,
+                        "post_title": "Developer Toolkit Pro",
+                        "post_status": "publish",
+                        "post_name": "developer-toolkit-pro",
+                        "thumbnail": "https://example.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                        "wpTerms": [
+                          {
+                            "term_id": 10,
+                            "name": "Software",
+                            "slug": "software",
+                            "taxonomy": "fluent_cart_category"
+                          }
+                        ]
+                      },
+                      {
+                        "ID": 124,
+                        "post_title": "Code Generator Plugin",
+                        "post_status": "publish",
+                        "post_name": "code-generator-plugin",
+                        "thumbnail": "https://example.com/wp-content/uploads/2025/04/code-gen.png",
+                        "wpTerms": [
+                          {
+                            "term_id": 11,
+                            "name": "Developer Tools",
+                            "slug": "developer-tools",
+                            "taxonomy": "fluent_cart_category"
+                          }
+                        ]
+                      }
+                    ]
+                  }
                 }
               }
             }

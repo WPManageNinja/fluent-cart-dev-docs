@@ -72,6 +72,11 @@
                     "type": "string",
                     "description": "Confirm new password (for password change flow)"
                   }
+                },
+                "example": {
+                  "first_name": "John",
+                  "last_name": "Smith",
+                  "email": "john@example.com"
                 }
               },
               "example": {
@@ -93,6 +98,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Profile updated successfully"
                   }
                 },
                 "example": {
@@ -107,6 +115,11 @@
               "application/json": {
                 "example": {
                   "message": "You are not logged in"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not logged in"
+                  }
                 }
               }
             }

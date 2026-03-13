@@ -62,7 +62,10 @@
                       "feed": {
                         "name": "Add to FluentCRM List",
                         "list_id": 1,
-                        "tag_ids": [5, 8],
+                        "tag_ids": [
+                          5,
+                          8
+                        ],
                         "conditional_variation_ids": [],
                         "enabled": "yes"
                       },
@@ -81,6 +84,41 @@
                     }
                   },
                   "all_module_config_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                },
+                "schema": {
+                  "example": {
+                    "feeds": [
+                      {
+                        "id": 10,
+                        "name": "Add to FluentCRM List",
+                        "enabled": "yes",
+                        "provider": "fluentcrm",
+                        "feed": {
+                          "name": "Add to FluentCRM List",
+                          "list_id": 1,
+                          "tag_ids": [
+                            5,
+                            8
+                          ],
+                          "conditional_variation_ids": [],
+                          "enabled": "yes"
+                        },
+                        "scope": "product"
+                      }
+                    ],
+                    "available_integrations": {
+                      "fluentcrm": {
+                        "title": "FluentCRM",
+                        "logo": "...",
+                        "enabled": true,
+                        "scopes": [
+                          "product",
+                          "order"
+                        ]
+                      }
+                    },
+                    "all_module_config_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                  }
                 }
               }
             }

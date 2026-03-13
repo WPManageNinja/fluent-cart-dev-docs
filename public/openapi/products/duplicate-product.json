@@ -66,6 +66,11 @@
                     "type": "string",
                     "description": "Include downloadable files (true/false)"
                   }
+                },
+                "example": {
+                  "import_stock_management": "true",
+                  "import_license_settings": "true",
+                  "import_downloadable_files": "false"
                 }
               },
               "example": {
@@ -91,6 +96,19 @@
                     "edit_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products/130"
                   },
                   "message": "Product duplicated successfully. The new product has been saved as a draft."
+                },
+                "schema": {
+                  "example": {
+                    "product_id": 130,
+                    "product": {
+                      "ID": 130,
+                      "post_title": "Developer Toolkit Pro (Copy)",
+                      "post_status": "draft",
+                      "post_type": "fluent-products",
+                      "edit_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products/130"
+                    },
+                    "message": "Product duplicated successfully. The new product has been saved as a draft."
+                  }
                 }
               }
             }

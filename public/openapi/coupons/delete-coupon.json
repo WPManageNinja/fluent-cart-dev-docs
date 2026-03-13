@@ -64,6 +64,10 @@
                       "type": "string",
                       "example": ""
                     }
+                  },
+                  "example": {
+                    "message": "Coupon successfully deleted.",
+                    "data": ""
                   }
                 },
                 "example": {
@@ -83,6 +87,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Please use a valid coupon ID!"
                   }
                 },
                 "example": {
@@ -101,6 +108,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Coupon not found in database, failed to remove."
                   }
                 },
                 "example": {
@@ -119,6 +129,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Coupon deletion failed!"
                   }
                 },
                 "example": {

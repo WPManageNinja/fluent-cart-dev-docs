@@ -100,6 +100,53 @@
                         "$ref": "#/components/schemas/ShortcodeGroup"
                       }
                     }
+                  },
+                  "example": {
+                    "data": {
+                      "from_name": "TechStore",
+                      "from_email": "orders@example.com",
+                      "reply_to_name": "TechStore Support",
+                      "reply_to_email": "support@example.com",
+                      "email_footer": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p><p>456 Market Street, San Francisco, CA 94102</p>",
+                      "show_email_footer": "yes",
+                      "admin_email": "{{wp.admin_email}}",
+                      "notification_config": {
+                        "order_paid_admin": {
+                          "active": "yes"
+                        },
+                        "order_paid_customer": {
+                          "active": "yes"
+                        },
+                        "order_refunded_admin": {
+                          "active": "yes"
+                        },
+                        "order_refunded_customer": {
+                          "active": "yes"
+                        }
+                      }
+                    },
+                    "shortcodes": [
+                      {
+                        "title": "General",
+                        "key": "wp",
+                        "shortcodes": {
+                          "{{wp.admin_email}}": "Admin Email",
+                          "{{wp.site_url}}": "Site URL",
+                          "{{wp.site_title}}": "Site Title",
+                          "{{user.display_name}}": "User Display Name",
+                          "{{user.user_email}}": "User Email"
+                        }
+                      },
+                      {
+                        "title": "Settings",
+                        "key": "settings",
+                        "shortcodes": {
+                          "{{settings.store_name}}": "Store Name",
+                          "{{settings.store_logo}}": "Store Logo",
+                          "{{settings.store_address}}": "Store Address Line 1"
+                        }
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -186,7 +233,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

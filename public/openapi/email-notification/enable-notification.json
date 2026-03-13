@@ -67,6 +67,9 @@
                     "description": "Set to yes to enable or no to disable the notification",
                     "example": "yes"
                   }
+                },
+                "example": {
+                  "active": "yes"
                 }
               },
               "example": {
@@ -87,6 +90,9 @@
                       "type": "string",
                       "example": "Notification updated successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Notification updated successfully"
                   }
                 },
                 "example": {
@@ -106,6 +112,9 @@
                       "type": "string",
                       "example": "Failed to update notification"
                     }
+                  },
+                  "example": {
+                    "message": "Failed to update notification"
                   }
                 },
                 "example": {

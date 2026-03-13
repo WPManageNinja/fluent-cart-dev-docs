@@ -61,6 +61,13 @@
                       "type": "string",
                       "example": "Label created successfully!"
                     }
+                  },
+                  "example": {
+                    "data": {
+                      "id": 4,
+                      "value": "Returning Customer"
+                    },
+                    "message": "Label created successfully!"
                   }
                 },
                 "example": {
@@ -90,6 +97,13 @@
                           }
                         }
                       }
+                    }
+                  },
+                  "example": {
+                    "errors": {
+                      "value": [
+                        "Label must be unique."
+                      ]
                     }
                   }
                 },

@@ -61,6 +61,9 @@
                     "type": "string",
                     "description": "The editor mode to set"
                   }
+                },
+                "example": {
+                  "active_editor": "visual"
                 }
               },
               "example": {
@@ -76,6 +79,11 @@
               "application/json": {
                 "example": {
                   "message": "Editor mode updated successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Editor mode updated successfully"
+                  }
                 }
               }
             }

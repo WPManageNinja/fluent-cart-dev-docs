@@ -123,6 +123,24 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "settings": {
+                    "basic_info": {
+                      "full_name": {
+                        "enabled": "no",
+                        "required": "no"
+                      },
+                      "first_name": {
+                        "enabled": "yes",
+                        "required": "yes"
+                      },
+                      "last_name": {
+                        "enabled": "yes",
+                        "required": "no"
+                      }
+                    }
+                  }
                 }
               },
               "example": {
@@ -158,6 +176,9 @@
                       "type": "string",
                       "example": "Checkout fields has been updated successfully."
                     }
+                  },
+                  "example": {
+                    "message": "Checkout fields has been updated successfully."
                   }
                 },
                 "example": {

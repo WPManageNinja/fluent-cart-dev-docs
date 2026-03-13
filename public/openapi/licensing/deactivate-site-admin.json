@@ -80,6 +80,10 @@
                     ],
                     "description": "The activation record ID to deactivate"
                   }
+                },
+                "example": {
+                  "id": 1,
+                  "activation_id": 5
                 }
               },
               "example": {
@@ -100,6 +104,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Site has been deactivated successfully!"
                   }
                 },
                 "example": {
@@ -118,6 +125,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "<error message from license manager>"
                   }
                 },
                 "example": {

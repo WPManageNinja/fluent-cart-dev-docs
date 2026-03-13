@@ -111,6 +111,182 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "fields": {
+                      "basic_info": {
+                        "full_name": {
+                          "label": "Full Name",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "first_name": {
+                          "label": "First Name",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "last_name": {
+                          "label": "Last Name",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "email": {
+                          "label": "Email",
+                          "type": "email",
+                          "configurable": false
+                        }
+                      },
+                      "billing_address": {
+                        "address_1": {
+                          "label": "Address Line 1",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "address_2": {
+                          "label": "Address Line 2",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "city": {
+                          "label": "City",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "state": {
+                          "label": "State",
+                          "type": "select",
+                          "configurable": true
+                        },
+                        "postcode": {
+                          "label": "Postcode",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "country": {
+                          "label": "Country",
+                          "type": "select",
+                          "configurable": false
+                        },
+                        "phone": {
+                          "label": "Phone",
+                          "type": "tel",
+                          "configurable": true
+                        },
+                        "company": {
+                          "label": "Company",
+                          "type": "text",
+                          "configurable": true
+                        }
+                      },
+                      "shipping_address": {
+                        "address_1": {
+                          "label": "Address Line 1",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "address_2": {
+                          "label": "Address Line 2",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "city": {
+                          "label": "City",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "state": {
+                          "label": "State",
+                          "type": "select",
+                          "configurable": true
+                        },
+                        "postcode": {
+                          "label": "Postcode",
+                          "type": "text",
+                          "configurable": true
+                        },
+                        "country": {
+                          "label": "Country",
+                          "type": "select",
+                          "configurable": false
+                        }
+                      }
+                    },
+                    "settings": {
+                      "basic_info": {
+                        "full_name": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "first_name": {
+                          "enabled": "no",
+                          "required": "no"
+                        },
+                        "last_name": {
+                          "enabled": "no",
+                          "required": "no"
+                        }
+                      },
+                      "billing_address": {
+                        "address_1": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "address_2": {
+                          "enabled": "yes",
+                          "required": "no"
+                        },
+                        "city": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "state": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "postcode": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "country": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "phone": {
+                          "enabled": "yes",
+                          "required": "no"
+                        },
+                        "company": {
+                          "enabled": "yes",
+                          "required": "no"
+                        }
+                      },
+                      "shipping_address": {
+                        "address_1": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "address_2": {
+                          "enabled": "yes",
+                          "required": "no"
+                        },
+                        "city": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "state": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "postcode": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        },
+                        "country": {
+                          "enabled": "yes",
+                          "required": "yes"
+                        }
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -303,7 +479,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

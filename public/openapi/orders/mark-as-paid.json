@@ -70,6 +70,11 @@
                     "type": "string",
                     "description": "Note to attach to the order"
                   }
+                },
+                "example": {
+                  "payment_method": "offline_payment",
+                  "vendor_charge_id": "CHK-12345",
+                  "mark_paid_note": "Payment received via bank transfer"
                 }
               },
               "example": {
@@ -92,6 +97,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Order has been marked as paid"
                   }
                 },
                 "example": {
@@ -110,6 +118,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Order has already been paid"
                   }
                 },
                 "example": {

@@ -66,6 +66,11 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "tax_data": {
+                      "tax_id": "DE123456789"
+                    }
                   }
                 },
                 "example": {

@@ -112,6 +112,17 @@
                     "maxLength": 255,
                     "description": "Company name. Max 255 characters."
                   }
+                },
+                "example": {
+                  "id": 5,
+                  "type": "billing",
+                  "name": "John Smith",
+                  "address_1": "456 Oak Ave",
+                  "city": "Boston",
+                  "state": "MA",
+                  "postcode": "02101",
+                  "country": "US",
+                  "email": "john@example.com"
                 }
               },
               "example": {
@@ -142,6 +153,20 @@
                     "data": {
                       "type": "object"
                     }
+                  },
+                  "example": {
+                    "message": "Customer address updated successfully!",
+                    "data": {
+                      "id": 5,
+                      "customer_id": 1,
+                      "type": "billing",
+                      "name": "John Smith",
+                      "address_1": "456 Oak Ave",
+                      "city": "Boston",
+                      "state": "MA",
+                      "postcode": "02101",
+                      "country": "US"
+                    }
                   }
                 },
                 "example": {
@@ -167,6 +192,11 @@
               "application/json": {
                 "example": {
                   "message": "You are not authorized to update this address"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to update this address"
+                  }
                 }
               }
             }

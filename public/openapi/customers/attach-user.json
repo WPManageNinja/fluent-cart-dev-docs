@@ -61,6 +61,9 @@
                     "type": "integer",
                     "description": "The WordPress user ID to attach. Must reference an existing user who is not already linked to a customer."
                   }
+                },
+                "example": {
+                  "user_id": 8
                 }
               },
               "example": {
@@ -80,6 +83,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "User attached successfully"
                   }
                 },
                 "example": {
@@ -115,6 +121,14 @@
                   "success": false,
                   "data": {
                     "message": "This WordPress user is already attached to another customer record."
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "This WordPress user is already attached to another customer record."
+                    }
                   }
                 }
               }

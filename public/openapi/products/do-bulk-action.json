@@ -58,6 +58,14 @@
                     },
                     "description": "Array of product IDs to act on"
                   }
+                },
+                "example": {
+                  "action": "publish",
+                  "product_ids": [
+                    123,
+                    456,
+                    789
+                  ]
                 }
               },
               "example": {
@@ -78,6 +86,11 @@
               "application/json": {
                 "example": {
                   "message": "Bulk action completed successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Bulk action completed successfully"
+                  }
                 }
               }
             }

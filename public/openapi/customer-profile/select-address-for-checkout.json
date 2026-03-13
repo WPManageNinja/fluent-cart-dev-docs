@@ -85,6 +85,13 @@
                     "fragments": {
                       "type": "object"
                     }
+                  },
+                  "example": {
+                    "message": "Address Attached",
+                    "data": "<div class=\"fct-address-info\">...</div>",
+                    "fragments": {
+                      ".fct-checkout-summary": "<div>...updated summary HTML...</div>"
+                    }
                   }
                 },
                 "example": {
@@ -103,6 +110,11 @@
               "application/json": {
                 "example": {
                   "message": "Address not found"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Address not found"
+                  }
                 }
               }
             }
@@ -113,6 +125,11 @@
               "application/json": {
                 "example": {
                   "message": "You are not authorized to view this address"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to view this address"
+                  }
                 }
               }
             }

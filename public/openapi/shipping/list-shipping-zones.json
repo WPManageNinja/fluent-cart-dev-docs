@@ -136,6 +136,34 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "shipping_zones": {
+                      "total": 3,
+                      "per_page": 10,
+                      "current_page": 1,
+                      "last_page": 1,
+                      "data": [
+                        {
+                          "id": 1,
+                          "name": "Domestic",
+                          "region": "US",
+                          "order": 0,
+                          "formatted_region": "United States",
+                          "created_at": "2025-01-15 12:00:00",
+                          "updated_at": "2025-01-15 12:00:00"
+                        },
+                        {
+                          "id": 2,
+                          "name": "Rest of World",
+                          "region": "all",
+                          "order": 1,
+                          "formatted_region": "Whole World",
+                          "created_at": "2025-01-16 10:00:00",
+                          "updated_at": "2025-01-16 10:00:00"
+                        }
+                      ]
+                    }
                   }
                 },
                 "example": {

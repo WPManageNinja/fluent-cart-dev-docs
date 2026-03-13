@@ -88,6 +88,25 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "orders": {
+                      "total": 25,
+                      "per_page": 15,
+                      "current_page": 1,
+                      "last_page": 2,
+                      "data": [
+                        {
+                          "id": 101,
+                          "invoice_no": "INV-000101",
+                          "total_amount": 4999,
+                          "uuid": "abc-123-def",
+                          "type": "one-time",
+                          "status": "completed",
+                          "created_at": "2025-06-15 10:30:00"
+                        }
+                      ]
+                    }
                   }
                 },
                 "example": {

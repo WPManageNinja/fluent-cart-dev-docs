@@ -66,6 +66,9 @@
                     ],
                     "description": "New status. One of: `active`, `disabled`, `expired`"
                   }
+                },
+                "example": {
+                  "status": "disabled"
                 }
               },
               "example": {
@@ -96,6 +99,13 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "license": {
+                      "id": 1,
+                      "status": "disabled"
+                    },
+                    "message": "License status has been updated successfully!"
                   }
                 },
                 "example": {
@@ -118,6 +128,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Invalid status!"
                   }
                 },
                 "example": {

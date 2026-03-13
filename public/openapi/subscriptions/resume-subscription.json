@@ -67,6 +67,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Not available yet"
                   }
                 },
                 "example": {

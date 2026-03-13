@@ -107,6 +107,16 @@
                     "type": "string",
                     "description": "Customer website URL"
                   }
+                },
+                "example": {
+                  "first_name": "Sarah",
+                  "last_name": "Johnson",
+                  "email": "sarah.johnson@example.com",
+                  "country": "US",
+                  "city": "San Francisco",
+                  "state": "CA",
+                  "postcode": "94102",
+                  "wp_user": "yes"
                 }
               },
               "example": {
@@ -135,6 +145,28 @@
                     },
                     "data": {
                       "type": "object"
+                    }
+                  },
+                  "example": {
+                    "message": "Customer created successfully!",
+                    "data": {
+                      "id": 12,
+                      "user_id": 5,
+                      "email": "sarah.johnson@example.com",
+                      "first_name": "Sarah",
+                      "last_name": "Johnson",
+                      "status": "active",
+                      "purchase_value": 0,
+                      "purchase_count": 0,
+                      "ltv": 0,
+                      "aov": 0,
+                      "uuid": "cust_a1b2c3d4",
+                      "country": "US",
+                      "city": "San Francisco",
+                      "state": "CA",
+                      "postcode": "94102",
+                      "created_at": "2025-06-10 09:15:00",
+                      "updated_at": "2025-06-10 09:15:00"
                     }
                   }
                 },
@@ -171,6 +203,13 @@
                   "code": 400,
                   "message": "Customer already exists.",
                   "data": ""
+                },
+                "schema": {
+                  "example": {
+                    "code": 400,
+                    "message": "Customer already exists.",
+                    "data": ""
+                  }
                 }
               }
             }

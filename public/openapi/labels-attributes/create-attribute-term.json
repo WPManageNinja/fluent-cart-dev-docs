@@ -73,6 +73,20 @@
                       "type": "string",
                       "example": "Successfully created!"
                     }
+                  },
+                  "example": {
+                    "data": {
+                      "id": 6,
+                      "group_id": 1,
+                      "serial": 10,
+                      "title": "Green",
+                      "slug": "green",
+                      "description": null,
+                      "settings": null,
+                      "created_at": "2025-01-15 12:00:00",
+                      "updated_at": "2025-01-15 12:00:00"
+                    },
+                    "message": "Successfully created!"
                   }
                 },
                 "example": {
@@ -107,6 +121,10 @@
                       "type": "integer",
                       "example": 404
                     }
+                  },
+                  "example": {
+                    "message": "Information mismatch.",
+                    "code": 404
                   }
                 },
                 "example": {
@@ -139,6 +157,16 @@
                           }
                         }
                       }
+                    }
+                  },
+                  "example": {
+                    "errors": {
+                      "title": [
+                        "Title is required"
+                      ],
+                      "slug": [
+                        "Slug is required"
+                      ]
                     }
                   }
                 },

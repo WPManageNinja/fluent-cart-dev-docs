@@ -85,6 +85,14 @@
                     "type": "string",
                     "description": "Upgrade path slug"
                   }
+                },
+                "example": {
+                  "from_variant": 456,
+                  "to_variants": [
+                    457,
+                    458
+                  ],
+                  "discount_amount": 500
                 }
               },
               "example": {
@@ -105,6 +113,11 @@
               "application/json": {
                 "example": {
                   "message": "Settings saved successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Settings saved successfully"
+                  }
                 }
               }
             }

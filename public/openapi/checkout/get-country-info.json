@@ -136,6 +136,43 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "data": {
+                      "country_code": "US",
+                      "states": [
+                        {
+                          "label": "Alabama",
+                          "value": "AL"
+                        },
+                        {
+                          "label": "Alaska",
+                          "value": "AK"
+                        },
+                        {
+                          "label": "California",
+                          "value": "CA"
+                        },
+                        {
+                          "label": "New York",
+                          "value": "NY"
+                        }
+                      ],
+                      "address_locale": {
+                        "state": {
+                          "label": "State",
+                          "required": true
+                        },
+                        "postcode": {
+                          "label": "ZIP Code",
+                          "required": true
+                        },
+                        "city": {
+                          "label": "City",
+                          "required": true
+                        }
+                      }
+                    }
                   }
                 },
                 "example": {

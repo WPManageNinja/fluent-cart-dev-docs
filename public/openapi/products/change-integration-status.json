@@ -70,6 +70,11 @@
                     ],
                     "description": "yes to enable, no to disable"
                   }
+                },
+                "example": {
+                  "product_id": 123,
+                  "notification_id": 10,
+                  "status": "yes"
                 }
               },
               "example": {
@@ -87,6 +92,11 @@
               "application/json": {
                 "example": {
                   "message": "Integration status has been updated"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Integration status has been updated"
+                  }
                 }
               }
             }

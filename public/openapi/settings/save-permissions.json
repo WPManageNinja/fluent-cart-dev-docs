@@ -56,6 +56,26 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "capability": {
+                    "shop_manager": {
+                      "orders/view": true,
+                      "orders/manage": true,
+                      "customers/view": true,
+                      "customers/manage": true,
+                      "products/manage": true,
+                      "coupons/manage": true,
+                      "subscriptions/view": false,
+                      "settings/manage": false
+                    },
+                    "editor": {
+                      "orders/view": true,
+                      "orders/manage": false,
+                      "customers/view": true,
+                      "products/manage": false
+                    }
+                  }
                 }
               },
               "example": {
@@ -93,6 +113,9 @@
                       "type": "string",
                       "example": "Permissions saved successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Permissions saved successfully"
                   }
                 },
                 "example": {
@@ -112,7 +135,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

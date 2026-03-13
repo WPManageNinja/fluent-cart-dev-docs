@@ -69,6 +69,11 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "address": {
+                    "id": 5
+                  }
                 }
               },
               "example": {
@@ -90,6 +95,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Address deleted successfully"
                   }
                 },
                 "example": {
@@ -104,6 +112,11 @@
               "application/json": {
                 "example": {
                   "message": "You are not authorized to delete this address"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to delete this address"
+                  }
                 }
               }
             }

@@ -83,6 +83,15 @@
                         "type": "string"
                       }
                     }
+                  },
+                  "example": {
+                    "message": "Order 42 deleted successfully",
+                    "data": {
+                      "order_id": 42,
+                      "invoice_no": "INV-042",
+                      "status": "success"
+                    },
+                    "errors": []
                   }
                 },
                 "example": {
@@ -107,6 +116,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Order not found"
                   }
                 },
                 "example": {

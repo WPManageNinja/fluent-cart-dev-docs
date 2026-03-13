@@ -70,6 +70,9 @@
                       "type": "string",
                       "example": "OSS tax override deleted successfully"
                     }
+                  },
+                  "example": {
+                    "message": "OSS tax override deleted successfully"
                   }
                 },
                 "example": {
@@ -89,6 +92,9 @@
                       "type": "string",
                       "example": "No matching OSS tax override found to delete"
                     }
+                  },
+                  "example": {
+                    "message": "No matching OSS tax override found to delete"
                   }
                 },
                 "example": {

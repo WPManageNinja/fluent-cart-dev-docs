@@ -58,6 +58,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "User detached successfully"
                   }
                 },
                 "example": {
@@ -72,6 +75,11 @@
               "application/json": {
                 "example": {
                   "message": "Customer not found."
+                },
+                "schema": {
+                  "example": {
+                    "message": "Customer not found."
+                  }
                 }
               }
             }

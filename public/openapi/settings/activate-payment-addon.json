@@ -51,6 +51,9 @@
                     "description": "The plugin file path (e.g., `fluent-cart-pro/fluent-cart-pro.php`).",
                     "example": "fluent-cart-pro/fluent-cart-pro.php"
                   }
+                },
+                "example": {
+                  "plugin_file": "fluent-cart-pro/fluent-cart-pro.php"
                 }
               },
               "example": {
@@ -71,6 +74,9 @@
                       "type": "string",
                       "example": "Payment addon activated successfully!"
                     }
+                  },
+                  "example": {
+                    "message": "Payment addon activated successfully!"
                   }
                 },
                 "example": {

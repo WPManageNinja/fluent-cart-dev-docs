@@ -169,7 +169,46 @@
                 "schema": {
                   "type": "object",
                   "description": "Ranked variant list with sales counts and revenue data",
-                  "additionalProperties": true
+                  "additionalProperties": true,
+                  "example": {
+                    "topSoldVariants": [
+                      {
+                        "variant_id": 457,
+                        "title": "Business License - Annual",
+                        "product_title": "Developer Toolkit Pro",
+                        "total_sold": 89,
+                        "revenue": 450000
+                      },
+                      {
+                        "variant_id": 456,
+                        "title": "Personal License",
+                        "product_title": "Developer Toolkit Pro",
+                        "total_sold": 53,
+                        "revenue": 230000
+                      },
+                      {
+                        "variant_id": 460,
+                        "title": "Team License - Annual",
+                        "product_title": "API Testing Suite",
+                        "total_sold": 48,
+                        "revenue": 192000
+                      },
+                      {
+                        "variant_id": 459,
+                        "title": "Solo License",
+                        "product_title": "API Testing Suite",
+                        "total_sold": 50,
+                        "revenue": 98000
+                      },
+                      {
+                        "variant_id": 465,
+                        "title": "Standard License",
+                        "product_title": "WordPress starter theme",
+                        "total_sold": 76,
+                        "revenue": 152000
+                      }
+                    ]
+                  }
                 },
                 "example": {
                   "topSoldVariants": [
@@ -224,7 +263,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

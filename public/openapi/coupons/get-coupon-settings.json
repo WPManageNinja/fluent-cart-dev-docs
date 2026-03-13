@@ -50,6 +50,11 @@
                       "description": "Whether the coupon code input is displayed on the checkout page. 1 for yes, 0 for no.",
                       "example": 1
                     }
+                  },
+                  "example": {
+                    "show_on_checkout": 1,
+                    "enable_coupons": true,
+                    "auto_apply_coupons": false
                   }
                 },
                 "example": {

@@ -94,6 +94,18 @@
                         "$ref": "#/components/schemas/DynamicOption"
                       }
                     }
+                  },
+                  "example": {
+                    "options": [
+                      {
+                        "id": "123",
+                        "title": "Example Product"
+                      },
+                      {
+                        "id": "456",
+                        "title": "Another Product"
+                      }
+                    ]
                   }
                 },
                 "example": {

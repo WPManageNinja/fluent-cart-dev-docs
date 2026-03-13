@@ -52,7 +52,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object"
+                "type": "object",
+                "example": {
+                  "title": "Manager",
+                  "capabilities": [
+                    "manage_orders",
+                    "manage_products",
+                    "manage_customers",
+                    "manage_coupons"
+                  ]
+                }
               },
               "example": {
                 "title": "Manager",
@@ -72,7 +81,22 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "example": {
+                    "message": "Role updated successfully.",
+                    "role": {
+                      "key": "fct_manager",
+                      "display_name": "FluentCart Manager",
+                      "capabilities": {
+                        "fct_manage_orders": true,
+                        "fct_manage_products": true,
+                        "fct_manage_customers": true,
+                        "fct_view_reports": true,
+                        "fct_manage_coupons": true,
+                        "fct_manage_settings": false
+                      }
+                    }
+                  }
                 },
                 "example": {
                   "message": "Role updated successfully.",

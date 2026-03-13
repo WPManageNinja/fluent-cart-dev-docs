@@ -43,6 +43,11 @@
               "application/json": {
                 "example": {
                   "count": 55
+                },
+                "schema": {
+                  "example": {
+                    "count": 55
+                  }
                 }
               }
             }

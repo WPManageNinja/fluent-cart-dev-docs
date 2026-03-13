@@ -52,6 +52,14 @@
                       },
                       "description": "Array of active coupon code strings"
                     }
+                  },
+                  "example": {
+                    "coupons": [
+                      "WELCOME20",
+                      "SUMMER25",
+                      "LAUNCH50",
+                      "FREESHIP"
+                    ]
                   }
                 },
                 "example": {

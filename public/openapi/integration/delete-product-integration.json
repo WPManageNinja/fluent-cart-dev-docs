@@ -70,6 +70,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Integration deleted successfully"
                   }
                 },
                 "example": {

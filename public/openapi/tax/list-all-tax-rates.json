@@ -50,6 +50,56 @@
                         "$ref": "#/components/schemas/TaxRateGroup"
                       }
                     }
+                  },
+                  "example": {
+                    "tax_rates": [
+                      {
+                        "group_name": "European Union",
+                        "group_code": "EU",
+                        "countries": [
+                          {
+                            "country_code": "DE",
+                            "country_name": "Germany",
+                            "rates": [
+                              {
+                                "class_id": 1,
+                                "name": "DE Standard Tax",
+                                "rate": "19.0000",
+                                "for_shipping": null
+                              },
+                              {
+                                "class_id": 2,
+                                "name": "DE Reduced Tax",
+                                "rate": "7.0000",
+                                "for_shipping": null
+                              }
+                            ],
+                            "total_rates": 2
+                          }
+                        ],
+                        "total_countries": 1
+                      },
+                      {
+                        "group_name": "North America",
+                        "group_code": "NA",
+                        "countries": [
+                          {
+                            "country_code": "US",
+                            "country_name": "United States",
+                            "rates": [
+                              {
+                                "class_id": 1,
+                                "name": "US Standard Tax",
+                                "rate": "10.0000",
+                                "for_shipping": null
+                              }
+                            ],
+                            "total_rates": 1
+                          }
+                        ],
+                        "total_countries": 1
+                      }
+                    ]
                   }
                 },
                 "example": {

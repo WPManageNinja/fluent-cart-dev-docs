@@ -68,6 +68,11 @@
                         "downloadable_file_not_found"
                       ]
                     }
+                  },
+                  "example": {
+                    "success": false,
+                    "message": "Invalid package data",
+                    "error_type": "invalid_package_data"
                   }
                 },
                 "example": {

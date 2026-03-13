@@ -61,6 +61,9 @@
                     "type": "string",
                     "description": "The site URL to deactivate"
                   }
+                },
+                "example": {
+                  "site_url": "example.com"
                 }
               },
               "example": {
@@ -80,6 +83,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Site deactivated successfully"
                   }
                 },
                 "example": {
@@ -98,6 +104,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Site not found or not activated for this license"
                   }
                 },
                 "example": {

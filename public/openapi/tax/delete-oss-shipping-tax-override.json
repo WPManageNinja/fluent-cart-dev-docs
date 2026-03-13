@@ -70,6 +70,9 @@
                       "type": "string",
                       "example": "OSS shipping override deleted successfully"
                     }
+                  },
+                  "example": {
+                    "message": "OSS shipping override deleted successfully"
                   }
                 },
                 "example": {
@@ -89,6 +92,9 @@
                       "type": "string",
                       "example": "No matching OSS shipping override found to delete"
                     }
+                  },
+                  "example": {
+                    "message": "No matching OSS shipping override found to delete"
                   }
                 },
                 "example": {

@@ -65,6 +65,72 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "fields": {
+                      "modules_settings": {
+                        "title": "Features & addon",
+                        "type": "section",
+                        "class": "no-padding",
+                        "disable_nesting": true,
+                        "columns": {
+                          "default": 1,
+                          "md": 1
+                        },
+                        "schema": {
+                          "shipping": {
+                            "title": "Shipping",
+                            "type": "toggle",
+                            "description": "Enable shipping module for physical products"
+                          },
+                          "tax": {
+                            "title": "Tax",
+                            "type": "toggle",
+                            "description": "Enable tax calculation on orders"
+                          },
+                          "coupons": {
+                            "title": "Coupons",
+                            "type": "toggle",
+                            "description": "Enable coupon/discount code support"
+                          },
+                          "subscriptions": {
+                            "title": "Subscriptions",
+                            "type": "toggle",
+                            "description": "Enable subscription-based products"
+                          },
+                          "licensing": {
+                            "title": "Licensing",
+                            "type": "toggle",
+                            "description": "Enable software licensing"
+                          },
+                          "stock_management": {
+                            "title": "Stock Management",
+                            "type": "toggle",
+                            "description": "Track product inventory levels"
+                          }
+                        }
+                      }
+                    },
+                    "settings": {
+                      "shipping": {
+                        "active": "yes"
+                      },
+                      "tax": {
+                        "active": "no"
+                      },
+                      "coupons": {
+                        "active": "yes"
+                      },
+                      "subscriptions": {
+                        "active": "yes"
+                      },
+                      "licensing": {
+                        "active": "no"
+                      },
+                      "stock_management": {
+                        "active": "yes"
+                      }
+                    }
                   }
                 },
                 "example": {
@@ -147,7 +213,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

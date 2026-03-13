@@ -51,6 +51,9 @@
                     "description": "The plugin file path to activate (e.g., `fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php`).",
                     "example": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php"
                   }
+                },
+                "example": {
+                  "plugin_file": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php"
                 }
               },
               "example": {
@@ -71,6 +74,9 @@
                       "type": "string",
                       "example": "Addon activated successfully."
                     }
+                  },
+                  "example": {
+                    "message": "Addon activated successfully."
                   }
                 },
                 "example": {

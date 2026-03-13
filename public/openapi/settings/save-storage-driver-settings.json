@@ -63,6 +63,15 @@
                       "region": "us-east-1"
                     }
                   }
+                },
+                "example": {
+                  "driver": "s3",
+                  "settings": {
+                    "access_key": "AKIA...",
+                    "secret_key": "wJalr...",
+                    "bucket": "my-store-files",
+                    "region": "us-east-1"
+                  }
                 }
               },
               "example": {
@@ -94,6 +103,17 @@
                       "description": "Saved driver settings",
                       "additionalProperties": true
                     }
+                  },
+                  "example": {
+                    "message": "Settings saved successfully",
+                    "data": {
+                      "access_key": "AKIAIOSFODNN7EXAMPLE",
+                      "secret_key": "****",
+                      "bucket": "techstore-downloads",
+                      "region": "us-east-1",
+                      "is_active": true,
+                      "base_url": "https://techstore-downloads.s3.amazonaws.com"
+                    }
                   }
                 },
                 "example": {
@@ -121,7 +141,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

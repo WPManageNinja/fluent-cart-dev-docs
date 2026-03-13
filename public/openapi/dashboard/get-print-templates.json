@@ -50,6 +50,35 @@
                         "$ref": "#/components/schemas/PrintTemplate"
                       }
                     }
+                  },
+                  "example": {
+                    "templates": [
+                      {
+                        "key": "invoice_template",
+                        "title": "Invoice Template",
+                        "content": "<html>...invoice HTML template with shortcodes...</html>"
+                      },
+                      {
+                        "key": "packing_slip",
+                        "title": "Packing Slip Template",
+                        "content": "<html>...packing slip HTML template...</html>"
+                      },
+                      {
+                        "key": "delivery_slip",
+                        "title": "Delivery Slip Template",
+                        "content": "<html>...delivery slip HTML template...</html>"
+                      },
+                      {
+                        "key": "shipping_slip",
+                        "title": "Shipping Slip Template",
+                        "content": "<html>...shipping slip HTML template...</html>"
+                      },
+                      {
+                        "key": "dispatch_slip",
+                        "title": "Dispatch Slip Template",
+                        "content": "<html>...dispatch slip HTML template...</html>"
+                      }
+                    ]
                   }
                 },
                 "example": {

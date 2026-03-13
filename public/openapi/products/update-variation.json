@@ -102,6 +102,22 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "variants": {
+                    "id": 460,
+                    "post_id": 123,
+                    "variation_title": "Pro Plan - Updated",
+                    "item_price": 3999,
+                    "fulfillment_type": "digital",
+                    "total_stock": 1,
+                    "available": 1,
+                    "committed": 0,
+                    "on_hold": 0,
+                    "other_info": {
+                      "payment_type": "onetime"
+                    }
+                  }
                 }
               },
               "example": {
@@ -153,6 +169,34 @@
                     "thumbnail": null
                   },
                   "message": "Variation updated successfully"
+                },
+                "schema": {
+                  "example": {
+                    "variant": {
+                      "id": 460,
+                      "post_id": 123,
+                      "serial_index": 0,
+                      "variation_title": "Pro Plan - Updated",
+                      "variation_identifier": "pro-plan-updated",
+                      "sku": "PRO-PLN",
+                      "payment_type": "onetime",
+                      "item_price": 3999,
+                      "item_cost": 0,
+                      "compare_price": 0,
+                      "item_status": "active",
+                      "manage_stock": 0,
+                      "stock_status": "in-stock",
+                      "total_stock": 0,
+                      "available": 0,
+                      "committed": 0,
+                      "on_hold": 0,
+                      "fulfillment_type": "digital",
+                      "downloadable": 0,
+                      "sold_individually": 0,
+                      "thumbnail": null
+                    },
+                    "message": "Variation updated successfully"
+                  }
                 }
               }
             }

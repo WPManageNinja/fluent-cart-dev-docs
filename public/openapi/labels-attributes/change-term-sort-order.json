@@ -85,6 +85,10 @@
                       "type": "string",
                       "example": "Serial updated."
                     }
+                  },
+                  "example": {
+                    "data": 2,
+                    "message": "Serial updated."
                   }
                 },
                 "example": {
@@ -109,6 +113,10 @@
                       "type": "integer",
                       "example": 404
                     }
+                  },
+                  "example": {
+                    "message": "Info mismatch.",
+                    "code": 404
                   }
                 },
                 "example": {

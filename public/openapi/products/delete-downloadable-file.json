@@ -54,6 +54,11 @@
               "application/json": {
                 "example": {
                   "message": "File deleted successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "File deleted successfully"
+                  }
                 }
               }
             }

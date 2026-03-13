@@ -59,6 +59,14 @@
                       "ES"
                     ]
                   }
+                },
+                "example": {
+                  "countries": [
+                    "DE",
+                    "FR",
+                    "IT",
+                    "ES"
+                  ]
                 }
               },
               "example": {
@@ -84,6 +92,9 @@
                       "type": "string",
                       "example": "Countries saved successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Countries saved successfully"
                   }
                 },
                 "example": {

@@ -192,6 +192,103 @@
                       },
                       "description": "Fluctuation data"
                     }
+                  },
+                  "example": {
+                    "currentMetrics": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01",
+                        "subscriptions": 12,
+                        "mrr": 118800
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-02",
+                        "subscriptions": 15,
+                        "mrr": 148500
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-03",
+                        "subscriptions": 18,
+                        "mrr": 178200
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-04",
+                        "subscriptions": 14,
+                        "mrr": 138600
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-05",
+                        "subscriptions": 22,
+                        "mrr": 217800
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-06",
+                        "subscriptions": 19,
+                        "mrr": 188100
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-07",
+                        "subscriptions": 25,
+                        "mrr": 247500
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-08",
+                        "subscriptions": 20,
+                        "mrr": 198000
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-09",
+                        "subscriptions": 28,
+                        "mrr": 277200
+                      }
+                    ],
+                    "compareMetrics": [
+                      {
+                        "year": "2024",
+                        "group": "2024-01",
+                        "subscriptions": 8,
+                        "mrr": 79200
+                      },
+                      {
+                        "year": "2024",
+                        "group": "2024-02",
+                        "subscriptions": 10,
+                        "mrr": 99000
+                      },
+                      {
+                        "year": "2024",
+                        "group": "2024-03",
+                        "subscriptions": 12,
+                        "mrr": 118800
+                      }
+                    ],
+                    "summary": {
+                      "future_installments": 1138500,
+                      "total_subscriptions": 183,
+                      "active_subscriptions": 89,
+                      "canceled_subscriptions": 25,
+                      "mrr": 277200
+                    },
+                    "fluctuations": [
+                      {
+                        "key": "total_subscriptions",
+                        "value": 28.5,
+                        "direction": "up"
+                      },
+                      {
+                        "key": "mrr",
+                        "value": 35.2,
+                        "direction": "up"
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -305,7 +402,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

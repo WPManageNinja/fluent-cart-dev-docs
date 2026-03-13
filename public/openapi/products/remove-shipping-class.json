@@ -54,6 +54,11 @@
               "application/json": {
                 "example": {
                   "message": "Shipping Class removed successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Shipping Class removed successfully"
+                  }
                 }
               }
             }

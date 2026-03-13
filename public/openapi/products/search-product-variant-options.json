@@ -112,6 +112,36 @@
                       ]
                     }
                   ]
+                },
+                "schema": {
+                  "example": {
+                    "products": [
+                      {
+                        "value": "product_123",
+                        "label": "Developer Toolkit Pro",
+                        "children": [
+                          {
+                            "value": 456,
+                            "label": "Personal License - $49.00"
+                          },
+                          {
+                            "value": 457,
+                            "label": "Business License - Annual - $99.00/yr"
+                          }
+                        ]
+                      },
+                      {
+                        "value": "product_124",
+                        "label": "Code Generator Plugin",
+                        "children": [
+                          {
+                            "value": 460,
+                            "label": "Single Site License - $29.00"
+                          }
+                        ]
+                      }
+                    ]
+                  }
                 }
               }
             }

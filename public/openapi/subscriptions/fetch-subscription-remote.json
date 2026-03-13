@@ -70,6 +70,14 @@
                     "subscription": {
                       "$ref": "#/components/schemas/Subscription"
                     }
+                  },
+                  "example": {
+                    "message": "Subscription fetched successfully from remote payment gateway!",
+                    "subscription": {
+                      "id": 15,
+                      "status": "active",
+                      "vendor_subscription_id": "sub_1QxR3nH"
+                    }
                   }
                 },
                 "example": {
@@ -88,7 +96,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Error",
+                  "example": {
+                    "message": "Could not fetch subscription from remote gateway"
+                  }
                 },
                 "example": {
                   "message": "Could not fetch subscription from remote gateway"

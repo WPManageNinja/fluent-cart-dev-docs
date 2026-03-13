@@ -96,6 +96,35 @@
                       },
                       "description": "List of abandoned cart items with frequency and pricing"
                     }
+                  },
+                  "example": {
+                    "abandonedItems": [
+                      {
+                        "product_name": "Developer Toolkit Pro",
+                        "abandoned_times": 42,
+                        "unit_price": 9900
+                      },
+                      {
+                        "product_name": "API Testing Suite",
+                        "abandoned_times": 28,
+                        "unit_price": 4900
+                      },
+                      {
+                        "product_name": "WordPress starter theme",
+                        "abandoned_times": 19,
+                        "unit_price": 2900
+                      },
+                      {
+                        "product_name": "Cloud Hosting Add-on",
+                        "abandoned_times": 15,
+                        "unit_price": 1499
+                      },
+                      {
+                        "product_name": "Premium Support Package",
+                        "abandoned_times": 8,
+                        "unit_price": 14900
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -141,7 +170,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -67,6 +67,13 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "term": {
+                    "name": "New Category,Another Category",
+                    "taxonomy": "product-categories",
+                    "parent": 0
+                  }
                 }
               },
               "example": {
@@ -94,6 +101,19 @@
                     "Another Category"
                   ],
                   "taxonomy": "product-categories"
+                },
+                "schema": {
+                  "example": {
+                    "term_ids": [
+                      14,
+                      15
+                    ],
+                    "names": [
+                      "New Category",
+                      "Another Category"
+                    ],
+                    "taxonomy": "product-categories"
+                  }
                 }
               }
             }

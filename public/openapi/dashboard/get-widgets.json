@@ -70,6 +70,15 @@
                         "$ref": "#/components/schemas/Widget"
                       }
                     }
+                  },
+                  "example": {
+                    "widgets": [
+                      {
+                        "title": "Customer Lifetime Value",
+                        "value": "$1,250.00",
+                        "type": "stat"
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -94,6 +103,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Order not found"
                   }
                 },
                 "example": {

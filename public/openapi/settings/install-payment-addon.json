@@ -66,6 +66,10 @@
                     "description": "The URL to the plugin source. Required when `source_type` is `github`.",
                     "example": "https://github.com/fluentcart/fluent-cart-pro"
                   }
+                },
+                "example": {
+                  "plugin_slug": "fluent-cart-pro",
+                  "source_type": "wordpress"
                 }
               },
               "example": {
@@ -91,6 +95,10 @@
                       "type": "string",
                       "example": "fluent-cart-pro/fluent-cart-pro.php"
                     }
+                  },
+                  "example": {
+                    "message": "Payment addon installed successfully!",
+                    "plugin_file": "fluent-cart-pro/fluent-cart-pro.php"
                   }
                 },
                 "example": {

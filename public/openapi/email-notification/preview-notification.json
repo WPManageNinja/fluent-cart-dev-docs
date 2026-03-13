@@ -57,6 +57,10 @@
                     "description": "Specific order ID to use for shortcode data. If not provided or not found, the most recent order is used",
                     "example": 42
                   }
+                },
+                "example": {
+                  "notification_name": "order_paid_customer",
+                  "order_id": 42
                 }
               },
               "example": {
@@ -79,6 +83,9 @@
                       "description": "Fully rendered email HTML including parsed block editor content, header, footer, and resolved shortcodes",
                       "example": "<!DOCTYPE html><html>...rendered email HTML...</html>"
                     }
+                  },
+                  "example": {
+                    "html": "<!DOCTYPE html><html>...rendered email HTML...</html>"
                   }
                 },
                 "example": {
@@ -98,6 +105,9 @@
                       "type": "string",
                       "example": "No notification name provided."
                     }
+                  },
+                  "example": {
+                    "message": "No notification name provided."
                   }
                 },
                 "example": {
@@ -117,6 +127,9 @@
                       "type": "string",
                       "example": "Notification not found."
                     }
+                  },
+                  "example": {
+                    "message": "Notification not found."
                   }
                 },
                 "example": {

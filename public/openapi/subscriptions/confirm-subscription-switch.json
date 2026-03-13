@@ -77,6 +77,12 @@
                     },
                     "description": "Confirmation data. Additional fields depend on the specific payment gateway implementation."
                   }
+                },
+                "example": {
+                  "data": {
+                    "newVendorSubscriptionId": "I-WX9Y8Z7A6B5C",
+                    "method": "paypal"
+                  }
                 }
               },
               "example": {
@@ -99,6 +105,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Subscription switch confirmed successfully"
                   }
                 },
                 "example": {
@@ -112,7 +121,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Error",
+                  "example": {
+                    "message": "Could not confirm subscription switch"
+                  }
                 },
                 "example": {
                   "message": "Could not confirm subscription switch"

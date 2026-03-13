@@ -59,6 +59,14 @@
                       5
                     ]
                   }
+                },
+                "example": {
+                  "ids": [
+                    1,
+                    2,
+                    3,
+                    5
+                  ]
                 }
               },
               "example": {
@@ -84,6 +92,9 @@
                       "type": "string",
                       "example": "Taxes marked as filed successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Taxes marked as filed successfully"
                   }
                 },
                 "example": {
@@ -103,6 +114,9 @@
                       "type": "string",
                       "example": "No IDs provided to mark!"
                     }
+                  },
+                  "example": {
+                    "message": "No IDs provided to mark!"
                   }
                 },
                 "example": {

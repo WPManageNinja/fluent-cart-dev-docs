@@ -80,6 +80,15 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "media": [
+                    {
+                      "id": 101,
+                      "title": "Product Image",
+                      "url": "https://example.com/wp-content/uploads/product.jpg"
+                    }
+                  ]
                 }
               },
               "example": {
@@ -101,6 +110,11 @@
               "application/json": {
                 "example": {
                   "message": "Media set successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Media set successfully"
+                  }
                 }
               }
             }

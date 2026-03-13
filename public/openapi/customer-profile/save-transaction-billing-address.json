@@ -94,6 +94,16 @@
                     "type": "string",
                     "description": "VAT or Tax ID. Stored as order meta."
                   }
+                },
+                "example": {
+                  "address_id": "15",
+                  "name": "John Doe",
+                  "address_1": "123 Main St",
+                  "city": "New York",
+                  "state": "NY",
+                  "postcode": "10001",
+                  "country": "US",
+                  "vat_tax_id": "EU123456789"
                 }
               },
               "example": {
@@ -126,6 +136,10 @@
                     "formatted_address": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Billing address updated successfully",
+                    "formatted_address": "John Doe, 123 Main St, New York, NY 10001, US"
                   }
                 },
                 "example": {
@@ -141,6 +155,11 @@
               "application/json": {
                 "example": {
                   "message": "Order not found"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Order not found"
+                  }
                 }
               }
             }
@@ -154,6 +173,15 @@
                     "country": [
                       "The country field is required."
                     ]
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "errors": {
+                      "country": [
+                        "The country field is required."
+                      ]
+                    }
                   }
                 }
               }

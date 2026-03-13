@@ -58,6 +58,26 @@
                   "required": [
                     "active"
                   ]
+                },
+                "example": {
+                  "shipping": {
+                    "active": "yes"
+                  },
+                  "tax": {
+                    "active": "no"
+                  },
+                  "coupons": {
+                    "active": "yes"
+                  },
+                  "subscriptions": {
+                    "active": "yes"
+                  },
+                  "licensing": {
+                    "active": "no"
+                  },
+                  "stock_management": {
+                    "active": "yes"
+                  }
                 }
               },
               "example": {
@@ -95,6 +115,9 @@
                       "type": "string",
                       "example": "Settings saved successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Settings saved successfully"
                   }
                 },
                 "example": {
@@ -114,7 +137,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

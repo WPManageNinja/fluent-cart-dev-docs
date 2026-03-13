@@ -65,6 +65,110 @@
                       },
                       "description": "Array of label IDs applied to the subscription"
                     }
+                  },
+                  "example": {
+                    "subscription": {
+                      "id": 15,
+                      "uuid": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                      "status": "active",
+                      "item_name": "Developer Toolkit Pro - Business Annual",
+                      "parent_order_id": 42,
+                      "customer_id": 12,
+                      "product_id": 123,
+                      "variation_id": 457,
+                      "vendor_subscription_id": "sub_1QxR3nH",
+                      "vendor_customer_id": "cus_Qx7K9mN3pR",
+                      "current_payment_method": "stripe",
+                      "billing_interval": "yearly",
+                      "recurring_amount": 9900,
+                      "bill_times": 0,
+                      "bill_count": 1,
+                      "next_billing_date": "2026-09-20 14:25:00",
+                      "labels": [
+                        {
+                          "id": 2,
+                          "title": "VIP",
+                          "color": "#8b5cf6"
+                        },
+                        {
+                          "id": 5,
+                          "title": "Enterprise",
+                          "color": "#3b82f6"
+                        }
+                      ],
+                      "activities": [
+                        {
+                          "id": 101,
+                          "title": "Subscription Created",
+                          "content": "Subscription #15 created for order #42",
+                          "status": "success",
+                          "created_at": "2025-09-20 14:25:00",
+                          "user": {
+                            "ID": 12,
+                            "display_name": "Sarah Johnson"
+                          }
+                        },
+                        {
+                          "id": 102,
+                          "title": "Payment Received",
+                          "content": "Renewal payment of $99.00 processed via Stripe",
+                          "status": "success",
+                          "created_at": "2025-09-20 14:25:30",
+                          "user": {
+                            "ID": 0,
+                            "display_name": "System"
+                          }
+                        }
+                      ],
+                      "customer": {
+                        "id": 12,
+                        "shipping_address": {
+                          "first_name": "Sarah",
+                          "last_name": "Johnson",
+                          "address_line_1": "742 Evergreen Terrace",
+                          "address_line_2": "Suite 200",
+                          "city": "Portland",
+                          "state": "OR",
+                          "zip": "97201",
+                          "country": "US"
+                        },
+                        "billing_address": {
+                          "first_name": "Sarah",
+                          "last_name": "Johnson",
+                          "address_line_1": "742 Evergreen Terrace",
+                          "address_line_2": "Suite 200",
+                          "city": "Portland",
+                          "state": "OR",
+                          "zip": "97201",
+                          "country": "US"
+                        }
+                      },
+                      "related_orders": [
+                        {
+                          "id": 42,
+                          "order_items": [
+                            {
+                              "id": 58,
+                              "order_id": 42,
+                              "post_title": "Developer Toolkit Pro",
+                              "title": "Developer Toolkit Pro - Business Annual",
+                              "quantity": 1,
+                              "payment_type": "subscription",
+                              "line_meta": {
+                                "billing_interval": "yearly",
+                                "recurring_amount": 9900,
+                                "signup_fee": 0,
+                                "trial_days": 0
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "selected_labels": [
+                      2,
+                      5
+                    ]
                   }
                 },
                 "example": {
@@ -179,7 +283,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Error",
+                  "example": {
+                    "message": "Subscription not found",
+                    "action_text": "Back to Subscription list",
+                    "action_url": "/subscriptions"
+                  }
                 },
                 "example": {
                   "message": "Subscription not found",

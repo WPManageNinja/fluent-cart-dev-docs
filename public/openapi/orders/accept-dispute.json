@@ -67,6 +67,9 @@
                     "type": "string",
                     "description": "Note about the dispute acceptance"
                   }
+                },
+                "example": {
+                  "dispute_note": "Customer provided valid reason for dispute"
                 }
               },
               "example": {
@@ -87,6 +90,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Dispute accepted!"
                   }
                 },
                 "example": {

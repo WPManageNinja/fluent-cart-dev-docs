@@ -67,6 +67,19 @@
                         "$ref": "#/components/schemas/Bucket"
                       }
                     }
+                  },
+                  "example": {
+                    "default_bucket": "my-store-files",
+                    "buckets": [
+                      {
+                        "label": "my-store-files",
+                        "value": "my-store-files"
+                      },
+                      {
+                        "label": "my-store-backups",
+                        "value": "my-store-backups"
+                      }
+                    ]
                   }
                 },
                 "example": {

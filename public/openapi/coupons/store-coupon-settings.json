@@ -48,6 +48,9 @@
                     "type": "boolean",
                     "description": "Whether to show the coupon input on the checkout page. Any truthy value sets it to 1, falsy sets to 0."
                   }
+                },
+                "example": {
+                  "show_on_checkout": true
                 }
               },
               "example": {
@@ -93,7 +96,16 @@
                         }
                       }
                     }
-                  ]
+                  ],
+                  "example": {
+                    "message": "Coupon settings saved successfully.",
+                    "settings": {
+                      "enable_coupons": true,
+                      "auto_apply_coupons": false,
+                      "max_coupons_per_order": 3,
+                      "allow_stackable_coupons": false
+                    }
+                  }
                 },
                 "examples": {
                   "existing_setting": {

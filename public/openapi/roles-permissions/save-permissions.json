@@ -57,6 +57,12 @@
                       "author"
                     ]
                   }
+                },
+                "example": {
+                  "capability": [
+                    "editor",
+                    "author"
+                  ]
                 }
               },
               "example": {
@@ -80,6 +86,9 @@
                       "type": "string",
                       "example": "Successfully updated the role(s)."
                     }
+                  },
+                  "example": {
+                    "message": "Successfully updated the role(s)."
                   }
                 },
                 "example": {
@@ -107,6 +116,12 @@
                           "example": "Sorry, You can not update permissions. Only administrators can update permissions"
                         }
                       }
+                    }
+                  },
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "Sorry, You can not update permissions. Only administrators can update permissions"
                     }
                   }
                 },

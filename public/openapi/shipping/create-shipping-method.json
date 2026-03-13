@@ -103,6 +103,21 @@
                     },
                     "description": "Additional metadata key-value pairs (string values only)"
                   }
+                },
+                "example": {
+                  "zone_id": 1,
+                  "title": "Standard Shipping",
+                  "type": "flat_rate",
+                  "amount": "500",
+                  "is_enabled": 1,
+                  "states": [
+                    "CA",
+                    "NY"
+                  ],
+                  "settings": {
+                    "configure_rate": "per_order",
+                    "class_aggregation": "per_class"
+                  }
                 }
               },
               "example": {
@@ -134,6 +149,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Shipping method has been created successfully"
                   }
                 },
                 "example": {

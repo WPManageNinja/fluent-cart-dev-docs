@@ -60,6 +60,9 @@
                       "type": "string",
                       "example": "Country has been deleted successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Country has been deleted successfully"
                   }
                 },
                 "example": {
@@ -79,6 +82,9 @@
                       "type": "string",
                       "example": "Failed to delete country"
                     }
+                  },
+                  "example": {
+                    "message": "Failed to delete country"
                   }
                 },
                 "example": {

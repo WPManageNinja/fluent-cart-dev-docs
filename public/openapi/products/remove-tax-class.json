@@ -54,6 +54,11 @@
               "application/json": {
                 "example": {
                   "message": "Tax Class removed successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Tax Class removed successfully"
+                  }
                 }
               }
             }

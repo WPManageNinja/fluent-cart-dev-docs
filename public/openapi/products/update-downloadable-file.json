@@ -100,6 +100,19 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "title": "Software v2.0",
+                  "type": "zip",
+                  "driver": "local",
+                  "file_name": "software-v2.zip",
+                  "product_variation_id": [
+                    456,
+                    457
+                  ],
+                  "settings": {
+                    "download_limit": 10
+                  }
                 }
               },
               "example": {
@@ -125,6 +138,11 @@
               "application/json": {
                 "example": {
                   "message": "Product downloadable files updated successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Product downloadable files updated successfully"
+                  }
                 }
               }
             }

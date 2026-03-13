@@ -64,6 +64,15 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "drivers": [
+                      {
+                        "key": "local",
+                        "title": "Local Storage",
+                        "is_active": true
+                      }
+                    ]
                   }
                 },
                 "example": {

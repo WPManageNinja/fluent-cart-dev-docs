@@ -81,6 +81,10 @@
                       "format": "uri",
                       "description": "URL to redirect after installation"
                     }
+                  },
+                  "example": {
+                    "message": "Addon installation started successfully.",
+                    "redirect": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
                   }
                 },
                 "example": {
@@ -100,6 +104,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "This addon cannot be installed at this time"
                   }
                 },
                 "example": {

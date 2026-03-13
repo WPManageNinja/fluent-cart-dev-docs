@@ -61,6 +61,9 @@
                     "type": "string",
                     "description": "Pricing table description text (newlines preserved)"
                   }
+                },
+                "example": {
+                  "description": "Includes:\n- Feature A\n- Feature B\n- Priority Support"
                 }
               },
               "example": {
@@ -76,6 +79,11 @@
               "application/json": {
                 "example": {
                   "message": "Pricing table updated successfully"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Pricing table updated successfully"
+                  }
                 }
               }
             }

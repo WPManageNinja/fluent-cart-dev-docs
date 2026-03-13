@@ -71,6 +71,9 @@
                     ],
                     "example": "order.paid.customer"
                   }
+                },
+                "example": {
+                  "template": "order.paid.customer"
                 }
               },
               "example": {
@@ -96,6 +99,11 @@
                           "example": "<!DOCTYPE html><html>...rendered email HTML...</html>"
                         }
                       }
+                    }
+                  },
+                  "example": {
+                    "data": {
+                      "content": "<!DOCTYPE html><html>...rendered email HTML...</html>"
                     }
                   }
                 },

@@ -61,6 +61,9 @@
                     "type": "integer",
                     "description": "The WordPress user ID to remove the role from."
                   }
+                },
+                "example": {
+                  "user_id": 10
                 }
               },
               "example": {
@@ -81,6 +84,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Role deleted successfully"
                   }
                 },
                 "example": {
@@ -98,6 +104,12 @@
                   "properties": {
                     "message": {
                       "type": "string"
+                    }
+                  },
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "Invalid request. Please check your input and try again."
                     }
                   }
                 },

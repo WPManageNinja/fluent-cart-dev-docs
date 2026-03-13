@@ -59,6 +59,13 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "status": "deactivated",
+                    "notice": {
+                      "id": "activate_license",
+                      "html": "<div>License deactivation message</div>"
+                    }
                   }
                 },
                 "example": {

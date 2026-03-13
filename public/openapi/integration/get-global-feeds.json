@@ -62,6 +62,52 @@
                       "format": "uri",
                       "description": "URL to the integrations admin page"
                     }
+                  },
+                  "example": {
+                    "feeds": [
+                      {
+                        "id": 42,
+                        "name": "Add to FluentCRM list",
+                        "enabled": "yes",
+                        "provider": "fluent-crm",
+                        "feed": {
+                          "name": "Add to FluentCRM list",
+                          "enabled": "yes",
+                          "list_id": "2",
+                          "list_name": "Customers",
+                          "merge_fields": {
+                            "first_name": "{customer.first_name}",
+                            "last_name": "{customer.last_name}",
+                            "email": "{customer.email}"
+                          },
+                          "conditionals": {
+                            "conditions": [
+                              {
+                                "field": "payment_status",
+                                "operator": "is",
+                                "value": "paid"
+                              }
+                            ],
+                            "status": false,
+                            "type": "all"
+                          }
+                        },
+                        "scope": "global"
+                      }
+                    ],
+                    "available_integrations": {
+                      "fluent-crm": {
+                        "title": "FluentCRM",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
+                        "enabled": true,
+                        "scopes": [
+                          "global",
+                          "product"
+                        ],
+                        "description": "The most powerful email marketing automation plugin for WordPress."
+                      }
+                    },
+                    "all_module_config_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
                   }
                 },
                 "example": {
@@ -197,7 +243,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

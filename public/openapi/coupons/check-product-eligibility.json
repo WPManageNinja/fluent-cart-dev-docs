@@ -62,6 +62,14 @@
                     "type": "string",
                     "description": "The context where the check originates (e.g., checkout, admin_order)"
                   }
+                },
+                "example": {
+                  "productId": 123,
+                  "appliedCoupons": [
+                    "WELCOME20",
+                    "SUMMER15"
+                  ],
+                  "origin": "admin_order"
                 }
               },
               "example": {
@@ -91,6 +99,23 @@
                       "type": "string",
                       "description": "Reason for ineligibility (only present when isApplicable is false)"
                     }
+                  },
+                  "example": {
+                    "eligible": true,
+                    "product_id": 123,
+                    "coupon_codes": [
+                      "WELCOME20",
+                      "SUMMER25"
+                    ],
+                    "applicable_coupons": [
+                      {
+                        "id": 3,
+                        "code": "WELCOME20",
+                        "type": "percent",
+                        "amount": 2000,
+                        "title": "Welcome Discount"
+                      }
+                    ]
                   }
                 },
                 "examples": {

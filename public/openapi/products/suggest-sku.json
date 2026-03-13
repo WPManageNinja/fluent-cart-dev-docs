@@ -72,6 +72,11 @@
               "application/json": {
                 "example": {
                   "sku": "DEV-TOO-PER"
+                },
+                "schema": {
+                  "example": {
+                    "sku": "DEV-TOO-PER"
+                  }
                 }
               }
             }

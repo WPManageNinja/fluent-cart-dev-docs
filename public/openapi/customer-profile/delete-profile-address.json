@@ -50,6 +50,9 @@
                     "type": "integer",
                     "description": "The address record ID to delete"
                   }
+                },
+                "example": {
+                  "addressId": 5
                 }
               },
               "example": {
@@ -69,6 +72,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Address successfully deleted."
                   }
                 },
                 "example": {
@@ -83,6 +89,11 @@
               "application/json": {
                 "example": {
                   "message": "Primary address cannot be deleted!"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Primary address cannot be deleted!"
+                  }
                 }
               }
             }
@@ -93,6 +104,11 @@
               "application/json": {
                 "example": {
                   "message": "You are not authorized to update this address"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to update this address"
+                  }
                 }
               }
             }

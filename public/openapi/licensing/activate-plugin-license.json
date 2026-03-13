@@ -51,6 +51,9 @@
                     "type": "string",
                     "description": "The FluentCart Pro license key to activate"
                   }
+                },
+                "example": {
+                  "license_key": "DTPRO-A1B2-C3D4-E5F6"
                 }
               },
               "example": {
@@ -87,6 +90,15 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "status": "valid",
+                    "license_key": "DTPRO-A1B2-C3D4-E5F6",
+                    "notice": {
+                      "id": "fluent_cart_license_activated",
+                      "html": "<div>Your FluentCart Pro license has been activated successfully.</div>",
+                      "timeout": 5000
+                    }
                   }
                 },
                 "example": {
@@ -114,6 +126,11 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "success": false,
+                    "code": "invalid_license_key",
+                    "message": "The provided license key is invalid or has expired."
                   }
                 },
                 "examples": {

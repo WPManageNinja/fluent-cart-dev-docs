@@ -61,6 +61,9 @@
                     "type": "integer",
                     "description": "New customer ID to assign"
                   }
+                },
+                "example": {
+                  "customer_id": 15
                 }
               },
               "example": {
@@ -81,6 +84,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Customer changed successfully"
                   }
                 },
                 "example": {
@@ -99,6 +105,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Customer id is required"
                   }
                 },
                 "example": {

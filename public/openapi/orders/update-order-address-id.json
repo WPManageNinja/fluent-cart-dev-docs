@@ -70,6 +70,10 @@
                     ],
                     "default": "billing"
                   }
+                },
+                "example": {
+                  "address_id": 5,
+                  "address_type": "billing"
                 }
               },
               "example": {
@@ -91,6 +95,9 @@
                       "type": "string",
                       "description": "Success message"
                     }
+                  },
+                  "example": {
+                    "message": "Address updated successfully"
                   }
                 },
                 "example": {
@@ -109,6 +116,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Order not found"
                   }
                 },
                 "example": {

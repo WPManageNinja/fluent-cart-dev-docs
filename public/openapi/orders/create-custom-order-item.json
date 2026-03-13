@@ -75,6 +75,13 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "product": {
+                    "title": "Custom Service",
+                    "price": 1500,
+                    "quantity": 1
+                  }
                 }
               },
               "example": {
@@ -94,7 +101,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Returns the result of processing the custom item addition"
+                  "description": "Returns the result of processing the custom item addition",
+                  "example": {
+                    "message": "Custom item added successfully"
+                  }
                 },
                 "example": {
                   "message": "Custom item added successfully"
@@ -112,6 +122,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Error processing custom item"
                   }
                 },
                 "example": {

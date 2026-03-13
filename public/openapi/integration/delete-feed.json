@@ -64,6 +64,10 @@
                       "type": "integer",
                       "description": "The deleted feed ID"
                     }
+                  },
+                  "example": {
+                    "message": "Integration has been deleted successfully.",
+                    "id": 42
                   }
                 },
                 "example": {

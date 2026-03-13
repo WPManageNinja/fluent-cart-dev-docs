@@ -57,6 +57,10 @@
                     "description": "The override tax rate value to use for shipping",
                     "example": 7
                   }
+                },
+                "example": {
+                  "id": 5,
+                  "override_tax_rate": 7
                 }
               },
               "example": {
@@ -78,6 +82,9 @@
                       "type": "string",
                       "example": "Tax override has been saved successfully"
                     }
+                  },
+                  "example": {
+                    "message": "Tax override has been saved successfully"
                   }
                 },
                 "example": {
@@ -97,6 +104,9 @@
                       "type": "string",
                       "example": "Tax rate not found"
                     }
+                  },
+                  "example": {
+                    "message": "Tax rate not found"
                   }
                 },
                 "example": {

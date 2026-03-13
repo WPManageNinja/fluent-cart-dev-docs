@@ -76,6 +76,12 @@
                     },
                     "description": "Payment method data object. Additional fields depend on the specific payment gateway implementation."
                   }
+                },
+                "example": {
+                  "data": {
+                    "method": "stripe",
+                    "payment_method_id": "pm_1Px8KLMnOpQr"
+                  }
                 }
               },
               "example": {
@@ -98,6 +104,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Payment method updated successfully"
                   }
                 },
                 "example": {
@@ -111,7 +120,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Error",
+                  "example": {
+                    "message": "Could not update payment method"
+                  }
                 },
                 "example": {
                   "message": "Could not update payment method"

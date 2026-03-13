@@ -64,6 +64,12 @@
                     },
                     "description": "Array of label IDs to assign to the customer. Existing labels not in this array will be removed."
                   }
+                },
+                "example": {
+                  "labels": [
+                    1,
+                    2
+                  ]
                 }
               },
               "example": {
@@ -89,6 +95,30 @@
                     "data": {
                       "type": "object"
                     }
+                  },
+                  "example": {
+                    "message": "Customer updated successfully!",
+                    "data": {
+                      "id": 12,
+                      "user_id": 5,
+                      "email": "sarah.johnson@example.com",
+                      "first_name": "Sarah",
+                      "last_name": "Johnson",
+                      "full_name": "Sarah Johnson",
+                      "status": "active",
+                      "labels": [
+                        {
+                          "id": 1,
+                          "title": "VIP",
+                          "color": "#3b82f6"
+                        },
+                        {
+                          "id": 2,
+                          "title": "Enterprise",
+                          "color": "#10b981"
+                        }
+                      ]
+                    }
                   }
                 },
                 "example": {
@@ -102,8 +132,16 @@
                     "full_name": "Sarah Johnson",
                     "status": "active",
                     "labels": [
-                      {"id": 1, "title": "VIP", "color": "#3b82f6"},
-                      {"id": 2, "title": "Enterprise", "color": "#10b981"}
+                      {
+                        "id": 1,
+                        "title": "VIP",
+                        "color": "#3b82f6"
+                      },
+                      {
+                        "id": 2,
+                        "title": "Enterprise",
+                        "color": "#10b981"
+                      }
                     ]
                   }
                 }

@@ -74,6 +74,37 @@
                     "subscriptions": {
                       "$ref": "#/components/schemas/CustomerSubscriptionPagination"
                     }
+                  },
+                  "example": {
+                    "message": "Success",
+                    "subscriptions": {
+                      "data": [
+                        {
+                          "uuid": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                          "status": "active",
+                          "item_name": "Developer Toolkit Pro - Business Annual",
+                          "billing_interval": "yearly",
+                          "recurring_amount": 9900,
+                          "next_billing_date": "2026-09-20 14:25:00",
+                          "bill_times": 0,
+                          "bill_count": 1
+                        },
+                        {
+                          "uuid": "c5f9e3d4-1a6f-6c0d-d7e8-f9a0b1234567",
+                          "status": "active",
+                          "item_name": "CloudSync Starter - Monthly",
+                          "billing_interval": "monthly",
+                          "recurring_amount": 1900,
+                          "next_billing_date": "2026-04-15 09:00:00",
+                          "bill_times": 12,
+                          "bill_count": 3
+                        }
+                      ],
+                      "total": 2,
+                      "per_page": 10,
+                      "current_page": 1,
+                      "last_page": 1
+                    }
                   }
                 },
                 "example": {

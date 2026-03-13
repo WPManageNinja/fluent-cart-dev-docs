@@ -67,6 +67,16 @@
                     "file": {
                       "$ref": "#/components/schemas/File"
                     }
+                  },
+                  "example": {
+                    "message": "File Uploaded Successfully",
+                    "path": "my-ebook__fluent-cart__.1710345600.pdf",
+                    "file": {
+                      "driver": "local",
+                      "size": 2048576,
+                      "name": "my-ebook__fluent-cart__.1710345600.pdf",
+                      "bucket": ""
+                    }
                   }
                 },
                 "example": {
@@ -100,6 +110,10 @@
                       "description": "Additional error information",
                       "example": "File is empty"
                     }
+                  },
+                  "example": {
+                    "message": "Failed To Upload File",
+                    "additional": "File is empty"
                   }
                 },
                 "example": {

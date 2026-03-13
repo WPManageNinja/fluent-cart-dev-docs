@@ -135,6 +135,17 @@
                     "type": "string",
                     "description": "Email address (for shipping type)"
                   }
+                },
+                "example": {
+                  "type": "billing",
+                  "billing_name": "John Doe",
+                  "billing_address_1": "123 Main St",
+                  "billing_city": "New York",
+                  "billing_state": "NY",
+                  "billing_postcode": "10001",
+                  "billing_country": "US",
+                  "billing_phone": "+1234567890",
+                  "label": "Home"
                 }
               },
               "example": {
@@ -179,6 +190,16 @@
                         }
                       }
                     }
+                  },
+                  "example": {
+                    "message": "Customer address created successfully!",
+                    "fragment": [
+                      {
+                        "selector": "[data-fluent-cart-checkout-page-form-address-modal-address-selector-button-wrapper]",
+                        "content": "<div>...updated address selector HTML...</div>",
+                        "type": "replace"
+                      }
+                    ]
                   }
                 },
                 "example": {
@@ -203,6 +224,16 @@
                   "errors": {
                     "billing_country": {
                       "required": "Country is required."
+                    }
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "status": "failed",
+                    "errors": {
+                      "billing_country": {
+                        "required": "Country is required."
+                      }
                     }
                   }
                 }

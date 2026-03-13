@@ -61,6 +61,15 @@
                     },
                     "description": "Array of taxonomy names to retrieve terms for"
                   }
+                },
+                "example": {
+                  "parents": [
+                    1,
+                    2
+                  ],
+                  "listeners": [
+                    "product-categories"
+                  ]
                 }
               },
               "example": {
@@ -94,6 +103,24 @@
                         "parent": 10
                       }
                     ]
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "data": {
+                      "product-categories": [
+                        {
+                          "value": 11,
+                          "label": "Developer Tools",
+                          "parent": 10
+                        },
+                        {
+                          "value": 12,
+                          "label": "Plugins",
+                          "parent": 10
+                        }
+                      ]
+                    }
                   }
                 }
               }

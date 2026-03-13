@@ -58,6 +58,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Activity Deleted Successfully"
                   }
                 },
                 "example": {
@@ -76,6 +79,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Activity not found"
                   }
                 },
                 "example": {

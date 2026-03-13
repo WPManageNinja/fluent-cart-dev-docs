@@ -126,6 +126,16 @@
                     "type": "string",
                     "description": "Display name"
                   }
+                },
+                "example": {
+                  "first_name": "Sarah",
+                  "last_name": "Johnson",
+                  "email": "sarah.johnson@example.com",
+                  "city": "San Francisco",
+                  "state": "CA",
+                  "postcode": "94102",
+                  "country": "US",
+                  "notes": "Preferred contact method: email"
                 }
               },
               "example": {
@@ -154,6 +164,31 @@
                     },
                     "data": {
                       "type": "object"
+                    }
+                  },
+                  "example": {
+                    "message": "Customer updated successfully!",
+                    "data": {
+                      "id": 12,
+                      "user_id": 5,
+                      "contact_id": null,
+                      "email": "sarah.johnson@example.com",
+                      "first_name": "Sarah",
+                      "last_name": "Johnson",
+                      "full_name": "Sarah Johnson",
+                      "status": "active",
+                      "purchase_value": 24900,
+                      "purchase_count": 3,
+                      "ltv": 24900,
+                      "aov": 8300,
+                      "country": "US",
+                      "city": "San Francisco",
+                      "state": "CA",
+                      "postcode": "94102",
+                      "notes": "Preferred contact method: email",
+                      "uuid": "cust_a1b2c3d4",
+                      "created_at": "2025-06-10 09:15:00",
+                      "updated_at": "2025-09-20 14:30:00"
                     }
                   }
                 },

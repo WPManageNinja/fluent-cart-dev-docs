@@ -81,6 +81,12 @@
                       ],
                       "description": "Execution mode"
                     }
+                  },
+                  "example": {
+                    "success": true,
+                    "message": "Snapshot generation queued",
+                    "job_id": 1718456789,
+                    "mode": "background"
                   }
                 },
                 "example": {

@@ -175,6 +175,17 @@
                     "default": "UTC",
                     "description": "Customer timezone (e.g., `America/New_York`). Default: `UTC`"
                   }
+                },
+                "example": {
+                  "billing_email": "john@example.com",
+                  "billing_full_name": "John Doe",
+                  "billing_country": "US",
+                  "billing_address_1": "123 Main St",
+                  "billing_city": "New York",
+                  "billing_state": "NY",
+                  "billing_postcode": "10001",
+                  "payment_method": "stripe",
+                  "user_tz": "America/New_York"
                 }
               },
               "example": {
@@ -233,6 +244,21 @@
                       "type": "object",
                       "description": "Validation errors keyed by field name (when status is `failed`)"
                     }
+                  },
+                  "example": {
+                    "success": true,
+                    "order": {
+                      "id": 42,
+                      "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                      "status": "pending",
+                      "total": 9900,
+                      "total_formatted": "$99.00",
+                      "currency": "USD",
+                      "payment_method": "stripe",
+                      "created_at": "2025-03-20 14:30:00"
+                    },
+                    "redirect_url": "https://example.com/checkout/payment/a1b2c3d4",
+                    "message": "Order placed successfully."
                   }
                 },
                 "examples": {
@@ -317,6 +343,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Product is out of stock"
                   }
                 },
                 "example": {
@@ -335,6 +364,9 @@
                     "message": {
                       "type": "string"
                     }
+                  },
+                  "example": {
+                    "message": "Too many requests. Please try again later."
                   }
                 },
                 "example": {

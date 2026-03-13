@@ -4,7 +4,8 @@
     "@types/node": "^22.7.5",
     "mermaid": "^10.6.1",
     "vitepress": "^1.6.4",
-    "vitepress-openapi": "^0.1.15"
+    "vitepress-openapi": "^0.1.15",
+    "vue": "^3.5.30"
   },
   "scripts": {
     "generate:manifest": "node generate-manifest.js",

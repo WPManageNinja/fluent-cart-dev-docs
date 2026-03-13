@@ -120,6 +120,12 @@
                       "message": "The user already has all the accesses as part of Administrator Role"
                     }
                   }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "Invalid request. Please check your input and try again."
+                  }
                 }
               }
             }

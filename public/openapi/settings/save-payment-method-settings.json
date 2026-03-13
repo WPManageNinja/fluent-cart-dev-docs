@@ -95,7 +95,11 @@
                 "example": {
                   "settings": {
                     "is_active": "yes",
-                    "payment_mode": "live"
+                    "payment_mode": "live",
+                    "checkout_label": "Cash on Delivery",
+                    "checkout_logo": "",
+                    "checkout_instructions": "Pay with cash when your order is delivered.",
+                    "thank_you_page_instructions": "Please have the exact amount ready for the delivery driver."
                   },
                   "message": "Settings saved successfully"
                 }
@@ -113,7 +117,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

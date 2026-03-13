@@ -64,7 +64,7 @@
                 }
               },
               "example": {
-                "user_id": 10
+                "user_id": 8
               }
             }
           }
@@ -109,6 +109,12 @@
                       "code": "rest_request_validation",
                       "message": "User not found."
                     }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "This WordPress user is already attached to another customer record."
                   }
                 }
               }

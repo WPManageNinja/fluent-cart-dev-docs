@@ -53,7 +53,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "url": "https://example.com/fluent-cart/download?token=..."
+                  "url": "https://example.com/fluent-cart/download?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9&file_id=30&expires=1756684800"
                 }
               }
             }

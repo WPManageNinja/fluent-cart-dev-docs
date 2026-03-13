@@ -89,12 +89,41 @@
                   {
                     "id": 456,
                     "post_id": 123,
-                    "variation_title": "Default Plan",
-                    "item_price": 1000,
-                    "sku": null,
+                    "variation_title": "Personal License",
+                    "variation_identifier": "personal",
+                    "item_price": 4900,
+                    "item_cost": 0,
+                    "compare_price": 6900,
+                    "sku": "DTK-PERSONAL",
                     "stock_status": "in-stock",
                     "payment_type": "onetime",
-                    "other_info": {}
+                    "item_status": "active",
+                    "fulfillment_type": "digital",
+                    "other_info": {
+                      "payment_type": "onetime",
+                      "description": "For individual developers"
+                    }
+                  },
+                  {
+                    "id": 457,
+                    "post_id": 123,
+                    "variation_title": "Business License - Annual",
+                    "variation_identifier": "business-annual",
+                    "item_price": 9900,
+                    "item_cost": 0,
+                    "compare_price": 14900,
+                    "sku": "DTK-BIZ-ANNUAL",
+                    "stock_status": "in-stock",
+                    "payment_type": "subscription",
+                    "item_status": "active",
+                    "fulfillment_type": "digital",
+                    "other_info": {
+                      "payment_type": "subscription",
+                      "billing_interval": "yearly",
+                      "trial_days": 14,
+                      "signup_fee": 0,
+                      "bill_times": 0
+                    }
                   }
                 ]
               }

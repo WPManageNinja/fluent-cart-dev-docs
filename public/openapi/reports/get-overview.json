@@ -67,43 +67,144 @@
                   "data": {
                     "gross_revenue": {
                       "2025-01": {
-                        "current": 500000,
+                        "current": 420000,
                         "prev": 350000,
-                        "yoy_growth": "42.86"
+                        "yoy_growth": "20.00"
+                      },
+                      "2025-02": {
+                        "current": 480000,
+                        "prev": 380000,
+                        "yoy_growth": "26.32"
+                      },
+                      "2025-03": {
+                        "current": 510000,
+                        "prev": 410000,
+                        "yoy_growth": "24.39"
+                      },
+                      "2025-04": {
+                        "current": 390000,
+                        "prev": 360000,
+                        "yoy_growth": "8.33"
+                      },
+                      "2025-05": {
+                        "current": 550000,
+                        "prev": 420000,
+                        "yoy_growth": "30.95"
+                      },
+                      "2025-06": {
+                        "current": 620000,
+                        "prev": 480000,
+                        "yoy_growth": "29.17"
                       }
                     },
                     "gross_revenue_quarterly": {
                       "Q1-2025": {
-                        "current": 1500000,
-                        "prev_year": 1200000,
-                        "yy_growth": "25.00"
+                        "current": 1410000,
+                        "prev_year": 1140000,
+                        "yy_growth": "23.68"
+                      },
+                      "Q2-2025": {
+                        "current": 1560000,
+                        "prev_year": 1260000,
+                        "yy_growth": "23.81"
                       }
                     },
-                    "net_revenue": {},
-                    "net_revenue_quarterly": {},
+                    "net_revenue": {
+                      "2025-01": {
+                        "current": 378000,
+                        "prev": 315000,
+                        "yoy_growth": "20.00"
+                      },
+                      "2025-02": {
+                        "current": 432000,
+                        "prev": 342000,
+                        "yoy_growth": "26.32"
+                      },
+                      "2025-03": {
+                        "current": 459000,
+                        "prev": 369000,
+                        "yoy_growth": "24.39"
+                      },
+                      "2025-04": {
+                        "current": 351000,
+                        "prev": 324000,
+                        "yoy_growth": "8.33"
+                      },
+                      "2025-05": {
+                        "current": 495000,
+                        "prev": 378000,
+                        "yoy_growth": "30.95"
+                      },
+                      "2025-06": {
+                        "current": 558000,
+                        "prev": 432000,
+                        "yoy_growth": "29.17"
+                      }
+                    },
+                    "net_revenue_quarterly": {
+                      "Q1-2025": {
+                        "current": 1269000,
+                        "prev_year": 1026000,
+                        "yy_growth": "23.68"
+                      },
+                      "Q2-2025": {
+                        "current": 1404000,
+                        "prev_year": 1134000,
+                        "yy_growth": "23.81"
+                      }
+                    },
                     "gross_summary": {
-                      "total": 6000000,
-                      "total_prev": 4800000,
-                      "yoy_growth": "25.00"
+                      "total": 2970000,
+                      "total_prev": 2400000,
+                      "yoy_growth": "23.75"
                     },
                     "net_summary": {
-                      "total": 5400000,
-                      "total_prev": 4300000,
-                      "yoy_growth": "25.58"
+                      "total": 2673000,
+                      "total_prev": 2160000,
+                      "yoy_growth": "23.75"
                     },
                     "top_country_net": {
                       "by_month": {
                         "2025-01": {
-                          "US": 300000,
-                          "GB": 150000
+                          "US": 210000,
+                          "GB": 85000,
+                          "DE": 42000
+                        },
+                        "2025-02": {
+                          "US": 240000,
+                          "GB": 95000,
+                          "DE": 48000
                         }
                       },
                       "by_countries": {
-                        "US": 3600000,
-                        "GB": 1800000
+                        "US": 1500000,
+                        "GB": 580000,
+                        "DE": 310000,
+                        "CA": 180000,
+                        "AU": 103000
                       }
                     },
-                    "top_country_gross": {}
+                    "top_country_gross": {
+                      "by_month": {
+                        "2025-01": {
+                          "US": 233000,
+                          "GB": 94000,
+                          "DE": 47000
+                        },
+                        "2025-02": {
+                          "US": 267000,
+                          "GB": 106000,
+                          "DE": 53000
+                        }
+                      },
+                      "by_countries": {
+                        "US": 1667000,
+                        "GB": 644000,
+                        "DE": 344000,
+                        "CA": 200000,
+                        "AU": 115000
+                      }
+                    }
                   }
                 }
               }
@@ -141,7 +242,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

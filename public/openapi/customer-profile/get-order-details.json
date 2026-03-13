@@ -99,15 +99,37 @@
                         "unit_price": 4999,
                         "subtotal": 4999,
                         "payment_type": "one-time",
-                        "meta_lines": [],
+                        "meta_lines": [
+                          {
+                            "key": "License",
+                            "value": "DTPRO-A1B2-C3D4-E5F6"
+                          },
+                          {
+                            "key": "Activation Limit",
+                            "value": "1 site"
+                          }
+                        ],
                         "extra_amount": 0,
                         "image": "https://example.com/wp-content/uploads/product.jpg",
                         "variant_image": "",
                         "url": "https://example.com/product/premium-plugin/",
-                        "line_meta": {}
+                        "line_meta": {
+                          "license_id": 100,
+                          "billing_interval": "year",
+                          "billing_count": 1
+                        }
                       }
                     ],
-                    "subscriptions": [],
+                    "subscriptions": [
+                      {
+                        "id": 10,
+                        "status": "active",
+                        "billing_interval": "year",
+                        "billing_count": 1,
+                        "next_billing_date": "2026-06-15 10:30:00",
+                        "amount": 4999
+                      }
+                    ],
                     "downloads": [
                       {
                         "file_size": "2.5 MB",
@@ -171,7 +193,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

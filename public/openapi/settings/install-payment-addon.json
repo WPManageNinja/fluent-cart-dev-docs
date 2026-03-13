@@ -64,7 +64,7 @@
                   "source_link": {
                     "type": "string",
                     "description": "The URL to the plugin source. Required when `source_type` is `github`.",
-                    "example": ""
+                    "example": "https://github.com/fluentcart/fluent-cart-pro"
                   }
                 }
               },

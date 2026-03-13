@@ -76,7 +76,7 @@
                 },
                 "example": {
                   "message": "Early payment link generated.",
-                  "payment_url": "https://your-site.com/?fluent-cart=early-installment-payment&subscription_hash=abc123-def456"
+                  "payment_url": "https://example.com/?fluent-cart=early-installment-payment&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
                 }
               }
             }
@@ -118,6 +118,12 @@
                     "value": {
                       "message": "All installments have already been paid."
                     }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "Invalid request. Please check your input and try again."
                   }
                 }
               }

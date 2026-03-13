@@ -71,7 +71,7 @@
                       "payment_method_id": {
                         "type": "string",
                         "description": "Gateway-specific payment method identifier",
-                        "example": "pm_1234567890"
+                        "example": "pm_1Px8KLMnOpQr"
                       }
                     },
                     "description": "Payment method data object. Additional fields depend on the specific payment gateway implementation."
@@ -81,7 +81,7 @@
               "example": {
                 "data": {
                   "method": "stripe",
-                  "payment_method_id": "pm_1234567890"
+                  "payment_method_id": "pm_1Px8KLMnOpQr"
                 }
               }
             }

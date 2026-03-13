@@ -81,8 +81,31 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "3 product(s) created successfully",
-                  "created": [],
+                  "message": "2 product(s) created successfully",
+                  "created": [
+                    {
+                      "ID": 130,
+                      "post_title": "Product A",
+                      "post_status": "draft",
+                      "detail": {
+                        "id": 95,
+                        "post_id": 130,
+                        "fulfillment_type": "digital",
+                        "variation_type": "single"
+                      }
+                    },
+                    {
+                      "ID": 131,
+                      "post_title": "Product B",
+                      "post_status": "draft",
+                      "detail": {
+                        "id": 96,
+                        "post_id": 131,
+                        "fulfillment_type": "physical",
+                        "variation_type": "single"
+                      }
+                    }
+                  ],
                   "errors": []
                 }
               }

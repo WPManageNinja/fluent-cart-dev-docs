@@ -98,7 +98,13 @@
                 "example": {
                   "settings": {
                     "conditionals": {
-                      "conditions": [],
+                      "conditions": [
+                        {
+                          "field": "payment_status",
+                          "operator": "is",
+                          "value": "paid"
+                        }
+                      ],
                       "status": false,
                       "type": "all"
                     },
@@ -106,7 +112,11 @@
                     "list_id": "",
                     "list_name": "",
                     "name": "",
-                    "merge_fields": {}
+                    "merge_fields": {
+                      "first_name": "{customer.first_name}",
+                      "last_name": "{customer.last_name}",
+                      "email": "{customer.email}"
+                    }
                   },
                   "settings_fields": {
                     "fields": [
@@ -121,13 +131,44 @@
                         "label": "Contact List",
                         "type": "select",
                         "required": true,
-                        "options": []
+                        "options": [
+                          {
+                            "id": "1",
+                            "label": "Newsletter Subscribers"
+                          },
+                          {
+                            "id": "2",
+                            "label": "Customers"
+                          },
+                          {
+                            "id": "3",
+                            "label": "VIP Customers"
+                          }
+                        ]
                       }
                     ]
                   },
-                  "shortcodes": {},
-                  "inputs": {},
-                  "merge_fields": {}
+                  "shortcodes": {
+                    "customer": {
+                      "title": "Customer",
+                      "shortcodes": {
+                        "{customer.first_name}": "First Name",
+                        "{customer.last_name}": "Last Name",
+                        "{customer.email}": "Email"
+                      }
+                    }
+                  },
+                  "inputs": {
+                    "billing_first_name": "Billing First Name",
+                    "billing_last_name": "Billing Last Name",
+                    "billing_email": "Billing Email",
+                    "billing_phone": "Billing Phone"
+                  },
+                  "merge_fields": {
+                    "first_name": "{customer.first_name}",
+                    "last_name": "{customer.last_name}",
+                    "email": "{customer.email}"
+                  }
                 }
               }
             }
@@ -172,7 +213,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -200,7 +200,14 @@
                           "unit": "year",
                           "value": 1
                         },
-                        "media": [],
+                        "media": [
+                          {
+                            "id": "dev-toolkit-pro__fluent-cart__.1693526400.zip",
+                            "driver": "local",
+                            "path": "dev-toolkit-pro__fluent-cart__.1693526400.zip",
+                            "url": "https://example.com/wp-content/uploads/fluent-cart/dev-toolkit-pro__fluent-cart__.1693526400.zip"
+                          }
+                        ],
                         "subscription_info": "Billed yearly at $49.00",
                         "setup_fee_info": ""
                       },
@@ -212,7 +219,14 @@
                           "unit": "lifetime",
                           "value": 1
                         },
-                        "media": [],
+                        "media": [
+                          {
+                            "id": "dev-toolkit-pro__fluent-cart__.1693526400.zip",
+                            "driver": "local",
+                            "path": "dev-toolkit-pro__fluent-cart__.1693526400.zip",
+                            "url": "https://example.com/wp-content/uploads/fluent-cart/dev-toolkit-pro__fluent-cart__.1693526400.zip"
+                          }
+                        ],
                         "subscription_info": "",
                         "setup_fee_info": ""
                       }
@@ -245,7 +259,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

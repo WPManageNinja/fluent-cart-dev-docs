@@ -267,12 +267,12 @@
                 "example": {
                   "message": "Coupon created successfully!",
                   "data": {
-                    "id": 5,
+                    "id": 7,
                     "parent": null,
                     "title": "Summer Sale 20%",
                     "code": "SUMMER20",
                     "status": "active",
-                    "type": "percentage",
+                    "type": "percent",
                     "conditions": {
                       "min_purchase_amount": 2000,
                       "max_discount_amount": 5000,
@@ -292,7 +292,7 @@
                     "stackable": "yes",
                     "priority": 1,
                     "use_count": 0,
-                    "notes": "",
+                    "notes": "Summer promotional campaign - limited to new signups",
                     "show_on_checkout": "yes",
                     "start_date": "2025-06-01 00:00:00",
                     "end_date": "2025-08-31 23:59:59",
@@ -316,6 +316,20 @@
                     "errors": {
                       "type": "object"
                     }
+                  }
+                },
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "code": [
+                      "The code field is required."
+                    ],
+                    "type": [
+                      "The type field is required."
+                    ],
+                    "amount": [
+                      "The amount field is required."
+                    ]
                   }
                 }
               }

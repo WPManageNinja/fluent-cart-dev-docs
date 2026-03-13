@@ -124,6 +124,12 @@
                       "message": "No File Attached"
                     }
                   }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "Invalid request. Please check your input and try again."
+                  }
                 }
               }
             }

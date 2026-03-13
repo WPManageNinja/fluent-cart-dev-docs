@@ -209,19 +209,19 @@
                     "last_page": 3,
                     "data": [
                       {
-                        "id": 1,
+                        "id": 3,
                         "parent": null,
-                        "title": "10% Off Everything",
-                        "code": "SAVE10",
+                        "title": "Welcome Discount",
+                        "code": "WELCOME20",
                         "status": "active",
-                        "type": "percentage",
+                        "type": "percent",
                         "conditions": {
-                          "min_purchase_amount": 5000,
+                          "min_purchase_amount": 2000,
                           "max_discount_amount": 10000,
                           "max_purchase_amount": 0,
                           "apply_to_whole_cart": "no",
                           "apply_to_quantity": "no",
-                          "max_uses": 100,
+                          "max_uses": 500,
                           "max_per_customer": 1,
                           "excluded_categories": [],
                           "included_categories": [],
@@ -230,17 +230,51 @@
                           "email_restrictions": "",
                           "is_recurring": "no"
                         },
-                        "amount": 10,
-                        "stackable": "yes",
-                        "priority": 1,
-                        "use_count": 12,
-                        "notes": "",
+                        "amount": 20,
+                        "stackable": "no",
+                        "priority": 10,
+                        "use_count": 47,
+                        "notes": "20% off for new customers",
                         "show_on_checkout": "yes",
                         "start_date": "2025-01-01 00:00:00",
                         "end_date": "2025-12-31 23:59:59",
                         "created_at": "2025-01-01 10:00:00",
-                        "updated_at": "2025-06-15 14:30:00",
-                        "total_items": 12
+                        "updated_at": "2025-09-15 08:30:00",
+                        "total_items": 47
+                      },
+                      {
+                        "id": 5,
+                        "parent": null,
+                        "title": "Summer Sale 25%",
+                        "code": "SUMMER25",
+                        "status": "active",
+                        "type": "percent",
+                        "conditions": {
+                          "min_purchase_amount": 3000,
+                          "max_discount_amount": 15000,
+                          "max_purchase_amount": 0,
+                          "apply_to_whole_cart": "yes",
+                          "apply_to_quantity": "no",
+                          "max_uses": 300,
+                          "max_per_customer": 2,
+                          "excluded_categories": [],
+                          "included_categories": [],
+                          "excluded_products": [],
+                          "included_products": [],
+                          "email_restrictions": "",
+                          "is_recurring": "no"
+                        },
+                        "amount": 25,
+                        "stackable": "yes",
+                        "priority": 5,
+                        "use_count": 89,
+                        "notes": "Summer promotional campaign - 25% off all plans",
+                        "show_on_checkout": "yes",
+                        "start_date": "2025-06-01 00:00:00",
+                        "end_date": "2025-08-31 23:59:59",
+                        "created_at": "2025-05-25 10:00:00",
+                        "updated_at": "2025-08-20 16:45:00",
+                        "total_items": 89
                       }
                     ]
                   }
@@ -260,7 +294,7 @@
           "id": {
             "type": "integer",
             "description": "Coupon ID",
-            "example": 1
+            "example": 3
           },
           "parent": {
             "type": "integer",
@@ -270,12 +304,12 @@
           "title": {
             "type": "string",
             "description": "Coupon display name",
-            "example": "10% Off Everything"
+            "example": "Welcome Discount"
           },
           "code": {
             "type": "string",
             "description": "Unique coupon code",
-            "example": "SAVE10"
+            "example": "WELCOME20"
           },
           "status": {
             "type": "string",
@@ -297,7 +331,7 @@
               "buy_x_get_y"
             ],
             "description": "Discount type",
-            "example": "percentage"
+            "example": "percent"
           },
           "conditions": {
             "type": "object",
@@ -306,7 +340,7 @@
           "amount": {
             "type": "number",
             "description": "Discount amount. For percentage type: percentage value (e.g., 10 = 10%). For fixed type: amount in cents.",
-            "example": 10
+            "example": 20
           },
           "stackable": {
             "type": "string",
@@ -315,23 +349,23 @@
               "no"
             ],
             "description": "Whether coupon can be combined with others",
-            "example": "yes"
+            "example": "no"
           },
           "priority": {
             "type": "integer",
             "description": "Sort priority for discount calculation order",
-            "example": 1
+            "example": 10
           },
           "use_count": {
             "type": "integer",
             "nullable": true,
             "description": "Current usage count",
-            "example": 12
+            "example": 47
           },
           "notes": {
             "type": "string",
             "description": "Internal notes",
-            "example": ""
+            "example": "20% off for new customers"
           },
           "show_on_checkout": {
             "type": "string",
@@ -367,7 +401,7 @@
           "total_items": {
             "type": "integer",
             "description": "Aggregate count of coupon applications",
-            "example": 12
+            "example": 47
           }
         }
       }

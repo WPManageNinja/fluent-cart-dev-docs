@@ -113,7 +113,10 @@
                       "quantity": 2,
                       "shipping_charge": 500,
                       "unit_price": 2500,
-                      "other_info": {},
+                      "other_info": {
+                        "weight": 1.5,
+                        "dimensions": "10x8x4"
+                      },
                       "discount_total": 0,
                       "fulfillment_type": "physical"
                     }

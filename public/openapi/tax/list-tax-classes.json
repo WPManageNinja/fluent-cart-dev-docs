@@ -60,12 +60,12 @@
                       "slug": "standard",
                       "description": "Standard tax rate for most products",
                       "meta": {
-                        "categories": [],
+                        "categories": [5, 12, 18],
                         "priority": 10
                       },
-                      "categories": [],
-                      "created_at": "2025-01-01 00:00:00",
-                      "updated_at": "2025-01-01 00:00:00"
+                      "categories": [5, 12, 18],
+                      "created_at": "2025-01-15 10:00:00",
+                      "updated_at": "2025-01-15 10:00:00"
                     },
                     {
                       "id": 2,
@@ -73,12 +73,12 @@
                       "slug": "reduced",
                       "description": "Reduced tax rate for essential goods",
                       "meta": {
-                        "categories": [],
+                        "categories": [8, 22],
                         "priority": 5
                       },
-                      "categories": [],
-                      "created_at": "2025-01-01 00:00:00",
-                      "updated_at": "2025-01-01 00:00:00"
+                      "categories": [8, 22],
+                      "created_at": "2025-01-15 10:15:00",
+                      "updated_at": "2025-01-15 10:15:00"
                     },
                     {
                       "id": 3,
@@ -86,12 +86,12 @@
                       "slug": "zero",
                       "description": "Zero tax rate for exempt products",
                       "meta": {
-                        "categories": [],
+                        "categories": [30],
                         "priority": 2
                       },
-                      "categories": [],
-                      "created_at": "2025-01-01 00:00:00",
-                      "updated_at": "2025-01-01 00:00:00"
+                      "categories": [30],
+                      "created_at": "2025-01-15 10:30:00",
+                      "updated_at": "2025-01-15 10:30:00"
                     }
                   ]
                 }
@@ -137,7 +137,7 @@
                   "type": "integer"
                 },
                 "description": "Product category IDs",
-                "example": []
+                "example": [5, 12, 18]
               },
               "priority": {
                 "type": "integer",
@@ -152,7 +152,7 @@
               "type": "integer"
             },
             "description": "Product category IDs",
-            "example": []
+            "example": [5, 12, 18]
           },
           "created_at": {
             "type": "string",

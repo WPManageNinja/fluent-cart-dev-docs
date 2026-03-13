@@ -72,8 +72,8 @@
                   "summaryData": {
                     "total_products": 25,
                     "draft_products": 3,
-                    "active_coupons": 5,
-                    "expired_coupons": 2
+                    "active_coupons": 8,
+                    "expired_coupons": 4
                   }
                 }
               }
@@ -90,7 +90,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

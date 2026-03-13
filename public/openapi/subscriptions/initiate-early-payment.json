@@ -67,7 +67,7 @@
                 },
                 "example": {
                   "message": "Early payment URL generated.",
-                  "checkout_url": "https://your-site.com/?fluent-cart=early-installment-payment&subscription_hash=abc123-def456"
+                  "checkout_url": "https://example.com/?fluent-cart=early-installment-payment&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
                 }
               }
             }
@@ -104,6 +104,12 @@
                     "value": {
                       "message": "Subscription not found"
                     }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "The requested resource was not found."
                   }
                 }
               }

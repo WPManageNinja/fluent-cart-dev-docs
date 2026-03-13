@@ -104,7 +104,13 @@
                   "settings": {
                     "compound_tax": true,
                     "tax_id_label": "VAT",
-                    "states": {}
+                    "states": {
+                      "BW": "Baden-Württemberg",
+                      "BY": "Bavaria",
+                      "BE": "Berlin",
+                      "HH": "Hamburg",
+                      "NW": "North Rhine-Westphalia"
+                    }
                   }
                 }
               }

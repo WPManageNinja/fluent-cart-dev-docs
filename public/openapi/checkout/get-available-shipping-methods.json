@@ -149,7 +149,13 @@
                             "US",
                             "CA"
                           ],
-                          "states": []
+                          "states": [
+                            "CA",
+                            "NY",
+                            "TX",
+                            "FL",
+                            "WA"
+                          ]
                         },
                         {
                           "id": 2,
@@ -184,6 +190,28 @@
                       "view": "<div class=\"fct-empty-state\">No shipping methods available for this address.</div>"
                     }
                   }
+                },
+                "example": {
+                  "shipping_methods": [
+                    {
+                      "id": "flat_rate",
+                      "title": "Flat Rate",
+                      "cost": 500,
+                      "cost_formatted": "$5.00",
+                      "description": "Fixed shipping rate",
+                      "is_taxable": true,
+                      "tax_class": "standard"
+                    },
+                    {
+                      "id": "free_shipping",
+                      "title": "Free Shipping",
+                      "cost": 0,
+                      "cost_formatted": "$0.00",
+                      "description": "Free shipping on orders over $50",
+                      "is_taxable": false,
+                      "tax_class": ""
+                    }
+                  ]
                 }
               }
             }

@@ -79,7 +79,22 @@
               "example": {
                 "variation_type": "simple_variations",
                 "product_id": 123,
-                "options": []
+                "options": [
+                  {
+                    "id": 1,
+                    "name": "License Type",
+                    "variants": [
+                      {
+                        "id": 456,
+                        "value": "Personal"
+                      },
+                      {
+                        "id": 457,
+                        "value": "Business"
+                      }
+                    ]
+                  }
+                ]
               }
             }
           }

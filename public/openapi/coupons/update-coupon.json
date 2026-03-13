@@ -45,7 +45,7 @@
               "type": "integer"
             },
             "description": "The coupon ID",
-            "example": 5
+            "example": 3
           }
         ],
         "requestBody": {
@@ -177,13 +177,27 @@
                     "title": "Summer Sale 25%",
                     "code": "SUMMER25",
                     "status": "active",
-                    "type": "percentage",
+                    "type": "percent",
                     "amount": 25,
-                    "conditions": {},
+                    "conditions": {
+                      "min_purchase_amount": 3000,
+                      "max_discount_amount": 15000,
+                      "max_purchase_amount": 0,
+                      "apply_to_whole_cart": "yes",
+                      "apply_to_quantity": "no",
+                      "max_uses": 300,
+                      "max_per_customer": 2,
+                      "excluded_categories": [],
+                      "included_categories": [],
+                      "excluded_products": [],
+                      "included_products": [],
+                      "email_restrictions": "",
+                      "is_recurring": "no"
+                    },
                     "stackable": "yes",
                     "priority": 1,
                     "use_count": 12,
-                    "notes": "",
+                    "notes": "Summer promotional campaign - 25% off all plans",
                     "show_on_checkout": "yes",
                     "start_date": "2025-06-01 00:00:00",
                     "end_date": "2025-08-31 23:59:59",

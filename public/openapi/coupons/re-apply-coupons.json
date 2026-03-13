@@ -65,27 +65,27 @@
                 }
               },
               "example": {
-                "order_uuid": "abc123-def456",
+                "order_uuid": "e7b3a1d4-5f2c-48e9-a6b1-c3d4e5f67890",
                 "order_items": [
                   {
-                    "post_id": 42,
+                    "post_id": 123,
                     "quantity": 1,
-                    "price": 2500,
-                    "unit_price": 2500,
-                    "item_total": 2500,
-                    "line_total": 2500
+                    "price": 9900,
+                    "unit_price": 9900,
+                    "item_total": 9900,
+                    "line_total": 9900
                   },
                   {
-                    "post_id": 55,
-                    "quantity": 1,
-                    "price": 2000,
-                    "unit_price": 2000,
-                    "item_total": 2000,
-                    "line_total": 2000
+                    "post_id": 130,
+                    "quantity": 2,
+                    "price": 4900,
+                    "unit_price": 4900,
+                    "item_total": 9800,
+                    "line_total": 9800
                   }
                 ],
                 "applied_coupons": [
-                  1
+                  3
                 ]
               }
             }
@@ -117,31 +117,31 @@
                 },
                 "example": {
                   "applied_coupons": {
-                    "SAVE10": {
-                      "id": 1,
-                      "title": "10% Off",
-                      "code": "SAVE10",
-                      "type": "percentage",
-                      "amount": 10,
-                      "discount_amount": 450,
-                      "stackable": "yes",
-                      "priority": 1
+                    "WELCOME20": {
+                      "id": 3,
+                      "title": "Welcome Discount",
+                      "code": "WELCOME20",
+                      "type": "percent",
+                      "amount": 20,
+                      "discount_amount": 3940,
+                      "stackable": "no",
+                      "priority": 10
                     }
                   },
                   "calculated_items": [
                     {
-                      "post_id": 42,
+                      "post_id": 123,
                       "quantity": 1,
-                      "price": 2500,
-                      "discounted_price": 2250,
-                      "discount_total": 250
+                      "price": 9900,
+                      "discounted_price": 7920,
+                      "discount_total": 1980
                     },
                     {
-                      "post_id": 55,
-                      "quantity": 1,
-                      "price": 2000,
-                      "discounted_price": 1800,
-                      "discount_total": 200
+                      "post_id": 130,
+                      "quantity": 2,
+                      "price": 4900,
+                      "discounted_price": 3920,
+                      "discount_total": 1960
                     }
                   ]
                 }

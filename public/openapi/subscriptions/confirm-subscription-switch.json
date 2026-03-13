@@ -67,7 +67,7 @@
                       "newVendorSubscriptionId": {
                         "type": "string",
                         "description": "The new subscription ID from the target payment gateway",
-                        "example": "I-ABC123DEF456"
+                        "example": "I-WX9Y8Z7A6B5C"
                       },
                       "method": {
                         "type": "string",
@@ -81,7 +81,7 @@
               },
               "example": {
                 "data": {
-                  "newVendorSubscriptionId": "I-ABC123DEF456",
+                  "newVendorSubscriptionId": "I-WX9Y8Z7A6B5C",
                   "method": "paypal"
                 }
               }

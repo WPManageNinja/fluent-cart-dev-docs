@@ -71,14 +71,16 @@
                 "example": {
                   "users": [
                     {
-                      "ID": 10,
-                      "display_name": "Alice Johnson",
-                      "user_email": "alice@example.com"
+                      "ID": 8,
+                      "user_login": "mike.chen",
+                      "user_email": "mike.chen@example.com",
+                      "display_name": "Mike Chen"
                     },
                     {
-                      "ID": 15,
-                      "display_name": "Bob Wilson",
-                      "user_email": "bob@example.com"
+                      "ID": 14,
+                      "user_login": "lisa.park",
+                      "user_email": "lisa.park@example.com",
+                      "display_name": "Lisa Park"
                     }
                   ]
                 }

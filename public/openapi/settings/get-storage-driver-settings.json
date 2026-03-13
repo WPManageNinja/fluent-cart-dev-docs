@@ -70,12 +70,41 @@
                 },
                 "example": {
                   "settings": {
-                    "access_key": "AKIA...",
+                    "access_key": "AKIAIOSFODNN7EXAMPLE",
                     "secret_key": "****",
-                    "bucket": "my-store-files",
-                    "region": "us-east-1"
+                    "bucket": "techstore-downloads",
+                    "region": "us-east-1",
+                    "is_active": true,
+                    "base_url": "https://techstore-downloads.s3.amazonaws.com"
                   },
-                  "fields": {}
+                  "fields": {
+                    "s3_config": {
+                      "title": "S3 Configuration",
+                      "type": "section",
+                      "schema": {
+                        "access_key": {
+                          "label": "Access Key ID",
+                          "type": "text",
+                          "required": true
+                        },
+                        "secret_key": {
+                          "label": "Secret Access Key",
+                          "type": "password",
+                          "required": true
+                        },
+                        "bucket": {
+                          "label": "Bucket Name",
+                          "type": "text",
+                          "required": true
+                        },
+                        "region": {
+                          "label": "Region",
+                          "type": "select",
+                          "required": true
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -91,7 +120,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

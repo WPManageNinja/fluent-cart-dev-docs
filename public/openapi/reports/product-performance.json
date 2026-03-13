@@ -179,7 +179,53 @@
                   }
                 },
                 "example": {
-                  "productPerformance": []
+                  "productPerformance": [
+                    {
+                      "product_id": 123,
+                      "title": "Developer Toolkit Pro",
+                      "orders": 142,
+                      "revenue": 680000,
+                      "items_sold": 142,
+                      "refunds": 3,
+                      "refund_amount": 15000
+                    },
+                    {
+                      "product_id": 125,
+                      "title": "API Testing Suite",
+                      "orders": 98,
+                      "revenue": 290000,
+                      "items_sold": 98,
+                      "refunds": 2,
+                      "refund_amount": 9800
+                    },
+                    {
+                      "product_id": 130,
+                      "title": "WordPress starter theme",
+                      "orders": 76,
+                      "revenue": 152000,
+                      "items_sold": 76,
+                      "refunds": 1,
+                      "refund_amount": 2000
+                    },
+                    {
+                      "product_id": 128,
+                      "title": "Cloud Hosting Add-on",
+                      "orders": 65,
+                      "revenue": 97500,
+                      "items_sold": 65,
+                      "refunds": 0,
+                      "refund_amount": 0
+                    },
+                    {
+                      "product_id": 135,
+                      "title": "Premium Support Package",
+                      "orders": 42,
+                      "revenue": 626000,
+                      "items_sold": 42,
+                      "refunds": 2,
+                      "refund_amount": 29800
+                    }
+                  ]
                 }
               }
             }
@@ -195,7 +241,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

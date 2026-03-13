@@ -59,7 +59,7 @@
                     "eu_vat_settings": {
                       "require_vat_number": "no",
                       "local_reverse_charge": "yes",
-                      "vat_reverse_excluded_categories": [],
+                      "vat_reverse_excluded_categories": [30, 42],
                       "method": "oss",
                       "oss_country": "DE",
                       "oss_vat": "DE123456789"
@@ -152,7 +152,7 @@
               "type": "integer"
             },
             "description": "Product category IDs excluded from VAT reverse charge",
-            "example": []
+            "example": [30, 42]
           },
           "method": {
             "type": "string",

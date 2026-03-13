@@ -98,7 +98,7 @@
                 "example": {
                   "message": "Subscription has been cancelled successfully!",
                   "subscription": {
-                    "id": 1,
+                    "id": 15,
                     "status": "canceled"
                   }
                 }
@@ -130,7 +130,7 @@
           "id": {
             "type": "integer",
             "description": "Subscription ID",
-            "example": 1
+            "example": 15
           },
           "status": {
             "type": "string",

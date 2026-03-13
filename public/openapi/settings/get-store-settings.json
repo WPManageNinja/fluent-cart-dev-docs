@@ -62,7 +62,7 @@
                       "properties": {
                         "store_name": {
                           "type": "string",
-                          "example": "My Store"
+                          "example": "TechStore Inc."
                         },
                         "currency": {
                           "type": "string",
@@ -130,47 +130,47 @@
                         },
                         "checkout_page_id": {
                           "type": "string",
-                          "example": ""
+                          "example": "12"
                         },
                         "cart_page_id": {
                           "type": "string",
-                          "example": ""
+                          "example": "14"
                         },
                         "receipt_page_id": {
                           "type": "string",
-                          "example": ""
+                          "example": "16"
                         },
                         "shop_page_id": {
                           "type": "string",
-                          "example": ""
+                          "example": "18"
                         },
                         "customer_profile_page_id": {
                           "type": "string",
-                          "example": ""
+                          "example": "20"
                         },
                         "store_address1": {
                           "type": "string",
-                          "example": ""
+                          "example": "456 Market Street"
                         },
                         "store_address2": {
                           "type": "string",
-                          "example": ""
+                          "example": "Suite 200"
                         },
                         "store_city": {
                           "type": "string",
-                          "example": ""
+                          "example": "San Francisco"
                         },
                         "store_country": {
                           "type": "string",
-                          "example": ""
+                          "example": "US"
                         },
                         "store_postcode": {
                           "type": "string",
-                          "example": ""
+                          "example": "94102"
                         },
                         "store_state": {
                           "type": "string",
-                          "example": ""
+                          "example": "CA"
                         },
                         "order_mode": {
                           "type": "string",
@@ -207,7 +207,7 @@
                 },
                 "example": {
                   "settings": {
-                    "store_name": "My Store",
+                    "store_name": "TechStore Inc.",
                     "currency": "USD",
                     "currency_position": "before",
                     "decimal_separator": "dot",
@@ -224,18 +224,18 @@
                     "additional_address_field": "yes",
                     "hide_coupon_field": "no",
                     "user_account_creation_mode": "all",
-                    "checkout_page_id": "",
-                    "cart_page_id": "",
-                    "receipt_page_id": "",
-                    "shop_page_id": "",
-                    "customer_profile_page_id": "",
-                    "store_address1": "",
-                    "store_address2": "",
-                    "store_city": "",
-                    "store_country": "",
-                    "store_postcode": "",
-                    "store_state": "",
-                    "order_mode": "test",
+                    "checkout_page_id": "12",
+                    "cart_page_id": "14",
+                    "receipt_page_id": "16",
+                    "shop_page_id": "18",
+                    "customer_profile_page_id": "20",
+                    "store_address1": "456 Market Street",
+                    "store_address2": "Suite 200",
+                    "store_city": "San Francisco",
+                    "store_country": "US",
+                    "store_postcode": "94102",
+                    "store_state": "CA",
+                    "order_mode": "live",
                     "variation_view": "both",
                     "variation_columns": "masonry",
                     "min_receipt_number": "1",
@@ -243,7 +243,23 @@
                     "show_email_footer": "yes"
                   },
                   "fields": {
-                    "store_setup": {}
+                    "store_setup": {
+                      "store_name": {
+                        "label": "Store Name",
+                        "type": "text",
+                        "required": true
+                      },
+                      "currency": {
+                        "label": "Currency",
+                        "type": "select",
+                        "required": true
+                      },
+                      "store_country": {
+                        "label": "Country",
+                        "type": "select",
+                        "required": true
+                      }
+                    }
                   }
                 }
               }

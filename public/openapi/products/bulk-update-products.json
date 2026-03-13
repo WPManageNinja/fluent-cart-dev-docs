@@ -73,8 +73,14 @@
             "content": {
               "application/json": {
                 "example": {
-                  "message": "3 product(s) updated successfully",
-                  "updated": [],
+                  "message": "1 product(s) updated successfully",
+                  "updated": [
+                    {
+                      "ID": 123,
+                      "post_title": "Updated Title A",
+                      "post_status": "publish"
+                    }
+                  ],
                   "errors": []
                 }
               }

@@ -157,16 +157,34 @@
                         "status": "active",
                         "limit": 5,
                         "activation_count": 2,
-                        "license_key": "XXXX-XXXX-XXXX-XXXX",
+                        "license_key": "DTPRO-A1B2-C3D4-E5F6",
                         "product_id": 10,
                         "variation_id": 15,
                         "order_id": 42,
                         "customer_id": 7,
                         "expiration_date": "2026-01-15 00:00:00",
-                        "customer": {},
-                        "product_variant": {},
-                        "order": {},
-                        "product": {},
+                        "customer": {
+                          "id": 7,
+                          "first_name": "Sarah",
+                          "last_name": "Johnson",
+                          "email": "sarah.johnson@example.com"
+                        },
+                        "product_variant": {
+                          "id": 15,
+                          "title": "Personal License",
+                          "price": 4900,
+                          "product_id": 10
+                        },
+                        "order": {
+                          "id": 42,
+                          "invoice_no": "INV-042",
+                          "status": "completed",
+                          "total_amount": 4900
+                        },
+                        "product": {
+                          "ID": 10,
+                          "post_title": "Developer Toolkit Pro"
+                        },
                         "activations_count": 2
                       }
                     ],
@@ -189,7 +207,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -116,7 +116,12 @@
                 },
                 "example": {
                   "message": "Status has been updated",
-                  "data": {}
+                  "data": {
+                    "order_id": 42,
+                    "old_status": "pending",
+                    "new_status": "processing",
+                    "updated_at": "2025-09-20 15:00:00"
+                  }
                 }
               }
             }

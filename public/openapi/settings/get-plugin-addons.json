@@ -96,16 +96,30 @@
                     "elementor-block": {
                       "title": "Elementor Blocks",
                       "description": "Enable to get Elementor Blocks for FluentCart. Minimum Requirement: Elementor V3.34",
-                      "logo": "https://...",
-                      "dark_logo": "https://...",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/elementor.svg",
+                      "dark_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/elementor-dark.svg",
                       "plugin_slug": "fluent-cart-elementor-blocks",
                       "plugin_file": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php",
                       "source_type": "cdn",
                       "source_link": "https://addons-cdn.fluentcart.com/fluent-cart-elementor-blocks.zip",
                       "upcoming": false,
                       "repo_link": "https://fluentcart.com/fluentcart-addons",
-                      "is_installed": false,
-                      "is_active": false
+                      "is_installed": true,
+                      "is_active": true
+                    },
+                    "fluent-cart-pro": {
+                      "title": "FluentCart Pro",
+                      "description": "Pro features including licensing, advanced roles, order bumps, and more",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/pro.svg",
+                      "dark_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/pro-dark.svg",
+                      "plugin_slug": "fluent-cart-pro",
+                      "plugin_file": "fluent-cart-pro/fluent-cart-pro.php",
+                      "source_type": "cdn",
+                      "source_link": "https://addons-cdn.fluentcart.com/fluent-cart-pro.zip",
+                      "upcoming": false,
+                      "repo_link": "https://fluentcart.com/pricing",
+                      "is_installed": true,
+                      "is_active": true
                     }
                   }
                 }
@@ -123,7 +137,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

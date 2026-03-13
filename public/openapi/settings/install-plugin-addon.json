@@ -64,12 +64,12 @@
                   "source_link": {
                     "type": "string",
                     "description": "URL to the addon source. Defaults to the addon's registered source link.",
-                    "example": ""
+                    "example": "https://addons-cdn.fluentcart.com/fluent-cart-elementor-blocks.zip"
                   },
                   "asset_path": {
                     "type": "string",
                     "description": "GitHub release asset path (defaults to `zipball_url`).",
-                    "example": ""
+                    "example": "zipball_url"
                   }
                 }
               },

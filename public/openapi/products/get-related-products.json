@@ -91,9 +91,42 @@
                 "example": {
                   "products": [
                     {
-                      "ID": 456,
-                      "post_title": "Related Product",
-                      "post_status": "publish"
+                      "ID": 124,
+                      "post_title": "Code Generator Plugin",
+                      "post_status": "publish",
+                      "post_type": "fluent-products",
+                      "post_name": "code-generator-plugin",
+                      "post_excerpt": "Automatically generate boilerplate code for your projects.",
+                      "thumbnail": "https://example.com/wp-content/uploads/2025/04/code-gen.png",
+                      "view_url": "https://example.com/product/code-generator-plugin",
+                      "detail": {
+                        "id": 90,
+                        "post_id": 124,
+                        "fulfillment_type": "digital",
+                        "min_price": 2900,
+                        "max_price": 2900,
+                        "formatted_min_price": "$29.00",
+                        "formatted_max_price": "$29.00"
+                      }
+                    },
+                    {
+                      "ID": 125,
+                      "post_title": "API Testing Suite",
+                      "post_status": "publish",
+                      "post_type": "fluent-products",
+                      "post_name": "api-testing-suite",
+                      "post_excerpt": "Comprehensive API testing and monitoring tools.",
+                      "thumbnail": "https://example.com/wp-content/uploads/2025/05/api-test.png",
+                      "view_url": "https://example.com/product/api-testing-suite",
+                      "detail": {
+                        "id": 92,
+                        "post_id": 125,
+                        "fulfillment_type": "digital",
+                        "min_price": 3900,
+                        "max_price": 7900,
+                        "formatted_min_price": "$39.00",
+                        "formatted_max_price": "$79.00"
+                      }
                     }
                   ]
                 }

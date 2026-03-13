@@ -135,6 +135,53 @@
                   "type": "object",
                   "description": "Time-series chart data for license metrics",
                   "additionalProperties": true
+                },
+                "example": {
+                  "labels": [
+                    "2025-01",
+                    "2025-02",
+                    "2025-03",
+                    "2025-04",
+                    "2025-05",
+                    "2025-06",
+                    "2025-07",
+                    "2025-08",
+                    "2025-09"
+                  ],
+                  "datasets": [
+                    {
+                      "label": "Licenses Issued",
+                      "data": [
+                        18,
+                        22,
+                        28,
+                        24,
+                        32,
+                        30,
+                        35,
+                        29,
+                        38
+                      ]
+                    },
+                    {
+                      "label": "Activations",
+                      "data": [
+                        25,
+                        30,
+                        38,
+                        35,
+                        45,
+                        42,
+                        50,
+                        40,
+                        52
+                      ]
+                    }
+                  ],
+                  "summary": {
+                    "total_licenses_issued": 256,
+                    "total_activations": 357
+                  }
                 }
               }
             }
@@ -150,7 +197,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

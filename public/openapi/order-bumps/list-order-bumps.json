@@ -152,7 +152,21 @@
                         "src_object_type": null,
                         "title": "Add Extended Warranty",
                         "description": "<p>Protect your purchase with our 2-year warranty plan.</p>",
-                        "conditions": [],
+                        "conditions": [
+                          {
+                            "type": "cart_products",
+                            "operator": "contains",
+                            "value": [
+                              123,
+                              124
+                            ]
+                          },
+                          {
+                            "type": "cart_total",
+                            "operator": "greater_than",
+                            "value": 2500
+                          }
+                        ],
                         "config": {
                           "discount": {
                             "discount_type": "percentage",
@@ -294,7 +308,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

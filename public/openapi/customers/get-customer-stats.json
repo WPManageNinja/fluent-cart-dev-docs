@@ -65,7 +65,40 @@
                   }
                 },
                 "example": {
-                  "widgets": []
+                  "widgets": [
+                    {
+                      "title": "Total Orders",
+                      "value": 3
+                    },
+                    {
+                      "title": "Completed Orders",
+                      "value": 2
+                    },
+                    {
+                      "title": "Pending Orders",
+                      "value": 1
+                    },
+                    {
+                      "title": "Total Spent",
+                      "value": 24900
+                    },
+                    {
+                      "title": "Average Order Value",
+                      "value": 8300
+                    },
+                    {
+                      "title": "First Order Date",
+                      "value": "2025-06-10 09:15:00"
+                    },
+                    {
+                      "title": "Last Order Date",
+                      "value": "2025-09-20 14:25:00"
+                    },
+                    {
+                      "title": "Active Subscriptions",
+                      "value": 1
+                    }
+                  ]
                 }
               }
             }

@@ -80,7 +80,11 @@
                     "first_name": "John",
                     "last_name": "Doe",
                     "status": "active",
-                    "purchase_value": {},
+                    "purchase_value": {
+                      "total": 15000,
+                      "currency": "USD",
+                      "formatted": "$150.00"
+                    },
                     "purchase_count": 3,
                     "ltv": 15000,
                     "country": "US",
@@ -115,7 +119,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

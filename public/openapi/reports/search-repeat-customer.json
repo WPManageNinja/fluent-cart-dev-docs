@@ -91,10 +91,56 @@
                 },
                 "example": {
                   "repeat_customers": {
-                    "total": 50,
+                    "total": 183,
                     "per_page": 15,
                     "current_page": 1,
-                    "data": []
+                    "data": [
+                      {
+                        "customer_id": 42,
+                        "customer_name": "Sarah Johnson",
+                        "email": "sarah@example.com",
+                        "order_count": 12,
+                        "total_spent": 128500,
+                        "first_order": "2024-03-15",
+                        "last_order": "2025-09-20"
+                      },
+                      {
+                        "customer_id": 73,
+                        "customer_name": "Mike Chen",
+                        "email": "mike@example.com",
+                        "order_count": 8,
+                        "total_spent": 89200,
+                        "first_order": "2024-05-22",
+                        "last_order": "2025-09-18"
+                      },
+                      {
+                        "customer_id": 91,
+                        "customer_name": "Emily Wilson",
+                        "email": "emily@example.com",
+                        "order_count": 6,
+                        "total_spent": 72000,
+                        "first_order": "2024-07-10",
+                        "last_order": "2025-09-15"
+                      },
+                      {
+                        "customer_id": 28,
+                        "customer_name": "David Kim",
+                        "email": "david@example.com",
+                        "order_count": 5,
+                        "total_spent": 58900,
+                        "first_order": "2024-02-28",
+                        "last_order": "2025-08-30"
+                      },
+                      {
+                        "customer_id": 156,
+                        "customer_name": "Lisa Anderson",
+                        "email": "lisa@example.com",
+                        "order_count": 5,
+                        "total_spent": 45000,
+                        "first_order": "2024-09-05",
+                        "last_order": "2025-09-12"
+                      }
+                    ]
                   }
                 }
               }
@@ -111,7 +157,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

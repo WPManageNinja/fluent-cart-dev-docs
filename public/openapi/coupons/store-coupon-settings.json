@@ -110,6 +110,15 @@
                       "object_type": ""
                     }
                   }
+                },
+                "example": {
+                  "message": "Coupon settings saved successfully.",
+                  "settings": {
+                    "enable_coupons": true,
+                    "auto_apply_coupons": false,
+                    "max_coupons_per_order": 3,
+                    "allow_stackable_coupons": false
+                  }
                 }
               }
             }

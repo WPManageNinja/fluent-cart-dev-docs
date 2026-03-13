@@ -199,21 +199,83 @@
                 },
                 "example": {
                   "summary": {
-                    "total_products_sold": 1200,
-                    "total_revenue": 6000000,
+                    "total_products_sold": 856,
+                    "total_revenue": 2970000,
                     "unique_products": 25
                   },
-                  "previousSummary": {},
-                  "fluctuations": {},
+                  "previousSummary": {
+                    "total_products_sold": 720,
+                    "total_revenue": 2400000,
+                    "unique_products": 22
+                  },
+                  "fluctuations": {
+                    "total_products_sold": {
+                      "value": 18.9,
+                      "direction": "up"
+                    },
+                    "total_revenue": {
+                      "value": 23.75,
+                      "direction": "up"
+                    }
+                  },
                   "currentMetrics": [
                     {
                       "year": "2025",
                       "group": "2025-01",
-                      "products_sold": 100,
-                      "revenue": 500000
+                      "products_sold": 120,
+                      "revenue": 420000
+                    },
+                    {
+                      "year": "2025",
+                      "group": "2025-02",
+                      "products_sold": 138,
+                      "revenue": 480000
+                    },
+                    {
+                      "year": "2025",
+                      "group": "2025-03",
+                      "products_sold": 145,
+                      "revenue": 510000
+                    },
+                    {
+                      "year": "2025",
+                      "group": "2025-04",
+                      "products_sold": 110,
+                      "revenue": 390000
+                    },
+                    {
+                      "year": "2025",
+                      "group": "2025-05",
+                      "products_sold": 162,
+                      "revenue": 550000
+                    },
+                    {
+                      "year": "2025",
+                      "group": "2025-06",
+                      "products_sold": 181,
+                      "revenue": 620000
                     }
                   ],
-                  "previousMetrics": []
+                  "previousMetrics": [
+                    {
+                      "year": "2024",
+                      "group": "2024-07",
+                      "products_sold": 105,
+                      "revenue": 350000
+                    },
+                    {
+                      "year": "2024",
+                      "group": "2024-08",
+                      "products_sold": 115,
+                      "revenue": 380000
+                    },
+                    {
+                      "year": "2024",
+                      "group": "2024-09",
+                      "products_sold": 125,
+                      "revenue": 410000
+                    }
+                  ]
                 }
               }
             }
@@ -229,7 +291,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

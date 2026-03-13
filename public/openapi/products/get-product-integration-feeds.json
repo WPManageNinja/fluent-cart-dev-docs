@@ -59,7 +59,13 @@
                       "name": "Add to FluentCRM List",
                       "enabled": "yes",
                       "provider": "fluentcrm",
-                      "feed": {},
+                      "feed": {
+                        "name": "Add to FluentCRM List",
+                        "list_id": 1,
+                        "tag_ids": [5, 8],
+                        "conditional_variation_ids": [],
+                        "enabled": "yes"
+                      },
                       "scope": "product"
                     }
                   ],

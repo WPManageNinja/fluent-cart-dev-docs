@@ -76,9 +76,19 @@
                         "enabled": "yes",
                         "list_id": "2",
                         "list_name": "Customers",
-                        "merge_fields": {},
+                        "merge_fields": {
+                          "first_name": "{customer.first_name}",
+                          "last_name": "{customer.last_name}",
+                          "email": "{customer.email}"
+                        },
                         "conditionals": {
-                          "conditions": [],
+                          "conditions": [
+                            {
+                              "field": "payment_status",
+                              "operator": "is",
+                              "value": "paid"
+                            }
+                          ],
                           "status": false,
                           "type": "all"
                         }
@@ -187,7 +197,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

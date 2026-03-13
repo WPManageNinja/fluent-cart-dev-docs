@@ -164,6 +164,12 @@
                       }
                     }
                   }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "Invalid email or password. Please try again."
+                  }
                 }
               }
             }

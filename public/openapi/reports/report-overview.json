@@ -66,8 +66,34 @@
                   }
                 },
                 "example": {
-                  "data": {},
-                  "orders_by_payment_method": {}
+                  "data": {
+                    "total_orders": 342,
+                    "total_revenue": 1250000,
+                    "net_revenue": 1180000,
+                    "total_tax": 95000,
+                    "total_shipping": 35000,
+                    "total_discounts": 42000,
+                    "total_refunds": 70000,
+                    "average_order_value": 3655,
+                    "total_customers": 215
+                  },
+                  "orders_by_payment_method": {
+                    "stripe": {
+                      "count": 230,
+                      "revenue": 850000,
+                      "percentage": 67.3
+                    },
+                    "paypal": {
+                      "count": 95,
+                      "revenue": 320000,
+                      "percentage": 27.8
+                    },
+                    "cod": {
+                      "count": 17,
+                      "revenue": 80000,
+                      "percentage": 4.9
+                    }
+                  }
                 }
               }
             }
@@ -83,7 +109,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

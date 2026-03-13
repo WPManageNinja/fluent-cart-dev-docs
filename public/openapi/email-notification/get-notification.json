@@ -76,7 +76,11 @@
                     "title": "Purchase receipt to customer",
                     "description": "This email will be sent to the customer after an order is placed.",
                     "recipient": "customer",
-                    "smartcode_groups": [],
+                    "smartcode_groups": [
+                      "order",
+                      "customer",
+                      "transaction"
+                    ],
                     "template_path": "order.paid.customer",
                     "is_async": false,
                     "name": "order_paid_customer",
@@ -293,7 +297,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -89,7 +89,16 @@
                   "integration_id": 10,
                   "integration_name": "fluentcrm",
                   "created": true,
-                  "feedData": {}
+                  "feedData": {
+                    "id": 10,
+                    "name": "Add to List",
+                    "list_id": 1,
+                    "tag_ids": [5, 8],
+                    "conditional_variation_ids": [],
+                    "enabled": "yes",
+                    "provider": "fluentcrm",
+                    "scope": "product"
+                  }
                 }
               }
             }

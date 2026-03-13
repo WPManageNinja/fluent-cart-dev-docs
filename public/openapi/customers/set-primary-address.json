@@ -73,7 +73,7 @@
                 }
               },
               "example": {
-                "addressId": 5,
+                "addressId": 25,
                 "type": "billing"
               }
             }

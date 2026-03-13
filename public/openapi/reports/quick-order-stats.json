@@ -78,9 +78,17 @@
                   }
                 },
                 "example": {
-                  "stats": {},
-                  "from_date": "2025-06-01 00:00:00",
-                  "to_date": "2025-06-15 23:59:59"
+                  "stats": {
+                    "total_orders": 18,
+                    "total_revenue": 125000,
+                    "average_order_value": 6944,
+                    "total_items_sold": 42,
+                    "compare_total_orders": 15,
+                    "compare_total_revenue": 108000,
+                    "compare_average_order_value": 7200
+                  },
+                  "from_date": "2025-09-01 00:00:00",
+                  "to_date": "2025-09-20 23:59:59"
                 }
               }
             }
@@ -96,7 +104,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

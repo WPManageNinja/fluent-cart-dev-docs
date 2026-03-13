@@ -62,7 +62,28 @@
         },
         "responses": {
           "200": {
-            "description": "Returns the created dummy product data."
+            "description": "Returns the created dummy product data.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "product": {
+                    "ID": 135,
+                    "post_title": "Sample Digital Product",
+                    "post_status": "publish",
+                    "post_type": "fluent-products",
+                    "post_name": "sample-digital-product",
+                    "detail": {
+                      "id": 100,
+                      "post_id": 135,
+                      "fulfillment_type": "digital",
+                      "variation_type": "single",
+                      "manage_stock": 0
+                    }
+                  },
+                  "message": "Dummy product created successfully"
+                }
+              }
+            }
           }
         }
       }

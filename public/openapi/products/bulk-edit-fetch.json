@@ -97,8 +97,57 @@
             "content": {
               "application/json": {
                 "example": {
-                  "products": [],
-                  "columns": []
+                  "products": [
+                    {
+                      "ID": 123,
+                      "post_title": "Developer Toolkit Pro",
+                      "post_status": "publish",
+                      "post_date": "2025-03-15 10:00:00",
+                      "detail": {
+                        "id": 89,
+                        "post_id": 123,
+                        "fulfillment_type": "digital",
+                        "min_price": 4900,
+                        "max_price": 19900,
+                        "variation_type": "multi",
+                        "formatted_min_price": "$49.00",
+                        "formatted_max_price": "$199.00"
+                      }
+                    },
+                    {
+                      "ID": 124,
+                      "post_title": "Cloud Hosting Starter",
+                      "post_status": "draft",
+                      "post_date": "2025-06-20 08:30:00",
+                      "detail": {
+                        "id": 90,
+                        "post_id": 124,
+                        "fulfillment_type": "digital",
+                        "min_price": 1900,
+                        "max_price": 4900,
+                        "variation_type": "single",
+                        "formatted_min_price": "$19.00",
+                        "formatted_max_price": "$49.00"
+                      }
+                    }
+                  ],
+                  "columns": [
+                    {
+                      "key": "post_title",
+                      "label": "Product Title",
+                      "editable": true
+                    },
+                    {
+                      "key": "post_status",
+                      "label": "Status",
+                      "editable": true
+                    },
+                    {
+                      "key": "fulfillment_type",
+                      "label": "Fulfillment",
+                      "editable": true
+                    }
+                  ]
                 }
               }
             }

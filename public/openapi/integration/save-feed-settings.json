@@ -107,7 +107,11 @@
                     "name": "Add to customers list",
                     "enabled": "yes",
                     "list_id": "2",
-                    "merge_fields": {}
+                    "merge_fields": {
+                      "first_name": "{customer.first_name}",
+                      "last_name": "{customer.last_name}",
+                      "email": "{customer.email}"
+                    }
                   }
                 }
               }
@@ -152,7 +156,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

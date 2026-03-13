@@ -72,12 +72,34 @@
                 "example": [
                   {
                     "id": 789,
-                    "variation_title": "Bundle Plan",
+                    "post_id": 126,
+                    "variation_title": "Complete Developer Bundle",
+                    "variation_identifier": "complete-bundle",
+                    "sku": "DEV-BUNDLE",
+                    "item_price": 14900,
+                    "compare_price": 19900,
+                    "payment_type": "onetime",
+                    "item_status": "active",
+                    "stock_status": "in-stock",
+                    "fulfillment_type": "digital",
                     "other_info": {
-                      "bundle_child_ids": [
-                        101,
-                        102,
-                        103
+                      "payment_type": "onetime",
+                      "is_bundle": true,
+                      "bundle_type": "fixed",
+                      "bundle_child_ids": [460, 465],
+                      "items": [
+                        {
+                          "product_id": 124,
+                          "variation_id": 460,
+                          "title": "Code Generator Plugin",
+                          "quantity": 1
+                        },
+                        {
+                          "product_id": 125,
+                          "variation_id": 465,
+                          "title": "API Testing Suite",
+                          "quantity": 1
+                        }
                       ]
                     }
                   }

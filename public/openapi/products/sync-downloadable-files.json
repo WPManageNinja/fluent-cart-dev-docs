@@ -162,13 +162,22 @@
                 "example": {
                   "downloadable_files": [
                     {
-                      "id": 1,
+                      "id": 30,
                       "post_id": 123,
                       "title": "Software v1.0",
                       "type": "zip",
                       "driver": "local",
                       "file_name": "software-v1.zip",
-                      "download_identifier": "a1b2c3d4-..."
+                      "file_path": "software-v1.zip",
+                      "file_url": "https://example.com/wp-content/uploads/fluent-cart/software-v1.zip",
+                      "download_identifier": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                      "serial": 0,
+                      "product_variation_id": [456],
+                      "settings": {
+                        "download_limit": 5,
+                        "download_expiry": 365
+                      },
+                      "created_at": "2025-09-01 12:00:00"
                     }
                   ]
                 }

@@ -116,7 +116,7 @@
                 "type": "flat_rate",
                 "amount": "1200",
                 "is_enabled": 1,
-                "states": []
+                "states": ["CA", "NY", "TX", "FL"]
               }
             }
           }

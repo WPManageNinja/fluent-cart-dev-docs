@@ -61,7 +61,7 @@
                 },
                 "example": {
                   "status": "valid",
-                  "license_key": "XXXX-XXXX-XXXX-XXXX",
+                  "license_key": "DTPRO-A1B2-C3D4-E5F6",
                   "expires": "2026-01-15"
                 }
               }
@@ -78,7 +78,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

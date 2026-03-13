@@ -45,7 +45,7 @@
               "type": "integer"
             },
             "description": "The coupon ID",
-            "example": 5
+            "example": 3
           }
         ],
         "responses": {

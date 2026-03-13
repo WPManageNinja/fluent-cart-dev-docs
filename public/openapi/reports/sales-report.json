@@ -189,19 +189,109 @@
                 },
                 "example": {
                   "graphs": {
-                    "gross_revenue": [],
-                    "net_revenue": [],
-                    "orders": [],
-                    "items_sold": []
+                    "gross_revenue": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01",
+                        "value": 420000
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-02",
+                        "value": 480000
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-03",
+                        "value": 510000
+                      }
+                    ],
+                    "net_revenue": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01",
+                        "value": 378000
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-02",
+                        "value": 432000
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-03",
+                        "value": 459000
+                      }
+                    ],
+                    "orders": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01",
+                        "value": 45
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-02",
+                        "value": 52
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-03",
+                        "value": 48
+                      }
+                    ],
+                    "items_sold": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01",
+                        "value": 120
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-02",
+                        "value": 138
+                      },
+                      {
+                        "year": "2025",
+                        "group": "2025-03",
+                        "value": 145
+                      }
+                    ]
                   },
                   "summaryData": {
-                    "gross_revenue": 6000000,
-                    "net_revenue": 5400000,
-                    "total_orders": 540,
-                    "items_sold": 1200
+                    "gross_revenue": 2970000,
+                    "net_revenue": 2673000,
+                    "total_orders": 342,
+                    "items_sold": 856,
+                    "tax_collected": 185000,
+                    "shipping_collected": 52000,
+                    "discounts": 60000,
+                    "refunds": 70000
                   },
-                  "previousSummary": {},
-                  "fluctuations": {}
+                  "previousSummary": {
+                    "gross_revenue": 2400000,
+                    "net_revenue": 2160000,
+                    "total_orders": 289,
+                    "items_sold": 720
+                  },
+                  "fluctuations": {
+                    "gross_revenue": {
+                      "value": 23.75,
+                      "direction": "up"
+                    },
+                    "net_revenue": {
+                      "value": 23.75,
+                      "direction": "up"
+                    },
+                    "total_orders": {
+                      "value": 18.34,
+                      "direction": "up"
+                    },
+                    "items_sold": {
+                      "value": 18.89,
+                      "direction": "up"
+                    }
+                  }
                 }
               }
             }
@@ -217,7 +307,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -100,12 +100,84 @@
                 "example": {
                   "recentActivities": [
                     {
-                      "title": "Order #150 created",
-                      "content": "New order placed by John Doe",
-                      "created_at": "2025-06-15 14:30:00",
+                      "title": "Order completed",
+                      "content": "Order #INV-342 marked as completed",
+                      "created_at": "2025-09-20 14:25:30",
                       "created_by": 1,
                       "module_name": "orders",
-                      "module_id": 150
+                      "module_id": 342
+                    },
+                    {
+                      "title": "New subscription",
+                      "content": "Sarah Johnson subscribed to Developer Toolkit Pro (Business License - Annual)",
+                      "created_at": "2025-09-20 14:25:00",
+                      "created_by": 0,
+                      "module_name": "subscriptions",
+                      "module_id": 89
+                    },
+                    {
+                      "title": "Payment received",
+                      "content": "$106.92 received via Stripe for order #INV-342",
+                      "created_at": "2025-09-20 14:24:50",
+                      "created_by": 0,
+                      "module_name": "transactions",
+                      "module_id": 415
+                    },
+                    {
+                      "title": "Refund processed",
+                      "content": "Refund of $49.00 issued for order #INV-338",
+                      "created_at": "2025-09-20 11:15:00",
+                      "created_by": 1,
+                      "module_name": "orders",
+                      "module_id": 338
+                    },
+                    {
+                      "title": "Order created",
+                      "content": "New order #INV-341 placed by Mike Chen",
+                      "created_at": "2025-09-20 11:10:00",
+                      "created_by": 0,
+                      "module_name": "orders",
+                      "module_id": 341
+                    },
+                    {
+                      "title": "Subscription renewed",
+                      "content": "Subscription #75 renewed successfully for $99.00",
+                      "created_at": "2025-09-20 09:00:00",
+                      "created_by": 0,
+                      "module_name": "subscriptions",
+                      "module_id": 75
+                    },
+                    {
+                      "title": "Coupon applied",
+                      "content": "Coupon FALL25 applied to order #INV-340",
+                      "created_at": "2025-09-19 16:45:00",
+                      "created_by": 0,
+                      "module_name": "orders",
+                      "module_id": 340
+                    },
+                    {
+                      "title": "License activated",
+                      "content": "License key activated for Developer Toolkit Pro by Emily Wilson",
+                      "created_at": "2025-09-19 15:30:00",
+                      "created_by": 0,
+                      "module_name": "licenses",
+                      "module_id": 210
+                    },
+                    {
+                      "title": "Subscription canceled",
+                      "content": "Subscription #62 canceled by customer request",
+                      "created_at": "2025-09-19 12:00:00",
+                      "created_by": 0,
+                      "module_name": "subscriptions",
+                      "module_id": 62
+                    },
+                    {
+                      "title": "Order created",
+                      "content": "New order #INV-340 placed by Emily Wilson",
+                      "created_at": "2025-09-19 11:45:00",
+                      "created_by": 0,
+                      "module_name": "orders",
+                      "module_id": 340
                     }
                   ]
                 }
@@ -123,7 +195,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

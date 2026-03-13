@@ -68,12 +68,20 @@
                 },
                 "example": [
                   {
-                    "id": 456,
-                    "title": "Monthly Subscription"
+                    "id": 457,
+                    "title": "Developer Toolkit Pro - Business License - Annual",
+                    "post_id": 123,
+                    "item_price": 9900,
+                    "sku": "DTK-BIZ-ANNUAL",
+                    "payment_type": "subscription"
                   },
                   {
-                    "id": 457,
-                    "title": "Yearly Subscription"
+                    "id": 470,
+                    "title": "Cloud Hosting - Monthly Plan",
+                    "post_id": 124,
+                    "item_price": 1900,
+                    "sku": "HOST-MONTHLY",
+                    "payment_type": "subscription"
                   }
                 ]
               }

@@ -212,9 +212,17 @@
                         "order_tax": 1000,
                         "total_tax": 1150,
                         "meta": {
-                          "rates": [],
+                          "rates": [
+                            {
+                              "rate_id": 5,
+                              "name": "CA State Tax",
+                              "rate": "8.2500",
+                              "tax_amount": 825,
+                              "shipping_tax_amount": 150
+                            }
+                          ],
                           "tax_country": "US",
-                          "store_vat_number": ""
+                          "store_vat_number": "12-3456789"
                         },
                         "filed_at": null,
                         "created_at": "2025-06-01 12:00:00",
@@ -284,7 +292,7 @@
               },
               "store_vat_number": {
                 "type": "string",
-                "example": ""
+                "example": "12-3456789"
               }
             }
           },

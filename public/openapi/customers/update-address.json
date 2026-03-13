@@ -144,15 +144,18 @@
                 }
               },
               "example": {
-                "id": 5,
-                "name": "John Doe",
-                "email": "john@example.com",
-                "address_1": "789 Updated Street",
-                "city": "New York",
-                "state": "NY",
-                "postcode": "10003",
+                "id": 25,
+                "name": "Sarah Johnson",
+                "email": "sarah.johnson@example.com",
+                "address_1": "456 Market Street",
+                "address_2": "Suite 500",
+                "city": "San Francisco",
+                "state": "CA",
+                "postcode": "94102",
                 "country": "US",
-                "type": "billing"
+                "phone": "+1-415-555-0142",
+                "type": "billing",
+                "company_name": "TechStart Inc."
               }
             }
           }
@@ -176,12 +179,21 @@
                 "example": {
                   "message": "Billing address updated successfully!",
                   "data": {
-                    "id": 5,
-                    "customer_id": 1,
-                    "is_primary": 0,
+                    "id": 25,
+                    "customer_id": 12,
+                    "is_primary": 1,
                     "type": "billing",
-                    "name": "John Doe",
-                    "address_1": "789 Updated Street"
+                    "name": "Sarah Johnson",
+                    "address_1": "456 Market Street",
+                    "address_2": "Suite 500",
+                    "city": "San Francisco",
+                    "state": "CA",
+                    "postcode": "94102",
+                    "country": "US",
+                    "phone": "+1-415-555-0142",
+                    "email": "sarah.johnson@example.com",
+                    "company": "TechStart Inc.",
+                    "meta": null
                   }
                 }
               }

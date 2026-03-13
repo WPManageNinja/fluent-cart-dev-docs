@@ -86,13 +86,14 @@
               "application/json": {
                 "example": {
                   "term_ids": [
-                    10,
-                    11
+                    14,
+                    15
                   ],
                   "names": [
-                    "Category A",
-                    "Category B"
-                  ]
+                    "New Category",
+                    "Another Category"
+                  ],
+                  "taxonomy": "product-categories"
                 }
               }
             }

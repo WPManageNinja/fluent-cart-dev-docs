@@ -88,17 +88,73 @@
                 "example": {
                   "order": {
                     "id": 42,
-                    "uuid": "abc123-def456",
+                    "uuid": "ord_a1b2c3d4e5f6",
+                    "invoice_no": "INV-042",
+                    "receipt_number": "RCP-042",
                     "status": "completed",
+                    "parent_id": null,
+                    "fulfillment_type": "digital",
+                    "type": "payment",
+                    "customer_id": 12,
+                    "payment_method": "stripe",
+                    "payment_method_title": "Credit Card (Stripe)",
                     "payment_status": "paid",
-                    "transactions": [],
-                    "created_at": "2025-01-15 10:30:00",
-                    "updated_at": "2025-01-15 10:35:00"
+                    "currency": "USD",
+                    "subtotal": 9900,
+                    "discount_tax": 0,
+                    "manual_discount_total": 0,
+                    "coupon_discount_total": 0,
+                    "shipping_tax": 0,
+                    "shipping_total": 0,
+                    "tax_total": 792,
+                    "total_amount": 10692,
+                    "rate": 1,
+                    "note": "",
+                    "ip_address": "203.0.113.42",
+                    "completed_at": "2025-09-20 14:25:30",
+                    "refunded_at": null,
+                    "total_refund": 0,
+                    "total_paid": 10692,
+                    "mode": "live",
+                    "shipping_status": "unfulfilled",
+                    "transactions": [
+                      {
+                        "id": 78,
+                        "order_id": 42,
+                        "vendor_charge_id": "ch_3PxKE2JY8q",
+                        "payment_method": "stripe",
+                        "payment_mode": "live",
+                        "payment_method_type": "card",
+                        "currency": "USD",
+                        "transaction_type": "payment",
+                        "card_last_4": "4242",
+                        "card_brand": "visa",
+                        "status": "paid",
+                        "total": 10692,
+                        "uuid": "txn_f7e8d9c0",
+                        "url": "https://example.com/order-receipt/?order_hash=abc123",
+                        "created_at": "2025-09-20 14:25:30"
+                      }
+                    ],
+                    "created_at": "2025-09-20 14:25:00",
+                    "updated_at": "2025-09-20 14:25:30"
                   },
-                  "discount_meta": {},
-                  "shipping_meta": {},
-                  "order_settings": {},
-                  "selected_labels": [],
+                  "discount_meta": {
+                    "type": "",
+                    "value": 0,
+                    "label": "",
+                    "reason": ""
+                  },
+                  "shipping_meta": {
+                    "type": "none",
+                    "rate_name": "",
+                    "custom_price": 0
+                  },
+                  "order_settings": {
+                    "is_tax_enabled": true,
+                    "tax_behavior": "exclusive"
+                  },
+                  "selected_labels": [1],
                   "tax_id": null
                 }
               }

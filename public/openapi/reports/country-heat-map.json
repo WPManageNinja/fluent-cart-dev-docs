@@ -79,15 +79,43 @@
                   "countryHeatMap": [
                     {
                       "name": "United States",
-                      "value": 250
-                    },
-                    {
-                      "name": "United Kingdom",
                       "value": 120
                     },
                     {
+                      "name": "United Kingdom",
+                      "value": 35
+                    },
+                    {
                       "name": "Germany",
-                      "value": 85
+                      "value": 22
+                    },
+                    {
+                      "name": "Canada",
+                      "value": 18
+                    },
+                    {
+                      "name": "Australia",
+                      "value": 12
+                    },
+                    {
+                      "name": "France",
+                      "value": 10
+                    },
+                    {
+                      "name": "Netherlands",
+                      "value": 8
+                    },
+                    {
+                      "name": "India",
+                      "value": 7
+                    },
+                    {
+                      "name": "Brazil",
+                      "value": 5
+                    },
+                    {
+                      "name": "Japan",
+                      "value": 4
                     }
                   ]
                 }
@@ -105,7 +133,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

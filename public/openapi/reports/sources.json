@@ -180,8 +180,54 @@
                   }
                 },
                 "example": {
-                  "sourceReportData": {},
-                  "fluctuations": {}
+                  "sourceReportData": {
+                    "sources": [
+                      {
+                        "source": "direct",
+                        "orders": 150,
+                        "revenue": 720000,
+                        "percentage": 43.9
+                      },
+                      {
+                        "source": "google",
+                        "orders": 95,
+                        "revenue": 450000,
+                        "percentage": 27.8
+                      },
+                      {
+                        "source": "referral",
+                        "orders": 55,
+                        "revenue": 280000,
+                        "percentage": 16.1
+                      },
+                      {
+                        "source": "social",
+                        "orders": 42,
+                        "revenue": 180000,
+                        "percentage": 12.3
+                      }
+                    ],
+                    "total_orders": 342,
+                    "total_revenue": 1630000
+                  },
+                  "fluctuations": {
+                    "direct": {
+                      "value": 12.5,
+                      "direction": "up"
+                    },
+                    "google": {
+                      "value": 8.2,
+                      "direction": "up"
+                    },
+                    "referral": {
+                      "value": 22.4,
+                      "direction": "up"
+                    },
+                    "social": {
+                      "value": -5.1,
+                      "direction": "down"
+                    }
+                  }
                 }
               }
             }
@@ -197,7 +243,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

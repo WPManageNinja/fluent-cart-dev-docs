@@ -53,7 +53,9 @@
                   }
                 },
                 "example": {
-                  "show_on_checkout": 1
+                  "show_on_checkout": 1,
+                  "enable_coupons": true,
+                  "auto_apply_coupons": false
                 }
               }
             }

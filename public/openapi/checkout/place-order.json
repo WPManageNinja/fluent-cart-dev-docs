@@ -288,6 +288,21 @@
                       "message": "Cart is empty or already completed"
                     }
                   }
+                },
+                "example": {
+                  "success": true,
+                  "order": {
+                    "id": 42,
+                    "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                    "status": "pending",
+                    "total": 9900,
+                    "total_formatted": "$99.00",
+                    "currency": "USD",
+                    "payment_method": "stripe",
+                    "created_at": "2025-03-20 14:30:00"
+                  },
+                  "redirect_url": "https://example.com/checkout/payment/a1b2c3d4",
+                  "message": "Order placed successfully."
                 }
               }
             }

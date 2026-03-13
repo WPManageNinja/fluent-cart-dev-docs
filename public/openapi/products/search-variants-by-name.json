@@ -104,15 +104,25 @@
                 "example": [
                   {
                     "value": 123,
-                    "label": "Example Product",
+                    "label": "Developer Toolkit Pro",
                     "children": [
                       {
                         "value": 456,
-                        "label": "Monthly Plan"
+                        "label": "Personal License ($49.00)"
                       },
                       {
                         "value": 457,
-                        "label": "Yearly Plan"
+                        "label": "Business License - Annual ($99.00/yr)"
+                      }
+                    ]
+                  },
+                  {
+                    "value": 124,
+                    "label": "Code Generator Plugin",
+                    "children": [
+                      {
+                        "value": 460,
+                        "label": "Single Site License ($29.00)"
                       }
                     ]
                   }

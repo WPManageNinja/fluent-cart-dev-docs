@@ -120,6 +120,29 @@
                   "type": "object",
                   "description": "License status distribution data",
                   "additionalProperties": true
+                },
+                "example": {
+                  "distribution": [
+                    {
+                      "label": "Active",
+                      "value": 198,
+                      "percentage": 80.8,
+                      "color": "#67C23A"
+                    },
+                    {
+                      "label": "Expired",
+                      "value": 32,
+                      "percentage": 13.1,
+                      "color": "#E6A23C"
+                    },
+                    {
+                      "label": "Revoked",
+                      "value": 15,
+                      "percentage": 6.1,
+                      "color": "#F56C6C"
+                    }
+                  ],
+                  "total_licenses": 245
                 }
               }
             }
@@ -135,7 +158,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

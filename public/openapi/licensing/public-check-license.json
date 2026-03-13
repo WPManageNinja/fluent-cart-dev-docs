@@ -135,7 +135,7 @@
                   "activation_limit": 5,
                   "activation_hash": "abc123def456...",
                   "activations_count": 2,
-                  "license_key": "XXXX-XXXX-XXXX-XXXX",
+                  "license_key": "DTPRO-A1B2-C3D4-E5F6",
                   "expiration_date": "2026-01-15 00:00:00",
                   "product_id": 10,
                   "variation_id": 15,
@@ -194,7 +194,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

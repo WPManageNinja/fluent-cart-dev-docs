@@ -67,7 +67,7 @@
                           },
                           "logo": {
                             "type": "string",
-                            "example": "https://..."
+                            "example": "https://example.com/wp-content/plugins/fluent-cart/assets/images/local-storage.svg"
                           }
                         }
                       }
@@ -81,14 +81,21 @@
                       "title": "Local Storage",
                       "description": "Store files on your server",
                       "is_active": true,
-                      "logo": "https://..."
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/local-storage.svg"
                     },
                     {
                       "key": "s3",
                       "title": "Amazon S3",
-                      "description": "Store files on Amazon S3",
+                      "description": "Store files on Amazon S3 cloud storage",
                       "is_active": false,
-                      "logo": "https://..."
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/s3.svg"
+                    },
+                    {
+                      "key": "bunny",
+                      "title": "Bunny CDN",
+                      "description": "Store files on Bunny CDN storage",
+                      "is_active": false,
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/bunny.svg"
                     }
                   ]
                 }
@@ -106,7 +113,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -114,6 +114,12 @@
                       "message": "Failed to create order bump"
                     }
                   }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "Invalid request. Please check your input and try again."
+                  }
                 }
               }
             }

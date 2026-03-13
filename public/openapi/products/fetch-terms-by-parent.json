@@ -84,8 +84,14 @@
                   "data": {
                     "product-categories": [
                       {
-                        "value": 5,
-                        "label": "Sub Category"
+                        "value": 11,
+                        "label": "Developer Tools",
+                        "parent": 10
+                      },
+                      {
+                        "value": 12,
+                        "label": "Plugins",
+                        "parent": 10
                       }
                     ]
                   }

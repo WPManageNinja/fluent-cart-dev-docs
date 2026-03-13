@@ -75,9 +75,9 @@
                 "example": {
                   "message": "Subscription fetched successfully from remote payment gateway!",
                   "subscription": {
-                    "id": 1,
+                    "id": 15,
                     "status": "active",
-                    "vendor_subscription_id": "sub_1234567890"
+                    "vendor_subscription_id": "sub_1QxR3nH"
                   }
                 }
               }
@@ -108,7 +108,7 @@
           "id": {
             "type": "integer",
             "description": "Subscription ID",
-            "example": 1
+            "example": 15
           },
           "status": {
             "type": "string",
@@ -118,7 +118,7 @@
           "vendor_subscription_id": {
             "type": "string",
             "description": "Vendor subscription ID",
-            "example": "sub_1234567890"
+            "example": "sub_1QxR3nH"
           }
         }
       },

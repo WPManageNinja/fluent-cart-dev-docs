@@ -81,17 +81,27 @@
                   "subscriptions": {
                     "data": [
                       {
-                        "uuid": "abc123-def456",
+                        "uuid": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
                         "status": "active",
-                        "item_name": "Pro Plan",
-                        "billing_interval": "monthly",
-                        "recurring_amount": 2999,
-                        "next_billing_date": "2025-02-15 00:00:00",
+                        "item_name": "Developer Toolkit Pro - Business Annual",
+                        "billing_interval": "yearly",
+                        "recurring_amount": 9900,
+                        "next_billing_date": "2026-09-20 14:25:00",
                         "bill_times": 0,
-                        "bill_count": 6
+                        "bill_count": 1
+                      },
+                      {
+                        "uuid": "c5f9e3d4-1a6f-6c0d-d7e8-f9a0b1234567",
+                        "status": "active",
+                        "item_name": "CloudSync Starter - Monthly",
+                        "billing_interval": "monthly",
+                        "recurring_amount": 1900,
+                        "next_billing_date": "2026-04-15 09:00:00",
+                        "bill_times": 12,
+                        "bill_count": 3
                       }
                     ],
-                    "total": 5,
+                    "total": 2,
                     "per_page": 10,
                     "current_page": 1,
                     "last_page": 1
@@ -112,7 +122,7 @@
           "uuid": {
             "type": "string",
             "description": "Subscription UUID",
-            "example": "abc123-def456"
+            "example": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
           },
           "status": {
             "type": "string",
@@ -122,23 +132,23 @@
           "item_name": {
             "type": "string",
             "description": "Item name",
-            "example": "Pro Plan"
+            "example": "Developer Toolkit Pro - Business Annual"
           },
           "billing_interval": {
             "type": "string",
             "description": "Billing interval",
-            "example": "monthly"
+            "example": "yearly"
           },
           "recurring_amount": {
             "type": "integer",
             "description": "Recurring amount in cents",
-            "example": 2999
+            "example": 9900
           },
           "next_billing_date": {
             "type": "string",
             "format": "date-time",
             "description": "Next billing date in GMT",
-            "example": "2025-02-15 00:00:00"
+            "example": "2026-09-20 14:25:00"
           },
           "bill_times": {
             "type": "integer",
@@ -148,7 +158,7 @@
           "bill_count": {
             "type": "integer",
             "description": "Number of completed billing cycles",
-            "example": 6
+            "example": 1
           }
         }
       },

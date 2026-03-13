@@ -144,7 +144,13 @@
                 "example": {
                   "settings": {
                     "conditionals": {
-                      "conditions": [],
+                      "conditions": [
+                        {
+                          "field": "payment_status",
+                          "operator": "is",
+                          "value": "paid"
+                        }
+                      ],
                       "status": false,
                       "type": "all"
                     },
@@ -152,8 +158,15 @@
                     "list_id": "",
                     "list_name": "",
                     "name": "",
-                    "merge_fields": {},
-                    "conditional_variation_ids": []
+                    "merge_fields": {
+                      "first_name": "{customer.first_name}",
+                      "last_name": "{customer.last_name}",
+                      "email": "{customer.email}"
+                    },
+                    "conditional_variation_ids": [
+                      456,
+                      457
+                    ]
                   },
                   "settings_fields": {
                     "fields": [
@@ -165,9 +178,26 @@
                       }
                     ]
                   },
-                  "shortcodes": {},
-                  "inputs": {},
-                  "merge_fields": {},
+                  "shortcodes": {
+                    "customer": {
+                      "title": "Customer",
+                      "shortcodes": {
+                        "{customer.first_name}": "First Name",
+                        "{customer.last_name}": "Last Name",
+                        "{customer.email}": "Email"
+                      }
+                    }
+                  },
+                  "inputs": {
+                    "billing_first_name": "Billing First Name",
+                    "billing_last_name": "Billing Last Name",
+                    "billing_email": "Billing Email"
+                  },
+                  "merge_fields": {
+                    "first_name": "{customer.first_name}",
+                    "last_name": "{customer.last_name}",
+                    "email": "{customer.email}"
+                  },
                   "product_variations": [
                     {
                       "id": 101,
@@ -194,7 +224,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

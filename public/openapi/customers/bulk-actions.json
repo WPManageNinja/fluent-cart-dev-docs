@@ -71,11 +71,11 @@
               "example": {
                 "action": "change_customer_status",
                 "customer_ids": [
-                  1,
-                  2,
-                  3
+                  12,
+                  15,
+                  23
                 ],
-                "new_status": "archived"
+                "new_status": "inactive"
               }
             }
           }
@@ -109,6 +109,11 @@
                       "data": ""
                     }
                   }
+                },
+                "example": {
+                  "message": "Bulk action completed successfully.",
+                  "affected_count": 5,
+                  "action": "delete"
                 }
               }
             }

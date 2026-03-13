@@ -65,10 +65,10 @@
                 }
               },
               "example": {
-                "productId": 42,
+                "productId": 123,
                 "appliedCoupons": [
-                  "SAVE10",
-                  "WELCOME5"
+                  "WELCOME20",
+                  "SUMMER15"
                 ],
                 "origin": "admin_order"
               }
@@ -104,9 +104,26 @@
                     "summary": "Product is not eligible",
                     "value": {
                       "isApplicable": false,
-                      "message": "Product A conflicts with SAVE10 coupon. Remove the coupon first."
+                      "message": "Developer Toolkit Pro conflicts with WELCOME20 coupon. Remove the coupon first."
                     }
                   }
+                },
+                "example": {
+                  "eligible": true,
+                  "product_id": 123,
+                  "coupon_codes": [
+                    "WELCOME20",
+                    "SUMMER25"
+                  ],
+                  "applicable_coupons": [
+                    {
+                      "id": 3,
+                      "code": "WELCOME20",
+                      "type": "percent",
+                      "amount": 2000,
+                      "title": "Welcome Discount"
+                    }
+                  ]
                 }
               }
             }

@@ -86,6 +86,12 @@
                       "message": "Subscription not found"
                     }
                   }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "Subscription not found or does not belong to this account."
+                  }
                 }
               }
             }

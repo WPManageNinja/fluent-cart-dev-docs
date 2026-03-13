@@ -54,7 +54,7 @@
                 }
               },
               "example": {
-                "license_key": "XXXX-XXXX-XXXX-XXXX"
+                "license_key": "DTPRO-A1B2-C3D4-E5F6"
               }
             }
           }
@@ -91,7 +91,7 @@
                 },
                 "example": {
                   "status": "valid",
-                  "license_key": "XXXX-XXXX-XXXX-XXXX",
+                  "license_key": "DTPRO-A1B2-C3D4-E5F6",
                   "notice": {
                     "id": "fluent_cart_license_activated",
                     "html": "<div>Your FluentCart Pro license has been activated successfully.</div>",
@@ -115,6 +115,27 @@
                       "type": "string"
                     }
                   }
+                },
+                "examples": {
+                  "invalid_key": {
+                    "summary": "Invalid license key",
+                    "value": {
+                      "code": "invalid_license",
+                      "message": "The provided license key is invalid or has expired."
+                    }
+                  },
+                  "activation_limit": {
+                    "summary": "Activation limit reached",
+                    "value": {
+                      "code": "activation_limit_reached",
+                      "message": "This license key has reached its maximum number of activations."
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "code": "invalid_license_key",
+                  "message": "The provided license key is invalid or has expired."
                 }
               }
             }

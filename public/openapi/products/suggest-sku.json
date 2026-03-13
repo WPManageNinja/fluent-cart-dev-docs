@@ -71,7 +71,7 @@
             "content": {
               "application/json": {
                 "example": {
-                  "sku": "EXA-PRO-MON"
+                  "sku": "DEV-TOO-PER"
                 }
               }
             }

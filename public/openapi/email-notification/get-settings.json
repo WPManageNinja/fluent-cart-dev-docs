@@ -50,28 +50,28 @@
                         "from_name": {
                           "type": "string",
                           "description": "Sender name displayed in emails",
-                          "example": "My Store"
+                          "example": "TechStore"
                         },
                         "from_email": {
                           "type": "string",
                           "format": "email",
                           "description": "Sender email address",
-                          "example": "store@example.com"
+                          "example": "orders@example.com"
                         },
                         "reply_to_name": {
                           "type": "string",
                           "description": "Reply-to name",
-                          "example": ""
+                          "example": "TechStore Support"
                         },
                         "reply_to_email": {
                           "type": "string",
                           "description": "Reply-to email address",
-                          "example": ""
+                          "example": "support@example.com"
                         },
                         "email_footer": {
                           "type": "string",
                           "description": "HTML content for the email footer",
-                          "example": "<p>Thank you for shopping with us!</p>"
+                          "example": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p>"
                         },
                         "show_email_footer": {
                           "type": "string",
@@ -104,14 +104,27 @@
                 },
                 "example": {
                   "data": {
-                    "from_name": "My Store",
-                    "from_email": "store@example.com",
-                    "reply_to_name": "",
-                    "reply_to_email": "",
-                    "email_footer": "<p>Thank you for shopping with us!</p>",
+                    "from_name": "TechStore",
+                    "from_email": "orders@example.com",
+                    "reply_to_name": "TechStore Support",
+                    "reply_to_email": "support@example.com",
+                    "email_footer": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p><p>456 Market Street, San Francisco, CA 94102</p>",
                     "show_email_footer": "yes",
                     "admin_email": "{{wp.admin_email}}",
-                    "notification_config": {}
+                    "notification_config": {
+                      "order_paid_admin": {
+                        "active": "yes"
+                      },
+                      "order_paid_customer": {
+                        "active": "yes"
+                      },
+                      "order_refunded_admin": {
+                        "active": "yes"
+                      },
+                      "order_refunded_customer": {
+                        "active": "yes"
+                      }
+                    }
                   },
                   "shortcodes": [
                     {
@@ -173,7 +186,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

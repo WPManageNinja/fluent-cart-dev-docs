@@ -176,7 +176,47 @@
                   }
                 },
                 "example": {
-                  "data": {}
+                  "data": {
+                    "by_payment_method": [
+                      {
+                        "label": "Stripe",
+                        "orders": 230,
+                        "revenue": 850000
+                      },
+                      {
+                        "label": "PayPal",
+                        "orders": 95,
+                        "revenue": 320000
+                      },
+                      {
+                        "label": "Cash on Delivery",
+                        "orders": 17,
+                        "revenue": 80000
+                      }
+                    ],
+                    "by_billing_country": [
+                      {
+                        "label": "US",
+                        "orders": 120,
+                        "revenue": 680000
+                      },
+                      {
+                        "label": "GB",
+                        "orders": 35,
+                        "revenue": 195000
+                      },
+                      {
+                        "label": "DE",
+                        "orders": 22,
+                        "revenue": 118000
+                      },
+                      {
+                        "label": "CA",
+                        "orders": 18,
+                        "revenue": 95000
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -192,7 +232,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

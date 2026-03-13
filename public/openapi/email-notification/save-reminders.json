@@ -193,7 +193,22 @@
                   }
                 },
                 "example": {
-                  "data": {},
+                  "data": {
+                    "reminders_enabled": "yes",
+                    "invoice_reminders_enabled": "yes",
+                    "invoice_reminder_due_days": 3,
+                    "invoice_reminder_overdue_days": "1,3,7",
+                    "yearly_renewal_reminders_enabled": "yes",
+                    "yearly_renewal_reminder_days": 30,
+                    "trial_end_reminders_enabled": "yes",
+                    "trial_end_reminder_days": 3,
+                    "monthly_renewal_reminders_enabled": "no",
+                    "monthly_renewal_reminder_days": 7,
+                    "quarterly_renewal_reminders_enabled": "no",
+                    "quarterly_renewal_reminder_days": 14,
+                    "half_yearly_renewal_reminders_enabled": "no",
+                    "half_yearly_renewal_reminder_days": 14
+                  },
                   "message": "Scheduling settings saved successfully"
                 }
               }
@@ -229,7 +244,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

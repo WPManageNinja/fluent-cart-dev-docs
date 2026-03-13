@@ -84,6 +84,12 @@
               "application/json": {
                 "schema": {
                   "type": "object"
+                },
+                "example": {
+                  "message": "PayPal account connected successfully",
+                  "merchant_id": "MERCHANTID1234567",
+                  "mode": "live",
+                  "webhook_id": "WH-LIVE-80021663MN711374V"
                 }
               }
             }
@@ -99,7 +105,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

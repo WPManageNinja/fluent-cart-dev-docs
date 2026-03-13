@@ -81,6 +81,9 @@
                       "example": "Successfully updated the role(s)."
                     }
                   }
+                },
+                "example": {
+                  "message": "Successfully updated the role(s)."
                 }
               }
             }
@@ -105,6 +108,12 @@
                         }
                       }
                     }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "Sorry, You can not update permissions. Only administrators can update permissions"
                   }
                 }
               }

@@ -211,25 +211,46 @@
                     "current_page": 1,
                     "data": [
                       {
-                        "id": 1,
-                        "uuid": "abc123-def456",
+                        "id": 15,
+                        "uuid": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
                         "status": "active",
-                        "item_name": "Pro Plan",
-                        "parent_order_id": 10,
-                        "customer_id": 5,
-                        "product_id": 3,
-                        "variation_id": 7,
-                        "vendor_subscription_id": "sub_1234567890",
-                        "vendor_customer_id": "cus_abc123",
-                        "vendor_plan_id": "price_xyz789",
+                        "item_name": "Developer Toolkit Pro - Business Annual",
+                        "parent_order_id": 42,
+                        "customer_id": 12,
+                        "product_id": 123,
+                        "variation_id": 457,
+                        "vendor_subscription_id": "sub_1QxR3nH",
+                        "vendor_customer_id": "cus_Qx7K9mN3pR",
+                        "vendor_plan_id": "price_1Px8KLM",
+                        "current_payment_method": "stripe",
+                        "billing_interval": "yearly",
+                        "recurring_amount": 9900,
+                        "bill_times": 0,
+                        "bill_count": 1,
+                        "next_billing_date": "2026-09-20 14:25:00",
+                        "created_at": "2025-09-20 14:25:00",
+                        "updated_at": "2025-09-20 14:25:30"
+                      },
+                      {
+                        "id": 16,
+                        "uuid": "b4e8d2c3-0f5e-5b9c-c6d7-e8f9a0123456",
+                        "status": "trialing",
+                        "item_name": "CloudSync Starter - Monthly",
+                        "parent_order_id": 45,
+                        "customer_id": 18,
+                        "product_id": 130,
+                        "variation_id": 462,
+                        "vendor_subscription_id": "sub_2RyS4oI",
+                        "vendor_customer_id": "cus_Ry8L0nO4qS",
+                        "vendor_plan_id": "price_2Qy9LMN",
                         "current_payment_method": "stripe",
                         "billing_interval": "monthly",
-                        "recurring_amount": 2999,
-                        "bill_times": 0,
-                        "bill_count": 6,
-                        "next_billing_date": "2025-02-15 00:00:00",
-                        "created_at": "2025-01-15 10:30:00",
-                        "updated_at": "2025-01-15 10:35:00"
+                        "recurring_amount": 1900,
+                        "bill_times": 12,
+                        "bill_count": 0,
+                        "next_billing_date": "2026-04-15 09:00:00",
+                        "created_at": "2026-03-01 09:00:00",
+                        "updated_at": "2026-03-01 09:00:15"
                       }
                     ],
                     "per_page": 10,
@@ -252,12 +273,12 @@
           "id": {
             "type": "integer",
             "description": "Subscription ID",
-            "example": 1
+            "example": 15
           },
           "uuid": {
             "type": "string",
             "description": "Subscription UUID",
-            "example": "abc123-def456"
+            "example": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
           },
           "status": {
             "type": "string",
@@ -267,43 +288,43 @@
           "item_name": {
             "type": "string",
             "description": "Item name",
-            "example": "Pro Plan"
+            "example": "Developer Toolkit Pro - Business Annual"
           },
           "parent_order_id": {
             "type": "integer",
             "description": "Parent order ID",
-            "example": 10
+            "example": 42
           },
           "customer_id": {
             "type": "integer",
             "description": "Customer ID",
-            "example": 5
+            "example": 12
           },
           "product_id": {
             "type": "integer",
             "description": "Product ID",
-            "example": 3
+            "example": 123
           },
           "variation_id": {
             "type": "integer",
             "description": "Variation ID",
-            "example": 7
+            "example": 457
           },
           "vendor_subscription_id": {
             "type": "string",
             "description": "Vendor subscription ID",
-            "example": "sub_1234567890"
+            "example": "sub_1QxR3nH"
           },
           "vendor_customer_id": {
             "type": "string",
             "description": "Vendor customer ID",
-            "example": "cus_abc123"
+            "example": "cus_Qx7K9mN3pR"
           },
           "vendor_plan_id": {
             "type": "string",
             "nullable": true,
             "description": "Vendor plan ID",
-            "example": "price_xyz789"
+            "example": "price_1Px8KLM"
           },
           "current_payment_method": {
             "type": "string",
@@ -313,12 +334,12 @@
           "billing_interval": {
             "type": "string",
             "description": "Billing interval (e.g., monthly, yearly)",
-            "example": "monthly"
+            "example": "yearly"
           },
           "recurring_amount": {
             "type": "integer",
             "description": "Recurring amount in cents",
-            "example": 2999
+            "example": 9900
           },
           "bill_times": {
             "type": "integer",
@@ -328,25 +349,25 @@
           "bill_count": {
             "type": "integer",
             "description": "Number of completed billing cycles",
-            "example": 6
+            "example": 1
           },
           "next_billing_date": {
             "type": "string",
             "format": "date-time",
             "description": "Next billing date in GMT",
-            "example": "2025-02-15 00:00:00"
+            "example": "2026-09-20 14:25:00"
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "description": "Creation timestamp",
-            "example": "2025-01-15 10:30:00"
+            "example": "2025-09-20 14:25:00"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time",
             "description": "Last update timestamp",
-            "example": "2025-01-15 10:35:00"
+            "example": "2025-09-20 14:25:30"
           }
         }
       },

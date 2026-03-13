@@ -90,6 +90,14 @@
                     "USD": {
                       "code": "USD",
                       "sign": "$"
+                    },
+                    "EUR": {
+                      "code": "EUR",
+                      "sign": "€"
+                    },
+                    "GBP": {
+                      "code": "GBP",
+                      "sign": "£"
                     }
                   },
                   "min_date": "2024-01-15 08:30:00",
@@ -110,7 +118,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

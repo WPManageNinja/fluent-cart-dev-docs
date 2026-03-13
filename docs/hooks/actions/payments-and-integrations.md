@@ -161,6 +161,8 @@ add_action('fluent_cart/payment_success', function ($data) {
 <details>
 <summary><code>fluent_cart/payment_failed</code> &mdash; Fires when an Airwallex payment fails</summary>
 
+> **Note:** This hook is fired by multiple payment gateways with different parameter structures. See the gateway-specific documentation for exact parameters. The Airwallex variant passes `order` and `payment_intent`; the Mollie variant (Pro) passes `order`, `transaction`, `old_payment_status`, `new_payment_status`, and `reason`.
+
 **When it runs:**
 This action fires inside the Airwallex gateway handler when a payment intent is determined to have failed. The order status and payment status are both set to `failed` before this hook runs.
 
@@ -231,6 +233,8 @@ add_action('fluent_cart/register_payment_methods', function ($data) {
 
 **When it runs:**
 This action fires after a payment method's frontend UI (logo or radio button) has been rendered on the checkout form. The `{$route}` is the gateway's route identifier. Note that this hook uses a **hyphenated** prefix (`fluent-cart/`) rather than the usual underscored prefix.
+
+> **Deprecated since 1.4.0.** Use `fluent_cart/after_render_payment_method_{$route}` instead. The hyphenated prefix still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
 
 **Parameters:**
 
@@ -631,6 +635,8 @@ add_action('fluent_cart/payments/mollie/webhook_payment_paid', function ($mollie
 ### <code> payment_failed (Mollie) </code>
 <details>
 <summary><code>fluent_cart/payment_failed</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a Mollie payment fails, is canceled, or expires</summary>
+
+> **Note:** This hook is fired by multiple payment gateways with different parameter structures. See the gateway-specific documentation for exact parameters. The Mollie variant passes `order`, `transaction`, `old_payment_status`, `new_payment_status`, and `reason`; the Airwallex variant passes `order` and `payment_intent`.
 
 **When it runs:**
 This action fires inside the Mollie IPN handler when a payment is determined to have failed, been canceled, or expired. The order status and payment status are updated before this hook runs. Note that this is the same `fluent_cart/payment_failed` hook used by the base plugin for Airwallex; the Pro plugin adds Mollie as an additional source that fires it.

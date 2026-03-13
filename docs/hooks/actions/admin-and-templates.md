@@ -272,6 +272,8 @@ Hooks for the custom FluentCart block editor used to compose email templates. Th
 **When it runs:**
 Fires at the end of `FluentCartBlockEditorHandler::enqueueEditorStyles()`, after all core WordPress block editor styles (`wp-edit-post`, `wp-block-library`, etc.) have been enqueued. WordPress's own `wp_enqueue_editor_format_library_assets` is also attached to this hook. Use it to add custom styles or scripts to the email block editor.
 
+> **Deprecated since 1.4.0.** Use `fluent_cart/enqueue_block_editor_assets` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
+
 **Parameters:**
 
 None.
@@ -916,6 +918,8 @@ Dynamic hooks for custom web route endpoints. Used primarily by payment gateways
 
 **When it runs:**
 Fires inside `WebRoutes` when the current FluentCart web route `$page` slug matches a registered action. After the action fires, `die()` is called immediately — your callback must handle the full response (headers, body, exit). This is typically used by payment gateway modules to register IPN/webhook listeners (e.g. `fluent_cart_action_stripe_ipn`).
+
+> **Deprecated since 1.4.0.** Use `fluent_cart/action_{$page}` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
 
 **Parameters:**
 

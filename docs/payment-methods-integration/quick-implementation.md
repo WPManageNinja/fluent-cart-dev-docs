@@ -850,7 +850,7 @@ Key hooks to be aware of:
    - `fluent_cart/subscription_created`
    - `fluent_cart/subscription_activated`
    - `fluent_cart/subscription_renewed`
-   - `fluent_cart/subscription_cancelled`
+   - `fluent_cart/subscription_canceled`
 
    <!-- add data passed with these hooks  -->
    ``` php

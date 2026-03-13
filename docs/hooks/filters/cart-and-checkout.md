@@ -747,6 +747,8 @@ This filter fires when rendering each individual payment method option in both t
 
 > **Note:** This hook uses a non-standard prefix (`fluent_cart_`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
 
+> **Deprecated since 1.4.0.** Use `fluent_cart/payment_method_list_class` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
+
 **Source:**
 - `app/Services/Renderer/CheckoutRenderer.php:797`
 - `app/Services/Renderer/ModalCheckoutRenderer.php:569`

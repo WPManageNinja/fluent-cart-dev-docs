@@ -412,6 +412,8 @@ add_action('fluent_cart/before_checkout_page_start', function ($data) {
 **When it runs:**
 This action fires right after the main checkout page `<div>` wrapper opens. Note the typo in the hook name (`afrer` instead of `after`) — this matches the actual hook name in the source code and must be used as-is.
 
+> **Deprecated since 1.4.0.** Use `fluent_cart/after_checkout_page_start` instead. The typo'd name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
+
 **Parameters:**
 
 - `$data` (array): The current cart

@@ -72,6 +72,8 @@ Applied when building the list of order statuses an admin can manually set on an
 
 > **Note:** This hook uses a non-standard hyphenated prefix (`fluent-cart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
 
+> **Deprecated since 1.4.0.** Use `fluent_cart/editable_order_statuses` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
+
 **Parameters:**
 - `$statuses` (array): Associative array of editable statuses (key => translated label)
     ```php
@@ -197,6 +199,8 @@ add_filter('fluent-cart/transaction_statuses', function ($statuses, $data) {
 Applied when building the list of transaction statuses that an admin can manually set.
 
 > **Note:** This hook uses a non-standard hyphenated prefix (`fluent-cart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+
+> **Deprecated since 1.4.0.** Use `fluent_cart/editable_transaction_statuses` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
 
 **Parameters:**
 - `$statuses` (array): Associative array of editable transaction statuses (key => translated label)
@@ -817,6 +821,8 @@ Applied when generating the URL the customer is redirected to after a successful
 
 > **Note:** This hook uses a non-standard prefix (`fluentcart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
 
+> **Deprecated since 1.4.0.** Use `fluent_cart/payment/success_url` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
+
 **Parameters:**
 - `$url` (string): The success redirect URL (receipt page with query args)
 - `$context` (array): Context data
@@ -931,6 +937,8 @@ add_filter('fluent_cart/transaction/url_stripe', function ($url, $context) {
 Applied when generating the public-facing receipt page URL for a transaction, typically used in email notifications and customer-facing links.
 
 > **Note:** This hook uses a non-standard prefix (`fluentcart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+
+> **Deprecated since 1.4.0.** Use `fluent_cart/transaction/receipt_page_url` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
 
 **Parameters:**
 - `$url` (string): The receipt page URL with `trx_hash` query parameter
@@ -1682,7 +1690,7 @@ Applied when determining the tax category for a product in Paddle. Paddle uses t
 
 **Returns:** `string` — The Paddle tax category (e.g., `'standard'`, `'digital-goods'`, `'saas'`)
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Product.php`
 
 **Usage:**
 ```php
@@ -1704,7 +1712,7 @@ Applied when resolving the Paddle price ID for a one-time payment product.
 
 **Returns:** `string` — The modified Paddle price ID
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Price.php`
 
 **Usage:**
 ```php
@@ -1726,7 +1734,7 @@ Applied when resolving the Paddle price ID for a recurring subscription product.
 
 **Returns:** `string` — The modified Paddle recurring price ID
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Price.php`
 
 **Usage:**
 ```php
@@ -1748,7 +1756,7 @@ Applied when resolving the Paddle discount ID to apply during checkout.
 
 **Returns:** `string` — The modified Paddle discount ID
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Price.php`
 
 **Usage:**
 ```php
@@ -1770,7 +1778,7 @@ Applied when determining the Paddle product type for subscription items.
 
 **Returns:** `string` — The modified Paddle product type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php`
 
 **Usage:**
 ```php
@@ -1792,7 +1800,7 @@ Applied when determining the Paddle price type for subscription items.
 
 **Returns:** `string` — The modified Paddle price type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php`
 
 **Usage:**
 ```php
@@ -1814,7 +1822,7 @@ Applied when determining the Paddle price type for subscription signup fees.
 
 **Returns:** `string` — The modified Paddle signup fee price type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php`
 
 **Usage:**
 ```php
@@ -1836,7 +1844,7 @@ Applied when resolving the Paddle product ID for one-time payment items.
 
 **Returns:** `string` — The modified Paddle product ID
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php`
 
 **Usage:**
 ```php
@@ -1858,7 +1866,7 @@ Applied when determining the Paddle product type for one-time payment items.
 
 **Returns:** `string` — The modified Paddle product type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php`
 
 **Usage:**
 ```php
@@ -1880,7 +1888,7 @@ Applied when determining the Paddle price type for one-time payment items.
 
 **Returns:** `string` — The modified Paddle price type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php`
 
 **Usage:**
 ```php
@@ -1902,7 +1910,7 @@ Applied when determining the Paddle product type for add-on items.
 
 **Returns:** `string` — The modified Paddle add-on product type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php`
 
 **Usage:**
 ```php
@@ -1924,7 +1932,7 @@ Applied when determining how discounts are applied in Paddle transactions.
 
 **Returns:** `string` — The modified discount mode
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php`
 
 **Usage:**
 ```php
@@ -1953,7 +1961,7 @@ Applied when checking which currencies are supported by the Authorize.net gatewa
 
 **Returns:** `array` — The modified array of supported currency codes
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetHelper.php`
 
 **Usage:**
 ```php

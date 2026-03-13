@@ -618,6 +618,8 @@ add_action('fluent_cart/order_paid_done', function ($data) {
 **When it runs:**
 Enqueued by `OrderPaid::afterDispatch()` as an Action Scheduler async action. The handler in `app/Hooks/actions.php` validates the order, clears the scheduler meta, and then dispatches `fluent_cart/order_paid_done`. It is also dispatched manually in `IntegrationEventListener` for retry scenarios. **You should generally hook into `order_paid_done` instead of this hook.**
 
+> **Deprecated since 1.4.0.** Use `fluent_cart/order_paid_async_private_handle` instead. The typo'd name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
+
 **Parameters:**
 
 - `$data` (array): Order identifier

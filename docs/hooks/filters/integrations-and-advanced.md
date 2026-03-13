@@ -29,7 +29,7 @@ This filter is applied when retrieving the list of all registered order integrat
 **Returns:**
 - `$integrations` (array): The modified integrations array
 
-**Source:** `IntegrationEventListener.php:54,247,386`, `IntegrationController.php:96,150`, `ProductIntegrationsController.php:18,48`, `GlobalIntegrationSettings.php:84`, `AddOnModule.php:16`
+**Source:** `app/Listeners/IntegrationEventListener.php:54,247,386`, `app/Http/Controllers/IntegrationController.php:96,150`, `app/Http/Controllers/ProductIntegrationsController.php:18,48`, `app/Modules/Integrations/GlobalIntegrationSettings.php:84`, `app/Modules/Integrations/AddOnModule.php:16`
 
 **Usage:**
 ```php
@@ -60,7 +60,7 @@ This filter controls whether integration actions should be dispatched asynchrono
 **Returns:**
 - `$async` (bool): Whether to run actions asynchronously
 
-**Source:** `IntegrationEventListener.php:145`
+**Source:** `app/Listeners/IntegrationEventListener.php:145`
 
 **Usage:**
 ```php
@@ -96,7 +96,7 @@ This filter is applied when retrieving the list of available global notification
 **Returns:**
 - `$types` (array): The modified notification types array
 
-**Source:** `GlobalIntegrationSettings.php:119`
+**Source:** `app/Modules/Integrations/GlobalIntegrationSettings.php:119`
 
 **Usage:**
 ```php
@@ -124,7 +124,7 @@ This dynamic filter is applied when retrieving notification feed data for a spec
 **Returns:**
 - `$feedData` (array): The modified feed data
 
-**Source:** `GlobalIntegrationSettings.php:151`
+**Source:** `app/Modules/Integrations/GlobalIntegrationSettings.php:151`
 
 **Usage:**
 ```php
@@ -158,7 +158,7 @@ This filter is applied when retrieving available global integration actions that
 **Returns:**
 - `$actions` (array): The modified integration actions array
 
-**Source:** `GlobalIntegrationActionHandler.php:22`
+**Source:** `app/Modules/IntegrationActions/GlobalIntegrationActionHandler.php:22`
 
 **Usage:**
 ```php
@@ -186,7 +186,7 @@ This dynamic filter controls whether a specific notification feed should be disp
 **Returns:**
 - `$async` (bool): Whether to use async processing
 
-**Source:** `GlobalNotificationHandler.php:104`
+**Source:** `app/Modules/Integrations/GlobalNotificationHandler.php:104`
 
 **Usage:**
 ```php
@@ -215,7 +215,7 @@ This dynamic filter is applied when retrieving settings for a specific integrati
 **Returns:**
 - `$settings` (array): The modified settings array
 
-**Source:** `GlobalIntegrationSettings.php:24`
+**Source:** `app/Modules/Integrations/GlobalIntegrationSettings.php:24`
 
 **Usage:**
 ```php
@@ -241,7 +241,7 @@ This dynamic filter is applied when retrieving field definitions for a specific 
 **Returns:**
 - `$fields` (array): The modified field definitions
 
-**Source:** `GlobalIntegrationSettings.php:25`
+**Source:** `app/Modules/Integrations/GlobalIntegrationSettings.php:25`
 
 **Usage:**
 ```php
@@ -270,7 +270,7 @@ This dynamic filter is applied when retrieving default settings for a specific i
 **Returns:**
 - `$defaults` (array): The modified defaults
 
-**Source:** `GlobalIntegrationSettings.php:199,201`
+**Source:** `app/Modules/Integrations/GlobalIntegrationSettings.php:199,201`
 
 **Usage:**
 ```php
@@ -296,7 +296,7 @@ This dynamic filter is applied when retrieving the settings field definitions fo
 **Returns:**
 - `$fields` (array): The modified field definitions
 
-**Source:** `GlobalIntegrationSettings.php:204,276`, `IntegrationHelper.php:27`
+**Source:** `app/Modules/Integrations/GlobalIntegrationSettings.php:204,276`, `app/Modules/Integrations/IntegrationHelper.php:27`
 
 **Usage:**
 ```php
@@ -327,7 +327,7 @@ This dynamic filter is applied just before integration settings are saved to the
 **Returns:**
 - `$integration` (Meta): The modified Meta model
 
-**Source:** `GlobalIntegrationSettings.php:248`
+**Source:** `app/Modules/Integrations/GlobalIntegrationSettings.php:248`
 
 **Usage:**
 ```php
@@ -358,7 +358,7 @@ This dynamic filter is applied when retrieving merge fields for a specific integ
 **Returns:**
 - `$list` (array): The modified merge fields
 
-**Source:** `GlobalIntegrationSettings.php:369`
+**Source:** `app/Modules/Integrations/GlobalIntegrationSettings.php:369`
 
 **Usage:**
 ```php
@@ -387,7 +387,7 @@ This dynamic filter is applied when retrieving option values for an integration 
 **Returns:**
 - `$options` (array): The modified options
 
-**Source:** `IntegrationController.php:302`
+**Source:** `app/Http/Controllers/IntegrationController.php:302`
 
 **Usage:**
 ```php
@@ -416,7 +416,7 @@ This dynamic filter is applied to integration data before it undergoes validatio
 **Returns:**
 - `$validatedData` (array): The modified data
 
-**Source:** `IntegrationHelper.php:62`
+**Source:** `app/Modules/Integrations/IntegrationHelper.php:62`
 
 **Usage:**
 ```php
@@ -445,7 +445,7 @@ This dynamic filter is applied when an integration is being loaded for editing i
 **Returns:**
 - `$data` (array): The modified integration data
 
-**Source:** `IntegrationHelper.php:80`
+**Source:** `app/Modules/Integrations/IntegrationHelper.php:80`
 
 **Usage:**
 ```php
@@ -477,7 +477,7 @@ This filter is applied when retrieving the list of available integration addons 
 **Returns:**
 - `$addons` (array): The modified addons array
 
-**Source:** `AddonsController.php:87`
+**Source:** `app/Http/Controllers/AddonsController.php:87`
 
 **Usage:**
 ```php
@@ -507,7 +507,7 @@ This filter is applied when retrieving the list of recommended plugins that can 
 **Returns:**
 - `$plugins` (array): The modified plugins array
 
-**Source:** `AddonsController.php:121`, `GlobalIntegrationSettings.php:396`
+**Source:** `app/Http/Controllers/AddonsController.php:121`, `app/Modules/Integrations/GlobalIntegrationSettings.php:396`
 
 **Usage:**
 ```php
@@ -616,7 +616,7 @@ This filter controls how long a download link remains valid for customer-facing 
 **Returns:**
 - `$minutes` (int): The modified validity in minutes
 
-**Source:** `Helper.php:1430`
+**Source:** `app/Helpers/Helper.php:1430`
 
 **Usage:**
 ```php
@@ -899,6 +899,8 @@ This filter is applied when retrieving the full list of countries.
 
 > **Note:** This hook uses a non-standard hyphenated prefix (`fluent-cart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
 
+> **Deprecated since 1.4.0.** Use `fluent_cart/util/countries` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
+
 **Parameters:**
 
 - `$options` (array): Array of country code => country name pairs
@@ -906,7 +908,7 @@ This filter is applied when retrieving the full list of countries.
 **Returns:**
 - `$options` (array): The modified country list
 
-**Source:** `Helper.php:1140`
+**Source:** `app/Helpers/Helper.php:1140`
 
 **Usage:**
 ```php
@@ -1620,7 +1622,7 @@ This filter is applied when sanitizing a site URL during license activation or v
 **Returns:**
 - `$url` (string): The modified sanitized URL
 
-**Source:** `LicenseHelper.php:36`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:36`
 
 **Usage:**
 ```php
@@ -1684,7 +1686,7 @@ This filter is applied when checking if a URL matches known staging subdomain pa
 **Returns:**
 - `$patterns` (array): The modified patterns array
 
-**Source:** `LicenseHelper.php:619`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:619`
 
 **Usage:**
 ```php
@@ -1710,7 +1712,7 @@ This filter is applied when checking if a URL matches known staging subfolder pa
 **Returns:**
 - `$patterns` (array): The modified patterns array
 
-**Source:** `LicenseHelper.php:620`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:620`
 
 **Usage:**
 ```php
@@ -1736,7 +1738,7 @@ This filter is applied when checking if a URL belongs to a known hosting provide
 **Returns:**
 - `$domains` (array): The modified domains array
 
-**Source:** `LicenseHelper.php:621`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:621`
 
 **Usage:**
 ```php
@@ -1763,7 +1765,7 @@ This filter is applied after all staging detection checks, providing the final d
 **Returns:**
 - `$isStaging` (bool): The modified staging detection result
 
-**Source:** `LicenseHelper.php:657`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:657`
 
 **Usage:**
 ```php
@@ -1925,7 +1927,7 @@ This filter is applied when calculating the license expiration date for a specif
 **Returns:**
 - `$timestamp` (int|false): The modified expiration timestamp
 
-**Source:** `LicenseHelper.php:81`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:81`
 
 **Usage:**
 ```php
@@ -1965,7 +1967,7 @@ This filter is applied when retrieving the default license validity settings for
 **Returns:**
 - `$validity` (array): The modified validity settings
 
-**Source:** `LicenseHelper.php:418`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:418`
 
 **Usage:**
 ```php
@@ -1994,7 +1996,7 @@ This filter controls the number of grace period days after a license expires bef
 **Returns:**
 - `$days` (int): The modified grace period
 
-**Source:** `LicenseHelper.php:687`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:687`
 
 **Usage:**
 ```php
@@ -2099,6 +2101,8 @@ This filter controls whether a specific user meta field should be sanitized duri
 
 > **Note:** This hook uses a non-standard prefix (`fluentcart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
 
+> **Deprecated since 1.4.0.** Use `fluent_cart/sanitize_user_meta` instead. The old name still works but triggers a deprecation notice when `WP_DEBUG` is enabled.
+
 **Parameters:**
 
 - `$sanitize` (bool): Whether to sanitize the field (default `true`)
@@ -2108,7 +2112,7 @@ This filter controls whether a specific user meta field should be sanitized duri
 **Returns:**
 - `$sanitize` (bool): Whether to sanitize
 
-**Source:** `WPUserConnect.php:219`
+**Source:** `fluent-cart-pro/app/Modules/Integrations/WPUserConnect.php:219`
 
 **Usage:**
 ```php

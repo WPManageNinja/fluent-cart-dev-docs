@@ -58,6 +58,14 @@
               },
               "example": {
                 "plugin_file": "fluent-cart-pro/fluent-cart-pro.php"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "plugin_file": "fluent-cart-pro/fluent-cart-pro.php"
+                  }
+                }
               }
             }
           }
@@ -81,6 +89,14 @@
                 },
                 "example": {
                   "message": "Payment addon activated successfully!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Payment addon activated successfully!"
+                    }
+                  }
                 }
               }
             }

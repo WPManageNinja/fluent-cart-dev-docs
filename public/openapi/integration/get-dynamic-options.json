@@ -119,6 +119,23 @@
                       "title": "Another Product"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "options": [
+                        {
+                          "id": "123",
+                          "title": "Example Product"
+                        },
+                        {
+                          "id": "456",
+                          "title": "Another Product"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

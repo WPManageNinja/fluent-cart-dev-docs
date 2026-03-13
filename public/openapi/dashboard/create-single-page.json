@@ -71,6 +71,16 @@
                 "content": "shop_page_id",
                 "page_name": "Shop",
                 "save_settings": true
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "content": "shop_page_id",
+                    "page_name": "Shop",
+                    "save_settings": true
+                  }
+                }
               }
             }
           }
@@ -107,6 +117,16 @@
                   "page_id": "156",
                   "page_name": "Shop",
                   "link": "https://example.com/shop/"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "page_id": "156",
+                      "page_name": "Shop",
+                      "link": "https://example.com/shop/"
+                    }
+                  }
                 }
               }
             }
@@ -128,6 +148,14 @@
                 },
                 "example": {
                   "message": "Unable to create page"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Unable to create page"
+                    }
+                  }
                 }
               }
             }

@@ -117,6 +117,26 @@
                     "for_shipping": 5
                   }
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "country_code": "IT",
+                    "overrides": [
+                      {
+                        "type": "standard",
+                        "rate": "22.0000",
+                        "for_shipping": 10
+                      },
+                      {
+                        "type": "reduced",
+                        "rate": "10.0000",
+                        "for_shipping": 5
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -140,6 +160,14 @@
                 },
                 "example": {
                   "message": "OSS tax override saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "OSS tax override saved successfully"
+                    }
+                  }
                 }
               }
             }
@@ -176,6 +204,17 @@
                   "message": "Validation failed for OSS tax override",
                   "errors": {
                     "country_code": "Select country of OSS registration"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Validation failed for OSS tax override",
+                      "errors": {
+                        "country_code": "Select country of OSS registration"
+                      }
+                    }
                   }
                 }
               }

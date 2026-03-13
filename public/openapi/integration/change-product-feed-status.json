@@ -103,6 +103,14 @@
                 },
                 "example": {
                   "message": "Integration status has been updated"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Integration status has been updated"
+                    }
+                  }
                 }
               }
             }
@@ -124,6 +132,14 @@
                 },
                 "example": {
                   "message": "Product ID and Notification ID are required"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Product ID and Notification ID are required"
+                    }
+                  }
                 }
               }
             }
@@ -145,6 +161,14 @@
                 },
                 "example": {
                   "message": "Notification not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Notification not found"
+                    }
+                  }
                 }
               }
             }

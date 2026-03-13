@@ -150,6 +150,47 @@
                       "order_items_count": 1
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "unfulfilledOrders": [
+                        {
+                          "id": 340,
+                          "customer_id": 112,
+                          "customer_name": "Emily Wilson",
+                          "total_amount": 199,
+                          "created_at": "2025-09-19 16:45:00",
+                          "order_items_count": 3
+                        },
+                        {
+                          "id": 339,
+                          "customer_id": 87,
+                          "customer_name": "James Rodriguez",
+                          "total_amount": 29,
+                          "created_at": "2025-09-19 14:20:00",
+                          "order_items_count": 1
+                        },
+                        {
+                          "id": 336,
+                          "customer_id": 156,
+                          "customer_name": "Anna Schmidt",
+                          "total_amount": 248,
+                          "created_at": "2025-09-18 12:15:00",
+                          "order_items_count": 4
+                        },
+                        {
+                          "id": 334,
+                          "customer_id": 128,
+                          "customer_name": "Maria Garcia",
+                          "total_amount": 99,
+                          "created_at": "2025-09-17 15:50:00",
+                          "order_items_count": 1
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

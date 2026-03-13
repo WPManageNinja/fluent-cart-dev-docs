@@ -115,6 +115,38 @@
                     }
                   ],
                   "status": "ACTIVE"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "id": "WH-LIVE-80021663MN711374V",
+                      "url": "https://example.com/wp-json/fluent-cart/v2/webhook/paypal",
+                      "event_types": [
+                        {
+                          "name": "PAYMENT.CAPTURE.COMPLETED",
+                          "description": "Payment capture completed"
+                        },
+                        {
+                          "name": "PAYMENT.CAPTURE.REFUNDED",
+                          "description": "Payment capture refunded"
+                        },
+                        {
+                          "name": "BILLING.SUBSCRIPTION.ACTIVATED",
+                          "description": "Subscription activated"
+                        },
+                        {
+                          "name": "BILLING.SUBSCRIPTION.CANCELLED",
+                          "description": "Subscription cancelled"
+                        },
+                        {
+                          "name": "BILLING.SUBSCRIPTION.PAYMENT.FAILED",
+                          "description": "Subscription payment failed"
+                        }
+                      ],
+                      "status": "ACTIVE"
+                    }
+                  }
                 }
               }
             }

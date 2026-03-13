@@ -171,6 +171,29 @@
                       "shipping_charge": 1500
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "shipping_methods": [
+                        {
+                          "id": 1,
+                          "title": "Standard Shipping",
+                          "is_enabled": "1",
+                          "shipping_charge": 500
+                        }
+                      ],
+                      "other_shipping_methods": [
+                        {
+                          "id": 2,
+                          "title": "International Shipping",
+                          "is_enabled": "1",
+                          "shipping_charge": 1500
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

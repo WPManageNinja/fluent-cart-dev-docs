@@ -276,6 +276,74 @@
                     "current_active": 128,
                     "overall_retention_rate": 70
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "retention_data": {
+                        "labels": [
+                          "Period 1",
+                          "Period 2",
+                          "Period 3",
+                          "Period 4",
+                          "Period 5",
+                          "Period 6",
+                          "Period 7",
+                          "Period 8",
+                          "Period 9",
+                          "Period 10",
+                          "Period 11",
+                          "Period 12"
+                        ],
+                        "retention_rates": [
+                          100,
+                          92,
+                          87,
+                          83,
+                          80,
+                          78,
+                          76,
+                          74,
+                          73,
+                          72,
+                          71,
+                          70
+                        ],
+                        "subscriber_counts": [
+                          183,
+                          168,
+                          159,
+                          152,
+                          146,
+                          143,
+                          139,
+                          135,
+                          134,
+                          132,
+                          130,
+                          128
+                        ],
+                        "churn_rates": [
+                          0,
+                          8,
+                          5.4,
+                          4.6,
+                          3.6,
+                          2.5,
+                          2.6,
+                          2.6,
+                          1.4,
+                          1.4,
+                          1.4,
+                          1.4
+                        ],
+                        "total_initial_subscribers": 183,
+                        "current_active": 128,
+                        "overall_retention_rate": 70
+                      }
+                    }
+                  }
                 }
               }
             }

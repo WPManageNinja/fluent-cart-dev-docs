@@ -376,6 +376,113 @@
                       "total_customers": 21
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "summary": {
+                        "total_customers": 215,
+                        "new_customers": 32,
+                        "returning_customers": 183
+                      },
+                      "previousSummary": {
+                        "total_customers": 185,
+                        "new_customers": 28,
+                        "returning_customers": 157
+                      },
+                      "fluctuations": {
+                        "total_customers": {
+                          "value": 16.2,
+                          "direction": "up"
+                        },
+                        "new_customers": {
+                          "value": 14.3,
+                          "direction": "up"
+                        },
+                        "returning_customers": {
+                          "value": 16.6,
+                          "direction": "up"
+                        }
+                      },
+                      "currentMetrics": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01",
+                          "new_customers": 8,
+                          "total_customers": 25
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-02",
+                          "new_customers": 12,
+                          "total_customers": 30
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-03",
+                          "new_customers": 6,
+                          "total_customers": 22
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-04",
+                          "new_customers": 10,
+                          "total_customers": 28
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-05",
+                          "new_customers": 15,
+                          "total_customers": 35
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-06",
+                          "new_customers": 9,
+                          "total_customers": 27
+                        }
+                      ],
+                      "previousMetrics": [
+                        {
+                          "year": "2024",
+                          "group": "2024-07",
+                          "new_customers": 6,
+                          "total_customers": 20
+                        },
+                        {
+                          "year": "2024",
+                          "group": "2024-08",
+                          "new_customers": 9,
+                          "total_customers": 24
+                        },
+                        {
+                          "year": "2024",
+                          "group": "2024-09",
+                          "new_customers": 5,
+                          "total_customers": 18
+                        },
+                        {
+                          "year": "2024",
+                          "group": "2024-10",
+                          "new_customers": 8,
+                          "total_customers": 22
+                        },
+                        {
+                          "year": "2024",
+                          "group": "2024-11",
+                          "new_customers": 11,
+                          "total_customers": 28
+                        },
+                        {
+                          "year": "2024",
+                          "group": "2024-12",
+                          "new_customers": 7,
+                          "total_customers": 21
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

@@ -143,6 +143,49 @@
                       }
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "settings": {
+                        "access_key": "AKIAIOSFODNN7EXAMPLE",
+                        "secret_key": "****",
+                        "bucket": "techstore-downloads",
+                        "region": "us-east-1",
+                        "is_active": true,
+                        "base_url": "https://techstore-downloads.s3.amazonaws.com"
+                      },
+                      "fields": {
+                        "s3_config": {
+                          "title": "S3 Configuration",
+                          "type": "section",
+                          "schema": {
+                            "access_key": {
+                              "label": "Access Key ID",
+                              "type": "text",
+                              "required": true
+                            },
+                            "secret_key": {
+                              "label": "Secret Access Key",
+                              "type": "password",
+                              "required": true
+                            },
+                            "bucket": {
+                              "label": "Bucket Name",
+                              "type": "text",
+                              "required": true
+                            },
+                            "region": {
+                              "label": "Region",
+                              "type": "select",
+                              "required": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

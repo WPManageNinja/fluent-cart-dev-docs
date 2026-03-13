@@ -74,6 +74,14 @@
               },
               "example": {
                 "active": "yes"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "active": "yes"
+                  }
+                }
               }
             }
           }
@@ -97,6 +105,14 @@
                 },
                 "example": {
                   "message": "Notification updated successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Notification updated successfully"
+                    }
+                  }
                 }
               }
             }
@@ -119,6 +135,14 @@
                 },
                 "example": {
                   "message": "Failed to update notification"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Failed to update notification"
+                    }
+                  }
                 }
               }
             }

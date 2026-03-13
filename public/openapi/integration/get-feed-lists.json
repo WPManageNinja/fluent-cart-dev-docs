@@ -117,6 +117,33 @@
                       "required": false
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "merge_fields": [
+                        {
+                          "key": "email",
+                          "label": "Email",
+                          "type": "text",
+                          "required": true
+                        },
+                        {
+                          "key": "first_name",
+                          "label": "First Name",
+                          "type": "text",
+                          "required": false
+                        },
+                        {
+                          "key": "last_name",
+                          "label": "Last Name",
+                          "type": "text",
+                          "required": false
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

@@ -116,6 +116,20 @@
                 "email_footer": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p>",
                 "admin_email": "admin@techstore.com",
                 "show_email_footer": "yes"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "from_name": "TechStore",
+                    "from_email": "orders@example.com",
+                    "reply_to_name": "TechStore Support",
+                    "reply_to_email": "support@example.com",
+                    "email_footer": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p>",
+                    "admin_email": "admin@techstore.com",
+                    "show_email_footer": "yes"
+                  }
+                }
               }
             }
           }
@@ -139,6 +153,14 @@
                 },
                 "example": {
                   "message": "Email settings saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Email settings saved successfully"
+                    }
+                  }
                 }
               }
             }
@@ -161,6 +183,14 @@
                 },
                 "example": {
                   "message": "Failed to save email settings"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Failed to save email settings"
+                    }
+                  }
                 }
               }
             }

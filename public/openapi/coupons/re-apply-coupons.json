@@ -111,6 +111,35 @@
                 "applied_coupons": [
                   3
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "order_uuid": "e7b3a1d4-5f2c-48e9-a6b1-c3d4e5f67890",
+                    "order_items": [
+                      {
+                        "post_id": 123,
+                        "quantity": 1,
+                        "price": 9900,
+                        "unit_price": 9900,
+                        "item_total": 9900,
+                        "line_total": 9900
+                      },
+                      {
+                        "post_id": 130,
+                        "quantity": 2,
+                        "price": 4900,
+                        "unit_price": 4900,
+                        "item_total": 9800,
+                        "line_total": 9800
+                      }
+                    ],
+                    "applied_coupons": [
+                      3
+                    ]
+                  }
+                }
               }
             }
           }
@@ -198,6 +227,41 @@
                       "discount_total": 1960
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "applied_coupons": {
+                        "WELCOME20": {
+                          "id": 3,
+                          "title": "Welcome Discount",
+                          "code": "WELCOME20",
+                          "type": "percent",
+                          "amount": 20,
+                          "discount_amount": 3940,
+                          "stackable": "no",
+                          "priority": 10
+                        }
+                      },
+                      "calculated_items": [
+                        {
+                          "post_id": 123,
+                          "quantity": 1,
+                          "price": 9900,
+                          "discounted_price": 7920,
+                          "discount_total": 1980
+                        },
+                        {
+                          "post_id": 130,
+                          "quantity": 2,
+                          "price": 4900,
+                          "discounted_price": 3920,
+                          "discount_total": 1960
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

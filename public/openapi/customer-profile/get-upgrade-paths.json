@@ -131,6 +131,31 @@
                       "prorated_amount": 15000
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "upgradePaths": [
+                        {
+                          "variation_id": 15,
+                          "title": "Premium Plugin - 5 Sites",
+                          "price": 9999,
+                          "billing_interval": "year",
+                          "upgrade_type": "upgrade",
+                          "prorated_amount": 5000
+                        },
+                        {
+                          "variation_id": 20,
+                          "title": "Premium Plugin - Unlimited Sites",
+                          "price": 19999,
+                          "billing_interval": "year",
+                          "upgrade_type": "upgrade",
+                          "prorated_amount": 15000
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -146,6 +171,14 @@
                   "example": {
                     "message": "You must be logged in to view upgrade paths."
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You must be logged in to view upgrade paths."
+                    }
+                  }
                 }
               }
             }
@@ -160,6 +193,14 @@
                 "schema": {
                   "example": {
                     "message": "Order not found or you do not have permission to view it."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Order not found or you do not have permission to view it."
+                    }
                   }
                 }
               }

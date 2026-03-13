@@ -74,6 +74,18 @@
                     "id": "activate_license",
                     "html": "<div>License deactivation message</div>"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "status": "deactivated",
+                      "notice": {
+                        "id": "activate_license",
+                        "html": "<div>License deactivation message</div>"
+                      }
+                    }
+                  }
                 }
               }
             }

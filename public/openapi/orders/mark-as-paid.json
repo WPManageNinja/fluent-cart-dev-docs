@@ -81,6 +81,16 @@
                 "payment_method": "offline_payment",
                 "vendor_charge_id": "CHK-12345",
                 "mark_paid_note": "Payment received via bank transfer"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "payment_method": "offline_payment",
+                    "vendor_charge_id": "CHK-12345",
+                    "mark_paid_note": "Payment received via bank transfer"
+                  }
+                }
               }
             }
           }
@@ -104,6 +114,14 @@
                 },
                 "example": {
                   "message": "Order has been marked as paid"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Order has been marked as paid"
+                    }
+                  }
                 }
               }
             }
@@ -125,6 +143,14 @@
                 },
                 "example": {
                   "message": "Order has already been paid"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Order has already been paid"
+                    }
+                  }
                 }
               }
             }

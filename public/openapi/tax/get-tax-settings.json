@@ -88,6 +88,31 @@
                       "oss_vat": "DE123456789"
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "settings": {
+                        "tax_inclusion": "included",
+                        "tax_calculation_basis": "shipping",
+                        "tax_rounding": "item",
+                        "enable_tax": "yes",
+                        "price_suffix": "",
+                        "eu_vat_settings": {
+                          "require_vat_number": "no",
+                          "local_reverse_charge": "yes",
+                          "vat_reverse_excluded_categories": [
+                            30,
+                            42
+                          ],
+                          "method": "oss",
+                          "oss_country": "DE",
+                          "oss_vat": "DE123456789"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

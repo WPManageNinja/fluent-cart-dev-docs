@@ -309,6 +309,63 @@
                     "total": 50,
                     "last_page": 5
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "current_page": 1,
+                        "data": [
+                          {
+                            "id": 15,
+                            "uuid": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                            "status": "active",
+                            "item_name": "Developer Toolkit Pro - Business Annual",
+                            "parent_order_id": 42,
+                            "customer_id": 12,
+                            "product_id": 123,
+                            "variation_id": 457,
+                            "vendor_subscription_id": "sub_1QxR3nH",
+                            "vendor_customer_id": "cus_Qx7K9mN3pR",
+                            "vendor_plan_id": "price_1Px8KLM",
+                            "current_payment_method": "stripe",
+                            "billing_interval": "yearly",
+                            "recurring_amount": 9900,
+                            "bill_times": 0,
+                            "bill_count": 1,
+                            "next_billing_date": "2026-09-20 14:25:00",
+                            "created_at": "2025-09-20 14:25:00",
+                            "updated_at": "2025-09-20 14:25:30"
+                          },
+                          {
+                            "id": 16,
+                            "uuid": "b4e8d2c3-0f5e-5b9c-c6d7-e8f9a0123456",
+                            "status": "trialing",
+                            "item_name": "CloudSync Starter - Monthly",
+                            "parent_order_id": 45,
+                            "customer_id": 18,
+                            "product_id": 130,
+                            "variation_id": 462,
+                            "vendor_subscription_id": "sub_2RyS4oI",
+                            "vendor_customer_id": "cus_Ry8L0nO4qS",
+                            "vendor_plan_id": "price_2Qy9LMN",
+                            "current_payment_method": "stripe",
+                            "billing_interval": "monthly",
+                            "recurring_amount": 1900,
+                            "bill_times": 12,
+                            "bill_count": 0,
+                            "next_billing_date": "2026-04-15 09:00:00",
+                            "created_at": "2026-03-01 09:00:00",
+                            "updated_at": "2026-03-01 09:00:15"
+                          }
+                        ],
+                        "per_page": 10,
+                        "total": 50,
+                        "last_page": 5
+                      }
+                    }
+                  }
                 }
               }
             }

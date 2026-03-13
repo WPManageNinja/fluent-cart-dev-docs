@@ -94,6 +94,17 @@
                   "message": "Snapshot generation queued",
                   "job_id": 1718456789,
                   "mode": "background"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "success": true,
+                      "message": "Snapshot generation queued",
+                      "job_id": 1718456789,
+                      "mode": "background"
+                    }
+                  }
                 }
               }
             }

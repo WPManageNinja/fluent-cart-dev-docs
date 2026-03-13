@@ -59,6 +59,14 @@
                   "example": {
                     "message": "Tax Class removed successfully"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Tax Class removed successfully"
+                    }
+                  }
                 }
               }
             }

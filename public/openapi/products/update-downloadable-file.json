@@ -127,6 +127,24 @@
                 "settings": {
                   "download_limit": 10
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "title": "Software v2.0",
+                    "type": "zip",
+                    "driver": "local",
+                    "file_name": "software-v2.zip",
+                    "product_variation_id": [
+                      456,
+                      457
+                    ],
+                    "settings": {
+                      "download_limit": 10
+                    }
+                  }
+                }
               }
             }
           }
@@ -142,6 +160,14 @@
                 "schema": {
                   "example": {
                     "message": "Product downloadable files updated successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Product downloadable files updated successfully"
+                    }
                   }
                 }
               }

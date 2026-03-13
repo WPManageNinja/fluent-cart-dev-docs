@@ -90,6 +90,17 @@
                   "newPaymentMethod": "paypal",
                   "currentPaymentMethod": "stripe"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "data": {
+                      "newPaymentMethod": "paypal",
+                      "currentPaymentMethod": "stripe"
+                    }
+                  }
+                }
               }
             }
           }
@@ -112,6 +123,14 @@
                 },
                 "example": {
                   "message": "Payment method switch initiated"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Payment method switch initiated"
+                    }
+                  }
                 }
               }
             }
@@ -128,6 +147,14 @@
                 },
                 "example": {
                   "message": "Could not switch payment method"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Could not switch payment method"
+                    }
+                  }
                 }
               }
             }

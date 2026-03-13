@@ -79,6 +79,18 @@
                   102,
                   103
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "bundle_child_ids": [
+                      101,
+                      102,
+                      103
+                    ]
+                  }
+                }
               }
             }
           }
@@ -99,7 +111,15 @@
                 },
                 "example": [
                   true
-                ]
+                ],
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": [
+                      true
+                    ]
+                  }
+                }
               }
             }
           }

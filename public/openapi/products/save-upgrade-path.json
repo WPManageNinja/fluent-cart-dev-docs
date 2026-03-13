@@ -102,6 +102,19 @@
                   458
                 ],
                 "discount_amount": 500
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "from_variant": 456,
+                    "to_variants": [
+                      457,
+                      458
+                    ],
+                    "discount_amount": 500
+                  }
+                }
               }
             }
           }
@@ -117,6 +130,14 @@
                 "schema": {
                   "example": {
                     "message": "Settings saved successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Settings saved successfully"
+                    }
                   }
                 }
               }

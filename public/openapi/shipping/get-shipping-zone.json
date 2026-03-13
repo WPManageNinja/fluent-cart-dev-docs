@@ -145,6 +145,54 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "shipping_zone": {
+                        "id": 1,
+                        "name": "Domestic",
+                        "region": "US",
+                        "order": 0,
+                        "formatted_region": "United States",
+                        "created_at": "2025-01-15 12:00:00",
+                        "updated_at": "2025-01-15 12:00:00",
+                        "methods": [
+                          {
+                            "id": 10,
+                            "zone_id": 1,
+                            "title": "Standard Shipping",
+                            "type": "flat_rate",
+                            "amount": 500,
+                            "is_enabled": true,
+                            "states": [
+                              "CA",
+                              "NY",
+                              "TX"
+                            ],
+                            "settings": {
+                              "configure_rate": "per_order",
+                              "class_aggregation": "per_class",
+                              "tax_status": "taxable"
+                            },
+                            "meta": {
+                              "min_amount": 0,
+                              "max_amount": 0
+                            },
+                            "order": 0,
+                            "formatted_states": [
+                              "California",
+                              "New York",
+                              "Texas"
+                            ],
+                            "created_at": "2025-01-15 12:30:00",
+                            "updated_at": "2025-01-15 12:30:00"
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

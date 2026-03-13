@@ -327,6 +327,37 @@
                     "total": 50,
                     "last_page": 5
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "licenses": {
+                        "current_page": 1,
+                        "data": [
+                          {
+                            "id": 1,
+                            "status": "active",
+                            "limit": 5,
+                            "activation_count": 2,
+                            "license_key": "DTPRO-A1B2-C3D4-E5F6",
+                            "product_id": 10,
+                            "variation_id": 15,
+                            "order_id": 42,
+                            "parent_id": null,
+                            "customer_id": 7,
+                            "expiration_date": "2026-01-15 00:00:00",
+                            "subscription_id": 3,
+                            "created_at": "2025-01-15 10:30:00",
+                            "updated_at": "2025-06-15 10:35:00"
+                          }
+                        ],
+                        "per_page": 10,
+                        "total": 50,
+                        "last_page": 5
+                      }
+                    }
+                  }
                 }
               }
             }

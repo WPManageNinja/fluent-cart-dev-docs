@@ -112,6 +112,27 @@
                       "created_at": "2025-03-12 09:15:00"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "activations": [
+                        {
+                          "site_url": "example.com",
+                          "is_local": 0,
+                          "status": "active",
+                          "created_at": "2025-03-10 14:22:00"
+                        },
+                        {
+                          "site_url": "staging.example.com",
+                          "is_local": 1,
+                          "status": "active",
+                          "created_at": "2025-03-12 09:15:00"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -133,6 +154,14 @@
                 },
                 "example": {
                   "message": "License not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "License not found"
+                    }
+                  }
                 }
               }
             }

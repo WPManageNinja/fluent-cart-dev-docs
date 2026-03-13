@@ -76,6 +76,18 @@
                     "value": "Returning Customer"
                   },
                   "message": "Label created successfully!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "id": 4,
+                        "value": "Returning Customer"
+                      },
+                      "message": "Label created successfully!"
+                    }
+                  }
                 }
               }
             }
@@ -112,6 +124,18 @@
                     "value": [
                       "Label must be unique."
                     ]
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "errors": {
+                        "value": [
+                          "Label must be unique."
+                        ]
+                      }
+                    }
                   }
                 }
               }

@@ -92,6 +92,20 @@
                   15
                 ],
                 "priority": 7
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "title": "Digital Goods",
+                    "description": "Tax class for digital products",
+                    "categories": [
+                      12,
+                      15
+                    ],
+                    "priority": 7
+                  }
+                }
               }
             }
           }
@@ -115,6 +129,14 @@
                 },
                 "example": {
                   "message": "Tax class has been created successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Tax class has been created successfully"
+                    }
+                  }
                 }
               }
             }
@@ -157,6 +179,19 @@
                     ]
                   },
                   "message": "Validation failed"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "errors": {
+                        "title": [
+                          "Tax class title is required."
+                        ]
+                      },
+                      "message": "Validation failed"
+                    }
+                  }
                 }
               }
             }

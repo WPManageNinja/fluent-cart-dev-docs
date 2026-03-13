@@ -79,6 +79,16 @@
                   "success": false,
                   "message": "Invalid package data",
                   "error_type": "invalid_package_data"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "success": false,
+                      "message": "Invalid package data",
+                      "error_type": "invalid_package_data"
+                    }
+                  }
                 }
               }
             }

@@ -81,6 +81,16 @@
                 "product_id": 123,
                 "notification_id": 10,
                 "status": "yes"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "product_id": 123,
+                    "notification_id": 10,
+                    "status": "yes"
+                  }
+                }
               }
             }
           }
@@ -96,6 +106,14 @@
                 "schema": {
                   "example": {
                     "message": "Integration status has been updated"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Integration status has been updated"
+                    }
                   }
                 }
               }

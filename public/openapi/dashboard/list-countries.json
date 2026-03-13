@@ -83,6 +83,27 @@
                       "value": "CA"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": [
+                        {
+                          "label": "United States",
+                          "value": "US"
+                        },
+                        {
+                          "label": "United Kingdom",
+                          "value": "GB"
+                        },
+                        {
+                          "label": "Canada",
+                          "value": "CA"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

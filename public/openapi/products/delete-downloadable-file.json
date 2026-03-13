@@ -59,6 +59,14 @@
                   "example": {
                     "message": "File deleted successfully"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "File deleted successfully"
+                    }
+                  }
                 }
               }
             }

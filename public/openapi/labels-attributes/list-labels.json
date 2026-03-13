@@ -92,6 +92,29 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "labels": {
+                        "labels": [
+                          {
+                            "id": 1,
+                            "value": "VIP"
+                          },
+                          {
+                            "id": 2,
+                            "value": "Wholesale"
+                          },
+                          {
+                            "id": 3,
+                            "value": "Priority"
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

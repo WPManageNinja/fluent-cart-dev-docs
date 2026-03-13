@@ -67,6 +67,14 @@
                 },
                 "example": {
                   "message": "Tax rate has been deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Tax rate has been deleted successfully"
+                    }
+                  }
                 }
               }
             }

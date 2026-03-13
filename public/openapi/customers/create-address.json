@@ -165,6 +165,25 @@
                 "type": "billing",
                 "label": "Office",
                 "company_name": "TechStart Inc."
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "name": "Sarah Johnson",
+                    "email": "sarah.johnson@example.com",
+                    "address_1": "456 Market Street",
+                    "address_2": "Suite 300",
+                    "city": "San Francisco",
+                    "state": "CA",
+                    "postcode": "94102",
+                    "country": "US",
+                    "phone": "+1-415-555-0142",
+                    "type": "billing",
+                    "label": "Office",
+                    "company_name": "TechStart Inc."
+                  }
+                }
               }
             }
           }
@@ -227,6 +246,33 @@
                     "email": "sarah.johnson@example.com",
                     "company": "TechStart Inc.",
                     "meta": null
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Billing address created successfully!",
+                      "data": {
+                        "id": 25,
+                        "customer_id": 12,
+                        "is_primary": 1,
+                        "type": "billing",
+                        "status": "active",
+                        "label": "Office",
+                        "name": "Sarah Johnson",
+                        "address_1": "456 Market Street",
+                        "address_2": "Suite 300",
+                        "city": "San Francisco",
+                        "state": "CA",
+                        "postcode": "94102",
+                        "country": "US",
+                        "phone": "+1-415-555-0142",
+                        "email": "sarah.johnson@example.com",
+                        "company": "TechStart Inc.",
+                        "meta": null
+                      }
+                    }
                   }
                 }
               }

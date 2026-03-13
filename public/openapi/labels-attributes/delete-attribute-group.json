@@ -73,6 +73,15 @@
                 "example": {
                   "data": "",
                   "message": "Attribute group successfully deleted!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": "",
+                      "message": "Attribute group successfully deleted!"
+                    }
+                  }
                 }
               }
             }
@@ -101,6 +110,15 @@
                 "example": {
                   "message": "This group is already in use, can not be deleted.",
                   "code": 403
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "This group is already in use, can not be deleted.",
+                      "code": 403
+                    }
+                  }
                 }
               }
             }
@@ -129,6 +147,15 @@
                 "example": {
                   "message": "Attribute group not found in database, failed to remove.",
                   "code": 404
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Attribute group not found in database, failed to remove.",
+                      "code": 404
+                    }
+                  }
                 }
               }
             }

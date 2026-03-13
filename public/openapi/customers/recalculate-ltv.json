@@ -112,6 +112,36 @@
                     "created_at": "2025-06-10 09:15:00",
                     "updated_at": "2025-09-20 14:30:00"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Lifetime value recalculated successfully",
+                      "customer": {
+                        "id": 12,
+                        "user_id": 5,
+                        "email": "sarah.johnson@example.com",
+                        "first_name": "Sarah",
+                        "last_name": "Johnson",
+                        "full_name": "Sarah Johnson",
+                        "status": "active",
+                        "purchase_count": 3,
+                        "purchase_value": 24900,
+                        "ltv": 24900,
+                        "aov": 8300,
+                        "first_purchase_date": "2025-06-10 09:15:00",
+                        "last_purchase_date": "2025-09-20 14:25:00",
+                        "country": "US",
+                        "city": "San Francisco",
+                        "state": "CA",
+                        "postcode": "94102",
+                        "uuid": "cust_a1b2c3d4",
+                        "created_at": "2025-06-10 09:15:00",
+                        "updated_at": "2025-09-20 14:30:00"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -126,6 +156,14 @@
                 "schema": {
                   "example": {
                     "message": "Customer not found."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Customer not found."
+                    }
                   }
                 }
               }

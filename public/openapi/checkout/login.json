@@ -84,6 +84,16 @@
                 "user_login": "john@example.com",
                 "password": "securepassword123",
                 "remember_me": "on"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "user_login": "john@example.com",
+                    "password": "securepassword123",
+                    "remember_me": "on"
+                  }
+                }
               }
             }
           }
@@ -127,6 +137,18 @@
                   "data": {
                     "message": "Login successful",
                     "redirect_url": "https://your-site.com/customer-profile/#/profile"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "success": true,
+                      "data": {
+                        "message": "Login successful",
+                        "redirect_url": "https://your-site.com/customer-profile/#/profile"
+                      }
+                    }
                   }
                 }
               }
@@ -228,6 +250,18 @@
                     "message": "The password you entered for the username john@example.com is incorrect.",
                     "code": "login_failed"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "success": false,
+                      "data": {
+                        "message": "The password you entered for the username john@example.com is incorrect.",
+                        "code": "login_failed"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -254,6 +288,15 @@
                 "example": {
                   "message": "Invalid security token. Please refresh the page and try again.",
                   "code": "invalid_nonce"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Invalid security token. Please refresh the page and try again.",
+                      "code": "invalid_nonce"
+                    }
+                  }
                 }
               }
             }

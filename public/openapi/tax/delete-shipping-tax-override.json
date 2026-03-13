@@ -67,6 +67,14 @@
                 },
                 "example": {
                   "message": "Shipping override has been deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Shipping override has been deleted successfully"
+                    }
+                  }
                 }
               }
             }

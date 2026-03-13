@@ -398,6 +398,110 @@
                     }
                   ],
                   "appliedGroupKey": "monthly"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "revenueReport": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01",
+                          "gross_revenue": 420000,
+                          "net_revenue": 378000,
+                          "orders": 45
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-02",
+                          "gross_revenue": 480000,
+                          "net_revenue": 432000,
+                          "orders": 52
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-03",
+                          "gross_revenue": 510000,
+                          "net_revenue": 459000,
+                          "orders": 48
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-04",
+                          "gross_revenue": 390000,
+                          "net_revenue": 351000,
+                          "orders": 40
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-05",
+                          "gross_revenue": 550000,
+                          "net_revenue": 495000,
+                          "orders": 58
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-06",
+                          "gross_revenue": 620000,
+                          "net_revenue": 558000,
+                          "orders": 65
+                        }
+                      ],
+                      "summary": {
+                        "gross_revenue": 2970000,
+                        "net_revenue": 2673000,
+                        "total_orders": 308,
+                        "total_items_sold": 756,
+                        "total_tax": 185000,
+                        "total_shipping": 52000,
+                        "total_discounts": 60000
+                      },
+                      "previousSummary": {
+                        "gross_revenue": 2400000,
+                        "net_revenue": 2160000,
+                        "total_orders": 260,
+                        "total_items_sold": 640
+                      },
+                      "fluctuations": {
+                        "gross_revenue": {
+                          "value": 23.75,
+                          "direction": "up"
+                        },
+                        "net_revenue": {
+                          "value": 23.75,
+                          "direction": "up"
+                        },
+                        "total_orders": {
+                          "value": 18.46,
+                          "direction": "up"
+                        }
+                      },
+                      "previousMetrics": [
+                        {
+                          "year": "2024",
+                          "group": "2024-07",
+                          "gross_revenue": 350000,
+                          "net_revenue": 315000,
+                          "orders": 38
+                        },
+                        {
+                          "year": "2024",
+                          "group": "2024-08",
+                          "gross_revenue": 380000,
+                          "net_revenue": 342000,
+                          "orders": 42
+                        },
+                        {
+                          "year": "2024",
+                          "group": "2024-09",
+                          "gross_revenue": 410000,
+                          "net_revenue": 369000,
+                          "orders": 45
+                        }
+                      ],
+                      "appliedGroupKey": "monthly"
+                    }
+                  }
                 }
               }
             }

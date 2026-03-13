@@ -75,6 +75,15 @@
               "example": {
                 "taxonomy": "product-categories",
                 "term": 5
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "taxonomy": "product-categories",
+                    "term": 5
+                  }
+                }
               }
             }
           }
@@ -90,6 +99,14 @@
                 "schema": {
                   "example": {
                     "message": "Taxonomy term removed successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Taxonomy term removed successfully"
+                    }
                   }
                 }
               }

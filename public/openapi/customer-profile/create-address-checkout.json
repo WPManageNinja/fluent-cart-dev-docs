@@ -158,6 +158,22 @@
                 "billing_country": "US",
                 "billing_phone": "+1234567890",
                 "label": "Home"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "type": "billing",
+                    "billing_name": "John Doe",
+                    "billing_address_1": "123 Main St",
+                    "billing_city": "New York",
+                    "billing_state": "NY",
+                    "billing_postcode": "10001",
+                    "billing_country": "US",
+                    "billing_phone": "+1234567890",
+                    "label": "Home"
+                  }
+                }
               }
             }
           }
@@ -211,6 +227,21 @@
                       "type": "replace"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Customer address created successfully!",
+                      "fragment": [
+                        {
+                          "selector": "[data-fluent-cart-checkout-page-form-address-modal-address-selector-button-wrapper]",
+                          "content": "<div>...updated address selector HTML...</div>",
+                          "type": "replace"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -233,6 +264,19 @@
                     "errors": {
                       "billing_country": {
                         "required": "Country is required."
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "status": "failed",
+                      "errors": {
+                        "billing_country": {
+                          "required": "Country is required."
+                        }
                       }
                     }
                   }

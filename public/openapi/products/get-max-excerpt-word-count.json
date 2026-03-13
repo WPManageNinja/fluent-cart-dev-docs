@@ -48,6 +48,14 @@
                   "example": {
                     "count": 55
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "count": 55
+                    }
+                  }
                 }
               }
             }

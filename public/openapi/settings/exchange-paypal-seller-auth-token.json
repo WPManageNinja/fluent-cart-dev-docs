@@ -78,6 +78,16 @@
                 "authCode": "C21AAF...",
                 "sharedId": "AaBbCc...",
                 "mode": "live"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "authCode": "C21AAF...",
+                    "sharedId": "AaBbCc...",
+                    "mode": "live"
+                  }
+                }
               }
             }
           }
@@ -101,6 +111,17 @@
                   "merchant_id": "MERCHANTID1234567",
                   "mode": "live",
                   "webhook_id": "WH-LIVE-80021663MN711374V"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "PayPal account connected successfully",
+                      "merchant_id": "MERCHANTID1234567",
+                      "mode": "live",
+                      "webhook_id": "WH-LIVE-80021663MN711374V"
+                    }
+                  }
                 }
               }
             }

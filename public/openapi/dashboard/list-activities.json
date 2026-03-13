@@ -205,6 +205,32 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "activities": {
+                        "total": 156,
+                        "per_page": 10,
+                        "current_page": 1,
+                        "last_page": 16,
+                        "data": [
+                          {
+                            "id": 42,
+                            "title": "Order #1024 status changed",
+                            "content": "Order status changed from pending to completed",
+                            "status": "success",
+                            "log_type": "activity",
+                            "module_name": "orders",
+                            "read_status": "unread",
+                            "created_at": "2025-06-15 14:30:00",
+                            "updated_at": "2025-06-15 14:30:00"
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

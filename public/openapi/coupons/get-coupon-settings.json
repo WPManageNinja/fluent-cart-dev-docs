@@ -61,6 +61,16 @@
                   "show_on_checkout": 1,
                   "enable_coupons": true,
                   "auto_apply_coupons": false
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "show_on_checkout": 1,
+                      "enable_coupons": true,
+                      "auto_apply_coupons": false
+                    }
+                  }
                 }
               }
             }

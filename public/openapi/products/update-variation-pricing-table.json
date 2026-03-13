@@ -68,6 +68,14 @@
               },
               "example": {
                 "description": "Includes:\n- Feature A\n- Feature B\n- Priority Support"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "description": "Includes:\n- Feature A\n- Feature B\n- Priority Support"
+                  }
+                }
               }
             }
           }
@@ -83,6 +91,14 @@
                 "schema": {
                   "example": {
                     "message": "Pricing table updated successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Pricing table updated successfully"
+                    }
                   }
                 }
               }

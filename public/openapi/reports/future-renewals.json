@@ -139,6 +139,47 @@
                   ],
                   "total_expected_revenue": 1138500,
                   "total_renewals": 115
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "futureRenewals": [
+                        {
+                          "date": "2025-10-01",
+                          "count": 15,
+                          "expected_revenue": 148500
+                        },
+                        {
+                          "date": "2025-11-01",
+                          "count": 22,
+                          "expected_revenue": 217800
+                        },
+                        {
+                          "date": "2025-12-01",
+                          "count": 18,
+                          "expected_revenue": 178200
+                        },
+                        {
+                          "date": "2026-01-01",
+                          "count": 28,
+                          "expected_revenue": 277200
+                        },
+                        {
+                          "date": "2026-02-01",
+                          "count": 12,
+                          "expected_revenue": 118800
+                        },
+                        {
+                          "date": "2026-03-01",
+                          "count": 20,
+                          "expected_revenue": 198000
+                        }
+                      ],
+                      "total_expected_revenue": 1138500,
+                      "total_renewals": 115
+                    }
+                  }
                 }
               }
             }

@@ -70,6 +70,14 @@
               },
               "example": {
                 "tax_id": "DE123456789"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "tax_id": "DE123456789"
+                  }
+                }
               }
             }
           }
@@ -93,6 +101,14 @@
                 },
                 "example": {
                   "message": "Tax ID has been saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Tax ID has been saved successfully"
+                    }
+                  }
                 }
               }
             }

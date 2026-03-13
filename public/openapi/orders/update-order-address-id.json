@@ -79,6 +79,15 @@
               "example": {
                 "address_id": 5,
                 "address_type": "billing"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "address_id": 5,
+                    "address_type": "billing"
+                  }
+                }
               }
             }
           }
@@ -102,6 +111,14 @@
                 },
                 "example": {
                   "message": "Address updated successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Address updated successfully"
+                    }
+                  }
                 }
               }
             }
@@ -123,6 +140,14 @@
                 },
                 "example": {
                   "message": "Order not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Order not found"
+                    }
+                  }
                 }
               }
             }

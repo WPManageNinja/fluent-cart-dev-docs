@@ -170,6 +170,25 @@
                 "phone": "+1-415-555-0142",
                 "type": "billing",
                 "company_name": "TechStart Inc."
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "id": 25,
+                    "name": "Sarah Johnson",
+                    "email": "sarah.johnson@example.com",
+                    "address_1": "456 Market Street",
+                    "address_2": "Suite 500",
+                    "city": "San Francisco",
+                    "state": "CA",
+                    "postcode": "94102",
+                    "country": "US",
+                    "phone": "+1-415-555-0142",
+                    "type": "billing",
+                    "company_name": "TechStart Inc."
+                  }
+                }
               }
             }
           }
@@ -229,6 +248,31 @@
                     "company": "TechStart Inc.",
                     "meta": null
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Billing address updated successfully!",
+                      "data": {
+                        "id": 25,
+                        "customer_id": 12,
+                        "is_primary": 1,
+                        "type": "billing",
+                        "name": "Sarah Johnson",
+                        "address_1": "456 Market Street",
+                        "address_2": "Suite 500",
+                        "city": "San Francisco",
+                        "state": "CA",
+                        "postcode": "94102",
+                        "country": "US",
+                        "phone": "+1-415-555-0142",
+                        "email": "sarah.johnson@example.com",
+                        "company": "TechStart Inc.",
+                        "meta": null
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -247,6 +291,16 @@
                     "code": 404,
                     "message": "Address not found, please reload the page and try again!",
                     "data": ""
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": 404,
+                      "message": "Address not found, please reload the page and try again!",
+                      "data": ""
+                    }
                   }
                 }
               }

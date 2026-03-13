@@ -137,6 +137,42 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "group": {
+                        "id": 1,
+                        "title": "Color",
+                        "slug": "color",
+                        "description": "Product color options",
+                        "settings": null,
+                        "created_at": "2025-01-10 08:30:00",
+                        "updated_at": "2025-01-10 08:30:00",
+                        "terms": [
+                          {
+                            "id": 1,
+                            "group_id": 1,
+                            "title": "Red",
+                            "slug": "red",
+                            "serial": 1,
+                            "description": null,
+                            "settings": null
+                          },
+                          {
+                            "id": 2,
+                            "group_id": 1,
+                            "title": "Blue",
+                            "slug": "blue",
+                            "serial": 2,
+                            "description": null,
+                            "settings": null
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

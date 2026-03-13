@@ -82,6 +82,18 @@
                   "taxonomy": "product-categories",
                   "parent": 0
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "term": {
+                      "name": "New Category,Another Category",
+                      "taxonomy": "product-categories",
+                      "parent": 0
+                    }
+                  }
+                }
               }
             }
           }
@@ -113,6 +125,22 @@
                       "Another Category"
                     ],
                     "taxonomy": "product-categories"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "term_ids": [
+                        14,
+                        15
+                      ],
+                      "names": [
+                        "New Category",
+                        "Another Category"
+                      ],
+                      "taxonomy": "product-categories"
+                    }
                   }
                 }
               }

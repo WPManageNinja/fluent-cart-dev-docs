@@ -149,6 +149,40 @@
                       "is_cents": true
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "dashBoardStats": {
+                        "total_orders": {
+                          "title": "All Orders",
+                          "icon": "AllOrdersIcon",
+                          "current_count": 342,
+                          "compare_count": 289
+                        },
+                        "paid_orders": {
+                          "title": "Paid Orders",
+                          "icon": "Money",
+                          "current_count": 328,
+                          "compare_count": 275
+                        },
+                        "total_paid_order_items": {
+                          "title": "Paid Order Items",
+                          "icon": "OrderItemsIcon",
+                          "current_count": 856,
+                          "compare_count": 720
+                        },
+                        "total_paid_amounts": {
+                          "title": "Order Value (Paid)",
+                          "icon": "OrderValueIcon",
+                          "current_count": 1250000,
+                          "compare_count": 1050000,
+                          "is_cents": true
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

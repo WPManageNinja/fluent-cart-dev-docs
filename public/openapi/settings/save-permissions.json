@@ -97,6 +97,31 @@
                     "products/manage": false
                   }
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "capability": {
+                      "shop_manager": {
+                        "orders/view": true,
+                        "orders/manage": true,
+                        "customers/view": true,
+                        "customers/manage": true,
+                        "products/manage": true,
+                        "coupons/manage": true,
+                        "subscriptions/view": false,
+                        "settings/manage": false
+                      },
+                      "editor": {
+                        "orders/view": true,
+                        "orders/manage": false,
+                        "customers/view": true,
+                        "products/manage": false
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -120,6 +145,14 @@
                 },
                 "example": {
                   "message": "Permissions saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Permissions saved successfully"
+                    }
+                  }
                 }
               }
             }

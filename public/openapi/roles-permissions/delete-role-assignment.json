@@ -68,6 +68,14 @@
               },
               "example": {
                 "user_id": 10
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "user_id": 10
+                  }
+                }
               }
             }
           }
@@ -91,6 +99,14 @@
                 },
                 "example": {
                   "message": "Role deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Role deleted successfully"
+                    }
+                  }
                 }
               }
             }

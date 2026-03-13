@@ -58,6 +58,14 @@
               },
               "example": {
                 "plugin_file": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "plugin_file": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php"
+                  }
+                }
               }
             }
           }
@@ -81,6 +89,14 @@
                 },
                 "example": {
                   "message": "Addon activated successfully."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Addon activated successfully."
+                    }
+                  }
                 }
               }
             }

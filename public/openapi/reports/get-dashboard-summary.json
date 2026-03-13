@@ -83,6 +83,19 @@
                     "active_coupons": 8,
                     "expired_coupons": 4
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "summaryData": {
+                        "total_products": 25,
+                        "draft_products": 3,
+                        "active_coupons": 8,
+                        "expired_coupons": 4
+                      }
+                    }
+                  }
                 }
               }
             }

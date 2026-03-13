@@ -70,6 +70,15 @@
               "example": {
                 "method": "paypal",
                 "mode": "test"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "method": "paypal",
+                    "mode": "test"
+                  }
+                }
               }
             }
           }
@@ -113,6 +122,22 @@
                     "checkout_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg",
                     "checkout_instructions": "",
                     "thank_you_page_instructions": ""
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "PayPal settings has been disconnected",
+                      "settings": {
+                        "is_active": "no",
+                        "payment_mode": "test",
+                        "checkout_label": "Pay with PayPal",
+                        "checkout_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg",
+                        "checkout_instructions": "",
+                        "thank_you_page_instructions": ""
+                      }
+                    }
                   }
                 }
               }

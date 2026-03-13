@@ -140,6 +140,23 @@
                 "phone": "+1234567890",
                 "email": "john@example.com",
                 "label": "Home"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "type": "billing",
+                    "name": "John Doe",
+                    "address_1": "123 Main St",
+                    "city": "New York",
+                    "state": "NY",
+                    "postcode": "10001",
+                    "country": "US",
+                    "phone": "+1234567890",
+                    "email": "john@example.com",
+                    "label": "Home"
+                  }
+                }
               }
             }
           }
@@ -205,6 +222,30 @@
                     },
                     "total_address_count": 2
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Customer address created successfully!",
+                      "data": {
+                        "is_created": {
+                          "id": 10,
+                          "customer_id": 1,
+                          "type": "billing",
+                          "name": "John Doe",
+                          "address_1": "123 Main St",
+                          "city": "New York",
+                          "state": "NY",
+                          "postcode": "10001",
+                          "country": "US",
+                          "is_primary": "1",
+                          "status": "active"
+                        },
+                        "total_address_count": 2
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -219,6 +260,14 @@
                 "schema": {
                   "example": {
                     "message": "Name field is required."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Name field is required."
+                    }
                   }
                 }
               }

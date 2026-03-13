@@ -173,6 +173,60 @@
                     }
                   },
                   "all_module_config_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "feeds": [
+                        {
+                          "id": 15,
+                          "name": "Tag VIP buyers",
+                          "enabled": "yes",
+                          "provider": "fluent-crm",
+                          "feed": {
+                            "name": "Tag VIP buyers",
+                            "enabled": "yes",
+                            "list_id": "3",
+                            "list_name": "VIP Customers",
+                            "merge_fields": {
+                              "first_name": "{customer.first_name}",
+                              "last_name": "{customer.last_name}",
+                              "email": "{customer.email}"
+                            },
+                            "conditional_variation_ids": [
+                              101,
+                              102
+                            ],
+                            "conditionals": {
+                              "conditions": [
+                                {
+                                  "field": "payment_status",
+                                  "operator": "is",
+                                  "value": "paid"
+                                }
+                              ],
+                              "status": false,
+                              "type": "all"
+                            }
+                          },
+                          "scope": "product"
+                        }
+                      ],
+                      "available_integrations": {
+                        "fluent-crm": {
+                          "title": "FluentCRM",
+                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/integrations/fluentcrm.svg",
+                          "enabled": true,
+                          "scopes": [
+                            "global",
+                            "product"
+                          ]
+                        }
+                      },
+                      "all_module_config_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                    }
+                  }
                 }
               }
             }

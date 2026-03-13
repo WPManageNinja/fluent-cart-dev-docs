@@ -67,6 +67,14 @@
                 },
                 "example": {
                   "message": "Country has been deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Country has been deleted successfully"
+                    }
+                  }
                 }
               }
             }
@@ -89,6 +97,14 @@
                 },
                 "example": {
                   "message": "Failed to delete country"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Failed to delete country"
+                    }
+                  }
                 }
               }
             }

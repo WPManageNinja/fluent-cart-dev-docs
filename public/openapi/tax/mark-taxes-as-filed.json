@@ -76,6 +76,19 @@
                   3,
                   5
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "ids": [
+                      1,
+                      2,
+                      3,
+                      5
+                    ]
+                  }
+                }
               }
             }
           }
@@ -99,6 +112,14 @@
                 },
                 "example": {
                   "message": "Taxes marked as filed successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Taxes marked as filed successfully"
+                    }
+                  }
                 }
               }
             }
@@ -121,6 +142,14 @@
                 },
                 "example": {
                   "message": "No IDs provided to mark!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No IDs provided to mark!"
+                    }
+                  }
                 }
               }
             }

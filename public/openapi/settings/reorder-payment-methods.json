@@ -73,6 +73,18 @@
                   "paypal",
                   "cod"
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "order": [
+                      "stripe",
+                      "paypal",
+                      "cod"
+                    ]
+                  }
+                }
               }
             }
           }
@@ -117,6 +129,19 @@
                     "paypal",
                     "cod"
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Payment methods order saved successfully",
+                      "order": [
+                        "stripe",
+                        "paypal",
+                        "cod"
+                      ]
+                    }
+                  }
                 }
               }
             }

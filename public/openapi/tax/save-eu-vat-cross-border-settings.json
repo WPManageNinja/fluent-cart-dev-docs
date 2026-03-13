@@ -117,6 +117,19 @@
                   "oss_country": "DE",
                   "oss_vat": "DE123456789"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "action": "euCrossBorderSettings",
+                    "eu_vat_settings": {
+                      "method": "oss",
+                      "oss_country": "DE",
+                      "oss_vat": "DE123456789"
+                    }
+                  }
+                }
               }
             }
           }
@@ -140,6 +153,14 @@
                 },
                 "example": {
                   "message": "EU VAT settings saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "EU VAT settings saved successfully"
+                    }
+                  }
                 }
               }
             }
@@ -172,6 +193,17 @@
                   "message": "Validation failed for EU VAT settings",
                   "errors": {
                     "method": "Select a cross-border registration type"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Validation failed for EU VAT settings",
+                      "errors": {
+                        "method": "Select a cross-border registration type"
+                      }
+                    }
                   }
                 }
               }

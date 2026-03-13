@@ -65,6 +65,14 @@
                 },
                 "example": {
                   "message": "User detached successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "User detached successfully"
+                    }
+                  }
                 }
               }
             }
@@ -79,6 +87,14 @@
                 "schema": {
                   "example": {
                     "message": "Customer not found."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Customer not found."
+                    }
                   }
                 }
               }

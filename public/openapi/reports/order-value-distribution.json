@@ -245,6 +245,45 @@
                       "percentage": 1.7
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": [
+                        {
+                          "label": "$0-$25",
+                          "count": 28,
+                          "percentage": 8.2
+                        },
+                        {
+                          "label": "$25-$50",
+                          "count": 82,
+                          "percentage": 24
+                        },
+                        {
+                          "label": "$50-$100",
+                          "count": 120,
+                          "percentage": 35.1
+                        },
+                        {
+                          "label": "$100-$200",
+                          "count": 78,
+                          "percentage": 22.8
+                        },
+                        {
+                          "label": "$200-$500",
+                          "count": 28,
+                          "percentage": 8.2
+                        },
+                        {
+                          "label": "$500+",
+                          "count": 6,
+                          "percentage": 1.7
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

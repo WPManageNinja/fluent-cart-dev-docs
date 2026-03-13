@@ -99,6 +99,18 @@
                   "order_status": "processing"
                 },
                 "manage_stock": true
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "action": "change_order_status",
+                    "statuses": {
+                      "order_status": "processing"
+                    },
+                    "manage_stock": true
+                  }
+                }
               }
             }
           }
@@ -138,6 +150,20 @@
                     "new_status": "processing",
                     "updated_at": "2025-09-20 15:00:00"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Status has been updated",
+                      "data": {
+                        "order_id": 42,
+                        "old_status": "pending",
+                        "new_status": "processing",
+                        "updated_at": "2025-09-20 15:00:00"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -159,6 +185,14 @@
                 },
                 "example": {
                   "message": "Order already has the same status"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Order already has the same status"
+                    }
+                  }
                 }
               }
             }

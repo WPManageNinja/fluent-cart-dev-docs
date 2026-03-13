@@ -245,6 +245,45 @@
                       "amount": 9200
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": [
+                        {
+                          "weeks": "0-1",
+                          "count": 3,
+                          "percentage": 37.5,
+                          "amount": 28000
+                        },
+                        {
+                          "weeks": "1-2",
+                          "count": 2,
+                          "percentage": 25,
+                          "amount": 18000
+                        },
+                        {
+                          "weeks": "2-4",
+                          "count": 1,
+                          "percentage": 12.5,
+                          "amount": 9900
+                        },
+                        {
+                          "weeks": "4-8",
+                          "count": 1,
+                          "percentage": 12.5,
+                          "amount": 4900
+                        },
+                        {
+                          "weeks": "8+",
+                          "count": 1,
+                          "percentage": 12.5,
+                          "amount": 9200
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

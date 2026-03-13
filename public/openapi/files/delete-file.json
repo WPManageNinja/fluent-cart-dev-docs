@@ -102,6 +102,16 @@
                   "message": "File Deleted Successfully",
                   "driver": "local",
                   "path": "my-ebook__fluent-cart__.1710345600.pdf"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "File Deleted Successfully",
+                      "driver": "local",
+                      "path": "my-ebook__fluent-cart__.1710345600.pdf"
+                    }
+                  }
                 }
               }
             }
@@ -124,6 +134,14 @@
                 },
                 "example": {
                   "message": "You are not allowed to delete file"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not allowed to delete file"
+                    }
+                  }
                 }
               }
             }
@@ -146,6 +164,14 @@
                 },
                 "example": {
                   "message": "File not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "File not found"
+                    }
+                  }
                 }
               }
             }

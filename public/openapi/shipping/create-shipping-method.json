@@ -134,6 +134,26 @@
                   "configure_rate": "per_order",
                   "class_aggregation": "per_class"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "zone_id": 1,
+                    "title": "Standard Shipping",
+                    "type": "flat_rate",
+                    "amount": "500",
+                    "is_enabled": 1,
+                    "states": [
+                      "CA",
+                      "NY"
+                    ],
+                    "settings": {
+                      "configure_rate": "per_order",
+                      "class_aggregation": "per_class"
+                    }
+                  }
+                }
               }
             }
           }
@@ -156,6 +176,14 @@
                 },
                 "example": {
                   "message": "Shipping method has been created successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Shipping method has been created successfully"
+                    }
+                  }
                 }
               }
             }

@@ -72,6 +72,14 @@
               },
               "example": {
                 "status": "read"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "status": "read"
+                  }
+                }
               }
             }
           }
@@ -94,6 +102,14 @@
                 },
                 "example": {
                   "message": "Activity Marked as Read"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Activity Marked as Read"
+                    }
+                  }
                 }
               }
             }

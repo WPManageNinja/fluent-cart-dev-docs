@@ -77,6 +77,14 @@
                 },
                 "example": {
                   "message": "Integration deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Integration deleted successfully"
+                    }
+                  }
                 }
               }
             }

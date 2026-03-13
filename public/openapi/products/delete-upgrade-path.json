@@ -59,6 +59,14 @@
                   "example": {
                     "message": "Path deleted successfully"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Path deleted successfully"
+                    }
+                  }
                 }
               }
             }

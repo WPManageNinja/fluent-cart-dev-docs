@@ -94,6 +94,18 @@
                   "amount": 25.0,
                   "cancelSubscription": "true"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "refund_info": {
+                      "transaction_id": 15,
+                      "amount": 25.0,
+                      "cancelSubscription": "true"
+                    }
+                  }
+                }
               }
             }
           }
@@ -171,6 +183,25 @@
                     "status": "success",
                     "message": "Subscription cancelled successfully"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "fluent_cart_refund": {
+                        "status": "success",
+                        "message": "Refund processed on FluentCart."
+                      },
+                      "gateway_refund": {
+                        "status": "success",
+                        "message": "Refund processed on Stripe"
+                      },
+                      "subscription_cancel": {
+                        "status": "success",
+                        "message": "Subscription cancelled successfully"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -192,6 +223,14 @@
                 },
                 "example": {
                   "message": "Order can not be refunded"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Order can not be refunded"
+                    }
+                  }
                 }
               }
             }
@@ -213,6 +252,14 @@
                 },
                 "example": {
                   "message": "Transaction ID is required"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Transaction ID is required"
+                    }
+                  }
                 }
               }
             }

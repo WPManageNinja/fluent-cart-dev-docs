@@ -77,6 +77,17 @@
                   1,
                   2
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "labels": [
+                      1,
+                      2
+                    ]
+                  }
+                }
               }
             }
           }
@@ -143,6 +154,35 @@
                         "color": "#10b981"
                       }
                     ]
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Customer updated successfully!",
+                      "data": {
+                        "id": 12,
+                        "user_id": 5,
+                        "email": "sarah.johnson@example.com",
+                        "first_name": "Sarah",
+                        "last_name": "Johnson",
+                        "full_name": "Sarah Johnson",
+                        "status": "active",
+                        "labels": [
+                          {
+                            "id": 1,
+                            "title": "VIP",
+                            "color": "#3b82f6"
+                          },
+                          {
+                            "id": 2,
+                            "title": "Enterprise",
+                            "color": "#10b981"
+                          }
+                        ]
+                      }
+                    }
                   }
                 }
               }

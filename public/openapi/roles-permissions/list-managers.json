@@ -137,6 +137,54 @@
                       ]
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "managers": [
+                        {
+                          "id": 5,
+                          "email": "manager@example.com",
+                          "display_name": "Jane Manager",
+                          "username": "janemanager",
+                          "shop_role": "manager",
+                          "description": "With All Permissions Except Sensitive Settings",
+                          "registered_at": "2025-03-10 08:00:00",
+                          "role_permissions": [
+                            "store/settings",
+                            "products/view",
+                            "products/create",
+                            "products/edit",
+                            "products/delete",
+                            "customers/view",
+                            "customers/manage",
+                            "customers/delete",
+                            "orders/view",
+                            "orders/manage_statuses",
+                            "orders/can_refund",
+                            "orders/manage",
+                            "orders/export",
+                            "orders/delete",
+                            "subscriptions/view",
+                            "subscriptions/manage",
+                            "subscriptions/delete",
+                            "licenses/view",
+                            "licenses/manage",
+                            "licenses/delete",
+                            "coupons/view",
+                            "coupons/manage",
+                            "coupons/delete",
+                            "reports/view",
+                            "reports/export",
+                            "integrations/view",
+                            "integrations/manage",
+                            "integrations/delete"
+                          ]
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

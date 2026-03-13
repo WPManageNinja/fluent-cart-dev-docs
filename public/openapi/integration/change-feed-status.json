@@ -115,6 +115,24 @@
                       "email": "{customer.email}"
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Integration status updated successfully.",
+                      "meta": {
+                        "name": "Add to customers list",
+                        "enabled": "yes",
+                        "list_id": "2",
+                        "merge_fields": {
+                          "first_name": "{customer.first_name}",
+                          "last_name": "{customer.last_name}",
+                          "email": "{customer.email}"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

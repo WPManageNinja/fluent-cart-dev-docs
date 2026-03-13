@@ -59,6 +59,14 @@
                   "example": {
                     "message": "Shipping Class removed successfully"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Shipping Class removed successfully"
+                    }
+                  }
                 }
               }
             }

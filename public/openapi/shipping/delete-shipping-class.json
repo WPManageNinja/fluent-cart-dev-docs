@@ -65,6 +65,14 @@
                 },
                 "example": {
                   "message": "Shipping class has been deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Shipping class has been deleted successfully"
+                    }
+                  }
                 }
               }
             }

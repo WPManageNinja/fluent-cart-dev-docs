@@ -83,6 +83,15 @@
                 "example": {
                   "data": "",
                   "message": "Attribute term successfully deleted!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": "",
+                      "message": "Attribute term successfully deleted!"
+                    }
+                  }
                 }
               }
             }
@@ -111,6 +120,15 @@
                 "example": {
                   "message": "This term is already in use, can not be deleted.",
                   "code": 403
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "This term is already in use, can not be deleted.",
+                      "code": 403
+                    }
+                  }
                 }
               }
             }
@@ -139,6 +157,15 @@
                 "example": {
                   "message": "Term not found in database, failed to remove.",
                   "code": 404
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Term not found in database, failed to remove.",
+                      "code": 404
+                    }
+                  }
                 }
               }
             }

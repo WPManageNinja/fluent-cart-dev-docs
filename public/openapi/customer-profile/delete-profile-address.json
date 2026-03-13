@@ -57,6 +57,14 @@
               },
               "example": {
                 "addressId": 5
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "addressId": 5
+                  }
+                }
               }
             }
           }
@@ -79,6 +87,14 @@
                 },
                 "example": {
                   "message": "Address successfully deleted."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Address successfully deleted."
+                    }
+                  }
                 }
               }
             }
@@ -94,6 +110,14 @@
                   "example": {
                     "message": "Primary address cannot be deleted!"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Primary address cannot be deleted!"
+                    }
+                  }
                 }
               }
             }
@@ -108,6 +132,14 @@
                 "schema": {
                   "example": {
                     "message": "You are not authorized to update this address"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not authorized to update this address"
+                    }
                   }
                 }
               }

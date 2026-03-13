@@ -74,6 +74,14 @@
                 },
                 "example": {
                   "message": "Not available yet"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Not available yet"
+                    }
+                  }
                 }
               }
             }

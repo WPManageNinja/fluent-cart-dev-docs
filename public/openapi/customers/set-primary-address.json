@@ -79,6 +79,15 @@
               "example": {
                 "addressId": 25,
                 "type": "billing"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "addressId": 25,
+                    "type": "billing"
+                  }
+                }
               }
             }
           }
@@ -106,6 +115,15 @@
                 "example": {
                   "message": "Address successfully set as the primary",
                   "data": ""
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Address successfully set as the primary",
+                      "data": ""
+                    }
+                  }
                 }
               }
             }
@@ -124,6 +142,16 @@
                     "code": 400,
                     "message": "Address set as primary failed.",
                     "data": ""
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": 400,
+                      "message": "Address set as primary failed.",
+                      "data": ""
+                    }
                   }
                 }
               }

@@ -66,6 +66,14 @@
                 },
                 "example": {
                   "remaining": 5
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "remaining": 5
+                    }
+                  }
                 }
               }
             }
@@ -82,6 +90,14 @@
                 },
                 "example": {
                   "message": "Payment method not supported"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Payment method not supported"
+                    }
+                  }
                 }
               }
             }

@@ -85,6 +85,20 @@
                   23
                 ],
                 "new_status": "inactive"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "action": "change_customer_status",
+                    "customer_ids": [
+                      12,
+                      15,
+                      23
+                    ],
+                    "new_status": "inactive"
+                  }
+                }
               }
             }
           }
@@ -146,6 +160,16 @@
                     "code": 403,
                     "message": "Customers selection is required",
                     "data": ""
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": 403,
+                      "message": "Customers selection is required",
+                      "data": ""
+                    }
                   }
                 }
               }

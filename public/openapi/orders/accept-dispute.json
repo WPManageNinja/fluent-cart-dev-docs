@@ -74,6 +74,14 @@
               },
               "example": {
                 "dispute_note": "Customer provided valid reason for dispute"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "dispute_note": "Customer provided valid reason for dispute"
+                  }
+                }
               }
             }
           }
@@ -97,6 +105,14 @@
                 },
                 "example": {
                   "message": "Dispute accepted!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Dispute accepted!"
+                    }
+                  }
                 }
               }
             }

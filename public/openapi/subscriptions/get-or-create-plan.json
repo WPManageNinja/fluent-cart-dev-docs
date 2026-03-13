@@ -89,6 +89,17 @@
                   "method": "stripe",
                   "reason": "switching_payment_method"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "data": {
+                      "method": "stripe",
+                      "reason": "switching_payment_method"
+                    }
+                  }
+                }
               }
             }
           }
@@ -111,6 +122,14 @@
                 },
                 "example": {
                   "message": "Plan created successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Plan created successfully"
+                    }
+                  }
                 }
               }
             }
@@ -127,6 +146,14 @@
                 },
                 "example": {
                   "message": "Could not get or create plan"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Could not get or create plan"
+                    }
+                  }
                 }
               }
             }

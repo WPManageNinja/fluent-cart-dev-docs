@@ -126,6 +126,53 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "taxonomies": [
+                        {
+                          "name": "product-categories",
+                          "label": "Product Categories",
+                          "terms": [
+                            {
+                              "value": 10,
+                              "label": "Software",
+                              "children": [
+                                {
+                                  "value": 11,
+                                  "label": "Developer Tools",
+                                  "children": []
+                                },
+                                {
+                                  "value": 12,
+                                  "label": "Plugins",
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "value": 13,
+                              "label": "Templates",
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "name": "product-brands",
+                          "label": "Product Brands",
+                          "terms": [
+                            {
+                              "value": 20,
+                              "label": "FluentWP",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

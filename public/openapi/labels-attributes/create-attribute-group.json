@@ -86,6 +86,23 @@
                     "updated_at": "2025-01-15 12:00:00"
                   },
                   "message": "Successfully created!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "id": 3,
+                        "title": "Material",
+                        "slug": "material",
+                        "description": "Product material type",
+                        "settings": null,
+                        "created_at": "2025-01-15 12:00:00",
+                        "updated_at": "2025-01-15 12:00:00"
+                      },
+                      "message": "Successfully created!"
+                    }
+                  }
                 }
               }
             }
@@ -134,6 +151,21 @@
                     "slug": [
                       "Group slug can not be empty and must be unique."
                     ]
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "errors": {
+                        "title": [
+                          "Group title can not be empty and must be unique."
+                        ],
+                        "slug": [
+                          "Group slug can not be empty and must be unique."
+                        ]
+                      }
+                    }
                   }
                 }
               }

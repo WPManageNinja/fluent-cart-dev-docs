@@ -227,6 +227,99 @@
                       "total_countries": 2
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "tax_rates": {
+                        "EU": {
+                          "group_name": "European Union",
+                          "group_code": "EU",
+                          "countries": [
+                            {
+                              "country_code": "DE",
+                              "country_name": "Germany",
+                              "total_rates": 3,
+                              "rates": {
+                                "standard": {
+                                  "rate": 19,
+                                  "name": "DE Standard Tax",
+                                  "type": "standard",
+                                  "compound": false,
+                                  "shipping": false
+                                },
+                                "reduced": {
+                                  "rate": 7,
+                                  "name": "DE Reduced Tax",
+                                  "type": "reduced",
+                                  "compound": false,
+                                  "shipping": false
+                                },
+                                "zero": {
+                                  "rate": 0,
+                                  "name": "DE Zero Tax",
+                                  "type": "zero",
+                                  "compound": false,
+                                  "shipping": false
+                                }
+                              }
+                            }
+                          ],
+                          "total_countries": 27
+                        },
+                        "NA": {
+                          "group_name": "North America",
+                          "group_code": "NA",
+                          "countries": [
+                            {
+                              "country_code": "US",
+                              "country_name": "United States",
+                              "total_rates": 2,
+                              "rates": {
+                                "standard": {
+                                  "rate": 10,
+                                  "name": "US Standard Tax",
+                                  "type": "standard",
+                                  "compound": false,
+                                  "shipping": false
+                                },
+                                "zero": {
+                                  "rate": 0,
+                                  "name": "US Zero Tax",
+                                  "type": "zero",
+                                  "compound": false,
+                                  "shipping": false
+                                }
+                              }
+                            },
+                            {
+                              "country_code": "CA",
+                              "country_name": "Canada",
+                              "total_rates": 2,
+                              "rates": {
+                                "standard": {
+                                  "rate": 5,
+                                  "name": "CA GST",
+                                  "type": "standard",
+                                  "compound": false,
+                                  "shipping": true
+                                },
+                                "zero": {
+                                  "rate": 0,
+                                  "name": "CA Zero Tax",
+                                  "type": "zero",
+                                  "compound": false,
+                                  "shipping": false
+                                }
+                              }
+                            }
+                          ],
+                          "total_countries": 2
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

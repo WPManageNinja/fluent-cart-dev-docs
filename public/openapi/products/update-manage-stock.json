@@ -72,6 +72,14 @@
               },
               "example": {
                 "manage_stock": 1
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "manage_stock": 1
+                  }
+                }
               }
             }
           }
@@ -87,6 +95,14 @@
                 "schema": {
                   "example": {
                     "message": "Manage stock updated successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Manage stock updated successfully"
+                    }
                   }
                 }
               }

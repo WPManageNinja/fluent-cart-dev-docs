@@ -89,6 +89,20 @@
                       "value": "option_value"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "options": [
+                        {
+                          "id": "option_1",
+                          "label": "Option Label",
+                          "value": "option_value"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

@@ -60,6 +60,15 @@
               "example": {
                 "category": "digital",
                 "index": 1
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "category": "digital",
+                    "index": 1
+                  }
+                }
               }
             }
           }
@@ -103,6 +112,28 @@
                       }
                     },
                     "message": "Dummy product created successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "product": {
+                        "ID": 135,
+                        "post_title": "Sample Digital Product",
+                        "post_status": "publish",
+                        "post_type": "fluent-products",
+                        "post_name": "sample-digital-product",
+                        "detail": {
+                          "id": 100,
+                          "post_id": 135,
+                          "fulfillment_type": "digital",
+                          "variation_type": "single",
+                          "manage_stock": 0
+                        }
+                      },
+                      "message": "Dummy product created successfully"
+                    }
                   }
                 }
               }

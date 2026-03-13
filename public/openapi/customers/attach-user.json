@@ -68,6 +68,14 @@
               },
               "example": {
                 "user_id": 8
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "user_id": 8
+                  }
+                }
               }
             }
           }
@@ -90,6 +98,14 @@
                 },
                 "example": {
                   "message": "User attached successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "User attached successfully"
+                    }
+                  }
                 }
               }
             }

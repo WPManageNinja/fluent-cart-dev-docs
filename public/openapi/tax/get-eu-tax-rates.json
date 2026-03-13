@@ -186,6 +186,54 @@
                       "total_countries": 2
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "tax_rates": [
+                        {
+                          "group_name": "European Union",
+                          "group_code": "EU",
+                          "countries": [
+                            {
+                              "country_code": "DE",
+                              "country_name": "Germany",
+                              "rates": [
+                                {
+                                  "class_id": 1,
+                                  "name": "standard",
+                                  "rate": "19.0000",
+                                  "for_shipping": null
+                                },
+                                {
+                                  "class_id": 2,
+                                  "name": "reduced",
+                                  "rate": "7.0000",
+                                  "for_shipping": null
+                                }
+                              ],
+                              "total_rates": 2
+                            },
+                            {
+                              "country_code": "FR",
+                              "country_name": "France",
+                              "rates": [
+                                {
+                                  "class_id": 1,
+                                  "name": "standard",
+                                  "rate": "20.0000",
+                                  "for_shipping": null
+                                }
+                              ],
+                              "total_rates": 1
+                            }
+                          ],
+                          "total_countries": 2
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

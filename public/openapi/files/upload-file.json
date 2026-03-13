@@ -88,6 +88,21 @@
                     "name": "my-ebook__fluent-cart__.1710345600.pdf",
                     "bucket": ""
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "File Uploaded Successfully",
+                      "path": "my-ebook__fluent-cart__.1710345600.pdf",
+                      "file": {
+                        "driver": "local",
+                        "size": 2048576,
+                        "name": "my-ebook__fluent-cart__.1710345600.pdf",
+                        "bucket": ""
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -119,6 +134,15 @@
                 "example": {
                   "message": "Failed To Upload File",
                   "additional": "File is empty"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Failed To Upload File",
+                      "additional": "File is empty"
+                    }
+                  }
                 }
               }
             }

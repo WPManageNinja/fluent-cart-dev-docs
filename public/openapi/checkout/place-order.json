@@ -198,6 +198,22 @@
                 "billing_postcode": "10001",
                 "payment_method": "stripe",
                 "user_tz": "America/New_York"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "billing_email": "john@example.com",
+                    "billing_full_name": "John Doe",
+                    "billing_country": "US",
+                    "billing_address_1": "123 Main St",
+                    "billing_city": "New York",
+                    "billing_state": "NY",
+                    "billing_postcode": "10001",
+                    "payment_method": "stripe",
+                    "user_tz": "America/New_York"
+                  }
+                }
               }
             }
           }
@@ -350,6 +366,14 @@
                 },
                 "example": {
                   "message": "Product is out of stock"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Product is out of stock"
+                    }
+                  }
                 }
               }
             }
@@ -371,6 +395,14 @@
                 },
                 "example": {
                   "message": "Too many requests. Please try again later."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Too many requests. Please try again later."
+                    }
+                  }
                 }
               }
             }

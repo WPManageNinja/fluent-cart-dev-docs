@@ -89,6 +89,17 @@
                   "method": "stripe",
                   "payment_method_id": "pm_1Px8KLMnOpQr"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "data": {
+                      "method": "stripe",
+                      "payment_method_id": "pm_1Px8KLMnOpQr"
+                    }
+                  }
+                }
               }
             }
           }
@@ -111,6 +122,14 @@
                 },
                 "example": {
                   "message": "Payment method updated successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Payment method updated successfully"
+                    }
+                  }
                 }
               }
             }
@@ -127,6 +146,14 @@
                 },
                 "example": {
                   "message": "Could not update payment method"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Could not update payment method"
+                    }
+                  }
                 }
               }
             }

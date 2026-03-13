@@ -113,6 +113,16 @@
                 "first_name": "Jane",
                 "last_name": "Doe",
                 "email": "jane@example.com"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "first_name": "Jane",
+                    "last_name": "Doe",
+                    "email": "jane@example.com"
+                  }
+                }
               }
             }
           }
@@ -136,6 +146,14 @@
                 },
                 "example": {
                   "message": "Customer changed successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Customer changed successfully"
+                    }
+                  }
                 }
               }
             }
@@ -157,6 +175,14 @@
                 },
                 "example": {
                   "message": "Email is required"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Email is required"
+                    }
+                  }
                 }
               }
             }

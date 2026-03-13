@@ -69,6 +69,19 @@
                     "LAUNCH50",
                     "FREESHIP"
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "coupons": [
+                        "WELCOME20",
+                        "SUMMER25",
+                        "LAUNCH50",
+                        "FREESHIP"
+                      ]
+                    }
+                  }
                 }
               }
             }

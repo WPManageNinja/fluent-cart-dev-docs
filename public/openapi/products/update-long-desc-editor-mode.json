@@ -68,6 +68,14 @@
               },
               "example": {
                 "active_editor": "visual"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "active_editor": "visual"
+                  }
+                }
               }
             }
           }
@@ -83,6 +91,14 @@
                 "schema": {
                   "example": {
                     "message": "Editor mode updated successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Editor mode updated successfully"
+                    }
                   }
                 }
               }

@@ -136,6 +136,25 @@
                   "TX",
                   "FL"
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "method_id": 10,
+                    "zone_id": 1,
+                    "title": "Express Shipping",
+                    "type": "flat_rate",
+                    "amount": "1200",
+                    "is_enabled": 1,
+                    "states": [
+                      "CA",
+                      "NY",
+                      "TX",
+                      "FL"
+                    ]
+                  }
+                }
               }
             }
           }
@@ -158,6 +177,14 @@
                 },
                 "example": {
                   "message": "Shipping method has been updated successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Shipping method has been updated successfully"
+                    }
+                  }
                 }
               }
             }

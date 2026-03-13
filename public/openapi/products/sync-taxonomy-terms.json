@@ -85,6 +85,19 @@
                   5,
                   10
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "taxonomy": "product-categories",
+                    "terms": [
+                      1,
+                      5,
+                      10
+                    ]
+                  }
+                }
               }
             }
           }
@@ -100,6 +113,14 @@
                 "schema": {
                   "example": {
                     "message": "Taxonomy terms synced successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Taxonomy terms synced successfully"
+                    }
                   }
                 }
               }

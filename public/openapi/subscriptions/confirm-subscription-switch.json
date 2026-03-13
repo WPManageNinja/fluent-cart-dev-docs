@@ -90,6 +90,17 @@
                   "newVendorSubscriptionId": "I-WX9Y8Z7A6B5C",
                   "method": "paypal"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "data": {
+                      "newVendorSubscriptionId": "I-WX9Y8Z7A6B5C",
+                      "method": "paypal"
+                    }
+                  }
+                }
               }
             }
           }
@@ -112,6 +123,14 @@
                 },
                 "example": {
                   "message": "Subscription switch confirmed successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Subscription switch confirmed successfully"
+                    }
+                  }
                 }
               }
             }
@@ -128,6 +147,14 @@
                 },
                 "example": {
                   "message": "Could not confirm subscription switch"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Could not confirm subscription switch"
+                    }
+                  }
                 }
               }
             }

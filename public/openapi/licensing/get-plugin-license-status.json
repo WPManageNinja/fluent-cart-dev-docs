@@ -68,6 +68,16 @@
                   "status": "valid",
                   "license_key": "DTPRO-A1B2-C3D4-E5F6",
                   "expires": "2026-01-15"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "status": "valid",
+                      "license_key": "DTPRO-A1B2-C3D4-E5F6",
+                      "expires": "2026-01-15"
+                    }
+                  }
                 }
               }
             }

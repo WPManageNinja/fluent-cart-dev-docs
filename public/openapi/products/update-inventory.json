@@ -84,6 +84,15 @@
               "example": {
                 "total_stock": 100,
                 "available": 80
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "total_stock": 100,
+                    "available": 80
+                  }
+                }
               }
             }
           }
@@ -99,6 +108,14 @@
                 "schema": {
                   "example": {
                     "message": "Inventory updated successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Inventory updated successfully"
+                    }
                   }
                 }
               }

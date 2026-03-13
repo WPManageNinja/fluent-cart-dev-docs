@@ -244,6 +244,86 @@
                     "last_name": "{customer.last_name}",
                     "email": "{customer.email}"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "settings": {
+                        "conditionals": {
+                          "conditions": [
+                            {
+                              "field": "payment_status",
+                              "operator": "is",
+                              "value": "paid"
+                            }
+                          ],
+                          "status": false,
+                          "type": "all"
+                        },
+                        "enabled": "yes",
+                        "list_id": "",
+                        "list_name": "",
+                        "name": "",
+                        "merge_fields": {
+                          "first_name": "{customer.first_name}",
+                          "last_name": "{customer.last_name}",
+                          "email": "{customer.email}"
+                        }
+                      },
+                      "settings_fields": {
+                        "fields": [
+                          {
+                            "key": "name",
+                            "label": "Feed Name",
+                            "type": "text",
+                            "required": true
+                          },
+                          {
+                            "key": "list_id",
+                            "label": "Contact List",
+                            "type": "select",
+                            "required": true,
+                            "options": [
+                              {
+                                "id": "1",
+                                "label": "Newsletter Subscribers"
+                              },
+                              {
+                                "id": "2",
+                                "label": "Customers"
+                              },
+                              {
+                                "id": "3",
+                                "label": "VIP Customers"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "shortcodes": {
+                        "customer": {
+                          "title": "Customer",
+                          "shortcodes": {
+                            "{customer.first_name}": "First Name",
+                            "{customer.last_name}": "Last Name",
+                            "{customer.email}": "Email"
+                          }
+                        }
+                      },
+                      "inputs": {
+                        "billing_first_name": "Billing First Name",
+                        "billing_last_name": "Billing Last Name",
+                        "billing_email": "Billing Email",
+                        "billing_phone": "Billing Phone"
+                      },
+                      "merge_fields": {
+                        "first_name": "{customer.first_name}",
+                        "last_name": "{customer.last_name}",
+                        "email": "{customer.email}"
+                      }
+                    }
+                  }
                 }
               }
             }

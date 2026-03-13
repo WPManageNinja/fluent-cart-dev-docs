@@ -77,6 +77,14 @@
                 },
                 "example": {
                   "message": "OSS tax override deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "OSS tax override deleted successfully"
+                    }
+                  }
                 }
               }
             }
@@ -99,6 +107,14 @@
                 },
                 "example": {
                   "message": "No matching OSS tax override found to delete"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No matching OSS tax override found to delete"
+                    }
+                  }
                 }
               }
             }

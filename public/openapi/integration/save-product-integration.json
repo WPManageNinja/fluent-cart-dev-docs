@@ -136,6 +136,25 @@
                       101
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Integration has been successfully saved",
+                      "integration_id": 15,
+                      "integration_name": "fluent-crm",
+                      "created": true,
+                      "feedData": {
+                        "name": "Tag VIP buyers",
+                        "enabled": "yes",
+                        "list_id": "3",
+                        "conditional_variation_ids": [
+                          101
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -157,6 +176,14 @@
                 },
                 "example": {
                   "message": "Product not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Product not found"
+                    }
+                  }
                 }
               }
             }
@@ -189,6 +216,17 @@
                   "message": "Please fill up the required fields:",
                   "errors": {
                     "name": "Feed Name is required."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Please fill up the required fields:",
+                      "errors": {
+                        "name": "Feed Name is required."
+                      }
+                    }
                   }
                 }
               }

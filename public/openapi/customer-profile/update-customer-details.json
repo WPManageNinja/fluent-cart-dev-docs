@@ -108,6 +108,16 @@
                 "first_name": "John",
                 "last_name": "Smith",
                 "email": "john@example.com"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "email": "john@example.com"
+                  }
+                }
               }
             }
           }
@@ -145,6 +155,20 @@
                     "first_name": "John",
                     "last_name": "Doe"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Customer updated successfully!",
+                      "data": {
+                        "id": 1,
+                        "email": "john@example.com",
+                        "first_name": "John",
+                        "last_name": "Doe"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -159,6 +183,14 @@
                 "schema": {
                   "example": {
                     "message": "You are not authorized to update this customer"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not authorized to update this customer"
+                    }
                   }
                 }
               }

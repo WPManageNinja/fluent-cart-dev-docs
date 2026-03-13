@@ -90,6 +90,15 @@
                 "example": {
                   "message": "Addon installation started successfully.",
                   "redirect": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Addon installation started successfully.",
+                      "redirect": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
+                    }
+                  }
                 }
               }
             }
@@ -111,6 +120,14 @@
                 },
                 "example": {
                   "message": "This addon cannot be installed at this time"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "This addon cannot be installed at this time"
+                    }
+                  }
                 }
               }
             }

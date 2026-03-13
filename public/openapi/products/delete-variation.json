@@ -59,6 +59,14 @@
                   "example": {
                     "message": "Variation deleted successfully"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Variation deleted successfully"
+                    }
+                  }
                 }
               }
             }

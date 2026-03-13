@@ -68,6 +68,14 @@
               },
               "example": {
                 "expiration_date": "2027-06-15 00:00:00"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "expiration_date": "2027-06-15 00:00:00"
+                  }
+                }
               }
             }
           }
@@ -115,6 +123,19 @@
                     "status": "active"
                   },
                   "message": "License validity extended!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "license": {
+                        "id": 1,
+                        "expiration_date": "2027-01-15 00:00:00",
+                        "status": "active"
+                      },
+                      "message": "License validity extended!"
+                    }
+                  }
                 }
               }
             }
@@ -136,6 +157,14 @@
                 },
                 "example": {
                   "message": "Invalid expiration date!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Invalid expiration date!"
+                    }
+                  }
                 }
               }
             }

@@ -72,6 +72,15 @@
                 "example": {
                   "message": "Early payment URL generated.",
                   "checkout_url": "https://example.com/?fluent-cart=early-installment-payment&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Early payment URL generated.",
+                      "checkout_url": "https://example.com/?fluent-cart=early-installment-payment&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
+                    }
+                  }
                 }
               }
             }
@@ -88,6 +97,14 @@
                 },
                 "example": {
                   "message": "Early payment is not available for this subscription."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Early payment is not available for this subscription."
+                    }
+                  }
                 }
               }
             }

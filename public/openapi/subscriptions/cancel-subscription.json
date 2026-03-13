@@ -78,6 +78,14 @@
               },
               "example": {
                 "cancel_reason": "Customer requested cancellation"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "cancel_reason": "Customer requested cancellation"
+                  }
+                }
               }
             }
           }
@@ -111,6 +119,18 @@
                     "id": 15,
                     "status": "canceled"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Subscription has been cancelled successfully!",
+                      "subscription": {
+                        "id": 15,
+                        "status": "canceled"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -127,6 +147,14 @@
                 },
                 "example": {
                   "message": "Please select cancel reason!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Please select cancel reason!"
+                    }
+                  }
                 }
               }
             }

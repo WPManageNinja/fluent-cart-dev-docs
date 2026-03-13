@@ -84,6 +84,17 @@
                 "checkout_label": "Credit / Debit Card",
                 "checkout_logo": "https://example.com/card-icon.png",
                 "checkout_instructions": "<p>You will be charged securely via Stripe.</p>"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "method": "stripe",
+                    "checkout_label": "Credit / Debit Card",
+                    "checkout_logo": "https://example.com/card-icon.png",
+                    "checkout_instructions": "<p>You will be charged securely via Stripe.</p>"
+                  }
+                }
               }
             }
           }
@@ -127,6 +138,22 @@
                     "checkout_logo": "https://example.com/wp-content/uploads/card-icon.png",
                     "checkout_instructions": "<p>You will be charged securely via Stripe.</p>",
                     "thank_you_page_instructions": "<p>Your payment was processed successfully. A receipt has been sent to your email.</p>"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Checkout design settings saved",
+                      "settings": {
+                        "is_active": "yes",
+                        "payment_mode": "live",
+                        "checkout_label": "Credit / Debit Card",
+                        "checkout_logo": "https://example.com/wp-content/uploads/card-icon.png",
+                        "checkout_instructions": "<p>You will be charged securely via Stripe.</p>",
+                        "thank_you_page_instructions": "<p>Your payment was processed successfully. A receipt has been sent to your email.</p>"
+                      }
+                    }
                   }
                 }
               }

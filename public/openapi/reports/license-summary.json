@@ -138,6 +138,20 @@
                   "total_activations": 412,
                   "average_activations_per_license": 1.68,
                   "activation_limit_reached": 24
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "total_licenses": 245,
+                      "active_licenses": 198,
+                      "expired_licenses": 32,
+                      "revoked_licenses": 15,
+                      "total_activations": 412,
+                      "average_activations_per_license": 1.68,
+                      "activation_limit_reached": 24
+                    }
+                  }
                 }
               }
             }

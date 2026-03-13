@@ -157,6 +157,20 @@
                 "status": "active",
                 "stackable": "yes",
                 "show_on_checkout": "yes"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "title": "Summer Sale 25%",
+                    "code": "SUMMER25",
+                    "type": "percentage",
+                    "amount": 25,
+                    "status": "active",
+                    "stackable": "yes",
+                    "show_on_checkout": "yes"
+                  }
+                }
               }
             }
           }
@@ -248,6 +262,46 @@
                     "created_at": "2025-05-25 10:00:00",
                     "updated_at": "2025-06-20 11:00:00"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Coupon updated successfully!",
+                      "data": {
+                        "id": 5,
+                        "title": "Summer Sale 25%",
+                        "code": "SUMMER25",
+                        "status": "active",
+                        "type": "percent",
+                        "amount": 25,
+                        "conditions": {
+                          "min_purchase_amount": 3000,
+                          "max_discount_amount": 15000,
+                          "max_purchase_amount": 0,
+                          "apply_to_whole_cart": "yes",
+                          "apply_to_quantity": "no",
+                          "max_uses": 300,
+                          "max_per_customer": 2,
+                          "excluded_categories": [],
+                          "included_categories": [],
+                          "excluded_products": [],
+                          "included_products": [],
+                          "email_restrictions": "",
+                          "is_recurring": "no"
+                        },
+                        "stackable": "yes",
+                        "priority": 1,
+                        "use_count": 12,
+                        "notes": "Summer promotional campaign - 25% off all plans",
+                        "show_on_checkout": "yes",
+                        "start_date": "2025-06-01 00:00:00",
+                        "end_date": "2025-08-31 23:59:59",
+                        "created_at": "2025-05-25 10:00:00",
+                        "updated_at": "2025-06-20 11:00:00"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -269,6 +323,14 @@
                 },
                 "example": {
                   "message": "Please edit a valid coupon!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Please edit a valid coupon!"
+                    }
+                  }
                 }
               }
             }
@@ -290,6 +352,14 @@
                 },
                 "example": {
                   "message": "Coupon not found, please reload the page and try again!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Coupon not found, please reload the page and try again!"
+                    }
+                  }
                 }
               }
             }
@@ -311,6 +381,14 @@
                 },
                 "example": {
                   "message": "Coupon update failed."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Coupon update failed."
+                    }
+                  }
                 }
               }
             }

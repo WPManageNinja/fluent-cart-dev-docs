@@ -139,6 +139,36 @@
                     "checkout_label": "Pay with PayPal",
                     "checkout_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "connect_config": {
+                        "test_redirect": "https://example.com/wp-admin/?fluent-cart=paypal-connect&mode=test",
+                        "live_redirect": "https://example.com/wp-admin/?fluent-cart=paypal-connect&mode=live",
+                        "disconnect_note": "Disconnecting will prevent PayPal from processing payments. Existing subscriptions will not be affected until their next renewal."
+                      },
+                      "test_account": {
+                        "merchant_id": "TESTMERCHANT123",
+                        "email": "seller-test@example.com",
+                        "connected": true,
+                        "webhook_id": "WH-TEST-1234567890"
+                      },
+                      "live_account": {
+                        "merchant_id": "LIVEMERCHANT456",
+                        "email": "payments@techstore.com",
+                        "connected": true,
+                        "webhook_id": "WH-LIVE-0987654321"
+                      },
+                      "settings": {
+                        "is_active": "yes",
+                        "payment_mode": "live",
+                        "checkout_label": "Pay with PayPal",
+                        "checkout_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg"
+                      }
+                    }
+                  }
                 }
               }
             }

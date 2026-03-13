@@ -81,6 +81,16 @@
                 "name": "United States",
                 "region": "US",
                 "order": 0
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "name": "United States",
+                    "region": "US",
+                    "order": 0
+                  }
+                }
               }
             }
           }
@@ -124,6 +134,23 @@
                     "updated_at": "2025-02-01 09:00:00"
                   },
                   "message": "Shipping zone has been updated successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "shipping_zone": {
+                        "id": 1,
+                        "name": "United States",
+                        "region": "US",
+                        "order": 0,
+                        "formatted_region": "United States",
+                        "created_at": "2025-01-15 12:00:00",
+                        "updated_at": "2025-02-01 09:00:00"
+                      },
+                      "message": "Shipping zone has been updated successfully"
+                    }
+                  }
                 }
               }
             }

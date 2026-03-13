@@ -80,6 +80,24 @@
                       "fct_manage_settings": false
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "role": {
+                        "key": "fct_manager",
+                        "display_name": "FluentCart Manager",
+                        "capabilities": {
+                          "fct_manage_orders": true,
+                          "fct_manage_products": true,
+                          "fct_manage_customers": true,
+                          "fct_view_reports": true,
+                          "fct_manage_settings": false
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

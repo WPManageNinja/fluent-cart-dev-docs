@@ -68,6 +68,14 @@
               },
               "example": {
                 "shipping_class": 3
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "shipping_class": 3
+                  }
+                }
               }
             }
           }
@@ -83,6 +91,14 @@
                 "schema": {
                   "example": {
                     "message": "Shipping Class updated successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Shipping Class updated successfully"
+                    }
                   }
                 }
               }

@@ -83,6 +83,20 @@
                       "is_active": true
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "drivers": [
+                        {
+                          "key": "local",
+                          "title": "Local Storage",
+                          "is_active": true
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

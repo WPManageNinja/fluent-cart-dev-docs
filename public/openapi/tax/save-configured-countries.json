@@ -76,6 +76,19 @@
                   "IT",
                   "ES"
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "countries": [
+                      "DE",
+                      "FR",
+                      "IT",
+                      "ES"
+                    ]
+                  }
+                }
               }
             }
           }
@@ -99,6 +112,14 @@
                 },
                 "example": {
                   "message": "Countries saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Countries saved successfully"
+                    }
+                  }
                 }
               }
             }

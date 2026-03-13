@@ -80,6 +80,20 @@
                 "listeners": [
                   "product-categories"
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "parents": [
+                      1,
+                      2
+                    ],
+                    "listeners": [
+                      "product-categories"
+                    ]
+                  }
+                }
               }
             }
           }
@@ -120,6 +134,27 @@
                           "parent": 10
                         }
                       ]
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "product-categories": [
+                          {
+                            "value": 11,
+                            "label": "Developer Tools",
+                            "parent": 10
+                          },
+                          {
+                            "value": 12,
+                            "label": "Plugins",
+                            "parent": 10
+                          }
+                        ]
+                      }
                     }
                   }
                 }

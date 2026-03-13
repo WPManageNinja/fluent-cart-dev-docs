@@ -78,6 +78,15 @@
               "example": {
                 "variation_type": "simple_variations",
                 "action": "change_variation_type"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "variation_type": "simple_variations",
+                    "action": "change_variation_type"
+                  }
+                }
               }
             }
           }
@@ -93,6 +102,14 @@
                 "schema": {
                   "example": {
                     "message": "Product detail updated successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Product detail updated successfully"
+                    }
                   }
                 }
               }

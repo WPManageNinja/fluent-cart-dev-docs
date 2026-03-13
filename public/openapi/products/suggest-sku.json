@@ -77,6 +77,14 @@
                   "example": {
                     "sku": "DEV-TOO-PER"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "sku": "DEV-TOO-PER"
+                    }
+                  }
                 }
               }
             }

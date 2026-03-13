@@ -89,6 +89,20 @@
                       "type": "stat"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "widgets": [
+                        {
+                          "title": "Customer Lifetime Value",
+                          "value": "$1,250.00",
+                          "type": "stat"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -110,6 +124,14 @@
                 },
                 "example": {
                   "message": "Order not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Order not found"
+                    }
+                  }
                 }
               }
             }

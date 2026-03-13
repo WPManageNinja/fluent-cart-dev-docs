@@ -83,6 +83,19 @@
                     "content": "<html><body><h1>Invoice #{order_id}</h1>...</body></html>"
                   }
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "templates": [
+                      {
+                        "key": "invoice_template",
+                        "content": "<html><body><h1>Invoice #{order_id}</h1>...</body></html>"
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -105,6 +118,14 @@
                 },
                 "example": {
                   "message": "Template saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Template saved successfully"
+                    }
+                  }
                 }
               }
             }

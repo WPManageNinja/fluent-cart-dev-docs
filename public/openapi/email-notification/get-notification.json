@@ -225,6 +225,90 @@
                       }
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "event": "order_paid",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Purchase receipt to customer",
+                        "description": "This email will be sent to the customer after an order is placed.",
+                        "recipient": "customer",
+                        "smartcode_groups": [
+                          "order",
+                          "customer",
+                          "transaction"
+                        ],
+                        "template_path": "order.paid.customer",
+                        "is_async": false,
+                        "name": "order_paid_customer",
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Purchase Receipt #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        }
+                      },
+                      "shortcodes": {
+                        "order": {
+                          "title": "Order",
+                          "key": "order",
+                          "shortcodes": {
+                            "{{order.id}}": "Order ID",
+                            "{{order.invoice_no}}": "Order Number",
+                            "{{order.status}}": "Order Status",
+                            "{{order.total_amount_formatted}}": "Order Total Amount (Formatted)"
+                          }
+                        },
+                        "general": {
+                          "title": "General",
+                          "key": "wp",
+                          "shortcodes": {
+                            "{{wp.admin_email}}": "Admin Email",
+                            "{{wp.site_url}}": "Site URL",
+                            "{{wp.site_title}}": "Site Title"
+                          }
+                        },
+                        "customer": {
+                          "title": "Customer",
+                          "key": "customer",
+                          "shortcodes": {
+                            "{{order.billing.first_name}}": "First Name",
+                            "{{order.billing.last_name}}": "Last Name",
+                            "{{order.billing.email}}": "Email"
+                          }
+                        },
+                        "transaction": {
+                          "title": "transaction",
+                          "key": "settings",
+                          "shortcodes": {
+                            "{{transaction.total_formatted}}": "Total Amount (Formatted)",
+                            "{{transaction.payment_method}}": "Payment Method",
+                            "{{transaction.status}}": "Status"
+                          }
+                        },
+                        "settings": {
+                          "title": "Settings",
+                          "key": "settings",
+                          "shortcodes": {
+                            "{{settings.store_name}}": "Store Name",
+                            "{{settings.store_logo}}": "Store Logo"
+                          }
+                        },
+                        "license": {
+                          "title": "License (Loop)",
+                          "key": "license",
+                          "shortcodes": {
+                            "{{license.key}}": "License Key",
+                            "{{license.status}}": "Status"
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -247,6 +331,14 @@
                 },
                 "example": {
                   "message": "Notification Details not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Notification Details not found"
+                    }
+                  }
                 }
               }
             }

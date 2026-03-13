@@ -88,6 +88,16 @@
                   "id": 103,
                   "title": "new-product-photo",
                   "url": "https://example.com/wp-content/uploads/2025/01/new-product-photo.jpg"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "id": 103,
+                      "title": "new-product-photo",
+                      "url": "https://example.com/wp-content/uploads/2025/01/new-product-photo.jpg"
+                    }
+                  }
                 }
               }
             }
@@ -112,6 +122,14 @@
                 },
                 "example": {
                   "error": "Error Uploading File"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "error": "Error Uploading File"
+                    }
+                  }
                 }
               }
             }

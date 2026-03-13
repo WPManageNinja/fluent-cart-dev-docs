@@ -135,6 +135,43 @@
                     "before_orders_table": "",
                     "after_orders_table": ""
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Success",
+                      "dashboard_data": {
+                        "orders": [
+                          {
+                            "created_at": "2025-06-15 10:30:00",
+                            "invoice_no": "INV-000101",
+                            "total_amount": 4999,
+                            "uuid": "abc-123-def",
+                            "type": "one-time",
+                            "status": "completed",
+                            "renewals_count": 0,
+                            "order_items": [
+                              {
+                                "id": 1,
+                                "post_title": "Premium Plugin",
+                                "title": "Premium Plugin - Single Site",
+                                "quantity": 1,
+                                "payment_type": "one-time",
+                                "line_meta": {
+                                  "bundle_parent_item_id": null
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "sections_parts": {
+                        "before_orders_table": "",
+                        "after_orders_table": ""
+                      }
+                    }
+                  }
                 }
               }
             }

@@ -192,6 +192,22 @@
                     "from": 1,
                     "to": 10
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "products": {
+                        "views": "<div class=\"fct-product-card\">...rendered HTML...</div>",
+                        "current_page": 1,
+                        "last_page": 3,
+                        "total": 24,
+                        "per_page": 10,
+                        "from": 1,
+                        "to": 10
+                      }
+                    }
+                  }
                 }
               }
             }

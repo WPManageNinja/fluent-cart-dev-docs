@@ -99,6 +99,20 @@
                     "url": "https://example.com/wp-content/uploads/product.jpg"
                   }
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "media": [
+                      {
+                        "id": 101,
+                        "title": "Product Image",
+                        "url": "https://example.com/wp-content/uploads/product.jpg"
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -114,6 +128,14 @@
                 "schema": {
                   "example": {
                     "message": "Media set successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Media set successfully"
+                    }
                   }
                 }
               }

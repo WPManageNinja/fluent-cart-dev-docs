@@ -99,6 +99,31 @@
                 "stock_management": {
                   "active": "yes"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "shipping": {
+                      "active": "yes"
+                    },
+                    "tax": {
+                      "active": "no"
+                    },
+                    "coupons": {
+                      "active": "yes"
+                    },
+                    "subscriptions": {
+                      "active": "yes"
+                    },
+                    "licensing": {
+                      "active": "no"
+                    },
+                    "stock_management": {
+                      "active": "yes"
+                    }
+                  }
+                }
               }
             }
           }
@@ -122,6 +147,14 @@
                 },
                 "example": {
                   "message": "Settings saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Settings saved successfully"
+                    }
+                  }
                 }
               }
             }

@@ -92,6 +92,20 @@
                   3
                 ],
                 "new_status": "processing"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "action": "change_order_status",
+                    "order_ids": [
+                      1,
+                      2,
+                      3
+                    ],
+                    "new_status": "processing"
+                  }
+                }
               }
             }
           }
@@ -115,6 +129,14 @@
                 },
                 "example": {
                   "message": "Order Status has been changed for the selected orders"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Order Status has been changed for the selected orders"
+                    }
+                  }
                 }
               }
             }

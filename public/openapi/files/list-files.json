@@ -117,6 +117,27 @@
                       "bucket": ""
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "files": [
+                        {
+                          "name": "ebook__fluent-cart__.1710345600.pdf",
+                          "size": 2048576,
+                          "driver": "local",
+                          "bucket": ""
+                        },
+                        {
+                          "name": "software-v2__fluent-cart__.1710345700.zip",
+                          "size": 10485760,
+                          "driver": "local",
+                          "bucket": ""
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

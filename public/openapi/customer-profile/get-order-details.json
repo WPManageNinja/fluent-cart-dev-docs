@@ -254,6 +254,107 @@
                     "after_transactions": "",
                     "end_of_order": ""
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "order": {
+                        "id": 101,
+                        "fulfillment_type": "digital",
+                        "type": "one-time",
+                        "created_at": "2025-06-15 10:30:00",
+                        "invoice_no": "INV-000101",
+                        "currency": "USD",
+                        "uuid": "abc-123-def",
+                        "status": "completed",
+                        "payment_status": "paid",
+                        "shipping_status": "",
+                        "billing_address_text": "John Doe, 123 Main St, New York, NY 10001, US",
+                        "shipping_address_text": "",
+                        "subtotal": 4999,
+                        "total_amount": 4999,
+                        "total_paid": 4999,
+                        "total_refund": 0,
+                        "shipping_total": 0,
+                        "coupon_discount_total": 0,
+                        "manual_discount_total": 0,
+                        "tax_total": 0,
+                        "tax_behavior": "exclusive",
+                        "shipping_tax": 0,
+                        "payment_method": "stripe",
+                        "order_items": [
+                          {
+                            "id": 1,
+                            "variation_id": 10,
+                            "product_id": 5,
+                            "post_title": "Premium Plugin",
+                            "title": "Premium Plugin - Single Site",
+                            "quantity": 1,
+                            "unit_price": 4999,
+                            "subtotal": 4999,
+                            "payment_type": "one-time",
+                            "meta_lines": [
+                              {
+                                "key": "License",
+                                "value": "DTPRO-A1B2-C3D4-E5F6"
+                              },
+                              {
+                                "key": "Activation Limit",
+                                "value": "1 site"
+                              }
+                            ],
+                            "extra_amount": 0,
+                            "image": "https://example.com/wp-content/uploads/product.jpg",
+                            "variant_image": "",
+                            "url": "https://example.com/product/premium-plugin/",
+                            "line_meta": {
+                              "license_id": 100,
+                              "billing_interval": "year",
+                              "billing_count": 1
+                            }
+                          }
+                        ],
+                        "subscriptions": [
+                          {
+                            "id": 10,
+                            "status": "active",
+                            "billing_interval": "year",
+                            "billing_count": 1,
+                            "next_billing_date": "2026-06-15 10:30:00",
+                            "amount": 4999
+                          }
+                        ],
+                        "downloads": [
+                          {
+                            "file_size": "2.5 MB",
+                            "title": "premium-plugin-v2.zip",
+                            "download_url": "https://example.com/?fct_download=..."
+                          }
+                        ],
+                        "transactions": [
+                          {
+                            "id": 50,
+                            "uuid": "txn-abc-123",
+                            "order_id": 101,
+                            "amount": 4999,
+                            "status": "succeeded",
+                            "payment_method": "stripe",
+                            "created_at": "2025-06-15 10:30:00"
+                          }
+                        ]
+                      },
+                      "section_parts": {
+                        "before_summary": "",
+                        "after_summary": "",
+                        "after_licenses": "",
+                        "after_subscriptions": "",
+                        "after_downloads": "",
+                        "after_transactions": "",
+                        "end_of_order": ""
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -269,6 +370,14 @@
                   "example": {
                     "message": "Order not found"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Order not found"
+                    }
+                  }
                 }
               }
             }
@@ -283,6 +392,14 @@
                 "schema": {
                   "example": {
                     "message": "You are not logged in"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not logged in"
+                    }
                   }
                 }
               }

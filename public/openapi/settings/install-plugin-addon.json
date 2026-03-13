@@ -78,6 +78,14 @@
               },
               "example": {
                 "plugin_slug": "fluent-cart-elementor-blocks"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "plugin_slug": "fluent-cart-elementor-blocks"
+                  }
+                }
               }
             }
           }
@@ -107,6 +115,15 @@
                 "example": {
                   "message": "Addon installed successfully",
                   "plugin_file": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Addon installed successfully",
+                      "plugin_file": "fluent-cart-elementor-blocks/fluent-cart-elementor-blocks.php"
+                    }
+                  }
                 }
               }
             }

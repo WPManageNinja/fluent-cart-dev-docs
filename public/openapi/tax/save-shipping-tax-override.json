@@ -66,6 +66,15 @@
               "example": {
                 "id": 5,
                 "override_tax_rate": 7
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "id": 5,
+                    "override_tax_rate": 7
+                  }
+                }
               }
             }
           }
@@ -89,6 +98,14 @@
                 },
                 "example": {
                   "message": "Tax override has been saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Tax override has been saved successfully"
+                    }
+                  }
                 }
               }
             }
@@ -111,6 +128,14 @@
                 },
                 "example": {
                   "message": "Tax rate not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Tax rate not found"
+                    }
+                  }
                 }
               }
             }

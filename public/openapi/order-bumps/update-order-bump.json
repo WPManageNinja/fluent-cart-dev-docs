@@ -189,6 +189,41 @@
                     "value": 2500
                   }
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "title": "Add Extended Warranty",
+                    "src_object_id": 42,
+                    "status": "active",
+                    "description": "<p>Protect your purchase with our 2-year extended warranty.</p>",
+                    "priority": 1,
+                    "config": {
+                      "discount": {
+                        "discount_type": "percentage",
+                        "discount_amount": 10
+                      },
+                      "display_conditions_if": "",
+                      "call_to_action": "Yes, add warranty!"
+                    },
+                    "conditions": [
+                      {
+                        "type": "cart_products",
+                        "operator": "contains",
+                        "value": [
+                          123,
+                          124
+                        ]
+                      },
+                      {
+                        "type": "cart_total",
+                        "operator": "greater_than",
+                        "value": 2500
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -212,6 +247,14 @@
                 },
                 "example": {
                   "message": "Order bump updated successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Order bump updated successfully"
+                    }
+                  }
                 }
               }
             }
@@ -233,6 +276,14 @@
                 },
                 "example": {
                   "message": "Failed to update order bump"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Failed to update order bump"
+                    }
+                  }
                 }
               }
             }

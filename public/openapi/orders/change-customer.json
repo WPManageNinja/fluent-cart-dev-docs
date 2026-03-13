@@ -68,6 +68,14 @@
               },
               "example": {
                 "customer_id": 15
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "customer_id": 15
+                  }
+                }
               }
             }
           }
@@ -91,6 +99,14 @@
                 },
                 "example": {
                   "message": "Customer changed successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Customer changed successfully"
+                    }
+                  }
                 }
               }
             }
@@ -112,6 +128,14 @@
                 },
                 "example": {
                   "message": "Customer id is required"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Customer id is required"
+                    }
+                  }
                 }
               }
             }

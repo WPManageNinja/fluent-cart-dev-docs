@@ -88,6 +88,15 @@
                 "example": {
                   "message": "Settings saved successfully",
                   "status": true
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Settings saved successfully",
+                      "status": true
+                    }
+                  }
                 }
               }
             }

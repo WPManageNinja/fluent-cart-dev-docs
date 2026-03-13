@@ -59,6 +59,14 @@
                   "example": {
                     "message": "Product deleted successfully"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Product deleted successfully"
+                    }
+                  }
                 }
               }
             }

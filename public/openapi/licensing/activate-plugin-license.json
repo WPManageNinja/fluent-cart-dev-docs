@@ -58,6 +58,14 @@
               },
               "example": {
                 "license_key": "DTPRO-A1B2-C3D4-E5F6"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "license_key": "DTPRO-A1B2-C3D4-E5F6"
+                  }
+                }
               }
             }
           }
@@ -108,6 +116,20 @@
                     "id": "fluent_cart_license_activated",
                     "html": "<div>Your FluentCart Pro license has been activated successfully.</div>",
                     "timeout": 5000
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "status": "valid",
+                      "license_key": "DTPRO-A1B2-C3D4-E5F6",
+                      "notice": {
+                        "id": "fluent_cart_license_activated",
+                        "html": "<div>Your FluentCart Pro license has been activated successfully.</div>",
+                        "timeout": 5000
+                      }
+                    }
                   }
                 }
               }

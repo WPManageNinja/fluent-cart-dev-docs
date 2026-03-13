@@ -68,6 +68,15 @@
               "example": {
                 "addressId": 5,
                 "type": "billing"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "addressId": 5,
+                    "type": "billing"
+                  }
+                }
               }
             }
           }
@@ -90,6 +99,14 @@
                 },
                 "example": {
                   "message": "Address successfully set as the primary"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Address successfully set as the primary"
+                    }
+                  }
                 }
               }
             }
@@ -104,6 +121,14 @@
                 "schema": {
                   "example": {
                     "message": "You are not authorized to update this address"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not authorized to update this address"
+                    }
                   }
                 }
               }

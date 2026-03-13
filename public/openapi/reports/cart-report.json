@@ -155,6 +155,40 @@
                       "unit_price": 14900
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "abandonedItems": [
+                        {
+                          "product_name": "Developer Toolkit Pro",
+                          "abandoned_times": 42,
+                          "unit_price": 9900
+                        },
+                        {
+                          "product_name": "API Testing Suite",
+                          "abandoned_times": 28,
+                          "unit_price": 4900
+                        },
+                        {
+                          "product_name": "WordPress starter theme",
+                          "abandoned_times": 19,
+                          "unit_price": 2900
+                        },
+                        {
+                          "product_name": "Cloud Hosting Add-on",
+                          "abandoned_times": 15,
+                          "unit_price": 1499
+                        },
+                        {
+                          "product_name": "Premium Support Package",
+                          "abandoned_times": 8,
+                          "unit_price": 14900
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

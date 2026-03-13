@@ -99,6 +99,18 @@
                 "detail": {
                   "fulfillment_type": "digital"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "post_title": "New Digital Product",
+                    "post_status": "draft",
+                    "detail": {
+                      "fulfillment_type": "digital"
+                    }
+                  }
+                }
               }
             }
           }
@@ -194,6 +206,54 @@
                       }
                     },
                     "message": "Product has been created successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "ID": 124,
+                        "variant": {
+                          "id": 458,
+                          "post_id": 124,
+                          "serial_index": 0,
+                          "variation_title": "New Digital Product",
+                          "variation_identifier": "new-digital-product",
+                          "sku": null,
+                          "payment_type": "onetime",
+                          "item_price": 0,
+                          "item_cost": 0,
+                          "compare_price": 0,
+                          "item_status": "active",
+                          "manage_stock": 0,
+                          "stock_status": "in-stock",
+                          "total_stock": 0,
+                          "available": 0,
+                          "committed": 0,
+                          "on_hold": 0,
+                          "fulfillment_type": "digital",
+                          "downloadable": 0,
+                          "sold_individually": 0,
+                          "thumbnail": null
+                        },
+                        "product_details": {
+                          "id": 91,
+                          "post_id": 124,
+                          "fulfillment_type": "digital",
+                          "min_price": 0,
+                          "max_price": 0,
+                          "default_variation_id": 458,
+                          "variation_type": "single",
+                          "stock_availability": "in-stock",
+                          "manage_stock": 0,
+                          "manage_downloadable": 0,
+                          "formatted_min_price": "$0.00",
+                          "formatted_max_price": "$0.00"
+                        }
+                      },
+                      "message": "Product has been created successfully"
+                    }
                   }
                 }
               }

@@ -148,6 +148,54 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "roles": {
+                        "capability": false,
+                        "roles": [
+                          {
+                            "name": "Editor",
+                            "key": "editor"
+                          },
+                          {
+                            "name": "Author",
+                            "key": "author"
+                          },
+                          {
+                            "name": "Contributor",
+                            "key": "contributor"
+                          },
+                          {
+                            "name": "Translator",
+                            "key": "translator"
+                          },
+                          {
+                            "name": "LMS Manager",
+                            "key": "lms_manager"
+                          },
+                          {
+                            "name": "Instructor",
+                            "key": "instructor"
+                          },
+                          {
+                            "name": "Instructor's Assistant",
+                            "key": "instructors_assistant"
+                          },
+                          {
+                            "name": "Student",
+                            "key": "student"
+                          },
+                          {
+                            "name": "Group Leader",
+                            "key": "group_leader"
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

@@ -281,6 +281,69 @@
                       "net_revenue": 4200
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "salesGrowthChart": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01",
+                          "orders": 45,
+                          "net_revenue": 3780
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-02",
+                          "orders": 52,
+                          "net_revenue": 4320
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-03",
+                          "orders": 48,
+                          "net_revenue": 4590
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-04",
+                          "orders": 40,
+                          "net_revenue": 3510
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-05",
+                          "orders": 58,
+                          "net_revenue": 4950
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-06",
+                          "orders": 65,
+                          "net_revenue": 5580
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-07",
+                          "orders": 55,
+                          "net_revenue": 4800
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-08",
+                          "orders": 62,
+                          "net_revenue": 5250
+                        },
+                        {
+                          "year": "2025",
+                          "group": "2025-09",
+                          "orders": 48,
+                          "net_revenue": 4200
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

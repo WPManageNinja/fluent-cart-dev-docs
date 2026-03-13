@@ -76,6 +76,18 @@
                   "is_active": "yes",
                   "checkout_label": "Cash on Delivery"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "method": "cod",
+                    "settings": {
+                      "is_active": "yes",
+                      "checkout_label": "Cash on Delivery"
+                    }
+                  }
+                }
               }
             }
           }
@@ -120,6 +132,22 @@
                     "thank_you_page_instructions": "Please have the exact amount ready for the delivery driver."
                   },
                   "message": "Settings saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "settings": {
+                        "is_active": "yes",
+                        "payment_mode": "live",
+                        "checkout_label": "Cash on Delivery",
+                        "checkout_logo": "",
+                        "checkout_instructions": "Pay with cash when your order is delivered.",
+                        "thank_you_page_instructions": "Please have the exact amount ready for the delivery driver."
+                      },
+                      "message": "Settings saved successfully"
+                    }
+                  }
                 }
               }
             }

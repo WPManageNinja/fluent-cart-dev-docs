@@ -376,6 +376,114 @@
                     "max_count": 28,
                     "total_orders": 342
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "heatmap": {
+                        "days": [
+                          "Monday",
+                          "Tuesday",
+                          "Wednesday",
+                          "Thursday",
+                          "Friday",
+                          "Saturday",
+                          "Sunday"
+                        ],
+                        "hours": [
+                          0,
+                          1,
+                          2,
+                          3,
+                          4,
+                          5,
+                          6,
+                          7,
+                          8,
+                          9,
+                          10,
+                          11,
+                          12,
+                          13,
+                          14,
+                          15,
+                          16,
+                          17,
+                          18,
+                          19,
+                          20,
+                          21,
+                          22,
+                          23
+                        ],
+                        "data": [
+                          {
+                            "day": "Monday",
+                            "hour": 9,
+                            "count": 18
+                          },
+                          {
+                            "day": "Monday",
+                            "hour": 10,
+                            "count": 24
+                          },
+                          {
+                            "day": "Monday",
+                            "hour": 14,
+                            "count": 22
+                          },
+                          {
+                            "day": "Tuesday",
+                            "hour": 10,
+                            "count": 28
+                          },
+                          {
+                            "day": "Tuesday",
+                            "hour": 11,
+                            "count": 26
+                          },
+                          {
+                            "day": "Wednesday",
+                            "hour": 9,
+                            "count": 20
+                          },
+                          {
+                            "day": "Wednesday",
+                            "hour": 14,
+                            "count": 19
+                          },
+                          {
+                            "day": "Thursday",
+                            "hour": 10,
+                            "count": 25
+                          },
+                          {
+                            "day": "Thursday",
+                            "hour": 15,
+                            "count": 21
+                          },
+                          {
+                            "day": "Friday",
+                            "hour": 11,
+                            "count": 16
+                          },
+                          {
+                            "day": "Saturday",
+                            "hour": 12,
+                            "count": 8
+                          },
+                          {
+                            "day": "Sunday",
+                            "hour": 15,
+                            "count": 5
+                          }
+                        ],
+                        "max_count": 28,
+                        "total_orders": 342
+                      }
+                    }
+                  }
                 }
               }
             }

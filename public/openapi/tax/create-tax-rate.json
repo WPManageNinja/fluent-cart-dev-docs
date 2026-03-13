@@ -135,6 +135,19 @@
                 "name": "FR Standard Tax",
                 "group": "EU",
                 "priority": 1
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "class_id": 1,
+                    "country": "FR",
+                    "rate": "20.0000",
+                    "name": "FR Standard Tax",
+                    "group": "EU",
+                    "priority": 1
+                  }
+                }
               }
             }
           }
@@ -201,6 +214,34 @@
                     }
                   },
                   "message": "Tax rate has been created successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "tax_rate": {
+                        "id": 10,
+                        "class_id": 1,
+                        "country": "FR",
+                        "state": "",
+                        "postcode": "",
+                        "city": "",
+                        "rate": "20.0000",
+                        "name": "FR Standard Tax",
+                        "group": "EU",
+                        "priority": 1,
+                        "is_compound": 0,
+                        "for_shipping": null,
+                        "for_order": 0,
+                        "formatted_state": "",
+                        "tax_class": {
+                          "id": 1,
+                          "title": "Standard"
+                        }
+                      },
+                      "message": "Tax rate has been created successfully"
+                    }
+                  }
                 }
               }
             }
@@ -223,6 +264,14 @@
                 },
                 "example": {
                   "message": "Tax class is required"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Tax class is required"
+                    }
+                  }
                 }
               }
             }

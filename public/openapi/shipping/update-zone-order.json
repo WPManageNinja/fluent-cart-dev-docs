@@ -68,6 +68,18 @@
                   1,
                   2
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "zones": [
+                      3,
+                      1,
+                      2
+                    ]
+                  }
+                }
               }
             }
           }
@@ -90,6 +102,14 @@
                 },
                 "example": {
                   "message": "Shipping zones order has been updated"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Shipping zones order has been updated"
+                    }
+                  }
                 }
               }
             }
@@ -111,6 +131,14 @@
                 },
                 "example": {
                   "message": "Invalid data provided"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Invalid data provided"
+                    }
+                  }
                 }
               }
             }

@@ -83,6 +83,16 @@
                 "first_name": "John",
                 "last_name": "Smith",
                 "email": "john@example.com"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "email": "john@example.com"
+                  }
+                }
               }
             }
           }
@@ -105,6 +115,14 @@
                 },
                 "example": {
                   "message": "Profile updated successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Profile updated successfully"
+                    }
+                  }
                 }
               }
             }
@@ -119,6 +137,14 @@
                 "schema": {
                   "example": {
                     "message": "You are not logged in"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not logged in"
+                    }
                   }
                 }
               }

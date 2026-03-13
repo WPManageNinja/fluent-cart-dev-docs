@@ -73,6 +73,15 @@
                 "example": {
                   "message": "Coupon successfully deleted.",
                   "data": ""
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Coupon successfully deleted.",
+                      "data": ""
+                    }
+                  }
                 }
               }
             }
@@ -94,6 +103,14 @@
                 },
                 "example": {
                   "message": "Please use a valid coupon ID!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Please use a valid coupon ID!"
+                    }
+                  }
                 }
               }
             }
@@ -115,6 +132,14 @@
                 },
                 "example": {
                   "message": "Coupon not found in database, failed to remove."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Coupon not found in database, failed to remove."
+                    }
+                  }
                 }
               }
             }
@@ -136,6 +161,14 @@
                 },
                 "example": {
                   "message": "Coupon deletion failed!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Coupon deletion failed!"
+                    }
+                  }
                 }
               }
             }

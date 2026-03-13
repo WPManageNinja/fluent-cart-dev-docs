@@ -318,6 +318,68 @@
                       }
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "settings": {
+                        "store_name": "TechStore Inc.",
+                        "currency": "USD",
+                        "currency_position": "before",
+                        "decimal_separator": "dot",
+                        "checkout_button_text": "Checkout",
+                        "view_cart_button_text": "View Cart",
+                        "cart_button_text": "Add To Cart",
+                        "popup_button_text": "View Product",
+                        "out_of_stock_button_text": "Not Available",
+                        "checkout_method_style": "logo",
+                        "enable_modal_checkout": "no",
+                        "require_logged_in": "no",
+                        "show_cart_icon_in_nav": "no",
+                        "show_cart_icon_in_body": "yes",
+                        "additional_address_field": "yes",
+                        "hide_coupon_field": "no",
+                        "user_account_creation_mode": "all",
+                        "checkout_page_id": "12",
+                        "cart_page_id": "14",
+                        "receipt_page_id": "16",
+                        "shop_page_id": "18",
+                        "customer_profile_page_id": "20",
+                        "store_address1": "456 Market Street",
+                        "store_address2": "Suite 200",
+                        "store_city": "San Francisco",
+                        "store_country": "US",
+                        "store_postcode": "94102",
+                        "store_state": "CA",
+                        "order_mode": "live",
+                        "variation_view": "both",
+                        "variation_columns": "masonry",
+                        "min_receipt_number": "1",
+                        "inv_prefix": "INV-",
+                        "show_email_footer": "yes"
+                      },
+                      "fields": {
+                        "store_setup": {
+                          "store_name": {
+                            "label": "Store Name",
+                            "type": "text",
+                            "required": true
+                          },
+                          "currency": {
+                            "label": "Currency",
+                            "type": "select",
+                            "required": true
+                          },
+                          "store_country": {
+                            "label": "Country",
+                            "type": "select",
+                            "required": true
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

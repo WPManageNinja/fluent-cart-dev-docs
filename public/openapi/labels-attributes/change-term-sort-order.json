@@ -94,6 +94,15 @@
                 "example": {
                   "data": 2,
                   "message": "Serial updated."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": 2,
+                      "message": "Serial updated."
+                    }
+                  }
                 }
               }
             }
@@ -122,6 +131,15 @@
                 "example": {
                   "message": "Info mismatch.",
                   "code": 404
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Info mismatch.",
+                      "code": 404
+                    }
+                  }
                 }
               }
             }

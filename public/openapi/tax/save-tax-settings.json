@@ -154,6 +154,28 @@
                     ]
                   }
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "settings": {
+                      "enable_tax": "yes",
+                      "tax_inclusion": "excluded",
+                      "tax_calculation_basis": "billing",
+                      "tax_rounding": "subtotal",
+                      "price_suffix": "excl. VAT",
+                      "eu_vat_settings": {
+                        "require_vat_number": "yes",
+                        "local_reverse_charge": "yes",
+                        "vat_reverse_excluded_categories": [
+                          12,
+                          15
+                        ]
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -177,6 +199,14 @@
                 },
                 "example": {
                   "message": "Settings saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Settings saved successfully"
+                    }
+                  }
                 }
               }
             }

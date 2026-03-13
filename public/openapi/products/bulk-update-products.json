@@ -71,6 +71,19 @@
                     "post_title": "Updated Title A"
                   }
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "products": [
+                      {
+                        "ID": 123,
+                        "post_title": "Updated Title A"
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -102,6 +115,22 @@
                       }
                     ],
                     "errors": []
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "1 product(s) updated successfully",
+                      "updated": [
+                        {
+                          "ID": 123,
+                          "post_title": "Updated Title A",
+                          "post_status": "publish"
+                        }
+                      ],
+                      "errors": []
+                    }
                   }
                 }
               }

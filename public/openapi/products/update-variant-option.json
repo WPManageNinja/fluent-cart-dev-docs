@@ -115,6 +115,31 @@
                     ]
                   }
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "variation_type": "simple_variations",
+                    "product_id": 123,
+                    "options": [
+                      {
+                        "id": 1,
+                        "name": "License Type",
+                        "variants": [
+                          {
+                            "id": 456,
+                            "value": "Personal"
+                          },
+                          {
+                            "id": 457,
+                            "value": "Business"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -130,6 +155,14 @@
                 "schema": {
                   "example": {
                     "message": "Variant options synced successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Variant options synced successfully"
+                    }
                   }
                 }
               }

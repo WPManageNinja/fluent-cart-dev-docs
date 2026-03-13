@@ -66,6 +66,14 @@
                 },
                 "example": {
                   "message": "Order bump deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Order bump deleted successfully"
+                    }
+                  }
                 }
               }
             }
@@ -87,6 +95,14 @@
                 },
                 "example": {
                   "message": "Failed to delete order bump"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Failed to delete order bump"
+                    }
+                  }
                 }
               }
             }

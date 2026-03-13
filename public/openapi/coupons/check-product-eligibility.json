@@ -79,6 +79,19 @@
                   "SUMMER15"
                 ],
                 "origin": "admin_order"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "productId": 123,
+                    "appliedCoupons": [
+                      "WELCOME20",
+                      "SUMMER15"
+                    ],
+                    "origin": "admin_order"
+                  }
+                }
               }
             }
           }

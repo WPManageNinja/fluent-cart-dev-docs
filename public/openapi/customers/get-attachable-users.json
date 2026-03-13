@@ -99,6 +99,27 @@
                       "display_name": "Lisa Park"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "users": [
+                        {
+                          "ID": 8,
+                          "user_login": "mike.chen",
+                          "user_email": "mike.chen@example.com",
+                          "display_name": "Mike Chen"
+                        },
+                        {
+                          "ID": 14,
+                          "user_login": "lisa.park",
+                          "user_email": "lisa.park@example.com",
+                          "display_name": "Lisa Park"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

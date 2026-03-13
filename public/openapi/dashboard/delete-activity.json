@@ -65,6 +65,14 @@
                 },
                 "example": {
                   "message": "Activity Deleted Successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Activity Deleted Successfully"
+                    }
+                  }
                 }
               }
             }
@@ -86,6 +94,14 @@
                 },
                 "example": {
                   "message": "Activity not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Activity not found"
+                    }
+                  }
                 }
               }
             }

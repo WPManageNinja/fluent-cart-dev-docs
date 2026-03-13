@@ -254,6 +254,54 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "orders": {
+                        "total": 3,
+                        "per_page": 10,
+                        "current_page": 1,
+                        "last_page": 1,
+                        "data": [
+                          {
+                            "id": 42,
+                            "invoice_no": "INV-042",
+                            "customer_id": 12,
+                            "status": "completed",
+                            "payment_status": "paid",
+                            "payment_method": "stripe",
+                            "currency": "USD",
+                            "total_amount": 10692,
+                            "created_at": "2025-09-20 14:25:00"
+                          },
+                          {
+                            "id": 35,
+                            "invoice_no": "INV-035",
+                            "customer_id": 12,
+                            "status": "completed",
+                            "payment_status": "paid",
+                            "payment_method": "stripe",
+                            "currency": "USD",
+                            "total_amount": 7500,
+                            "created_at": "2025-08-05 11:30:00"
+                          },
+                          {
+                            "id": 28,
+                            "invoice_no": "INV-028",
+                            "customer_id": 12,
+                            "status": "processing",
+                            "payment_status": "paid",
+                            "payment_method": "paypal",
+                            "currency": "USD",
+                            "total_amount": 6708,
+                            "created_at": "2025-06-10 09:15:00"
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

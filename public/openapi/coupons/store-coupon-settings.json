@@ -55,6 +55,14 @@
               },
               "example": {
                 "show_on_checkout": true
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "show_on_checkout": true
+                  }
+                }
               }
             }
           }

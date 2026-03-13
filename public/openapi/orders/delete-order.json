@@ -102,6 +102,20 @@
                     "status": "success"
                   },
                   "errors": []
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Order 42 deleted successfully",
+                      "data": {
+                        "order_id": 42,
+                        "invoice_no": "INV-042",
+                        "status": "success"
+                      },
+                      "errors": []
+                    }
+                  }
                 }
               }
             }
@@ -123,6 +137,14 @@
                 },
                 "example": {
                   "message": "Order not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Order not found"
+                    }
+                  }
                 }
               }
             }

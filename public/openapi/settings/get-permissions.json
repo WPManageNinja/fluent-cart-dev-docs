@@ -141,6 +141,50 @@
                       }
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "roles": {
+                        "administrator": {
+                          "name": "Administrator",
+                          "capabilities": {
+                            "orders/view": true,
+                            "orders/manage": true,
+                            "customers/view": true,
+                            "customers/manage": true,
+                            "products/manage": true,
+                            "subscriptions/view": true,
+                            "subscriptions/manage": true,
+                            "settings/manage": true,
+                            "reports/view": true,
+                            "coupons/manage": true,
+                            "shipping/manage": true,
+                            "tax/manage": true
+                          }
+                        },
+                        "shop_manager": {
+                          "name": "Shop Manager",
+                          "capabilities": {
+                            "orders/view": true,
+                            "orders/manage": true,
+                            "customers/view": true,
+                            "customers/manage": true,
+                            "products/manage": true,
+                            "coupons/manage": true
+                          }
+                        },
+                        "editor": {
+                          "name": "Editor",
+                          "capabilities": {
+                            "orders/view": true,
+                            "customers/view": true
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

@@ -169,6 +169,62 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "data": [
+                          {
+                            "id": 42,
+                            "customer_id": 12,
+                            "invoice_no": "INV-042",
+                            "status": "completed",
+                            "payment_status": "paid",
+                            "currency": "USD",
+                            "total_amount": 10692,
+                            "created_at": "2025-09-20 14:25:00",
+                            "filtered_order_items": [
+                              {
+                                "id": 78,
+                                "order_id": 42,
+                                "title": "Pro Starter Kit",
+                                "quantity": 1,
+                                "unit_price": 9900
+                              },
+                              {
+                                "id": 79,
+                                "order_id": 42,
+                                "title": "Priority Support Add-on",
+                                "quantity": 1,
+                                "unit_price": 792
+                              }
+                            ]
+                          },
+                          {
+                            "id": 35,
+                            "customer_id": 12,
+                            "invoice_no": "INV-035",
+                            "status": "completed",
+                            "payment_status": "paid",
+                            "currency": "USD",
+                            "total_amount": 7500,
+                            "created_at": "2025-08-05 11:30:00",
+                            "filtered_order_items": [
+                              {
+                                "id": 62,
+                                "order_id": 35,
+                                "title": "Premium Theme License",
+                                "quantity": 1,
+                                "unit_price": 7500
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

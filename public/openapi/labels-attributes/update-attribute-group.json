@@ -83,6 +83,15 @@
                 "example": {
                   "data": true,
                   "message": "Group updated successfully!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": true,
+                      "message": "Group updated successfully!"
+                    }
+                  }
                 }
               }
             }
@@ -119,6 +128,18 @@
                     "title": [
                       "Group title can not be empty and must be unique."
                     ]
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "errors": {
+                        "title": [
+                          "Group title can not be empty and must be unique."
+                        ]
+                      }
+                    }
                   }
                 }
               }

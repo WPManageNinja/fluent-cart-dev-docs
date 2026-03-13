@@ -121,6 +121,45 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 5,
+                          "product_id": 123,
+                          "from_variant": 456,
+                          "to_variants": [
+                            457,
+                            458
+                          ],
+                          "title": "Upgrade to Business License",
+                          "description": "Upgrade from Personal to Business for team access and priority support.",
+                          "slug": "upgrade-to-business",
+                          "discount_amount": 500,
+                          "from_variation": {
+                            "id": 456,
+                            "variation_title": "Personal License",
+                            "item_price": 4900
+                          },
+                          "to_variations": [
+                            {
+                              "id": 457,
+                              "variation_title": "Business License - Annual",
+                              "item_price": 9900
+                            },
+                            {
+                              "id": 458,
+                              "variation_title": "Enterprise License",
+                              "item_price": 19900
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

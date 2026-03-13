@@ -62,6 +62,14 @@
               },
               "example": {
                 "mode": "live"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "mode": "live"
+                  }
+                }
               }
             }
           }
@@ -85,6 +93,14 @@
                 },
                 "example": {
                   "message": "Webhook setup successfully! Please reload the page."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Webhook setup successfully! Please reload the page."
+                    }
+                  }
                 }
               }
             }

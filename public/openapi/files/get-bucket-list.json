@@ -94,6 +94,24 @@
                       "value": "my-store-backups"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "default_bucket": "my-store-files",
+                      "buckets": [
+                        {
+                          "label": "my-store-files",
+                          "value": "my-store-files"
+                        },
+                        {
+                          "label": "my-store-backups",
+                          "value": "my-store-backups"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

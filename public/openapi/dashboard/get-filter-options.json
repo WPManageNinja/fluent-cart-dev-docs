@@ -125,6 +125,29 @@
                       ]
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "options": [
+                        {
+                          "id": 1,
+                          "title": "Premium T-Shirt - Small / Red",
+                          "children": [
+                            {
+                              "id": 10,
+                              "title": "Small / Red"
+                            },
+                            {
+                              "id": 11,
+                              "title": "Medium / Blue"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

@@ -77,6 +77,16 @@
                   "tax_data": {
                     "tax_id": "DE123456789"
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "tax_data": {
+                        "tax_id": "DE123456789"
+                      }
+                    }
+                  }
                 }
               }
             }

@@ -115,6 +115,38 @@
                     "checkout_page_id": "12",
                     "customer_profile_page_id": ""
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "pages": [
+                        {
+                          "id": 10,
+                          "title": "Shop",
+                          "link": "https://example.com/shop/"
+                        },
+                        {
+                          "id": 12,
+                          "title": "Checkout",
+                          "link": "https://example.com/checkout/"
+                        }
+                      ],
+                      "currencies": {
+                        "USD": "United States Dollar ($)",
+                        "EUR": "Euro (EUR)",
+                        "GBP": "British Pound (GBP)"
+                      },
+                      "default_settings": {
+                        "store_name": "My Store",
+                        "store_logo": "",
+                        "currency": "USD",
+                        "shop_page_id": "10",
+                        "checkout_page_id": "12",
+                        "customer_profile_page_id": ""
+                      }
+                    }
+                  }
                 }
               }
             }

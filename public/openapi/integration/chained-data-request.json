@@ -61,6 +61,15 @@
               "example": {
                 "route": "fluent-crm",
                 "list_id": "2"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "route": "fluent-crm",
+                    "list_id": "2"
+                  }
+                }
               }
             }
           }
@@ -112,6 +121,23 @@
                       "label": "Option B"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "options": [
+                        {
+                          "id": "1",
+                          "label": "Option A"
+                        },
+                        {
+                          "id": "2",
+                          "label": "Option B"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

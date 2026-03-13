@@ -82,6 +82,15 @@
               "example": {
                 "id": 1,
                 "url": "https://my-client-site.com"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "id": 1,
+                    "url": "https://my-client-site.com"
+                  }
+                }
               }
             }
           }
@@ -104,6 +113,14 @@
                 },
                 "example": {
                   "message": "Site has been activated successfully!"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Site has been activated successfully!"
+                    }
+                  }
                 }
               }
             }
@@ -125,6 +142,14 @@
                 },
                 "example": {
                   "message": "<error message from license manager>"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "<error message from license manager>"
+                    }
+                  }
                 }
               }
             }

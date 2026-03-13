@@ -67,6 +67,14 @@
                 },
                 "example": {
                   "message": "Tax class has been deleted successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Tax class has been deleted successfully"
+                    }
+                  }
                 }
               }
             }
@@ -89,6 +97,14 @@
                 },
                 "example": {
                   "message": "Failed to delete tax class"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Failed to delete tax class"
+                    }
+                  }
                 }
               }
             }

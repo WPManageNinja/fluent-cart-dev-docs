@@ -153,6 +153,61 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "variants": [
+                        {
+                          "id": 456,
+                          "post_id": 123,
+                          "serial_index": 0,
+                          "variation_title": "Personal License",
+                          "variation_identifier": "personal",
+                          "sku": "DTK-PERSONAL",
+                          "payment_type": "onetime",
+                          "item_price": 4900,
+                          "item_cost": 0,
+                          "compare_price": 6900,
+                          "item_status": "active",
+                          "manage_stock": 0,
+                          "stock_status": "in-stock",
+                          "total_stock": 0,
+                          "available": 0,
+                          "committed": 0,
+                          "on_hold": 0,
+                          "fulfillment_type": "digital",
+                          "downloadable": 1,
+                          "sold_individually": 1,
+                          "thumbnail": null
+                        },
+                        {
+                          "id": 457,
+                          "post_id": 123,
+                          "serial_index": 1,
+                          "variation_title": "Business License - Annual",
+                          "variation_identifier": "business-annual",
+                          "sku": "DTK-BIZ-ANNUAL",
+                          "payment_type": "subscription",
+                          "item_price": 9900,
+                          "item_cost": 0,
+                          "compare_price": 14900,
+                          "item_status": "active",
+                          "manage_stock": 0,
+                          "stock_status": "in-stock",
+                          "total_stock": 0,
+                          "available": 0,
+                          "committed": 0,
+                          "on_hold": 0,
+                          "fulfillment_type": "digital",
+                          "downloadable": 1,
+                          "sold_individually": 1,
+                          "thumbnail": null
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

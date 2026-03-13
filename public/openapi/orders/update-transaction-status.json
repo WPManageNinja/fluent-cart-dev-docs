@@ -77,6 +77,14 @@
               },
               "example": {
                 "status": "succeeded"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "status": "succeeded"
+                  }
+                }
               }
             }
           }
@@ -140,6 +148,21 @@
                     "payment_method": "stripe"
                   },
                   "message": "Payment status has been successfully updated"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "transaction": {
+                        "id": 15,
+                        "order_id": 42,
+                        "status": "succeeded",
+                        "total": 5000,
+                        "payment_method": "stripe"
+                      },
+                      "message": "Payment status has been successfully updated"
+                    }
+                  }
                 }
               }
             }
@@ -161,6 +184,14 @@
                 },
                 "example": {
                   "message": "Transaction already has the same status"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Transaction already has the same status"
+                    }
+                  }
                 }
               }
             }

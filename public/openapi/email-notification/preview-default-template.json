@@ -78,6 +78,14 @@
               },
               "example": {
                 "template": "order.paid.customer"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "template": "order.paid.customer"
+                  }
+                }
               }
             }
           }
@@ -110,6 +118,16 @@
                 "example": {
                   "data": {
                     "content": "<!DOCTYPE html><html>...rendered email HTML...</html>"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "content": "<!DOCTYPE html><html>...rendered email HTML...</html>"
+                      }
+                    }
                   }
                 }
               }

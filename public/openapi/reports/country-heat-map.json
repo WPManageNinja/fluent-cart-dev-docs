@@ -162,6 +162,55 @@
                       "value": 4
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "countryHeatMap": [
+                        {
+                          "name": "United States",
+                          "value": 120
+                        },
+                        {
+                          "name": "United Kingdom",
+                          "value": 35
+                        },
+                        {
+                          "name": "Germany",
+                          "value": 22
+                        },
+                        {
+                          "name": "Canada",
+                          "value": 18
+                        },
+                        {
+                          "name": "Australia",
+                          "value": 12
+                        },
+                        {
+                          "name": "France",
+                          "value": 10
+                        },
+                        {
+                          "name": "Netherlands",
+                          "value": 8
+                        },
+                        {
+                          "name": "India",
+                          "value": 7
+                        },
+                        {
+                          "name": "Brazil",
+                          "value": 5
+                        },
+                        {
+                          "name": "Japan",
+                          "value": 4
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }

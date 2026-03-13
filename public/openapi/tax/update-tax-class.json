@@ -106,6 +106,21 @@
                   20
                 ],
                 "priority": 8
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "title": "Digital Goods Updated",
+                    "description": "Updated description",
+                    "categories": [
+                      12,
+                      15,
+                      20
+                    ],
+                    "priority": 8
+                  }
+                }
               }
             }
           }
@@ -129,6 +144,14 @@
                 },
                 "example": {
                   "message": "Tax class has been updated successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Tax class has been updated successfully"
+                    }
+                  }
                 }
               }
             }

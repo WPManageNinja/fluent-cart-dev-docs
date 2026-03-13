@@ -166,6 +166,34 @@
                     }
                   ],
                   "total_licenses": 245
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "distribution": [
+                        {
+                          "label": "Active",
+                          "value": 198,
+                          "percentage": 80.8,
+                          "color": "#67C23A"
+                        },
+                        {
+                          "label": "Expired",
+                          "value": 32,
+                          "percentage": 13.1,
+                          "color": "#E6A23C"
+                        },
+                        {
+                          "label": "Revoked",
+                          "value": 15,
+                          "percentage": 6.1,
+                          "color": "#F56C6C"
+                        }
+                      ],
+                      "total_licenses": 245
+                    }
+                  }
                 }
               }
             }

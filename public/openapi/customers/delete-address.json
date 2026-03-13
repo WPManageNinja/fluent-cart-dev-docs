@@ -79,6 +79,15 @@
                 "example": {
                   "message": "Address successfully deleted.",
                   "data": ""
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Address successfully deleted.",
+                      "data": ""
+                    }
+                  }
                 }
               }
             }

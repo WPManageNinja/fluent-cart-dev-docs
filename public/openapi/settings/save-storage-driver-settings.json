@@ -82,6 +82,20 @@
                   "bucket": "my-store-files",
                   "region": "us-east-1"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "driver": "s3",
+                    "settings": {
+                      "access_key": "AKIA...",
+                      "secret_key": "wJalr...",
+                      "bucket": "my-store-files",
+                      "region": "us-east-1"
+                    }
+                  }
+                }
               }
             }
           }
@@ -125,6 +139,22 @@
                     "region": "us-east-1",
                     "is_active": true,
                     "base_url": "https://techstore-downloads.s3.amazonaws.com"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Settings saved successfully",
+                      "data": {
+                        "access_key": "AKIAIOSFODNN7EXAMPLE",
+                        "secret_key": "****",
+                        "bucket": "techstore-downloads",
+                        "region": "us-east-1",
+                        "is_active": true,
+                        "base_url": "https://techstore-downloads.s3.amazonaws.com"
+                      }
+                    }
                   }
                 }
               }

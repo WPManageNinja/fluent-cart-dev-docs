@@ -139,6 +139,54 @@
                   },
                   "height": 800,
                   "width": 1200
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "id": 456,
+                      "title": "product-banner",
+                      "filename": "product-banner.jpg",
+                      "url": "https://example.com/wp-content/uploads/2025/01/product-banner.jpg",
+                      "link": "https://example.com/?attachment_id=456",
+                      "alt": "",
+                      "author": "1",
+                      "description": "",
+                      "caption": "",
+                      "name": "product-banner",
+                      "status": "inherit",
+                      "uploadedTo": 0,
+                      "date": "2025-01-15T12:00:00.000Z",
+                      "modified": "2025-01-15T12:00:00.000Z",
+                      "menuOrder": 0,
+                      "mime": "image/jpeg",
+                      "type": "image",
+                      "subtype": "jpeg",
+                      "icon": "https://example.com/wp-includes/images/media/default.png",
+                      "dateFormatted": "January 15, 2025",
+                      "filesizeInBytes": 204800,
+                      "filesizeHumanReadable": "200 KB",
+                      "sizes": {
+                        "thumbnail": {
+                          "url": "https://example.com/wp-content/uploads/2025/01/product-banner-150x150.jpg",
+                          "height": 150,
+                          "width": 150
+                        },
+                        "medium": {
+                          "url": "https://example.com/wp-content/uploads/2025/01/product-banner-300x200.jpg",
+                          "height": 200,
+                          "width": 300
+                        },
+                        "full": {
+                          "url": "https://example.com/wp-content/uploads/2025/01/product-banner.jpg",
+                          "height": 800,
+                          "width": 1200
+                        }
+                      },
+                      "height": 800,
+                      "width": 1200
+                    }
+                  }
                 }
               }
             }

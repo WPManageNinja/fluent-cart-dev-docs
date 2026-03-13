@@ -149,6 +149,33 @@
                       }
                     }
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "country_code": "US",
+                        "states": {
+                          "AL": "Alabama",
+                          "AK": "Alaska",
+                          "AZ": "Arizona",
+                          "CA": "California",
+                          "NY": "New York"
+                        },
+                        "address_locale": {
+                          "state": {
+                            "label": "State",
+                            "required": true
+                          },
+                          "postcode": {
+                            "label": "ZIP Code",
+                            "required": true
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

@@ -79,6 +79,25 @@
                       "url": "https://example.com/wp-content/uploads/2025/01/store-logo.png"
                     }
                   ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "attachments": [
+                        {
+                          "id": 101,
+                          "title": "product-image",
+                          "url": "https://example.com/wp-content/uploads/2025/01/product-image.jpg"
+                        },
+                        {
+                          "id": 102,
+                          "title": "store-logo",
+                          "url": "https://example.com/wp-content/uploads/2025/01/store-logo.png"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -100,6 +119,14 @@
                 },
                 "example": {
                   "message": "No Images Found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No Images Found"
+                    }
+                  }
                 }
               }
             }

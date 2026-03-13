@@ -173,6 +173,62 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "sales_data": {
+                        "current_period": {
+                          "total_revenue": 1250000,
+                          "total_orders": 342,
+                          "average_order_value": 3655
+                        },
+                        "previous_period": {
+                          "total_revenue": 1050000,
+                          "total_orders": 289,
+                          "average_order_value": 3633
+                        },
+                        "growth": {
+                          "revenue_growth": 19.05,
+                          "orders_growth": 18.34,
+                          "aov_growth": 0.61
+                        },
+                        "monthly": [
+                          {
+                            "month": "2025-01",
+                            "revenue": 420000,
+                            "orders": 45
+                          },
+                          {
+                            "month": "2025-02",
+                            "revenue": 480000,
+                            "orders": 52
+                          },
+                          {
+                            "month": "2025-03",
+                            "revenue": 510000,
+                            "orders": 48
+                          },
+                          {
+                            "month": "2025-04",
+                            "revenue": 390000,
+                            "orders": 40
+                          },
+                          {
+                            "month": "2025-05",
+                            "revenue": 550000,
+                            "orders": 58
+                          },
+                          {
+                            "month": "2025-06",
+                            "revenue": 620000,
+                            "orders": 65
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

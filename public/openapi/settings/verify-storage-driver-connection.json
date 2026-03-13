@@ -82,6 +82,20 @@
                   "bucket": "my-store-files",
                   "region": "us-east-1"
                 }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "driver": "s3",
+                    "settings": {
+                      "access_key": "AKIA...",
+                      "secret_key": "wJalr...",
+                      "bucket": "my-store-files",
+                      "region": "us-east-1"
+                    }
+                  }
+                }
               }
             }
           }
@@ -105,6 +119,14 @@
                 },
                 "example": {
                   "message": "Connection verified successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Connection verified successfully"
+                    }
+                  }
                 }
               }
             }

@@ -257,6 +257,30 @@
                     }
                   }
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "post_title": "Updated Product",
+                    "post_status": "publish",
+                    "detail": {
+                      "fulfillment_type": "digital",
+                      "variation_type": "simple"
+                    },
+                    "variants": [
+                      {
+                        "id": 789,
+                        "post_id": 123,
+                        "variation_title": "Default Plan",
+                        "item_price": 1999,
+                        "other_info": {
+                          "payment_type": "onetime"
+                        }
+                      }
+                    ]
+                  }
+                }
               }
             }
           }
@@ -346,6 +370,51 @@
                       ]
                     },
                     "message": "Product updated successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "ID": 123,
+                        "post_title": "Developer Toolkit Pro",
+                        "post_status": "publish",
+                        "post_name": "developer-toolkit-pro",
+                        "post_excerpt": "Professional developer tools for building modern applications.",
+                        "view_url": "https://example.com/product/developer-toolkit-pro",
+                        "edit_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products/123",
+                        "detail": {
+                          "id": 89,
+                          "post_id": 123,
+                          "fulfillment_type": "digital",
+                          "min_price": 4900,
+                          "max_price": 19900,
+                          "default_variation_id": 456,
+                          "variation_type": "multi",
+                          "stock_availability": "in-stock",
+                          "manage_stock": 0,
+                          "manage_downloadable": 1,
+                          "formatted_min_price": "$49.00",
+                          "formatted_max_price": "$199.00"
+                        },
+                        "variants": [
+                          {
+                            "id": 456,
+                            "post_id": 123,
+                            "variation_title": "Personal License",
+                            "item_price": 4900,
+                            "compare_price": 6900,
+                            "sku": "DTK-PERSONAL",
+                            "stock_status": "in-stock",
+                            "payment_type": "onetime",
+                            "item_status": "active",
+                            "fulfillment_type": "digital"
+                          }
+                        ]
+                      },
+                      "message": "Product updated successfully"
+                    }
                   }
                 }
               }

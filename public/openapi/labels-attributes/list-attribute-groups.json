@@ -218,6 +218,41 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "groups": {
+                        "total": 3,
+                        "per_page": 10,
+                        "current_page": 1,
+                        "last_page": 1,
+                        "data": [
+                          {
+                            "id": 1,
+                            "title": "Color",
+                            "slug": "color",
+                            "description": "Product color options",
+                            "settings": null,
+                            "created_at": "2025-01-10 08:30:00",
+                            "updated_at": "2025-01-10 08:30:00",
+                            "terms_count": 5
+                          },
+                          {
+                            "id": 2,
+                            "title": "Size",
+                            "slug": "size",
+                            "description": "Product size options",
+                            "settings": null,
+                            "created_at": "2025-01-10 08:35:00",
+                            "updated_at": "2025-01-10 08:35:00",
+                            "terms_count": 4
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

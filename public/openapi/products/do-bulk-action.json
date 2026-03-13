@@ -75,6 +75,19 @@
                   456,
                   789
                 ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "action": "publish",
+                    "product_ids": [
+                      123,
+                      456,
+                      789
+                    ]
+                  }
+                }
               }
             }
           }
@@ -90,6 +103,14 @@
                 "schema": {
                   "example": {
                     "message": "Bulk action completed successfully"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Bulk action completed successfully"
+                    }
                   }
                 }
               }

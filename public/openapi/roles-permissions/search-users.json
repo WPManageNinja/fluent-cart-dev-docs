@@ -132,6 +132,31 @@
                       }
                     ]
                   }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "users": {
+                        "total": 25,
+                        "per_page": 15,
+                        "current_page": 1,
+                        "last_page": 2,
+                        "data": [
+                          {
+                            "ID": 10,
+                            "name": "Alice Johnson",
+                            "email": "alice@example.com"
+                          },
+                          {
+                            "ID": 15,
+                            "name": "Bob Wilson",
+                            "email": "bob@example.com"
+                          }
+                        ]
+                      }
+                    }
+                  }
                 }
               }
             }

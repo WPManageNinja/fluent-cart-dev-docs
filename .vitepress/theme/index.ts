@@ -1,14 +1,51 @@
 /// <reference path="../../env.d.ts" />
 
 import DefaultTheme from 'vitepress/theme'
-import { h } from 'vue'
+import { h, ref, watch, onMounted, onUnmounted, nextTick, defineComponent } from 'vue'
 import type { Theme } from 'vitepress'
+import { useRoute, useData } from 'vitepress'
 import { theme } from 'vitepress-openapi/client'
 import 'vitepress-openapi/dist/style.css'
 import Mermaid from './components/Mermaid.vue'
 import './custom.css'
 // OpenAPI styles - loaded globally but scoped to OpenAPI pages via CSS selectors
 import './openapi.css'
+
+// Fluent Comments widget component
+const FluentCommentsWidget = defineComponent({
+  setup() {
+    const container = ref<HTMLElement | null>(null)
+    const route = useRoute()
+    const { isDark, frontmatter } = useData()
+
+    function mountComments() {
+      if (!container.value) return
+      container.value.innerHTML = ''
+
+      // Skip if frontmatter has comments: false
+      if (frontmatter.value.comments === false) return
+
+      const el = document.createElement('fluent-comments')
+      el.setAttribute('site-id', 'F8UyRC2sCg34')
+      el.setAttribute('api-url', 'https://api.fluentcomments.com')
+      el.setAttribute('theme', isDark.value ? 'dark' : 'light')
+      container.value.appendChild(el)
+    }
+
+    onMounted(mountComments)
+
+    watch(() => route.path, () => {
+      nextTick(mountComments)
+    })
+
+    watch(isDark, (dark) => {
+      const el = container.value?.querySelector('fluent-comments')
+      if (el) el.setAttribute('theme', dark ? 'dark' : 'light')
+    })
+
+    return () => h('div', { ref: container, style: 'margin-top: 2rem;' })
+  }
+})
 
 // Extend Window interface for custom property
 declare global {
@@ -43,6 +80,7 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
+      'doc-after': () => h(FluentCommentsWidget),
     })
   },
   async enhanceApp({ app, router, siteData }) {
@@ -53,6 +91,14 @@ export default {
 
     // Client-side enhancements (mermaid zoom, playground, fetch interception)
     if (typeof window !== 'undefined') {
+      // Load Fluent Comments embed script
+      if (!document.querySelector('script[src*="fluentcomments"]')) {
+        const script = document.createElement('script')
+        script.src = 'https://api.fluentcomments.com/embed.js'
+        script.async = true
+        document.head.appendChild(script)
+      }
+
       // Add mermaid diagram zoom functionality
       let currentZoomedElement: HTMLElement | null = null
 

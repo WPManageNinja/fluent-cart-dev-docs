@@ -1,11 +1,11 @@
 ---
-title: Custom Product Selling Options
-description: Complete guide for developers to implement custom product selling options using FluentCart hooks.
+title: Ghost Product Selling Options
+description: Complete guide for developers to implement ghost product selling options using FluentCart hooks.
 ---
 
-# Custom Product Selling Options
+# Ghost Product Selling Options
 
-FluentCart provides a powerful hook system that allows developers to sell custom products that don't exist in the product catalog. This feature enables selling add-ons, gift wrapping, custom subscriptions, and any other custom items through your store.
+FluentCart provides a powerful hook system that allows developers to sell ghost products that don't exist in the product catalog. This feature enables selling add-ons, gift wrapping, custom subscriptions, and any other custom items through your store.
 
 ## Overview
 

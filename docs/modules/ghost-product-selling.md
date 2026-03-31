@@ -419,7 +419,7 @@ $product = (object)[
 
 1. **Always Validate Data**: Use the validation hook to ensure item data is correct before adding to cart
 2. **Handle Quantity Changes**: Implement quantity change handlers for one-time items
-3. **Mark Custom Items**: Use `is_custom` flag to distinguish custom items from regular products
+3. **Mark Custom Items**: Use `is_custom` flag to distinguish custom items from regular products (required for all custom items)
 4. **Set Correct Payment Type**: Ensure `payment_type` is set correctly (`onetime` or `subscription`)
 5. **Calculate Totals**: Always calculate `line_total` as `price × quantity`
 6. **Use Sanitization**: Apply `sanitize_text_field()` and `absint()` for security

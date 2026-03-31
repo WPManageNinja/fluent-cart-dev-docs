@@ -42,8 +42,8 @@ FluentCart modules are organized into several categories:
 - **Location**: `app/Modules/Integrations/`
 - **Examples**: FluentCRM, MailChimp, Webhooks
 
-#### 6. **Custom Product Selling** ⭐ **NEW**
-- **Purpose**: Sell custom products without catalog entries
+#### 6. **Ghost Product Selling** ⭐ **NEW**
+- **Purpose**: Sell ghost products without catalog entries
 - **Location**: Hook-based implementation
 - **Examples**: Add-ons, gift wrapping, custom subscriptions
 
@@ -456,7 +456,7 @@ Modules can be distributed through:
 
 Continue with module development:
 
-1. **[Custom Product Selling](./custom-product-selling)** - Sell custom products using hooks
+1. **[Ghost Product Selling](./ghost-product-selling)** - Sell ghost products using hooks
 2. **[Payment Methods Module](./payment-methods)** - Payment gateway development
 3. **[Shipping Module](./shipping)** - Shipping method development
 4. **[Storage Drivers](./storage)** - File storage integration

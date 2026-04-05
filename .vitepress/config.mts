@@ -109,7 +109,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'get-overview', 'report-overview', 'get-dashboard-summary', 'dashboard-stats',
     'get-revenue', 'revenue-by-group',
     'order-chart', 'fetch-order-by-group', 'quick-order-stats',
-    'get-recent-orders', 'get-unfulfilled-orders', 'order-completion-time', 'order-value-distribution', 'item-count-distribution',
+    'get-recent-orders', 'order-completion-time', 'order-value-distribution', 'item-count-distribution',
     'sales-report', 'sales-growth', 'sales-growth-chart',
     'product-report', 'product-performance', 'fetch-top-sold-products', 'fetch-top-sold-variants', 'top-products-sold',
     'customer-report', 'daily-signups', 'fetch-new-vs-returning-customer', 'search-repeat-customer',
@@ -118,7 +118,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'retention-chart', 'generate-retention-snapshots', 'retention-snapshots-status',
     'license-chart', 'license-pie-chart', 'license-summary',
     'country-heat-map', 'sources',
-    'cart-report', 'fetch-report-by-day-and-hour', 'fetch-report-meta',
+    'fetch-report-by-day-and-hour', 'fetch-report-meta',
     'get-recent-activities',
   ],
   integration: [

@@ -1202,49 +1202,6 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/get-recent-order
 
 ---
 
-### Get Unfulfilled Orders
-
-<badge type="tip">GET</badge> `/fluent-cart/v2/reports/get-unfulfilled-orders`
-
-Retrieve all orders that are not yet completed, canceled, or failed. Useful for dashboard fulfillment queues.
-
-- **Permission:** `reports/view`
-
-#### Parameters
-
-None.
-
-#### Response
-
-```json
-{
-    "unfulfilledOrders": [
-        {
-            "id": 148,
-            "customer_id": 38,
-            "customer_name": "Jane Smith",
-            "total_amount": 49.99,
-            "created_at": "2025-06-14 10:15:00",
-            "order_items_count": 1
-        }
-    ]
-}
-```
-
-**Notes:**
-- `total_amount` is in **decimal** (dollars), not cents
-- Excludes orders with status `canceled`, `failed`, or `completed`
-- Ordered by most recent first
-
-#### Example
-
-```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/get-unfulfilled-orders" \
-  -u "username:app_password"
-```
-
----
-
 ### Get Recent Activities
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/reports/get-recent-activities`
@@ -1320,52 +1277,6 @@ None.
 
 ```bash
 curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/get-dashboard-summary" \
-  -u "username:app_password"
-```
-
----
-
-## Cart Reports
-
-### Get Cart Report
-
-<badge type="tip">GET</badge> `/fluent-cart/v2/reports/cart-report`
-
-Retrieve abandoned cart data showing which products are most frequently abandoned, along with their unit prices and abandonment counts. A cart is considered abandoned if it has been inactive for more than 60 seconds.
-
-- **Permission:** `reports/view`
-
-#### Parameters
-
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `params[startDate]` | string | query | No | Start date to scope the cart data. |
-| `params[endDate]` | string | query | No | End date to scope the cart data. |
-| `params[groupKey]` | string | query | No | Grouping key (reserved for future use). |
-
-#### Response
-
-```json
-{
-    "abandonedItems": [
-        {
-            "product_name": "Premium Plan",
-            "abandoned_times": 15,
-            "unit_price": 4999
-        },
-        {
-            "product_name": "Basic Plan",
-            "abandoned_times": 8,
-            "unit_price": 1999
-        }
-    ]
-}
-```
-
-#### Example
-
-```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/cart-report?params[startDate]=2025-01-01&params[endDate]=2025-06-30" \
   -u "username:app_password"
 ```
 

@@ -291,6 +291,225 @@ add_filter('fluent_cart/cart/estimated_total', function ($total, $data) {
 ```
 </details>
 
+### <code> cart/item_price </code>
+<details>
+<summary><code>fluent_cart/cart/item_price</code> &mdash; Filter individual cart item price</summary>
+
+**When it runs:**
+Applied when calculating the price of an individual item in the cart, allowing customization based on the variation and quantity (e.g., bulk discounts, customer-specific pricing).
+
+**Source:** `app/Helpers/CartHelper.php:34`
+
+**Parameters:**
+
+- `$itemPrice` (int): The item price in cents
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'variation' => ProductVariation, // The variation model
+        'quantity'  => 2,                // Requested quantity
+    ];
+    ```
+
+**Returns:**
+- `int` — The modified item price in cents
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/item_price', function ($itemPrice, $data) {
+    $variation = $data['variation'];
+    $quantity = $data['quantity'];
+
+    // 10% discount for quantities of 5+
+    if ($quantity >= 5) {
+        return (int) ($itemPrice * 0.9);
+    }
+
+    return $itemPrice;
+}, 10, 2);
+```
+</details>
+
+### <code> cart/item_dynamic_discount </code>
+<details>
+<summary><code>fluent_cart/cart/item_dynamic_discount</code> &mdash; Apply dynamic discounts to cart items</summary>
+
+**When it runs:**
+Applied before cart totals are calculated, allowing dynamic discount modifications to the cart data (e.g., volume discounts, customer group discounts, dynamic pricing rules).
+
+**Source:** `app/Models/Cart.php:1075`
+
+**Parameters:**
+
+- `$cartData` (array): The cart items data array
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => Cart, // The Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `array` — The modified cart data with discounts applied
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/item_dynamic_discount', function ($cartData, $data) {
+    // Apply a 15% discount to all items for VIP customers
+    $cart = $data['cart'];
+    if (get_user_meta($cart->customer_id, 'is_vip', true)) {
+        foreach ($cartData as &$item) {
+            $item['line_total'] = (int) ($item['line_total'] * 0.85);
+        }
+    }
+    return $cartData;
+}, 10, 2);
+```
+</details>
+
+### <code> cart/shipping_total </code>
+<details>
+<summary><code>fluent_cart/cart/shipping_total</code> &mdash; Filter the cart shipping total</summary>
+
+**When it runs:**
+Applied when calculating the shipping total for the cart, before it is added to the overall total.
+
+**Source:** `app/Models/Cart.php:736`
+
+**Parameters:**
+
+- `$shippingTotal` (int): The shipping total in cents
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => Cart, // The Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `int` — The modified shipping total in cents
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/shipping_total', function ($shippingTotal, $data) {
+    // Free shipping for carts over $100
+    $cart = $data['cart'];
+    if ($cart->getItemsSubtotal() >= 10000) {
+        return 0;
+    }
+    return $shippingTotal;
+}, 10, 2);
+```
+</details>
+
+### <code> cart/fees </code>
+<details>
+<summary><code>fluent_cart/cart/fees</code> &mdash; Filter or add custom fees to the cart</summary>
+
+**When it runs:**
+Applied when calculating cart fees, allowing addons to dynamically compute or modify fees (e.g., processing fees, handling charges) based on cart contents and context.
+
+**Source:** `app/Models/Cart.php:781`
+
+**Parameters:**
+
+- `$fees` (array): Array of fee items
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart'           => Cart,          // The Cart model instance
+        'cart_items'     => [...],         // Cart items array
+        'cart_subtotal'  => 5000,          // Cart subtotal in cents
+        'shipping_total' => 500,           // Shipping total in cents
+        'customer_id'    => 42,            // Customer ID
+        'payment_method' => 'stripe',      // Selected payment method
+        'checkout_data'  => [...],         // Checkout form data
+    ];
+    ```
+
+**Returns:**
+- `array` — The modified fees array
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/fees', function ($fees, $data) {
+    // Add a 2% processing fee for credit card payments
+    if ($data['payment_method'] === 'stripe') {
+        $fees[] = [
+            'title'      => __('Processing Fee', 'fluent-cart'),
+            'amount'     => (int) ($data['cart_subtotal'] * 0.02),
+            'is_taxable' => true,
+        ];
+    }
+    return $fees;
+}, 10, 2);
+```
+</details>
+
+### <code> cart/items_total </code>
+<details>
+<summary><code>fluent_cart/cart/items_total</code> &mdash; Filter the calculated cart items total</summary>
+
+**When it runs:**
+Applied after calculating the total for all cart items (including discounts, taxes, and shipping).
+
+**Source:** `app/Services/OrderService.php:431`
+
+**Parameters:**
+
+- `$total` (int): The calculated total in cents
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'items'          => [...], // Array of order items
+        'shipping_total' => 500,   // Shipping total in cents
+    ];
+    ```
+
+**Returns:**
+- `int` — The modified total in cents
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/items_total', function ($total, $data) {
+    // Add a fixed handling fee
+    return $total + 200; // Add $2.00
+}, 10, 2);
+```
+</details>
+
+### <code> cart/context_data </code>
+<details>
+<summary><code>fluent_cart/cart/context_data</code> &mdash; Filter cart context data</summary>
+
+**When it runs:**
+Applied when retrieving cart context data used for checkout operations. The context contains payment method, customer ID, order type, and other cart metadata.
+
+**Source:** `app/Models/Cart.php:1164`
+
+**Parameters:**
+
+- `$context` (array): The cart context data
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => Cart, // The Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `array` — The modified context data
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/context_data', function ($context, $data) {
+    // Add custom metadata to cart context
+    $context['referral_code'] = sanitize_text_field($_COOKIE['ref_code'] ?? '');
+    return $context;
+}, 10, 2);
+```
+</details>
+
 ### <code> cart_cookie_minutes </code>
 <details>
 <summary><code>fluent_cart/cart_cookie_minutes</code> &mdash; Control cart cookie expiration time</summary>
@@ -740,12 +959,12 @@ add_filter('fluent_cart/checkout_page_order_button_text', function ($text) {
 
 ### <code> payment_method_list_class </code>
 <details>
-<summary><code>fluent_cart_payment_method_list_class</code> &mdash; Add CSS classes to a payment method wrapper</summary>
+<summary><code>fluent_cart/payment_method_list_class</code> &mdash; Add CSS classes to a payment method wrapper</summary>
 
 **When it runs:**
 This filter fires when rendering each individual payment method option in both the standard and modal checkout. It lets you add custom CSS classes to the payment method container element.
 
-> **Note:** This hook uses a non-standard prefix (`fluent_cart_`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+> **Deprecated:** The old hook name `fluent_cart_payment_method_list_class` is deprecated since 1.3.16. Use the new name shown above.
 
 **Source:**
 - `app/Services/Renderer/CheckoutRenderer.php:797`
@@ -768,12 +987,46 @@ This filter fires when rendering each individual payment method option in both t
 
 **Usage:**
 ```php
-add_filter('fluent_cart_payment_method_list_class', function ($class, $data) {
+add_filter('fluent_cart/payment_method_list_class', function ($class, $data) {
     // Add a highlight class for COD payment
     if ($data['route'] === 'cod') {
         return $class . ' payment-method-highlighted';
     }
     return $class;
+}, 10, 2);
+```
+</details>
+
+### <code> checkout/summary_extra_lines </code>
+<details>
+<summary><code>fluent_cart/checkout/summary_extra_lines</code> &mdash; Add extra lines to the checkout order summary</summary>
+
+**When it runs:**
+Applied when rendering the checkout order summary, allowing extra line items to be displayed (e.g., additional charges, credits, or promotional information).
+
+**Source:** `app/Services/Renderer/CartSummaryRender.php:123`
+
+**Parameters:**
+
+- `$extraLines` (array): Array of extra summary lines (default `[]`)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => Cart, // The Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `array` — Array of extra line items to display
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/summary_extra_lines', function ($extraLines, $data) {
+    $extraLines[] = [
+        'title'  => __('Loyalty Points Earned', 'my-plugin'),
+        'amount' => '+50 pts',
+    ];
+    return $extraLines;
 }, 10, 2);
 ```
 </details>
@@ -1048,6 +1301,40 @@ add_filter('fluent_cart/apply_order_bump', function ($response, $data) {
         'message' => __('Order bump applied!', 'fluent-cart'),
         'cart'    => $cart,
     ];
+}, 10, 2);
+```
+</details>
+
+### <code> discount/pre_apply </code>
+<details>
+<summary><code>fluent_cart/discount/pre_apply</code> &mdash; Filter cart items before coupon discount is applied</summary>
+
+**When it runs:**
+Applied just before a coupon discount is calculated, allowing modification of which items are eligible for the discount or their properties.
+
+**Source:** `app/Services/Coupon/DiscountService.php:210`
+
+**Parameters:**
+
+- `$cartItems` (array): The cart items that the discount will be applied to
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'coupon' => Coupon, // The coupon model being applied
+        'cart'   => Cart,   // The Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `array` — The modified cart items array
+
+**Usage:**
+```php
+add_filter('fluent_cart/discount/pre_apply', function ($cartItems, $data) {
+    // Exclude gift cards from discount
+    return array_filter($cartItems, function ($item) {
+        return ($item['product_type'] ?? '') !== 'gift_card';
+    });
 }, 10, 2);
 ```
 </details>

@@ -443,6 +443,43 @@ add_filter('fluent_cart/product_short_description', function($shortDescription) 
 ```
 </details>
 
+### <code> product/display_price </code>
+<details>
+<summary><code>fluent_cart/product/display_price</code> &mdash; Filter the displayed product price</summary>
+
+**When it runs:**
+Applied when rendering product prices on product cards and single product pages, allowing custom pricing display logic (e.g., customer-specific prices, promotional pricing).
+
+**Source:**
+- `app/Services/Renderer/ProductCardRender.php:176`
+- `app/Services/Renderer/ProductRenderer.php:643`
+
+**Parameters:**
+
+- `$price` (int): The display price in cents
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'product'   => Product,          // The Product model
+        'variation' => ProductVariation,  // The variation being displayed
+    ];
+    ```
+
+**Returns:**
+- `int` — The modified display price in cents
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/display_price', function ($price, $data) {
+    // Show 20% off for logged-in users
+    if (is_user_logged_in()) {
+        return (int) ($price * 0.8);
+    }
+    return $price;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Stock & Availability
@@ -505,6 +542,42 @@ add_filter('fluent_cart/product_stock_availability', function($availability, $da
     }
     return $availability;
 }, 10, 2);
+```
+</details>
+
+### <code> product_statuses </code>
+<details>
+<summary><code>fluent_cart/product_statuses</code> &mdash; Filter available product statuses</summary>
+
+**When it runs:**
+Applied when retrieving the list of available product statuses for admin dropdowns and filters.
+
+**Source:** `app/Helpers/Status.php:110`
+
+**Parameters:**
+
+- `$statuses` (array): Array of status key => label pairs
+    ```php
+    $statuses = [
+        'publish' => 'Publish',
+        'draft'   => 'Draft',
+        'private' => 'Private',
+        'future'  => 'Scheduled',
+        'trash'   => 'Trashed',
+    ];
+    ```
+- `$data` (array): Additional context (empty array)
+
+**Returns:**
+- `array` — The modified statuses array
+
+**Usage:**
+```php
+add_filter('fluent_cart/product_statuses', function ($statuses) {
+    // Add a custom "Review" status
+    $statuses['pending'] = __('Pending Review', 'my-plugin');
+    return $statuses;
+});
 ```
 </details>
 
@@ -811,10 +884,12 @@ add_filter('fluent_cart/coupon/per_customer_usage_query', function($usageQuery, 
 
 ### <code> coupon_statuses </code>
 <details>
-<summary><code>fluent-cart/coupon_statuses</code> &mdash; Filter the available coupon statuses</summary>
+<summary><code>fluent_cart/coupon_statuses</code> &mdash; Filter the available coupon statuses</summary>
 
 **When it runs:**
 This filter is applied when retrieving the list of available coupon statuses, used in the admin coupon management interface.
+
+> **Deprecated:** The old hook name `fluent-cart/coupon_statuses` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 
@@ -831,13 +906,11 @@ This filter is applied when retrieving the list of available coupon statuses, us
 **Returns:**
 - `$statuses` (array): The modified coupon statuses array
 
-**Source:** `app/Helpers/Helper.php:823`
-
-**Note:** This hook uses `fluent-cart/` (with a hyphen) instead of the usual `fluent_cart/` (with an underscore) prefix.
+**Source:** `app/Helpers/Status.php`
 
 **Usage:**
 ```php
-add_filter('fluent-cart/coupon_statuses', function($statuses) {
+add_filter('fluent_cart/coupon_statuses', function($statuses) {
     // Add a custom coupon status
     $statuses['scheduled'] = __('Scheduled', 'fluent-cart');
     return $statuses;

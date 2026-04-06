@@ -336,10 +336,12 @@ add_filter('fluent_cart/payment_methods/paypal_client_id', function($clientId, $
 
 ### <code> editable_customer_statuses </code>
 <details>
-<summary><code>fluent-cart/editable_customer_statuses</code> &mdash; Filter editable customer statuses</summary>
+<summary><code>fluent_cart/editable_customer_statuses</code> &mdash; Filter editable customer statuses</summary>
 
 **When it runs:**
 This filter is applied when retrieving the list of customer statuses that can be set in the admin panel.
+
+> **Deprecated:** The old hook name `fluent-cart/editable_customer_statuses` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 
@@ -355,20 +357,16 @@ This filter is applied when retrieving the list of customer statuses that can be
 **Returns:**
 - `$statuses` (array): The modified statuses array
 
-**Source:** `app/Helpers/Helper.php:162`, `app/Helpers/Status.php:350`
+**Source:** `app/Helpers/Status.php:350`
 
 **Usage:**
 ```php
-add_filter('fluent-cart/editable_customer_statuses', function($statuses, $context) {
+add_filter('fluent_cart/editable_customer_statuses', function($statuses, $context) {
     // Add a "suspended" customer status
     $statuses['suspended'] = __('Suspended', 'my-plugin');
     return $statuses;
 }, 10, 2);
 ```
-
-::: warning Note
-This hook uses a hyphen separator (`fluent-cart/`) instead of the usual underscore separator (`fluent_cart/`).
-:::
 </details>
 
 ### <code> user/after_register/skip_hooks </code>

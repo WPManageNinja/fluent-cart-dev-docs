@@ -415,10 +415,12 @@ add_filter('fluent_cart/global_currency_setting', function ($settings, $data) {
 
 ### <code> available_currencies </code>
 <details>
-<summary><code>fluent-cart/available_currencies</code> &mdash; Filter available currencies for the store</summary>
+<summary><code>fluent_cart/available_currencies</code> &mdash; Filter available currencies for the store</summary>
 
 **When it runs:**
-This filter is applied when retrieving the list of available currencies for the currency selector in store settings. Note the hyphenated hook prefix (`fluent-cart/` instead of `fluent_cart/`).
+This filter is applied when retrieving the list of available currencies for the currency selector in store settings.
+
+> **Deprecated:** The old hook name `fluent-cart/available_currencies` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 
@@ -446,11 +448,11 @@ This filter is applied when retrieving the list of available currencies for the 
 
 **Returns:** `array` — The modified currencies array
 
-**Source:** `app/Helpers/Helper.php:467`
+**Source:** `app/Helpers/Status.php`
 
 **Usage:**
 ```php
-add_filter('fluent-cart/available_currencies', function ($currencies, $data) {
+add_filter('fluent_cart/available_currencies', function ($currencies, $data) {
     // Add a custom currency option
     $currencies['BTC'] = [
         'label'  => 'Bitcoin',
@@ -801,6 +803,79 @@ This filter is applied when constructing admin navigation URLs throughout the pl
 add_filter('fluent_cart/admin_base_url', function ($baseUrl, $data) {
     // Use a custom admin page
     return admin_url('admin.php?page=my-custom-cart#/');
+}, 10, 2);
+```
+</details>
+
+### <code> admin_saved_views </code>
+<details>
+<summary><code>fluent_cart/admin_saved_views</code> &mdash; Filter admin table saved views configuration</summary>
+
+**When it runs:**
+Applied when loading the admin panel table configuration, including saved views for orders, products, customers, and other list tables.
+
+**Source:** `app/Hooks/Handlers/MenuHandler.php:385`
+
+**Parameters:**
+
+- `$tableConfig` (array): The table configuration with saved views
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'filterOptions' => [...], // Available filter options for tables
+    ];
+    ```
+
+**Returns:**
+- `array` — The modified table configuration
+
+**Usage:**
+```php
+add_filter('fluent_cart/admin_saved_views', function ($tableConfig, $data) {
+    // Add a custom saved view for orders
+    $tableConfig['orders']['views'][] = [
+        'title'   => __('High Value Orders', 'my-plugin'),
+        'filters' => ['min_total' => 10000],
+    ];
+    return $tableConfig;
+}, 10, 2);
+```
+</details>
+
+### <code> frontend_assets/should_load_global </code>
+<details>
+<summary><code>fluent_cart/frontend_assets/should_load_global</code> &mdash; Control global frontend asset loading</summary>
+
+**When it runs:**
+Applied when determining whether to load FluentCart's global frontend CSS and JS assets on the current page.
+
+**Source:** `app/Modules/Templating/AssetLoader.php:44`
+
+**Parameters:**
+
+- `$shouldLoad` (bool): Whether assets should be loaded
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'page_type'             => 'shop',   // Current FC page type
+        'is_marked'             => false,     // Whether page is marked for assets
+        'is_fluentcart_context' => true,      // Whether in FC context
+        'is_instant_checkout'   => false,     // Instant checkout request
+        'is_modal_checkout'     => false,     // Modal checkout request
+    ];
+    ```
+
+**Returns:**
+- `bool` — Whether to load global assets
+
+**Usage:**
+```php
+add_filter('fluent_cart/frontend_assets/should_load_global', function ($shouldLoad, $data) {
+    // Always load assets on the homepage
+    if (is_front_page()) {
+        return true;
+    }
+    return $shouldLoad;
 }, 10, 2);
 ```
 </details>
@@ -1289,6 +1364,166 @@ add_filter('fluent_cart/keep_email_body_draft', function ($keepDraft, $context) 
     // Always preserve custom email bodies as drafts
     return true;
 }, 10, 2);
+```
+</details>
+
+### <code> prepare_email_template_data </code>
+<details>
+<summary><code>fluent_cart/prepare_email_template_data</code> &mdash; Filter email notification template data before saving</summary>
+
+**When it runs:**
+Applied when saving email notification settings, allowing the pro version to restore custom email body and template fields.
+
+**Source:** `app/Http/Controllers/EmailNotificationController.php:84`
+
+**Parameters:**
+
+- `$settingsWithoutTemplate` (array): The email settings with template fields stripped
+- `$settings` (array): The original complete settings array
+
+**Returns:**
+- `array` — The modified settings data to save
+
+**Usage:**
+```php
+add_filter('fluent_cart/prepare_email_template_data', function ($settings, $original) {
+    // Restore custom template fields for pro
+    if (isset($original['email_body'])) {
+        $settings['email_body'] = $original['email_body'];
+    }
+    return $settings;
+}, 10, 2);
+```
+</details>
+
+### <code> parse_email_block_content </code>
+<details>
+<summary><code>fluent_cart/parse_email_block_content</code> &mdash; Parse block editor email content into HTML</summary>
+
+**When it runs:**
+Applied when sending email notifications that use block editor content. The pro version hooks this to convert block markup into rendered HTML.
+
+**Source:**
+- `app/Services/Email/EmailNotificationMailer.php:249`
+- `app/Hooks/CLI/Commands.php:1340`
+
+**Parameters:**
+
+- `$html` (string): The parsed HTML output (default `''`)
+- `$blockMarkup` (string): The raw block editor markup
+- `$data` (array): Template data for shortcode replacement
+
+**Returns:**
+- `string` — The rendered HTML from block content
+
+**Usage:**
+```php
+add_filter('fluent_cart/parse_email_block_content', function ($html, $blockMarkup, $data) {
+    // Custom block parser
+    return my_custom_block_parser($blockMarkup, $data);
+}, 10, 3);
+```
+</details>
+
+### <code> render_block_email_template </code>
+<details>
+<summary><code>fluent_cart/render_block_email_template</code> &mdash; Wrap parsed email content in a template</summary>
+
+**When it runs:**
+Applied after block email content is parsed, allowing the pro version to wrap it in an email template with header, footer, and styling.
+
+**Source:**
+- `app/Services/Email/EmailNotificationMailer.php:256`
+- `app/Hooks/CLI/Commands.php:1351`
+
+**Parameters:**
+
+- `$html` (string): The parsed email body HTML
+- `$data` (array): Template data
+    ```php
+    $data = [
+        'emailBody'   => '...',  // The parsed email body
+        'preheader'   => '...',  // Email preheader text
+        'emailFooter' => '...',  // Email footer HTML
+    ];
+    ```
+
+**Returns:**
+- `string` — The fully wrapped email HTML
+
+**Usage:**
+```php
+add_filter('fluent_cart/render_block_email_template', function ($html, $data) {
+    // Use a custom email wrapper template
+    return my_email_wrapper($data['emailBody'], $data['preheader'], $data['emailFooter']);
+}, 10, 2);
+```
+</details>
+
+### <code> pdf_einvoice_data </code>
+<details>
+<summary><code>fluent_cart/pdf_einvoice_data</code> &mdash; Filter e-invoice data for PDF generation</summary>
+
+**When it runs:**
+Applied when generating order receipt PDFs, allowing the pro version to attach e-invoice data (ZUGFeRD/Factur-X XML) for electronic invoicing compliance.
+
+**Source:** `app/Services/PDF/OrderReceiptPdfService.php:81`
+
+**Parameters:**
+
+- `$eInvoiceData` (array): E-invoice configuration
+    ```php
+    $eInvoiceData = [
+        'enabled'         => false, // Whether e-invoicing is enabled
+        'xml'             => null,  // The XML data to embed
+        'pdfa_compatible' => false, // Whether PDF/A compatibility is needed
+    ];
+    ```
+- `$order` (Order): The order model
+- `$meta` (array): Order metadata
+
+**Returns:**
+- `array` — The modified e-invoice data
+
+**Usage:**
+```php
+add_filter('fluent_cart/pdf_einvoice_data', function ($data, $order, $meta) {
+    // Enable ZUGFeRD for EU orders
+    if (in_array($order->country, ['DE', 'FR', 'IT'])) {
+        $data['enabled'] = true;
+        $data['pdfa_compatible'] = true;
+        $data['xml'] = generate_zugferd_xml($order);
+    }
+    return $data;
+}, 10, 3);
+```
+</details>
+
+### <code> pdf_templates/mpdf_config </code>
+<details>
+<summary><code>fluent_cart/pdf_templates/mpdf_config</code> &mdash; Filter mPDF configuration for PDF generation</summary>
+
+**When it runs:**
+Applied before PDF generation, allowing customization of mPDF rendering options such as fonts, margins, and encoding.
+
+**Source:** `app/Services/PDF/PdfGeneratorService.php:61`
+
+**Parameters:**
+
+- `$mpdfConfig` (array): The mPDF configuration array
+
+**Returns:**
+- `array` — The modified mPDF configuration
+
+**Usage:**
+```php
+add_filter('fluent_cart/pdf_templates/mpdf_config', function ($config) {
+    // Set custom margins and default font
+    $config['margin_left'] = 15;
+    $config['margin_right'] = 15;
+    $config['default_font'] = 'dejavusans';
+    return $config;
+});
 ```
 </details>
 

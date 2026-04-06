@@ -65,12 +65,12 @@ add_filter('fluent-cart/order_statuses', function ($statuses, $data) {
 
 ### <code> editable_order_statuses </code>
 <details>
-<summary><code>fluent-cart/editable_order_statuses</code> &mdash; Filter manually settable order statuses</summary>
+<summary><code>fluent_cart/editable_order_statuses</code> &mdash; Filter manually settable order statuses</summary>
 
 **When it runs:**
 Applied when building the list of order statuses an admin can manually set on an order. This controls the dropdown options in the order edit screen.
 
-> **Note:** This hook uses a non-standard hyphenated prefix (`fluent-cart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+> **Deprecated:** The old hook name `fluent-cart/editable_order_statuses` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$statuses` (array): Associative array of editable statuses (key => translated label)
@@ -86,11 +86,11 @@ Applied when building the list of order statuses an admin can manually set on an
 
 **Returns:** `array` — The modified editable order statuses array
 
-**Source:** `app/Helpers/Helper.php:151`, `app/Helpers/Status.php:170,242`
+**Source:** `app/Helpers/Status.php:170,242`
 
 **Usage:**
 ```php
-add_filter('fluent-cart/editable_order_statuses', function ($statuses, $data) {
+add_filter('fluent_cart/editable_order_statuses', function ($statuses, $data) {
     // Remove the ability to manually set "canceled"
     unset($statuses['canceled']);
     return $statuses;
@@ -191,12 +191,12 @@ add_filter('fluent-cart/transaction_statuses', function ($statuses, $data) {
 
 ### <code> editable_transaction_statuses </code>
 <details>
-<summary><code>fluent-cart/editable_transaction_statuses</code> &mdash; Filter manually editable transaction statuses</summary>
+<summary><code>fluent_cart/editable_transaction_statuses</code> &mdash; Filter manually editable transaction statuses</summary>
 
 **When it runs:**
 Applied when building the list of transaction statuses that an admin can manually set.
 
-> **Note:** This hook uses a non-standard hyphenated prefix (`fluent-cart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+> **Deprecated:** The old hook name `fluent-cart/editable_transaction_statuses` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$statuses` (array): Associative array of editable transaction statuses (key => translated label)
@@ -213,11 +213,11 @@ Applied when building the list of transaction statuses that an admin can manuall
 
 **Returns:** `array` — The modified editable transaction statuses array
 
-**Source:** `app/Helpers/Helper.php:233`, `app/Helpers/Status.php:214`
+**Source:** `app/Helpers/Status.php:214`
 
 **Usage:**
 ```php
-add_filter('fluent-cart/editable_transaction_statuses', function ($statuses, $data) {
+add_filter('fluent_cart/editable_transaction_statuses', function ($statuses, $data) {
     unset($statuses['refunded']);
     return $statuses;
 }, 10, 2);
@@ -302,6 +302,32 @@ Applied when retrieving the list of available shipping statuses used for order f
 ```php
 add_filter('fluent_cart/shipping_statuses', function ($statuses, $data) {
     $statuses['in_transit'] = __('In Transit', 'my-plugin');
+    return $statuses;
+}, 10, 2);
+```
+</details>
+
+### <code> editable_shipping_statuses </code>
+<details>
+<summary><code>fluent_cart/editable_shipping_statuses</code> &mdash; Filter manually settable shipping statuses</summary>
+
+**When it runs:**
+Applied when building the list of shipping statuses an admin can manually set on an order.
+
+> **Deprecated:** The old hook name `fluent-cart/editable_order_statuses` (used for shipping) is deprecated since 1.3.16. Use the new name shown above.
+
+**Parameters:**
+- `$statuses` (array): Associative array of editable shipping statuses (key => translated label)
+- `$data` (array): Additional context data (empty array)
+
+**Returns:** `array` — The modified editable shipping statuses array
+
+**Source:** `app/Helpers/Status.php:242`
+
+**Usage:**
+```php
+add_filter('fluent_cart/editable_shipping_statuses', function ($statuses, $data) {
+    $statuses['ready_to_ship'] = __('Ready to Ship', 'my-plugin');
     return $statuses;
 }, 10, 2);
 ```
@@ -581,6 +607,60 @@ add_filter('fluent_cart/order_can_be_deleted', function ($canBeDeleted, $context
 ```
 </details>
 
+### <code> order/delete_test_orders_batch_size </code>
+<details>
+<summary><code>fluent_cart/order/delete_test_orders_batch_size</code> &mdash; Control batch size when deleting test orders</summary>
+
+**When it runs:**
+Applied when bulk-deleting test orders, controlling how many orders are processed per batch.
+
+**Source:** `app/Http/Controllers/OrderController.php:995`
+
+**Parameters:**
+
+- `$batchSize` (int): The batch size (default `50`)
+
+**Returns:**
+- `int` — The modified batch size (minimum 1)
+
+**Usage:**
+```php
+add_filter('fluent_cart/order/delete_test_orders_batch_size', function ($batchSize) {
+    // Process smaller batches to reduce memory usage
+    return 25;
+});
+```
+</details>
+
+### <code> order/custom_item_changed </code>
+<details>
+<summary><code>fluent_cart/order/custom_item_changed</code> &mdash; Filter custom order item changes</summary>
+
+**When it runs:**
+Applied when a custom order item is updated, allowing validation or modification of item changes before persistence.
+
+**Source:** `api/Resource/OrderItemResource.php:256`
+
+**Parameters:**
+
+- `$oldItem` (array): The existing item data
+- `$newItem` (array): The updated item data
+
+**Returns:**
+- `array` — The modified item data to save
+
+**Usage:**
+```php
+add_filter('fluent_cart/order/custom_item_changed', function ($oldItem, $newItem) {
+    // Recalculate tax when price changes
+    if ($oldItem['item_price'] !== $newItem['item_price']) {
+        $newItem['tax_amount'] = calculate_tax($newItem['item_price']);
+    }
+    return $newItem;
+}, 10, 2);
+```
+</details>
+
 ### <code> min_receipt_number </code>
 <details>
 <summary><code>fluent_cart/min_receipt_number</code> &mdash; Filter the minimum receipt number</summary>
@@ -781,10 +861,12 @@ add_filter('fluent_cart/customer/order_details_section_parts', function ($sectio
 
 ### <code> ipn_url_{$slug} </code>
 <details>
-<summary><code>fluent_cart_ipn_url_{$slug}</code> &mdash; Filter IPN/webhook listener URL for a payment gateway</summary>
+<summary><code>fluent_cart/ipn_url_{$slug}</code> &mdash; Filter IPN/webhook listener URL for a payment gateway</summary>
 
 **When it runs:**
 Applied when generating the IPN (Instant Payment Notification) or webhook listener URL for a specific payment method. The `{$slug}` is the gateway slug (e.g., `stripe`, `paypal`).
+
+> **Deprecated:** The old hook name `fluent_cart_ipn_url_{$slug}` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$urlData` (array): Array containing the listener URL
@@ -796,11 +878,11 @@ Applied when generating the IPN (Instant Payment Notification) or webhook listen
 
 **Returns:** `array` — The modified URL data array
 
-**Source:** `app/Services/Payments/PaymentHelper.php:24`
+**Source:** `app/Services/Payments/PaymentHelper.php:28`
 
 **Usage:**
 ```php
-add_filter('fluent_cart_ipn_url_stripe', function ($urlData) {
+add_filter('fluent_cart/ipn_url_stripe', function ($urlData) {
     // Use a custom endpoint for Stripe webhooks
     $urlData['listener_url'] = home_url('/custom-stripe-webhook/');
     return $urlData;
@@ -810,12 +892,12 @@ add_filter('fluent_cart_ipn_url_stripe', function ($urlData) {
 
 ### <code> payment/success_url </code>
 <details>
-<summary><code>fluentcart/payment/success_url</code> &mdash; Filter the payment success redirect URL</summary>
+<summary><code>fluent_cart/payment/success_url</code> &mdash; Filter the payment success redirect URL</summary>
 
 **When it runs:**
 Applied when generating the URL the customer is redirected to after a successful payment.
 
-> **Note:** This hook uses a non-standard prefix (`fluentcart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+> **Deprecated:** The old hook name `fluentcart/payment/success_url` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$url` (string): The success redirect URL (receipt page with query args)
@@ -830,11 +912,11 @@ Applied when generating the URL the customer is redirected to after a successful
 
 **Returns:** `string` — The modified success URL
 
-**Source:** `app/Services/Payments/PaymentHelper.php:46`
+**Source:** `app/Services/Payments/PaymentHelper.php:55`
 
 **Usage:**
 ```php
-add_filter('fluentcart/payment/success_url', function ($url, $context) {
+add_filter('fluent_cart/payment/success_url', function ($url, $context) {
     // Redirect to a custom thank-you page
     return add_query_arg('trx_hash', $context['transaction_hash'], home_url('/thank-you/'));
 }, 10, 2);
@@ -925,12 +1007,12 @@ add_filter('fluent_cart/transaction/url_stripe', function ($url, $context) {
 
 ### <code> transaction/receipt_page_url </code>
 <details>
-<summary><code>fluentcart/transaction/receipt_page_url</code> &mdash; Filter the transaction receipt page URL</summary>
+<summary><code>fluent_cart/transaction/receipt_page_url</code> &mdash; Filter the transaction receipt page URL</summary>
 
 **When it runs:**
 Applied when generating the public-facing receipt page URL for a transaction, typically used in email notifications and customer-facing links.
 
-> **Note:** This hook uses a non-standard prefix (`fluentcart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+> **Deprecated:** The old hook name `fluentcart/transaction/receipt_page_url` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$url` (string): The receipt page URL with `trx_hash` query parameter
@@ -944,11 +1026,11 @@ Applied when generating the public-facing receipt page URL for a transaction, ty
 
 **Returns:** `string` — The modified receipt page URL
 
-**Source:** `app/Models/OrderTransaction.php:183`
+**Source:** `app/Models/OrderTransaction.php:188`
 
 **Usage:**
 ```php
-add_filter('fluentcart/transaction/receipt_page_url', function ($url, $context) {
+add_filter('fluent_cart/transaction/receipt_page_url', function ($url, $context) {
     // Use a custom receipt page
     return add_query_arg('trx_hash', $context['transaction']->uuid, home_url('/my-receipt/'));
 }, 10, 2);
@@ -1194,10 +1276,12 @@ add_filter('fluent_cart/payments/stripe_subscription_checkout_session_args', fun
 
 ### <code> stripe_idempotency_key </code>
 <details>
-<summary><code>fluent_cart_stripe_idempotency_key</code> &mdash; Filter the Stripe idempotency key</summary>
+<summary><code>fluent_cart/stripe_idempotency_key</code> &mdash; Filter the Stripe idempotency key</summary>
 
 **When it runs:**
 Applied when sending charge requests to the Stripe API. The idempotency key prevents duplicate charges from being created.
+
+> **Deprecated:** The old hook name `fluent_cart_stripe_idempotency_key` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$key` (string): The generated idempotency key
@@ -1210,11 +1294,11 @@ Applied when sending charge requests to the Stripe API. The idempotency key prev
 
 **Returns:** `string` — The modified idempotency key
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:115`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:119`
 
 **Usage:**
 ```php
-add_filter('fluent_cart_stripe_idempotency_key', function ($key, $context) {
+add_filter('fluent_cart/stripe_idempotency_key', function ($key, $context) {
     // Use a custom idempotency key format
     return 'fct_' . md5($key . time());
 }, 10, 2);
@@ -1223,10 +1307,12 @@ add_filter('fluent_cart_stripe_idempotency_key', function ($key, $context) {
 
 ### <code> stripe_request_body </code>
 <details>
-<summary><code>fluent_cart_stripe_request_body</code> &mdash; Filter the Stripe API request body</summary>
+<summary><code>fluent_cart/stripe_request_body</code> &mdash; Filter the Stripe API request body</summary>
 
 **When it runs:**
 Applied just before every request is sent to the Stripe API. This is a low-level filter that affects all Stripe API calls.
+
+> **Deprecated:** The old hook name `fluent_cart_stripe_request_body` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$request` (array): The request body data
@@ -1239,11 +1325,11 @@ Applied just before every request is sent to the Stripe API. This is a low-level
 
 **Returns:** `array` — The modified request body
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:126`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:130`
 
 **Usage:**
 ```php
-add_filter('fluent_cart_stripe_request_body', function ($request, $context) {
+add_filter('fluent_cart/stripe_request_body', function ($request, $context) {
     // Log all Stripe API requests
     error_log('Stripe API call to: ' . $context['api']);
     return $request;
@@ -1253,10 +1339,12 @@ add_filter('fluent_cart_stripe_request_body', function ($request, $context) {
 
 ### <code> form_disable_stripe_connect </code>
 <details>
-<summary><code>fluent_cart_form_disable_stripe_connect</code> &mdash; Disable Stripe Connect provider option</summary>
+<summary><code>fluent_cart/form_disable_stripe_connect</code> &mdash; Disable Stripe Connect provider option</summary>
 
 **When it runs:**
 Applied when rendering the Stripe settings form. Return `true` to force the use of manual API keys instead of Stripe Connect.
+
+> **Deprecated:** The old hook name `fluent_cart_form_disable_stripe_connect` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$disable` (bool): Whether to disable Stripe Connect (default `false`)
@@ -1264,11 +1352,11 @@ Applied when rendering the Stripe settings form. Return `true` to force the use 
 
 **Returns:** `bool` — `true` to disable Stripe Connect and force API keys mode
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:288`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:265`
 
 **Usage:**
 ```php
-add_filter('fluent_cart_form_disable_stripe_connect', function ($disable, $data) {
+add_filter('fluent_cart/form_disable_stripe_connect', function ($disable, $data) {
     // Force manual API keys
     return true;
 }, 10, 2);
@@ -1277,10 +1365,12 @@ add_filter('fluent_cart_form_disable_stripe_connect', function ($disable, $data)
 
 ### <code> stripe_appearance </code>
 <details>
-<summary><code>fluent_cart_stripe_appearance</code> &mdash; Filter Stripe Elements appearance configuration</summary>
+<summary><code>fluent_cart/stripe_appearance</code> &mdash; Filter Stripe Elements appearance configuration</summary>
 
 **When it runs:**
 Applied when initializing Stripe Elements on the checkout page. Controls the visual theme and styling of the embedded payment form.
+
+> **Deprecated:** The old hook name `fluent_cart_stripe_appearance` is deprecated since 1.3.16. Use the new name shown above.
 
 **Parameters:**
 - `$appearance` (array): Stripe Elements appearance configuration
@@ -1292,11 +1382,11 @@ Applied when initializing Stripe Elements on the checkout page. Controls the vis
 
 **Returns:** `array` — The modified appearance configuration (follows [Stripe Appearance API](https://docs.stripe.com/elements/appearance-api))
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:427`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:433`
 
 **Usage:**
 ```php
-add_filter('fluent_cart_stripe_appearance', function ($appearance) {
+add_filter('fluent_cart/stripe_appearance', function ($appearance) {
     return [
         'theme'     => 'night',
         'variables' => [

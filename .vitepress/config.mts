@@ -437,6 +437,7 @@ export default defineConfig({
           {
             text: 'Tutorials',
             items: [
+              { text: 'Fee System (Surcharges)', link: '/modules/fee-system' },
               { text: 'Ghost Product Selling', link: '/modules/ghost-product-selling' },
               { text: 'Custom Payment Gateway', link: '/payment-methods-integration/' },
               { text: '(Payment Gateway) Example', link: '/payment-methods-integration/paddle-example' }

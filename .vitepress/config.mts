@@ -633,24 +633,41 @@ export default defineConfig({
       //     ]
       //   }
       // ],
-      // '/modules/': [
-      //   {
-      //     text: 'Modules',
-      //     items: [
-      //       { text: 'Overview', link: '/modules/' },
-      //       { text: 'Payment Methods', link: '/modules/payment-methods' },
-      //       { text: 'Shipping', link: '/modules/shipping' },
-      //       { text: 'Storage Drivers', link: '/modules/storage' }
-      //     ]
-      //   },
-      //   {
-      //     text: 'Pro Modules',
-      //     items: [
-      //       { text: 'Licensing Module (Pro)', link: '/modules/licensing' },
-      //       { text: 'Order Bump Module (Pro)', link: '/modules/order-bump' }
-      //     ]
-      //   }
-      // ],
+      '/modules/': [
+        {
+          text: 'Tutorials',
+          items: [
+            { text: 'Fee System (Surcharges)', link: '/modules/fee-system' },
+            { text: 'Ghost Product Selling', link: '/modules/ghost-product-selling' }
+          ]
+        },
+        {
+          text: 'Modules',
+          items: [
+            { text: 'Payment Methods', link: '/modules/payment-methods' },
+            { text: 'Shipping', link: '/modules/shipping' },
+            { text: 'Storage Drivers', link: '/modules/storage' }
+          ]
+        },
+        {
+          text: 'Pro Modules',
+          items: [
+            { text: 'Licensing Module (Pro)', link: '/modules/licensing' },
+            { text: 'Order Bump Module (Pro)', link: '/modules/order-bump' }
+          ]
+        }
+      ],
+      '/payment-methods-integration/': [
+        {
+          text: 'Payment Methods Integration',
+          items: [
+            { text: 'Overview', link: '/payment-methods-integration/' },
+            { text: 'Quick Implementation', link: '/payment-methods-integration/quick-implementation' },
+            { text: 'Payment Setting Fields', link: '/payment-methods-integration/payment_setting_fields' },
+            { text: 'Paddle Example', link: '/payment-methods-integration/paddle-example' }
+          ]
+        }
+      ],
       // '/guides/': [
       //   {
       //     text: 'Developer Guides',

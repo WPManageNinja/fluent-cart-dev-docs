@@ -435,6 +435,12 @@ export default defineConfig({
           },
           { text: 'Rest API', link: '/restapi/' },
           {
+            text: 'Guides',
+            items: [
+              { text: 'Subscription Customization', link: '/guides/subscriptions' },
+            ]
+          },
+          {
             text: 'Tutorials',
             items: [
               { text: 'Fee System (Surcharges)', link: '/modules/fee-system' },
@@ -608,6 +614,17 @@ export default defineConfig({
                 ]
              },
             // { text: 'Event System', link: '/hooks/events' }
+          ]
+        }
+      ],
+      '/guides/': [
+        {
+          text: 'Guides',
+          items: [
+            { text: 'Overview', link: '/guides/' },
+            { text: 'Subscription Customization', link: '/guides/subscriptions' },
+            { text: 'Frontend Development', link: '/guides/frontend' },
+            { text: 'Integration Guide', link: '/guides/integrations' },
           ]
         }
       ],

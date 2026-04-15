@@ -97,3 +97,98 @@ The `fluent_cart/subscription/grace_period_days` filter applies globally across 
 - **Filter:** `fluent_cart/subscription/grace_period_days`
 - **Source:** `app/Services/Payments/SubscriptionHelper.php`
 - **Full filter reference:** [Customers & Subscriptions filters](/hooks/filters/customers-and-subscriptions#subscription-grace_period_days)
+
+---
+
+## Custom Subscription Intervals
+
+FluentCart ships with `daily`, `weekly`, `monthly`, `quarterly`, `half_yearly`, and `yearly`. You can register additional intervals through filters.
+
+The example below adds an **every 10th day** interval. Swap in your own values as needed.
+
+### 1. Register the interval option
+
+Adds the interval to the product editor dropdown. All three fields are required.
+
+```php
+add_filter('fluent_cart/available_subscription_interval_options', function ($options) {
+    return array_merge($options, [
+        [
+            'label'     => __('Every 10th day', 'fluent-cart'), // shown in dropdown
+            'value'     => 'every_tenth_day',                   // stored in database
+            'map_value' => '10th Day',                          // readable format
+        ],
+    ]);
+});
+```
+
+### 2. Define the interval in days
+
+Used internally for trial day calculations and renewal scheduling.
+
+```php
+add_filter('fluent_cart/subscription_interval_in_days', function ($days, $args) {
+    if ($args['interval'] === 'every_tenth_day') {
+        return 10;
+    }
+    return $days;
+}, 10, 2);
+```
+
+### 3. Map to gateway billing period
+
+Required for built-in gateways (Stripe, PayPal). If you own the gateway code, handle this directly in your processor instead.
+
+```php
+add_filter('fluent_cart/subscription_billing_period', function ($billingPeriod, $args) {
+    if ($args['subscription_interval'] !== 'every_tenth_day') {
+        return $billingPeriod;
+    }
+
+    if ($args['payment_method'] === 'stripe') {
+        $billingPeriod['interval_unit']      = 'day';
+        $billingPeriod['interval_frequency'] = 10;
+    }
+
+    if ($args['payment_method'] === 'paypal') {
+        $billingPeriod['interval_unit']      = 'day';
+        $billingPeriod['interval_frequency'] = 10;
+    }
+
+    return $billingPeriod;
+}, 10, 2);
+```
+
+### 4. Set max trial days (optional)
+
+Caps how many trial days can be assigned to this interval.
+
+```php
+add_filter('fluent_cart/max_trial_days_allowed', function ($days, $args) {
+    if ($args['repeat_interval'] === 'every_tenth_day') {
+        return min($args['existing_trial_days'] + $args['interval_in_days'], 10);
+    }
+    return $days;
+}, 10, 2);
+```
+
+### 5. License validity (Pro — licensed products only)
+
+If the product uses the licensing module, set the expiry period for the custom interval.
+
+```php
+add_filter('fluent_cart/license/default_validity_by_variation', function ($validity, $args) {
+    $interval = Arr::get($args['variation']->other_info, 'repeat_interval');
+    if ($interval === 'every_tenth_day') {
+        return ['unit' => 'day', 'value' => 10];
+    }
+    return $validity;
+}, 10, 2);
+```
+
+::: tip Gateway compatibility
+**Stripe** accepts any positive integer with `day`, `week`, `month`, or `year`.  
+**PayPal** supports the same units but has frequency limits — check PayPal's billing plan docs for your interval.
+:::
+
+Full reference and additional snippets: [fluent-cart-snippets on GitHub](https://github.com/fluent-cart/fluent-cart-snippets/blob/main/Subscriptions/HOW_TO_ADD_CUSTOM_SUBSCRIPTION_INTERVAL.md)

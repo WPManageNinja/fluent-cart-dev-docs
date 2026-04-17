@@ -565,6 +565,40 @@ add_filter('fluent_cart/front_url_slug', function($slug) {
 ```
 </details>
 
+### <code> product_url_with_front </code>
+<details>
+<summary><code>fluent_cart/product_url_with_front</code> &mdash; Filter whether the product URL includes the front base</summary>
+
+**When it runs:**
+This filter is applied when registering the `fluent-products` custom post type, immediately after `fluent_cart/front_url_slug` resolves the slug. The value is passed as the `with_front` argument to WordPress's `rewrite` option, controlling whether the site's permalink front base (e.g. `/blog/`) is prepended to product URLs.
+
+**Parameters:**
+
+- `$withFront` (bool): Whether to prepend the permalink front base. Default: `true`
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'slug' => $urlSlug // The resolved product URL slug
+    ];
+    ```
+
+**Returns:**
+- `$withFront` (bool): The modified value
+
+**Source:** `app/CPT/FluentProducts.php:183`
+
+**Note:** After changing this value, flush rewrite rules by visiting Settings > Permalinks in the WordPress admin.
+
+**Usage:**
+```php
+add_filter('fluent_cart/product_url_with_front', function($withFront, $data) {
+    // Remove the permalink front base from product URLs
+    // e.g. /blog/products/my-item → /products/my-item
+    return false;
+}, 10, 2);
+```
+</details>
+
 ### <code> show_standalone_product_menu </code>
 <details>
 <summary><code>fluent_cart/show_standalone_product_menu</code> &mdash; Filter whether to show a standalone Products menu in the WordPress admin</summary>

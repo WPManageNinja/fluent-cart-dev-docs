@@ -443,6 +443,12 @@ export default defineConfig({
               { text: '(Payment Gateway) Example', link: '/payment-methods-integration/paddle-example' }
             ]
           },
+          {
+            text: 'Migration',
+            items: [
+              { text: 'Easy Digital Downloads', link: '/migration/edd/' },
+            ]
+          },
           
           // {
           //   text: 'REST API',
@@ -656,6 +662,35 @@ export default defineConfig({
             { text: 'Order Bump Module (Pro)', link: '/modules/order-bump' }
           ]
         }
+      ],
+      '/migration/': [
+        {
+          text: 'Migration',
+          items: [
+            { text: 'Migration Hub', link: '/migration/' },
+          ]
+        },
+        {
+          text: 'Easy Digital Downloads',
+          items: [
+            { text: 'Overview', link: '/migration/edd/' },
+            { text: 'Admin UI Guide', link: '/migration/edd/admin-ui' },
+            { text: 'CLI Reference', link: '/migration/edd/cli-reference' },
+            { text: 'Troubleshooting & Reset', link: '/migration/edd/troubleshooting' },
+          ]
+        },
+        {
+          text: 'WooCommerce',
+          items: [
+            { text: 'Coming Soon', link: '/migration/' },
+          ]
+        },
+        {
+          text: 'SureCart',
+          items: [
+            { text: 'Coming Soon', link: '/migration/' },
+          ]
+        },
       ],
       '/payment-methods-integration/': [
         {

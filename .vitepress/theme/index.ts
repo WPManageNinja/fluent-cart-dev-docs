@@ -7,6 +7,7 @@ import { useRoute, useData } from 'vitepress'
 import { theme } from 'vitepress-openapi/client'
 import 'vitepress-openapi/dist/style.css'
 import Mermaid from './components/Mermaid.vue'
+import CopyPage from './components/CopyPage.vue'
 import './custom.css'
 // OpenAPI styles - loaded globally but scoped to OpenAPI pages via CSS selectors
 import './openapi.css'
@@ -80,6 +81,7 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
+      'doc-before': () => h(CopyPage),
       'doc-after': () => h(FluentCommentsWidget),
     })
   },

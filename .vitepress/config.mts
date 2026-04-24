@@ -290,6 +290,9 @@ export default defineConfig({
   
   head: [
     ['meta', { name: 'theme-color', content: '#136196' }],
+    ['link', { rel: 'icon', href: '/icon.webp' }],
+    ['meta', { property: 'og:image', content: '/fluent-cart-featured.png' }],
+
     [
       'script',
       { type: 'module' },

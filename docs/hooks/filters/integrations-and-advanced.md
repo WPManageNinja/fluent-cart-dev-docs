@@ -197,6 +197,47 @@ add_filter('fluent_cart/integration/notifying_async_email_alerts', function ($as
 ```
 </details>
 
+### <code> webhook/payload </code>
+<details>
+<summary><code>fluent_cart/webhook/payload</code> <Badge type="warning" text="Pro" /> &mdash; Filter webhook payload before sending</summary>
+
+**When it runs:**
+This filter is applied to the webhook payload body after it is constructed but before it is encoded and sent to the external endpoint. Allows complete customization of webhook data.
+
+**Parameters:**
+
+- `$payloadBody` (array): The payload body data
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order'      => $orderModel,       // The order model
+        'feed'       => $feedConfig,       // The webhook feed configuration
+        'event_data' => $eventData         // The original event data
+    ];
+    ```
+
+**Returns:**
+- `$payloadBody` (array): The modified payload body
+
+**Source:** `fluent-cart-pro/.../WebhookConnect.php:251`
+
+**Usage:**
+```php
+add_filter('fluent_cart/webhook/payload', function ($payloadBody, $context) {
+    // Add custom field to payload
+    $payloadBody['custom_meta'] = [
+        'source'    => 'fluentcart',
+        'timestamp' => gmdate('Y-m-d H:i:s')
+    ];
+
+    // Remove sensitive data
+    unset($payloadBody['customer']['email']);
+
+    return $payloadBody;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Integration Settings & Configuration

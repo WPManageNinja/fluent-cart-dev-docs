@@ -1966,6 +1966,70 @@ add_filter('fluent_cart/authorize_dot_net_supported_currencies', function ($curr
 ```
 </details>
 
+### <code> authorize_dot_net/transaction_request </code>
+<details>
+<summary><code>fluent_cart/authorize_dot_net/transaction_request</code> <Badge type="warning" text="Pro" /> &mdash; Filter the Authorize.net transaction request before it is sent to the API</summary>
+
+**When it runs:**
+Applied to the assembled `transactionRequest` payload immediately before it is sent to the Authorize.net API. Fires on both the one-time payment path and the subscription first-payment path, so developers can override any Auth.net field (invoice number, customer ID/email, `userFields`, line items, billing/shipping, etc.) without core changes.
+
+**Parameters:**
+- `$transactionRequest` (array): The Authorize.net transaction request payload (amount, payment, billTo, shipTo, lineItems, etc.)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'order'       => $order,        // Order model instance
+        'transaction' => $transaction,  // OrderTransaction model instance
+    ];
+    ```
+
+**Returns:** `array` — The modified transaction request payload
+
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetProcessor.php:71` (one-time) and `:542` (subscription first payment)
+
+**Usage:**
+```php
+add_filter('fluent_cart/authorize_dot_net/transaction_request', function ($transactionRequest, $data) {
+    // Attach a custom purchase order number via userFields
+    $transactionRequest['userFields'] = [
+        'userField' => [
+            ['name' => 'po_number', 'value' => 'PO-' . $data['order']->id],
+        ],
+    ];
+    return $transactionRequest;
+}, 10, 2);
+```
+</details>
+
+### <code> authorize_dot_net/order_description </code>
+<details>
+<summary><code>fluent_cart/authorize_dot_net/order_description</code> <Badge type="warning" text="Pro" /> &mdash; Filter the order description sent to Authorize.net</summary>
+
+**When it runs:**
+Applied when building the order metadata (invoice number and description) for an Authorize.net transaction. The default description is the comma-separated list of item names, or `Order #{id}` when no names are available. The returned value is truncated to 255 characters.
+
+**Parameters:**
+- `$default` (string): The default order description (item names or `Order #{id}`)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'order' => $order,  // Order model instance
+    ];
+    ```
+
+**Returns:** `string` — The order description (truncated to 255 chars)
+
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetHelper.php:222`
+
+**Usage:**
+```php
+add_filter('fluent_cart/authorize_dot_net/order_description', function ($description, $data) {
+    // Prefix the description with the store name
+    return 'My Store — ' . $description;
+}, 10, 2);
+```
+</details>
+
 ### <code> should_send_email_notification </code>
 <details>
 <summary><code>fluent_cart/should_send_email_notification</code> &mdash; Control whether an automatic email notification should be sent</summary>

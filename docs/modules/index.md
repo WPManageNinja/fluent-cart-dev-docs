@@ -5,140 +5,123 @@ description: FluentCart modules system architecture and development guide for ex
 
 # FluentCart Modules System
 
-FluentCart uses a modular architecture that allows developers to extend functionality through well-defined module interfaces. This system provides a clean separation of concerns and makes it easy to add new features without modifying core code.
+FluentCart groups self-contained features into module directories under `app/Modules/`. A module is simply a plain PHP class (no shared base class or interface) that owns a feature area — its hooks, services, models, controllers, and assets. Modules are wired up explicitly during plugin boot rather than auto-discovered, which keeps the load path predictable.
 
-## Module Architecture
+## How Modules Actually Work
 
-### Core Module Types
+There is **no** `AbstractModule` base class and **no** `ModuleInterface` in FluentCart. A module is a normal class. The common convention is a single entry-point class that exposes either:
 
-FluentCart modules are organized into several categories:
+- a `register($app)` instance method (most modules), or
+- a static `boot()` method (e.g. the MCP module).
 
-#### 1. **Payment Methods** 
-- **Purpose**: Handle payment processing and gateway integrations
-- **Location**: `app/Modules/PaymentMethods/`
-- **Interface**: `PaymentGatewayInterface`
-- **Examples**: Stripe, PayPal, Mollie, Square, Razorpay
+That entry point is called once from `app/Hooks/actions.php` during boot. Inside it, the module attaches everything it needs via the FluentCart hook system (`add_action`/`add_filter` or `$app->addFilter()` / `$app->addAction()`), registers its REST routes, and wires its services.
 
-#### 2. **Shipping** 
-- **Purpose**: Calculate shipping rates and manage delivery options
-- **Location**: `app/Modules/Shipping/`
-- **Models**: `ShippingZone`, `ShippingMethod`, `ShippingClass`
-- **Examples**: Shipping zones, methods, and rate calculations
+### Real Registration Examples
 
-#### 3. **Storage Drivers** 
-- **Purpose**: Handle file storage and digital product delivery
-- **Location**: `app/Modules/StorageDrivers/`
-- **Interface**: `BaseStorageInterface`
-- **Examples**: Local Storage, Amazon S3
-
-#### 4. **Subscriptions** 
-- **Purpose**: Manage recurring billing and subscription lifecycle
-- **Location**: `app/Modules/Subscriptions/`
-- **Models**: `Subscription`
-- **Examples**: Subscription management, recurring billing
-
-#### 5. **Integrations** 
-- **Purpose**: Connect with third-party services
-- **Location**: `app/Modules/Integrations/`
-- **Examples**: FluentCRM, MailChimp, Webhooks
-
-#### 6. **Ghost Product Selling** ⭐ **NEW**
-- **Purpose**: Sell ghost products without catalog entries
-- **Location**: Hook-based implementation
-- **Examples**: Add-ons, gift wrapping, custom subscriptions
-
-#### 7. **Pro Modules** ⭐ **PRO ONLY**
-- **Purpose**: Advanced features for FluentCart Pro
-- **Location**: `app/Modules/` (Pro-specific)
-- **Examples**: Licensing, Order Bump (Promotional)
-
-## Module Structure
-
-### Standard Module Directory Structure
-
-```
-app/Modules/YourModule/
-├── YourModule.php              # Main module class
-├── Settings/
-│   └── YourModuleSettings.php  # Configuration settings
-├── API/
-│   └── YourModuleAPI.php       # API endpoints
-├── Webhook/
-│   └── WebhookHandler.php      # Webhook processing
-├── Views/
-│   └── admin-settings.php      # Admin interface
-└── Assets/
-    ├── css/
-    ├── js/
-    └── images/
-```
-
-### Module Registration
-
-Modules are registered through the main application:
+These are the actual registrations from `app/Hooks/actions.php`:
 
 ```php
-// In your module's main file
-class YourModule extends AbstractModule
+// Instance method, passed the application container
+(new \FluentCart\App\Modules\StockManagement\StockManagement())->register(fluentCart());
+(new \FluentCart\App\Modules\Tax\TaxModule())->register();
+(new \FluentCart\App\Modules\Coupon\CouponHandler())->register();
+(new \FluentCart\App\Modules\Turnstile\TurnstileInit())->register(\FluentCart\App\App::getInstance());
+(new \FluentCart\App\Modules\IntegrationActions\GlobalIntegrationActionHandler())->register();
+
+// Static boot method
+\FluentCart\App\Modules\MCP\MCPInit::boot();
+```
+
+### A Module's `register()` Method
+
+A module's `register()` method typically declares its settings fields, sets default values, then short-circuits when the module is disabled before attaching the heavier feature hooks. This is the real pattern from `app/Modules/StockManagement/StockManagement.php`:
+
+```php
+class StockManagement
 {
     public function register($app)
     {
-        // Register module with the application
-        $app->addModule('your_module', $this);
-        
-        // Register hooks and filters
-        $this->registerHooks();
-        
-        // Register API endpoints
-        $this->registerAPI();
+        // Declare the module's settings card on the Modules settings screen
+        $app->addFilter('fluent_cart/module_setting/fields', function ($fields, $args) {
+            $fields['stock_management'] = [
+                'title'       => __('Stock Management', 'fluent-cart'),
+                'description' => __('Manage stock of your products easier than ever!', 'fluent-cart'),
+                'type'        => 'component',
+                'component'   => 'ModuleSettings',
+                'settings'    => [
+                    'enable_advanced_inventory' => [
+                        'label'   => __('Enable Advanced Inventory', 'fluent-cart'),
+                        'default' => 'no',
+                    ],
+                ],
+            ];
+            return $fields;
+        }, 10, 2);
+
+        // Provide default values for the settings store
+        $app->addFilter('fluent_cart/module_setting/default_values', function ($values, $args) {
+            if (empty($values['stock_management']['active'])) {
+                $values['stock_management']['active'] = 'no';
+            }
+            return $values;
+        }, 10, 2);
+
+        // Always-on hooks live before the active-check
+        add_filter('fluent_cart/shop_query', [$this, 'filterShopQuery'], 10, 2);
+
+        // Bail out before wiring feature behaviour when the module is off
+        if (!\FluentCart\Api\ModuleSettings::isActive('stock_management')) {
+            return;
+        }
+
+        // ...feature hooks for an active module...
     }
-    
-    public function boot()
-    {
-        // Initialize module functionality
-        $this->init();
-    }
 }
 ```
 
-## Module Interfaces
+Key conventions visible above:
 
-### Base Module Interface
+- **Settings live in the module** via the `fluent_cart/module_setting/fields` and `fluent_cart/module_setting/default_values` filters.
+- **Enabled state** is read with `\FluentCart\Api\ModuleSettings::isActive('<module_key>')` — there is no `isEnabled()` interface method.
+- **Hooks before the active-check** run regardless; feature hooks are attached only when the module is active.
 
-All modules must implement the base module interface:
+## Module Catalog
 
-```php
-interface ModuleInterface
-{
-    public function register($app): void;
-    public function boot(): void;
-    public function isEnabled(): bool;
-    public function getSettings(): array;
-    public function getMeta(): array;
-}
-```
+The following modules live under `app/Modules/` in the **core** (free) plugin:
 
-### Payment Gateway Interface
+| Module | Directory | Purpose |
+|--------|-----------|---------|
+| Payment Methods | `app/Modules/PaymentMethods/` | Payment gateway integrations (Stripe, PayPal, Mollie, Square, Razorpay, …) and the `GatewayManager` |
+| Shipping | `app/Modules/Shipping/` | Shipping zones, methods, classes, and rate calculation |
+| Storage Drivers | `app/Modules/StorageDrivers/` | File storage / digital delivery (Local, Amazon S3) |
+| Subscriptions | `app/Modules/Subscriptions/` | Recurring billing and subscription lifecycle |
+| Tax | `app/Modules/Tax/` | Tax calculation, EU VAT, reverse charge (`TaxModule`, `TaxCalculator`) |
+| Stock Management | `app/Modules/StockManagement/` | Inventory tracking and advanced inventory |
+| Coupon | `app/Modules/Coupon/` | Discount coupon handling (`CouponHandler`) |
+| Advanced Variation | `app/Services/AdvancedVariationService.php` + `app/Modules/...` helpers | Product attributes and multi-option variations (moved from Pro into core) — see [Advanced Variation](./advanced-variation) |
+| Turnstile | `app/Modules/Turnstile/` | Cloudflare Turnstile bot protection (`TurnstileInit`) |
+| Product Integration | `app/Modules/ProductIntegration/` | Product-level integration wiring |
+| Integrations | `app/Modules/Integrations/` | Third-party services (FluentCRM, MailChimp, Webhooks) |
+| Integration Actions | `app/Modules/IntegrationActions/` | Global integration action dispatch (`GlobalIntegrationActionHandler`) |
+| Reporting | `app/Modules/ReportingModule/` | Sales and store reporting |
+| Templating | `app/Modules/Templating/` | Page-builder/template integrations (e.g. Bricks via `BricksLoader`) |
+| WooCommerce Migrator | `app/Modules/WooCommerceMigrator/` | Import data from WooCommerce (WP-CLI driven) |
+| Data | `app/Modules/Data/` | Static/reference data helpers |
+| MCP | `app/Modules/MCP/` | Model Context Protocol tools for AI assistants — see [MCP](./mcp) |
 
-Payment gateways implement specific interfaces:
+The following modules live in **FluentCart Pro** (`app/Modules/` of the pro plugin):
 
-```php
-interface PaymentGatewayInterface
-{
-    public function has(string $feature): bool;
-    public function meta(): array;
-    public function makePaymentFromPaymentInstance(PaymentInstance $paymentInstance);
-    public function handleIPN();
-    public function getOrderInfo(array $data);
-    public function fields();
-}
-```
+| Module | Purpose |
+|--------|---------|
+| Licensing | Software license management and validation — see [Licensing (Pro)](./licensing) |
+| Order Bump | Promotional offers and order bumps — see [Order Bump (Pro)](./order-bump) |
+| MCP (License tools) | Read-only license MCP tools, gated on the Licensing module — see [MCP](./mcp) |
 
-## Module Manager
+> Ghost product selling is **not** a module — it is a hook-based pattern for adding non-catalog items to the cart. See [Ghost Product Selling](./ghost-product-selling).
 
-### Gateway Manager
+## The Gateway Manager
 
-The `GatewayManager` handles payment gateway registration and management:
+Payment gateways are the one module family with a dedicated manager. The `GatewayManager` handles gateway registration and lookup:
 
 ```php
 use FluentCart\App\Modules\PaymentMethods\Core\GatewayManager;
@@ -152,297 +135,47 @@ $gateway = GatewayManager::getInstance()->get('stripe');
 // Get all enabled gateways
 $enabledGateways = GatewayManager::getInstance()->enabled();
 
-// Check if gateway exists
+// Check if a gateway exists
 $exists = GatewayManager::has('stripe');
 ```
 
-### Module Settings
+See [Payment Methods Module](./payment-methods) and [Custom Payment Gateway Integration](/payment-methods-integration/) for the full gateway contract.
 
-Modules can have their own settings:
+## Building Your Own Module
 
-```php
-class YourModuleSettings extends BaseGatewaySettings
-{
-    public function getFields(): array
-    {
-        return [
-            'is_active' => [
-                'type' => 'yes_no',
-                'label' => __('Enable Module', 'fluent-cart'),
-                'default' => 'no'
-            ],
-            'api_key' => [
-                'type' => 'text',
-                'label' => __('API Key', 'fluent-cart'),
-                'required' => true
-            ]
-        ];
-    }
-}
-```
+To add a feature module to a custom add-on plugin:
 
-## Module Development
+1. **Create the entry-point class** with a `register($app)` (or static `boot()`) method:
 
-### Creating a Custom Module
+   ```php
+   <?php
+   namespace YourPlugin\Modules\YourModule;
 
-1. **Create Module Directory**
-```bash
-mkdir -p app/Modules/YourModule/
-```
+   class YourModule
+   {
+       public function register($app)
+       {
+           // Declare settings (optional)
+           $app->addFilter('fluent_cart/module_setting/fields', [$this, 'addSettings'], 10, 2);
 
-2. **Create Main Module Class**
-```php
-<?php
-namespace FluentCart\App\Modules\YourModule;
+           // Attach feature hooks
+           add_action('fluent_cart/order/created', [$this, 'handleOrderCreated']);
+           add_filter('fluent_cart/order/total', [$this, 'modifyOrderTotal']);
+       }
+   }
+   ```
 
-use FluentCart\App\Modules\Core\AbstractModule;
+2. **Wire it on boot** from your own plugin, after FluentCart has loaded:
 
-class YourModule extends AbstractModule
-{
-    public function register($app): void
-    {
-        // Module registration logic
-    }
-    
-    public function boot(): void
-    {
-        // Module initialization logic
-    }
-    
-    public function isEnabled(): bool
-    {
-        return $this->settings->get('is_active') === 'yes';
-    }
-}
-```
+   ```php
+   add_action('fluentcart_loaded', function ($app) {
+       (new \YourPlugin\Modules\YourModule\YourModule())->register($app);
+   });
+   ```
 
-3. **Register Module**
-```php
-// In your plugin's main file
-add_action('fluentcart_loaded', function($app) {
-    $app->addModule('your_module', new YourModule());
-});
-```
+3. **Gate behaviour** behind your module's active flag where appropriate using `\FluentCart\Api\ModuleSettings::isActive('your_module_key')`.
 
-### Module Hooks and Filters
-
-Modules can use FluentCart's hook system:
-
-```php
-class YourModule extends AbstractModule
-{
-    public function registerHooks(): void
-    {
-        // Action hooks
-        add_action('fluent_cart/order/created', [$this, 'handleOrderCreated']);
-        add_action('fluent_cart/payment/success', [$this, 'handlePaymentSuccess']);
-        
-        // Filter hooks
-        add_filter('fluent_cart/order/total', [$this, 'modifyOrderTotal']);
-        add_filter('fluent_cart/email/template', [$this, 'customizeEmailTemplate']);
-    }
-}
-```
-
-### Module API Endpoints
-
-Modules can register their own API endpoints:
-
-```php
-class YourModuleAPI
-{
-    public function register($app): void
-    {
-        $app->addAction('rest_api_init', function() {
-            register_rest_route('fluent-cart/v1', '/your-module/(?P<id>\d+)', [
-                'methods' => 'GET',
-                'callback' => [$this, 'getData'],
-                'permission_callback' => [$this, 'checkPermissions']
-            ]);
-        });
-    }
-    
-    public function getData($request): \WP_REST_Response
-    {
-        $id = $request->get_param('id');
-        // Your logic here
-        return new \WP_REST_Response(['data' => $data]);
-    }
-}
-```
-
-## Module Configuration
-
-### Settings Management
-
-Modules can have configurable settings:
-
-```php
-class YourModuleSettings
-{
-    public function getDefaultSettings(): array
-    {
-        return [
-            'is_active' => 'no',
-            'api_key' => '',
-            'webhook_url' => '',
-            'debug_mode' => 'no'
-        ];
-    }
-    
-    public function validateSettings($settings): array
-    {
-        $errors = [];
-        
-        if ($settings['is_active'] === 'yes' && empty($settings['api_key'])) {
-            $errors[] = __('API Key is required when module is active', 'fluent-cart');
-        }
-        
-        return $errors;
-    }
-}
-```
-
-### Admin Interface
-
-Modules can provide admin interfaces:
-
-```php
-class YourModuleAdmin
-{
-    public function renderSettingsPage(): void
-    {
-        $settings = $this->getSettings();
-        ?>
-        <div class="wrap">
-            <h1><?php _e('Your Module Settings', 'fluent-cart'); ?></h1>
-            <form method="post" action="options.php">
-                <?php settings_fields('your_module_settings'); ?>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row"><?php _e('Enable Module', 'fluent-cart'); ?></th>
-                        <td>
-                            <input type="checkbox" name="your_module[is_active]" 
-                                   value="yes" <?php checked($settings['is_active'], 'yes'); ?>>
-                        </td>
-                    </tr>
-                </table>
-                <?php submit_button(); ?>
-            </form>
-        </div>
-        <?php
-    }
-}
-```
-
-## Module Best Practices
-
-### 1. **Follow Naming Conventions**
-- Use PascalCase for class names
-- Use snake_case for file names
-- Use descriptive names that indicate functionality
-
-### 2. **Implement Proper Error Handling**
-```php
-public function processPayment($data)
-{
-    try {
-        // Payment processing logic
-        return $this->successResponse($result);
-    } catch (Exception $e) {
-        return $this->errorResponse($e->getMessage());
-    }
-}
-```
-
-### 3. **Use FluentCart's Helper Classes**
-```php
-use FluentCart\App\Helpers\Helper;
-use FluentCart\App\Services\PaymentHelper;
-
-// Use helper methods
-$formattedAmount = Helper::formatPrice($amount);
-$paymentUrl = PaymentHelper::getPaymentUrl($order);
-```
-
-### 4. **Implement Logging**
-```php
-use FluentCart\App\Services\Logger;
-
-public function logActivity($message, $data = [])
-{
-    Logger::info($message, [
-        'module' => 'your_module',
-        'data' => $data
-    ]);
-}
-```
-
-### 5. **Handle Webhooks Properly**
-```php
-public function handleWebhook($data)
-{
-    // Verify webhook signature
-    if (!$this->verifyWebhookSignature($data)) {
-        return new \WP_Error('invalid_signature', 'Invalid webhook signature');
-    }
-    
-    // Process webhook data
-    $this->processWebhookData($data);
-    
-    return ['status' => 'success'];
-}
-```
-
-## Module Testing
-
-### Unit Testing
-```php
-class YourModuleTest extends \PHPUnit\Framework\TestCase
-{
-    public function testModuleRegistration()
-    {
-        $module = new YourModule();
-        $this->assertInstanceOf(ModuleInterface::class, $module);
-    }
-    
-    public function testPaymentProcessing()
-    {
-        $module = new YourModule();
-        $result = $module->processPayment($testData);
-        $this->assertTrue($result['success']);
-    }
-}
-```
-
-### Integration Testing
-```php
-class YourModuleIntegrationTest extends \WP_UnitTestCase
-{
-    public function testModuleWithFluentCart()
-    {
-        // Test module integration with FluentCart
-        $this->assertTrue(class_exists('FluentCart\App\Modules\YourModule\YourModule'));
-    }
-}
-```
-
-## Module Distribution
-
-### Creating a Module Package
-
-1. **Create Module Structure**
-2. **Add Composer Configuration**
-3. **Include Documentation**
-4. **Add Installation Instructions**
-
-### Module Marketplace
-
-Modules can be distributed through:
-- **WordPress.org Plugin Directory**
-- **FluentCart Marketplace** (coming soon)
-- **Direct Distribution**
-- **Private Repositories**
+4. **Register REST routes** in a dedicated routes file loaded by your module, following the route-meta-permission convention used across core (see [REST API](/api/)).
 
 ## Related Documentation
 
@@ -456,12 +189,14 @@ Modules can be distributed through:
 
 Continue with module development:
 
-1. **[Ghost Product Selling](./ghost-product-selling)** - Sell ghost products using hooks
-2. **[Payment Methods Module](./payment-methods)** - Payment gateway development
-3. **[Shipping Module](./shipping)** - Shipping method development
-4. **[Storage Drivers](./storage)** - File storage integration
-5. **[Licensing Module (Pro)](./licensing)** - Software license management
-6. **[Order Bump Module (Pro)](./order-bump)** - Promotional tools
+1. **[Advanced Variation](./advanced-variation)** - Product attributes and variations (core)
+2. **[Ghost Product Selling](./ghost-product-selling)** - Sell ghost products using hooks
+3. **[Payment Methods Module](./payment-methods)** - Payment gateway development
+4. **[Shipping Module](./shipping)** - Shipping method development
+5. **[Storage Drivers](./storage)** - File storage integration
+6. **[MCP Module](./mcp)** - Model Context Protocol tools for AI assistants
+7. **[Licensing Module (Pro)](./licensing)** - Software license management
+8. **[Order Bump Module (Pro)](./order-bump)** - Promotional tools
 
 ## Previous/Next Navigation
 
@@ -469,4 +204,3 @@ Continue with module development:
 - **Next**: [Developer Guides](/guides/) - Advanced development topics
 
 ---
-

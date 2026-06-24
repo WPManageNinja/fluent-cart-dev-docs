@@ -842,6 +842,36 @@ add_filter('fluent_cart/storage/storage_settings_before_update_s3', function ($s
 ```
 </details>
 
+### <code> storage/settings_response </code>
+<details>
+<summary><code>fluent_cart/storage/settings_response</code> &mdash; Filter the settings response returned for a storage driver</summary>
+
+**When it runs:**
+Applied when a storage driver builds the settings response shown in the admin (including any settings template and payload). Use it to add or modify fields in the driver settings response for all drivers. A driver-specific variant, `fluent_cart/storage/settings_response_{$slug}`, fires immediately after with the same arguments — replace `{$slug}` with the driver slug (e.g. `s3`, `r2`).
+
+**Parameters:**
+- `$response` (array): The storage driver settings response
+- `$driver` (object): The storage driver instance (extends `BaseStorageDriver`)
+
+**Returns:** `array` — The modified settings response
+
+**Source:** `app/Modules/StorageDrivers/BaseStorageDriver.php:184` (generic) and `:186` (per-driver `_{$slug}` variant)
+
+**Usage:**
+```php
+// All drivers
+add_filter('fluent_cart/storage/settings_response', function ($response, $driver) {
+    $response['extra_note'] = 'Configured by my add-on';
+    return $response;
+}, 10, 2);
+
+// Only the S3 driver
+add_filter('fluent_cart/storage/settings_response_s3', function ($response, $driver) {
+    return $response;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Localization & Address
@@ -1484,6 +1514,145 @@ add_filter('fluent_cart/outside_addon/handle_install', function ($result) {
     // Handle custom external addon installation
     return ['success' => true, 'message' => 'Addon installed successfully'];
 });
+```
+</details>
+
+---
+
+## Pro: Invoices & E-Invoicing <Badge type="warning" text="Pro" />
+
+### <code> einvoice/tax_category </code>
+<details>
+<summary><code>fluent_cart/einvoice/tax_category</code> <Badge type="warning" text="Pro" /> &mdash; Filter the derived EN 16931 VAT category for an e-invoice line</summary>
+
+**When it runs:**
+Applied while mapping an order to an EN 16931 / ZUGFeRD e-invoice, after the VAT category for a line has been derived and before it is written to the XML. Regional add-ons can map a line to a different category (e.g. force category `E` with a VATEX exemption reason). The callback must return an array with the same shape it received; a non-array return is ignored.
+
+**Parameters:**
+- `$resolved` (array): The derived category data
+    ```php
+    $resolved = [
+        'categoryCode'        => 'S',   // (string) EN 16931 VAT category code (S/Z/E/AE)
+        'ratePercent'         => 19.0,  // (float) The VAT rate percent
+        'exemptionReasonCode' => '',    // (string) VATEX exemption reason code, if any
+        'exemptionReasonText' => '',    // (string) Human-readable exemption reason, if any
+    ];
+    ```
+- `$context` (array): Mapping context
+    ```php
+    $context = [
+        'order' => $order,   // (Order) The order being mapped
+        'line'  => $line,    // (object|null) The line item, or null
+    ];
+    ```
+
+**Returns:** `array` — The (possibly modified) category data in the same shape
+
+**Source:** `fluent-cart-pro/app/Services/Invoice/Mapper/En16931InvoiceMapper.php:357`
+
+**Usage:**
+```php
+add_filter('fluent_cart/einvoice/tax_category', function ($resolved, $context) {
+    // Force a specific line to an exempt category with a reason
+    $resolved['categoryCode']        = 'E';
+    $resolved['exemptionReasonCode'] = 'VATEX-EU-O';
+    $resolved['exemptionReasonText'] = 'Not subject to VAT';
+    return $resolved;
+}, 10, 2);
+```
+</details>
+
+### <code> einvoice/buyer_vat_id </code>
+<details>
+<summary><code>fluent_cart/einvoice/buyer_vat_id</code> <Badge type="warning" text="Pro" /> &mdash; Filter the buyer VAT identifier on an e-invoice</summary>
+
+**When it runs:**
+Applied while mapping an order to an EN 16931 / ZUGFeRD e-invoice, after the buyer VAT identifier (BT-48) has been resolved and before the buyer record is built. Use it to override or normalize the buyer's VAT ID.
+
+**Parameters:**
+- `$buyerVatId` (string): The resolved buyer VAT identifier
+- `$context` (array): Mapping context
+    ```php
+    $context = [
+        'order' => $order,   // (Order) The order being mapped
+    ];
+    ```
+
+**Returns:** `string` — The buyer VAT identifier (cast to a string)
+
+**Source:** `fluent-cart-pro/app/Services/Invoice/Mapper/En16931InvoiceMapper.php:154`
+
+**Usage:**
+```php
+add_filter('fluent_cart/einvoice/buyer_vat_id', function ($buyerVatId, $context) {
+    // Strip whitespace from the buyer VAT ID
+    return trim($buyerVatId);
+}, 10, 2);
+```
+</details>
+
+### <code> pdf_einvoice_data </code>
+<details>
+<summary><code>fluent_cart/pdf_einvoice_data</code> <Badge type="warning" text="Pro" /> &mdash; Filter the e-invoice data embedded in a PDF receipt</summary>
+
+**When it runs:**
+Applied while generating an order receipt PDF, allowing the e-invoice data attached to (or embedded in) the PDF to be customized before rendering.
+
+**Parameters:**
+- `$eInvoiceData` (array): The e-invoice data
+- `$order` ([Order](/database/models/order)): The order the receipt belongs to
+- `$meta` (array): The order/receipt meta
+
+**Returns:** `array` — The (possibly modified) e-invoice data
+
+**Source:** `fluent-cart-pro/app/Services/PDF/OrderReceiptPdfService.php:83`
+
+**Usage:**
+```php
+add_filter('fluent_cart/pdf_einvoice_data', function ($eInvoiceData, $order, $meta) {
+    // Adjust embedded e-invoice data for the PDF receipt
+    return $eInvoiceData;
+}, 10, 3);
+```
+</details>
+
+---
+
+## Pro: LearnDash <Badge type="warning" text="Pro" />
+
+### <code> learndash/before_set_user_course_expiry </code>
+<details>
+<summary><code>fluent_cart/learndash/before_set_user_course_expiry</code> <Badge type="warning" text="Pro" /> &mdash; Filter the LearnDash course expiry timestamp before it is stored</summary>
+
+**When it runs:**
+Applied in the LearnDash LMS integration just before the per-user, per-course expiry timestamp is written to user meta, when an order/subscription grants or extends course access. Use it to adjust how long a user's course access lasts.
+
+::: warning Renamed
+This filter was previously named `fluent_cart/before_setting_learndash_course_expiration_for_user`. The old name is no longer applied — update any callbacks to the new `fluent_cart/learndash/before_set_user_course_expiry` name.
+:::
+
+**Parameters:**
+- `$expiryTimestamp` (int): The computed expiry timestamp (Unix time)
+- `$context` (array): Course-access context
+    ```php
+    $context = [
+        'user_id'      => 5,             // (int) The WordPress user ID
+        'course_id'    => 42,            // (int) The LearnDash course ID
+        'order'        => $order,        // (Order) The order granting access
+        'subscription' => $subscription, // (Subscription|null) The related subscription, if any
+    ];
+    ```
+
+**Returns:** `int` — The expiry timestamp to store
+
+**Source:** `fluent-cart-pro/app/Modules/Integrations/LMS/LearnDashLMSConnect.php:238` and `:295`
+
+**Usage:**
+```php
+add_filter('fluent_cart/learndash/before_set_user_course_expiry', function ($expiryTimestamp, $context) {
+    // Grant an extra 7 days of grace on course access
+    return $expiryTimestamp + (7 * DAY_IN_SECONDS);
+}, 10, 2);
 ```
 </details>
 

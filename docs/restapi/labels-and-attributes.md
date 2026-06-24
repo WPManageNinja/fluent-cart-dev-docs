@@ -245,6 +245,49 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/options/attr/groups?with
 
 ---
 
+### Reorder Attribute Groups
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/options/attr/groups/reorder`
+
+Persist a new manual display order for attribute groups. The submitted order is written as a dense `serial` value (`1..N`) in array order, driving both the Attributes sidebar and the product editor's option-name dropdown.
+
+- **Permission:** `products/edit`
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `ids` | array | body | Yes | The full ordered list of attribute group IDs. Duplicates and non-positive values are stripped. Maximum 500 (filterable via `fluent_cart/attribute_groups/max_reorder`). |
+
+#### Response
+
+```json
+{
+  "message": "Groups reordered."
+}
+```
+
+**Errors:**
+
+| Status | Condition |
+|--------|-----------|
+| `422` | No group IDs provided, or more than the maximum allowed in one request |
+| `404` | One or more group IDs do not exist |
+| `500` | Failed to reorder groups |
+
+#### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/options/attr/groups/reorder" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ids": [3, 1, 2]
+  }'
+```
+
+---
+
 ### Create Attribute Group
 
 <badge type="warning">POST</badge> `/fluent-cart/v2/options/attr/group`

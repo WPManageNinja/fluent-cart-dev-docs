@@ -2125,6 +2125,70 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/products/variants/460" 
 
 ---
 
+### Group Bulk Update Variants
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/products/variants/group-bulk-update`
+
+Bulk-update multiple variations that belong to the **same product**. Uses PATCH semantics: only the fields you provide are written to each variant; omitted fields are left unchanged.
+
+- **Permission:** `products/edit`
+- **Request Class:** `GroupBulkUpdateVariantRequest`
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `variant_ids` | array | body | Yes | Variation IDs to update. Maximum 500 per request. All must belong to the same product. |
+| `item_price` | number | body | No | New price in **dollars** (converted to cents). |
+| `compare_price` | number | body | No | Compare-at price in **dollars**. Cleared to `0` if it is not greater than `item_price`. |
+| `sku` | string | body | No | New SKU (max 30 chars). Only applied when exactly **one** `variant_ids` entry is given. An empty string clears the SKU. |
+| `manage_stock` | integer | body | No | `1` to enable stock management, `0` to disable. |
+| `total_stock` | integer | body | No | New total stock quantity. |
+| `fulfillment_type` | string | body | No | `physical` or `digital`. |
+| `manage_cost` | string | body | No | `"true"` or `"false"` — whether to track cost per item. |
+| `item_cost` | number | body | No | Cost per item in **dollars** (converted to cents). |
+| `other_info` | object | body | No | Subscription/pricing sub-fields (e.g. `payment_type`, `signup_fee`, `manage_setup_fee`). Unknown sub-keys are dropped. |
+
+> At least one updatable field (a top-level field or `other_info`) must be provided, otherwise the request returns `422`.
+
+#### Response
+
+```json
+{
+  "message": "2 variants updated successfully.",
+  "updated": 2
+}
+```
+
+**Errors:**
+
+```json
+{ "message": "One or more variant IDs do not exist." }
+```
+
+| Status | Condition |
+|--------|-----------|
+| `422` | No variant IDs, no valid updates, or variants belong to different products |
+| `404` | One or more variant IDs do not exist |
+| `500` | Failed to update variants |
+
+#### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/products/variants/group-bulk-update" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "variant_ids": [460, 461],
+    "item_price": 39.99,
+    "fulfillment_type": "digital",
+    "manage_stock": 1,
+    "total_stock": 50
+  }'
+```
+
+---
+
 ### Delete Variation
 
 <badge type="danger">DELETE</badge> `/fluent-cart/v2/products/variants/{variantId}`

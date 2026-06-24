@@ -25,8 +25,12 @@ description: FluentCart AttributeGroup model documentation with attributes, scop
 | slug               | String    | Attribute group slug |
 | description        | Text      | Attribute group description |
 | settings           | JSON      | Attribute group settings |
+| serial             | Integer   | Manual display order of attribute groups |
+| is_system          | Boolean   | System group flag (see note below) |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
+
+> **Note:** `is_system` is cast to a boolean and is **not** mass-assignable (not in `$fillable`). It is a trust flag set only by the seeder via bulk insert, so user-created groups always remain `is_system = false` even if the field is sent in a request body.
 
 ## Boot Events
 

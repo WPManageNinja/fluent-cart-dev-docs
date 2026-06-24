@@ -674,3 +674,64 @@ add_action('fluent_cart/order/receipt_viewed', function ($data) {
 </details>
 
 ---
+
+## Taxes
+
+Hooks that fire while taxes are calculated for an order/cart, including EU B2B reverse-charge handling.
+
+### <code> tax/reverse_charge_applied </code>
+<details>
+<summary><code>fluent_cart/tax/reverse_charge_applied</code> &mdash; Fires after reverse charge is applied to the checkout</summary>
+
+**When it runs:**
+Fires inside the tax calculation flow once the reverse-charge (EU B2B) adjustment has been applied to the checkout — product line unit prices have been reduced to net and the reverse-charge fee adjustments have been computed. Use it to react to a checkout switching into reverse-charge mode.
+
+**Parameters:**
+
+- `$data` (array): Reverse-charge context
+    ```php
+    $data = [
+        'checkout_data' => $checkoutData,   // (array) The full checkout data, including tax_data
+        'product_lines' => $productLines,   // (array) The adjusted product line items
+    ];
+    ```
+
+**Source:** `app/Modules/Tax/TaxModule.php` (line 1410)
+
+**Usage:**
+```php
+add_action('fluent_cart/tax/reverse_charge_applied', function ($data) {
+    // Flag the checkout for downstream B2B handling
+    error_log('Reverse charge applied to checkout');
+}, 10, 1);
+```
+</details>
+
+### <code> tax/reverse_charge_removed </code>
+<details>
+<summary><code>fluent_cart/tax/reverse_charge_removed</code> &mdash; Fires when reverse charge no longer applies</summary>
+
+**When it runs:**
+Fires when a checkout that is not (or no longer) eligible for reverse charge has its reverse-charge fee adjustments cleared and product lines restored to gross prices. The counterpart to `reverse_charge_applied`.
+
+**Parameters:**
+
+- `$data` (array): Reverse-charge context
+    ```php
+    $data = [
+        'checkout_data' => $checkoutData,   // (array) The full checkout data, including tax_data
+        'product_lines' => $productLines,   // (array) The product line items (restored to gross)
+    ];
+    ```
+
+**Source:** `app/Modules/Tax/TaxModule.php` (line 1422)
+
+**Usage:**
+```php
+add_action('fluent_cart/tax/reverse_charge_removed', function ($data) {
+    // Clean up any state set while reverse charge was active
+}, 10, 1);
+```
+</details>
+
+---

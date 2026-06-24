@@ -589,6 +589,144 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/licensing/licenses/1/
 
 ---
 
+## License Sites
+
+Endpoints for browsing the sites that have activated a license, with aggregated product, customer, and activity data. Authorization is handled by the `LicensePolicy`.
+
+---
+
+### List License Sites
+
+<badge type="tip">GET</badge> `/fluent-cart/v2/licensing/sites`
+
+Retrieve a paginated list of sites that have activated a license. Each site is enriched with the unique products and customers tied to its activations, plus a local-environment flag and the most recent activity timestamp.
+
+- **Permission:** `licenses/view`
+- **Policy:** `LicensePolicy`
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `search` | string | query | No | Search by activated site URL. |
+| `per_page` | integer | query | No | Number of results per page (default: `15`). |
+| `page` | integer | query | No | Page number for pagination. |
+| `sort_by` | string | query | No | Column to sort by. |
+| `sort_type` | string | query | No | Sort direction: `asc` or `desc`. |
+| `filter_type` | string | query | No | `simple` or `advanced`. |
+
+#### Response
+
+```json
+{
+  "sites": {
+    "total": 12,
+    "per_page": 15,
+    "current_page": 1,
+    "last_page": 1,
+    "data": [
+      {
+        "id": 5,
+        "site_url": "https://customer-site.com",
+        "status": "active",
+        "created_at": "2026-01-10 09:00:00",
+        "products": [
+          { "name": "Pro Plugin", "variation": "Yearly" }
+        ],
+        "customers": ["Jane Doe"],
+        "is_local": false,
+        "last_activity": "2026-06-01 12:00:00"
+      }
+    ]
+  }
+}
+```
+
+#### Example
+
+```bash
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/licensing/sites?per_page=15&search=customer-site.com" \
+  -u "username:app_password"
+```
+
+---
+
+### Get License Site
+
+<badge type="tip">GET</badge> `/fluent-cart/v2/licensing/sites/{id}`
+
+Retrieve a single license site with its paginated activations, plus the related customers and orders.
+
+- **Permission:** `licenses/view`
+- **Policy:** `LicensePolicy`
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `id` | integer | path | Yes | The license site ID. |
+| `per_page` | integer | query | No | Activations per page (default: `15`, min `1`, max `100`). |
+
+#### Response
+
+```json
+{
+  "site": {
+    "id": 5,
+    "site_url": "https://customer-site.com",
+    "status": "active"
+  },
+  "activations": {
+    "data": [
+      {
+        "id": 88,
+        "license_id": 21,
+        "license_key": "ABC123-XYZ",
+        "product_id": 123,
+        "product_name": "Pro Plugin",
+        "variation_title": "Yearly",
+        "license_status": "active",
+        "activation_status": "active",
+        "is_local": "0",
+        "last_update_version": "1.4.0",
+        "last_update_date": "2026-06-01 12:00:00",
+        "customer": {
+          "id": 9,
+          "full_name": "Jane Doe",
+          "email": "jane@example.com"
+        },
+        "order_id": 4501,
+        "expiration_date": "2027-01-10",
+        "activation_limit": 5,
+        "activation_count": 2,
+        "created_at": "2026-01-10 09:00:00"
+      }
+    ],
+    "total": 1,
+    "per_page": 15,
+    "current_page": 1,
+    "last_page": 1
+  },
+  "customers": [],
+  "orders": []
+}
+```
+
+When a license's product is missing, `product_name` falls back to `"Unknown Product"`.
+
+**Errors:**
+
+A `404` is returned when the site ID does not exist.
+
+#### Example
+
+```bash
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/licensing/sites/5?per_page=15" \
+  -u "username:app_password"
+```
+
+---
+
 ## Product License Settings
 
 Endpoints for configuring license settings on a per-product basis. These control how licenses are generated when customers purchase the product.

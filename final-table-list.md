@@ -29,48 +29,50 @@
 23. fct_product_downloads
 24. fct_product_meta
 25. fct_product_variations
-26. fct_scheduled_actions
-27. fct_shipping_classes
-28. fct_shipping_methods
-29. fct_shipping_zones
-30. fct_subscription_meta
-31. fct_subscriptions
-32. fct_tax_classes
-33. fct_tax_rates
-34. fct_webhook_logger
+26. fct_retention_snapshots
+27. fct_scheduled_actions
+28. fct_shipping_classes
+29. fct_shipping_methods
+30. fct_shipping_zones
+31. fct_subscription_meta
+32. fct_subscriptions
+33. fct_tax_classes
+34. fct_tax_rates
+35. fct_webhook_logger
 
 ### **Pro Plugin Tables (6 tables)**
 
-35. fct_license_activations
-36. fct_license_meta
-37. fct_license_sites
-38. fct_licenses
-39. fct_order_promotions
-40. fct_order_promotion_stats
+36. fct_license_activations
+37. fct_license_meta
+38. fct_license_sites
+39. fct_licenses
+40. fct_order_promotions
+41. fct_order_promotion_stats
 
 ## **Verification Status**
 
-### ✅ Migration Files: 38 tables
-- All core tables have migration files
-- All Pro plugin tables (except promotions) have migration files
-- fct_webhook_logger has migration file (WebhookLogger.php)
+### ✅ Migration Files: 39 tables
+- All 35 core tables have migration files (under `database/Migrations/`)
+- 4 Pro license tables have migration files (license, license_activations, license_meta, license_sites)
+- The 2 Pro promotion tables are created dynamically (no migration file)
+- fct_webhook_logger has a migration file (WebhookLogger.php) and is a core table
+- fct_retention_snapshots has a migration file (RetentionSnapshotsMigrator.php)
 
 ### ✅ Schema Documentation: 41 tables
-- All 40 tables documented
+- All 41 tables documented in schema.md
 - Duplicates removed
-- fct_email_notifications removed (not needed)
 
-### ✅ Model Documentation: 41 models
-- All 41 models documented
-- Extra files (dynamic-model, user, relationships) are documentation helpers, not actual table models
+### ✅ Model Documentation
+- Model docs exist for every table that has an Eloquent model
+- fct_retention_snapshots has a migration/schema entry but no dedicated Eloquent model, so no model doc is required
+- Extra files (dynamic-model, user, user-meta, relationships) are documentation helpers, not actual table models
 
 ## **Final Count Verification**
 
-**Migration Files**: 38 tables (35 Core + 3 Pro with migrations)
+**Migration Files**: 39 tables (35 Core + 4 Pro license tables with migrations)
 **Promotion Tables**: 2 tables (created dynamically, no migrations)
-**Webhook Logger**: 1 table (has migration but not in standard format)
 
-**TOTAL**: 38 + 2 + 1 = 41 tables ✅
+**TOTAL**: 39 + 2 = 41 tables ✅
 
 ## **Action Items Completed**
 
@@ -96,9 +98,8 @@
 
 ### **✅ VERIFICATION COMPLETE**
 
-- **Migration Files**: 38 tables ✅
+- **Migration Files**: 39 tables ✅
 - **Schema Documentation**: 41 tables ✅  
-- **Model Documentation**: 41 models ✅
 - **Total Tables**: 41 tables (35 Core + 6 Pro Plugin) ✅
 
 **All audit files have been updated to reflect the final completion status of 41 tables.**

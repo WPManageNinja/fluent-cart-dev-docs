@@ -393,6 +393,36 @@ add_action('fluent_cart/licensing/license_renewed', function ($data) {
 ```
 </details>
 
+### <code> license_reactivated </code>
+<details>
+<summary><code>fluent_cart/licensing/license_reactivated</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a previously inactive license is reactivated</summary>
+
+**When it runs:**
+This action fires when a license is reactivated and its expiration date is restored from the associated subscription's next billing date (or the license's own expiration date) during license generation/renewal processing.
+
+**Parameters:**
+
+- `$data` (array): License reactivation data
+    - `license` ([`\FluentCart\App\Models\License`](/database/models/license)) — The reactivated license
+    - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)) — The associated subscription
+
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:417`
+
+**Usage:**
+```php
+add_action('fluent_cart/licensing/license_reactivated', function ($data) {
+    $license      = $data['license'];
+    $subscription = $data['subscription'];
+
+    fluent_cart_add_log(
+        'License Reactivated',
+        sprintf('License #%d reactivated via subscription #%d', $license->id, $subscription->id),
+        'info'
+    );
+}, 10, 1);
+```
+</details>
+
 ### <code> license_expired </code>
 <details>
 <summary><code>fluent_cart/licensing/license_expired</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a license expires due to subscription cancellation or scheduler</summary>

@@ -462,6 +462,28 @@ add_action('fluent_cart/render_custom_form_field', function ($fieldData) {
 
 Hooks for the generic fallback template used on product archive pages and other FluentCart template-driven pages. They fire in sequence from top to bottom of the page layout.
 
+### <code> fluent_cart/advanced_variation/enqueue_assets </code>
+<details>
+<summary><code>fluent_cart/advanced_variation/enqueue_assets</code> &mdash; Enqueue variation-selector assets when a product UI renders</summary>
+
+**When it runs:**
+Fires whenever a product surface that may show the variation selector is rendered — product cards, the single-product shortcode, and the product-info, buy-section, shop, related-product, and product-carousel block renders. Core listens on this hook to enqueue the advanced-variation selector scripts/styles exactly once per request. This is the single, unified replacement for the older per-surface enqueue hooks (`product_card/enqueue_assets`, `product_info_block/enqueue_assets`, `shop_block/enqueue_assets`), which are no longer fired.
+
+**Parameters:**
+
+None.
+
+**Source:** `app/Services/Renderer/ProductCardRender.php` (line 52), the block-editor render handlers under `app/Hooks/Handlers/BlockEditors/`, and `app/Hooks/Handlers/ShortCodes/SingleProductShortCode.php` (line 110). The core listener is registered in `app/Hooks/Handlers/AdvancedVariationHandler.php` (line 182).
+
+**Usage:**
+```php
+add_action('fluent_cart/advanced_variation/enqueue_assets', function () {
+    // Enqueue your own assets alongside the variation selector
+    wp_enqueue_script('my-variation-addon', plugins_url('js/variation-addon.js', __FILE__), [], '1.0', true);
+}, 20);
+```
+</details>
+
 ### <code> fluent_cart/generic_template/rendering </code>
 <details>
 <summary><code>fluent_cart/generic_template/rendering</code> &mdash; Start of generic fallback template</summary>
@@ -950,5 +972,29 @@ add_action('fluent_cart_action_my_gateway_ipn', function ($requestData) {
     status_header(200);
     echo 'OK';
 }, 10, 1);
+```
+</details>
+
+---
+
+## Scheduling
+
+### <code> store_digest/send </code>
+<details>
+<summary><code>fluent_cart/store_digest/send</code> &mdash; On-demand trigger to send a Store Digest email</summary>
+
+**When it runs:**
+This is a trigger hook you can fire (rather than listen to). Core registers a listener on it that sends the Store Digest email for the requested frequency, which is handy for WP-CLI or debugging without waiting for the scheduler.
+
+**Parameters:**
+
+- `$frequency` (string): The digest frequency to send — `'daily'`, `'weekly'`, or `'monthly'`
+
+**Source:** listener registered in `app/Hooks/Scheduler/AutoSchedules/HourlyScheduler.php` (line 19), which calls `StoreDigestService::sendDigest()`
+
+**Usage:**
+```php
+// Trigger a daily store digest immediately (e.g. from WP-CLI):
+do_action('fluent_cart/store_digest/send', 'daily');
 ```
 </details>

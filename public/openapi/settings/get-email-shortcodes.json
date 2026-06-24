@@ -108,7 +108,8 @@
                           "{{order.payment_method_title}}": "Payment Method",
                           "{{order.receipt_url}}": "Receipt URL",
                           "{{order.created_at}}": "Order Date",
-                          "{{order.customer_dashboard_link}}": "Customer Dashboard Link"
+                          "{{order.customer_dashboard_link}}": "Customer Dashboard Link",
+                          "{{order.payment_link}}": "Order Payment Link"
                         }
                       },
                       "customer": {
@@ -144,7 +145,8 @@
                         "{{order.payment_method_title}}": "Payment Method",
                         "{{order.receipt_url}}": "Receipt URL",
                         "{{order.created_at}}": "Order Date",
-                        "{{order.customer_dashboard_link}}": "Customer Dashboard Link"
+                        "{{order.customer_dashboard_link}}": "Customer Dashboard Link",
+                        "{{order.payment_link}}": "Order Payment Link"
                       }
                     },
                     "customer": {
@@ -182,7 +184,8 @@
                             "{{order.payment_method_title}}": "Payment Method",
                             "{{order.receipt_url}}": "Receipt URL",
                             "{{order.created_at}}": "Order Date",
-                            "{{order.customer_dashboard_link}}": "Customer Dashboard Link"
+                            "{{order.customer_dashboard_link}}": "Customer Dashboard Link",
+                            "{{order.payment_link}}": "Order Payment Link"
                           }
                         },
                         "customer": {

@@ -253,6 +253,7 @@ function buildRestApiSidebar() {
       { text: 'Licensing', link: '/restapi/licensing', dir: 'licensing' },
       { text: 'Roles & Permissions', link: '/restapi/roles', dir: 'roles-permissions' },
       { text: 'Order Bumps', link: '/restapi/order-bumps', dir: 'order-bumps' },
+      { text: 'Inventory', link: '/restapi/inventory', dir: 'inventory' },
     ]},
   ]
 
@@ -648,9 +649,11 @@ export default defineConfig({
         {
           text: 'Modules',
           items: [
+            { text: 'Advanced Variation', link: '/modules/advanced-variation' },
             { text: 'Payment Methods', link: '/modules/payment-methods' },
             { text: 'Shipping', link: '/modules/shipping' },
-            { text: 'Storage Drivers', link: '/modules/storage' }
+            { text: 'Storage Drivers', link: '/modules/storage' },
+            { text: 'MCP (AI Tools)', link: '/modules/mcp' }
           ]
         },
         {

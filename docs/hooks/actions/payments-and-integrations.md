@@ -792,6 +792,62 @@ add_action('fluent_cart/payments/paddle/webhook_transaction_refunded', function 
 ```
 </details>
 
+### <code> paddle/webhook_signature_bypass </code>
+<details>
+<summary><code>fluent_cart/paddle/webhook_signature_bypass</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a Paddle webhook is processed after a failed signature check</summary>
+
+**When it runs:**
+Fires during Paddle webhook (IPN) processing when signature verification failed but auto-recovery is enabled (see the `fluent_cart/paddle/webhook_auto_recover_enabled` filter), so the event is being processed via an API-pull fallback rather than rejected. Use it to audit or alert on unverified webhook deliveries.
+
+**Parameters:**
+
+- `$data` (array): Bypass context
+    ```php
+    $data = [
+        'event_type' => 'transaction.paid',   // (string) The Paddle event type
+        'entity_id'  => 'txn_...',            // (string|null) The Paddle entity ID from the pulled data
+    ];
+    ```
+
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Webhook/IPN.php` (line 105)
+
+**Usage:**
+```php
+add_action('fluent_cart/paddle/webhook_signature_bypass', function ($data) {
+    // Alert when a webhook is accepted without a valid signature
+    error_log('Paddle webhook signature bypassed for ' . $data['event_type']);
+}, 10, 1);
+```
+</details>
+
+### <code> paddle/webhook_subscription_unmatched </code>
+<details>
+<summary><code>fluent_cart/paddle/webhook_subscription_unmatched</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a Paddle subscription webhook cannot be matched locally</summary>
+
+**When it runs:**
+Fires during Paddle webhook processing when an incoming subscription event references a Paddle subscription ID that cannot be matched to a local subscription record. Use it to detect orphaned or migrated subscriptions that need manual reconciliation.
+
+**Parameters:**
+
+- `$data` (array): Unmatched-subscription context
+    ```php
+    $data = [
+        'paddle_subscription_id' => 'sub_...',          // (string) The unmatched Paddle subscription ID
+        'event_type'             => 'subscription.updated', // (string) The Paddle event type
+        'order_id'               => 123,                 // (int|null) Resolved order ID, or null
+    ];
+    ```
+
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Webhook/IPN.php` (line 350)
+
+**Usage:**
+```php
+add_action('fluent_cart/paddle/webhook_subscription_unmatched', function ($data) {
+    error_log('Unmatched Paddle subscription: ' . $data['paddle_subscription_id']);
+}, 10, 1);
+```
+</details>
+
 ---
 
 ## Integrations

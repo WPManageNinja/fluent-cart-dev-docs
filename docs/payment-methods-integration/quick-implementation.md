@@ -614,6 +614,61 @@ public function handlePaymentCompleted($data)
 
 ```
 
+### Step 6.5: Provide Webhook Instructions
+
+To tell store admins how to register your webhook endpoint, add a `getWebhookInstructions(): array` method to your gateway and surface it through an `html_attr` settings field. FluentCart's settings renderer turns the returned array into a consistent, translatable instructions UI (a copyable webhook URL, numbered setup steps, and a list of events to subscribe to) — so you never hand-build the HTML. This is the convention the built-in Stripe, Paddle, and Authorize.net gateways follow.
+
+```php
+<?php
+
+#YourGateway.php
+
+public function getWebhookInstructions(): array
+{
+    return [
+        'title'       => __('Webhook URL', 'your-plugin'),
+        'webhook_url' => $this->getWebhookUrl(),
+        'description' => __('Configure your gateway webhooks to receive payment updates remotely.', 'your-plugin'),
+        'steps'       => [
+            'title' => __('How to configure?', 'your-plugin'),
+            'list'  => [
+                __('Open your gateway dashboard → Developer → Webhooks.', 'your-plugin'),
+                __('Click Add endpoint and paste the webhook URL above.', 'your-plugin'),
+            ],
+        ],
+        'events'      => [
+            'title' => __('Select these events', 'your-plugin'),
+            'list'  => [
+                'payment.completed',
+                'payment.failed',
+                'subscription.created',
+                'subscription.canceled',
+            ],
+        ],
+    ];
+}
+```
+
+Then feed it into an `html_attr` field inside your `fields()` method:
+
+```php
+public function fields(): array
+{
+    $webhookInstructions = $this->getWebhookInstructions();
+
+    return [
+        // ... your other fields ...
+        'webhook_desc' => [
+            'type'  => 'html_attr',
+            'label' => __('Webhook Configuration', 'your-plugin'),
+            'value' => $webhookInstructions,
+        ],
+    ];
+}
+```
+
+The `html_attr` field also accepts a plain HTML string if you need fully custom markup. For the complete list of supported keys (including the optional `webhook_notice` block), see [Payment Gateway Settings Fields](./payment_setting_fields#html-attr).
+
 ### Step 7: (optional) Create your-gateway-checkout.js
 
 Create custom JavaScript file to handle (onsite) payment checkout, step #3 above is enough for (hosted) payment checkout.

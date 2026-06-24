@@ -265,6 +265,33 @@ add_filter('fluent_cart/products_views/preload_collection_bricks', function($htm
 ```
 </details>
 
+### <code> variation_types </code>
+<details>
+<summary><code>fluent_cart/variation_types</code> &mdash; Filter the list of available product variation types</summary>
+
+**When it runs:**
+This filter is applied when FluentCart builds the list of supported product variation types (e.g. simple, variable). Use it to register a custom variation type or relabel an existing one.
+
+**Parameters:**
+
+- `$types` (array): The variation types map (`key => label`)
+
+**Returns:** `array` — The modified variation types map
+
+**Source:** `app/Helpers/Helper.php:721`
+
+**Usage:**
+```php
+add_filter('fluent_cart/variation_types', function ($types) {
+    // Relabel an existing variation type
+    if (isset($types['simple'])) {
+        $types['simple'] = __('Standard', 'my-plugin');
+    }
+    return $types;
+});
+```
+</details>
+
 ---
 
 ## Product Buttons & Text
@@ -508,6 +535,31 @@ add_filter('fluent_cart/product_stock_availability', function($availability, $da
 ```
 </details>
 
+### <code> inventory_low_stock_threshold </code>
+<details>
+<summary><code>fluent_cart/inventory_low_stock_threshold</code> <Badge type="warning" text="Pro" /> &mdash; Filter the low-stock threshold used by Advanced Inventory</summary>
+
+**When it runs:**
+This filter is applied when the Advanced Inventory module determines what counts as "low stock" — both when computing the inventory stats counters and when filtering the inventory list by low-stock status. The default threshold is `10` units.
+
+**Parameters:**
+
+- `$threshold` (int): The low-stock threshold in units (default `10`)
+
+**Returns:**
+- `$threshold` (int): The threshold to use
+
+**Source:** `fluent-cart-pro/app/Modules/AdvancedInventory/Http/Controllers/AdvancedInventoryController.php:18` and `fluent-cart-pro/app/Modules/AdvancedInventory/Services/Filter/AdvancedInventoryFilter.php:67`
+
+**Usage:**
+```php
+add_filter('fluent_cart/inventory_low_stock_threshold', function ($threshold) {
+    // Treat anything below 25 units as low stock
+    return 25;
+});
+```
+</details>
+
 ---
 
 ## Product URLs & Templates
@@ -685,6 +737,43 @@ add_filter('fluent_cart/disable_auto_single_product_page', function($disable) {
 ---
 
 ## Coupons
+
+### <code> coupon/resolve_coupons </code>
+<details>
+<summary><code>fluent_cart/coupon/resolve_coupons</code> &mdash; Resolve coupon models from the requested codes</summary>
+
+**When it runs:**
+Applied while the discount service resolves the requested coupon codes into `Coupon` models for a cart. It receives the collection of coupons found in the database, the requested codes, and the cart. You may append unsaved/virtual `Coupon` instances (e.g. dynamically generated coupons) so they participate in discount calculation.
+
+**Parameters:**
+- `$coupons` (\Illuminate\Support\Collection): The resolved coupon models
+- `$codes` (array): The requested coupon codes
+- `$context` (array): Resolution context
+    ```php
+    $context = [
+        'cart' => $cart,   // \FluentCart\App\Models\Cart instance
+    ];
+    ```
+
+**Returns:** `\Illuminate\Support\Collection` — The coupon collection (possibly with appended instances)
+
+**Source:** `app/Services/Coupon/DiscountService.php:96`
+
+**Usage:**
+```php
+add_filter('fluent_cart/coupon/resolve_coupons', function ($coupons, $codes, $context) {
+    // Append a dynamically generated coupon for a special code
+    if (in_array('DYNAMIC10', $codes, true)) {
+        $coupons->push(new \FluentCart\App\Models\Coupon([
+            'code'        => 'DYNAMIC10',
+            'amount'      => 10,
+            'coupon_type' => 'percent',
+        ]));
+    }
+    return $coupons;
+}, 10, 3);
+```
+</details>
 
 ### <code> coupon/validating_coupon </code>
 <details>
@@ -876,6 +965,35 @@ add_filter('fluent-cart/coupon_statuses', function($statuses) {
     $statuses['scheduled'] = __('Scheduled', 'fluent-cart');
     return $statuses;
 }, 10, 1);
+```
+</details>
+
+---
+
+## Attributes
+
+### <code> attribute_groups/max_reorder </code>
+<details>
+<summary><code>fluent_cart/attribute_groups/max_reorder</code> &mdash; Filter the maximum number of attribute groups allowed in a single reorder request</summary>
+
+**When it runs:**
+This filter is applied when reordering attribute groups. A full-list reorder assigns a dense `1..N` serial and cannot be split into batches, so a request with more groups than the cap is rejected (not silently truncated). The default cap is `500`, which is far above any real catalog and also bounds the ownership lookup query.
+
+**Parameters:**
+
+- `$maxGroups` (int): The maximum number of groups allowed in one reorder request (default `500`)
+
+**Returns:**
+- `$maxGroups` (int): The cap to enforce
+
+**Source:** `app/Http/Controllers/AttributesController.php:205`
+
+**Usage:**
+```php
+add_filter('fluent_cart/attribute_groups/max_reorder', function ($maxGroups) {
+    // Raise the cap for an unusually large attribute catalog
+    return 1000;
+});
 ```
 </details>
 

@@ -642,6 +642,37 @@ add_filter('fluent_cart/checkout_renderer/shipping_fields', function ($fields, $
 ```
 </details>
 
+### <code> shipping/auto_select_single_method </code>
+<details>
+<summary><code>fluent_cart/shipping/auto_select_single_method</code> &mdash; Control auto-selecting the only available shipping method</summary>
+
+**When it runs:**
+This filter fires when a checkout has exactly one available shipping method and FluentCart is about to auto-select it server-side. Return `false` to force the customer to pick the method explicitly instead of having it pre-selected.
+
+**Parameters:**
+
+- `$shouldAutoSelect` (bool): Whether to auto-select the single method (default `true`)
+- `$context` (array): Shipping context
+    ```php
+    $context = [
+        'cart'   => $cart,     // \FluentCart\App\Models\Cart instance
+        'method' => $method,   // (array) The single available shipping method
+    ];
+    ```
+
+**Returns:** `bool` — `true` to auto-select, `false` to require an explicit choice
+
+**Source:** `app/Helpers/CartHelper.php:866`
+
+**Usage:**
+```php
+add_filter('fluent_cart/shipping/auto_select_single_method', function ($shouldAutoSelect, $context) {
+    // Always require the customer to confirm the shipping method
+    return false;
+}, 10, 2);
+```
+</details>
+
 ### <code> disable_order_notes_for_digital_products </code>
 <details>
 <summary><code>fluent_cart/disable_order_notes_for_digital_products</code> &mdash; Control order notes visibility for digital products</summary>

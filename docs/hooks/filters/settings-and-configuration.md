@@ -966,6 +966,66 @@ add_filter('fluent_cart/storage/storage_driver_settings_routes', function ($rout
 ```
 </details>
 
+### <code> show_admin_top_bar </code>
+<details>
+<summary><code>fluent_cart/show_admin_top_bar</code> &mdash; Toggle the FluentCart admin top bar</summary>
+
+**When it runs:**
+Applied when rendering the FluentCart admin app to decide whether the admin top bar is shown. Return `false` to hide it (the menu handler also uses this value to skip top-bar setup).
+
+**Parameters:**
+
+- `$show` (bool): Whether to show the admin top bar (default `true`)
+
+**Returns:** `bool` — `true` to show the top bar, `false` to hide it
+
+**Source:** `app/Views/admin/admin_app.php:2` and `app/Hooks/Handlers/MenuHandler.php:417`
+
+**Usage:**
+```php
+add_filter('fluent_cart/show_admin_top_bar', function ($show) {
+    // Hide the admin top bar
+    return false;
+});
+```
+</details>
+
+### <code> generatable_pages </code>
+<details>
+<summary><code>fluent_cart/generatable_pages</code> &mdash; Register pages the Pages Setup tool can generate</summary>
+
+**When it runs:**
+Applied when building the list of pages FluentCart can auto-create (used by the Pages Setup "+" create button and onboarding). Add your own entries so add-on pages can be generated from the admin.
+
+**Parameters:**
+
+- `$pages` (array): The generatable pages, keyed by page key, each with `title` and `content`
+    ```php
+    $pages = [
+        'account' => [
+            'title'   => 'Account',
+            'content' => '<!-- wp:fluent-cart/customer-profile /-->',
+        ],
+        // ...
+    ];
+    ```
+
+**Returns:** `array` — The modified pages map
+
+**Source:** `app/CPT/Pages.php:42`
+
+**Usage:**
+```php
+add_filter('fluent_cart/generatable_pages', function ($pages) {
+    $pages['my_addon_page'] = [
+        'title'   => 'My Addon Page',
+        'content' => '<!-- wp:fluent-cart/my-addon-block /-->',
+    ];
+    return $pages;
+});
+```
+</details>
+
 ---
 
 ## Permissions & Auth
@@ -1539,6 +1599,92 @@ add_filter('fluent_cart/disable_email_celebration_messages', function ($disable,
     // Disable celebrations for all admin emails
     return true;
 }, 10, 2);
+```
+</details>
+
+### <code> store_digest/recipients </code>
+<details>
+<summary><code>fluent_cart/store_digest/recipients</code> &mdash; Filter the recipients of the Store Digest email</summary>
+
+**When it runs:**
+Applied when building the recipient list for a Store Digest email (daily/weekly/monthly summary) before it is sent. Use it to add or restrict who receives the digest.
+
+**Parameters:**
+
+- `$emails` (array): The resolved recipient email addresses
+- `$context` (array): Digest context
+    ```php
+    $context = [
+        'frequency' => 'daily',     // (string) 'daily', 'weekly', or 'monthly'
+        'settings'  => $config,     // (array) The Store Digest configuration
+    ];
+    ```
+
+**Returns:** `array` — The recipient email addresses (cast to an array)
+
+**Source:** `app/Services/Email/StoreDigestService.php:492`
+
+**Usage:**
+```php
+add_filter('fluent_cart/store_digest/recipients', function ($emails, $context) {
+    $emails[] = 'owner@example.com';
+    return $emails;
+}, 10, 2);
+```
+</details>
+
+### <code> store_digest/data </code>
+<details>
+<summary><code>fluent_cart/store_digest/data</code> &mdash; Filter the data payload used to render the Store Digest email</summary>
+
+**When it runs:**
+Applied after the Store Digest metrics payload is assembled for a given period and before the email is rendered. Use it to add custom metrics or override values shown in the digest.
+
+**Parameters:**
+
+- `$payload` (array): The assembled digest data
+- `$context` (array): Digest period context
+    ```php
+    $context = [
+        'frequency' => 'weekly',    // (string) 'daily', 'weekly', or 'monthly'
+        'startDate' => $startDate,  // The start of the reporting period
+        'endDate'   => $endDate,    // The end of the reporting period
+    ];
+    ```
+
+**Returns:** `array` — The digest data payload (cast to an array)
+
+**Source:** `app/Services/Email/StoreDigestService.php:347`
+
+**Usage:**
+```php
+add_filter('fluent_cart/store_digest/data', function ($payload, $context) {
+    $payload['custom_metric'] = my_compute_metric($context['startDate'], $context['endDate']);
+    return $payload;
+}, 10, 2);
+```
+</details>
+
+### <code> store_digest/pro_url </code>
+<details>
+<summary><code>fluent_cart/store_digest/pro_url</code> &mdash; Filter the upgrade URL shown in the Store Digest email</summary>
+
+**When it runs:**
+Applied when rendering the Store Digest email to determine the "upgrade to Pro" link target. Defaults to `https://fluentcart.com/pricing/`.
+
+**Parameters:**
+
+- `$proUrl` (string): The pricing/upgrade URL
+
+**Returns:** `string` — The URL to use
+
+**Source:** `app/Services/Email/StoreDigestService.php:311`
+
+**Usage:**
+```php
+add_filter('fluent_cart/store_digest/pro_url', function ($proUrl) {
+    return 'https://example.com/my-affiliate-link';
+});
 ```
 </details>
 

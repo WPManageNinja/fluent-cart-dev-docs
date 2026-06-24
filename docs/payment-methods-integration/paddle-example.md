@@ -1269,22 +1269,55 @@ public function fields(): array
     );
 }
 
-public function getWebhookInstructions()
+public function getWebhookInstructions(): array
 {
-    $webhook_url = $this->getWebhookUrl();
-    $eventsHtml = $this->getEventshtml();
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6V8H5V19H16V14H18V20C18 20.5523 17.5523 21 17 21H4C3.44772 21 3 20.5523 3 20V7C3 6.44772 3.44772 6 4 6H10ZM21 3V11H19L18.9999 6.413L11.2071 14.2071L9.79289 12.7929L17.5849 5H13V3H21Z"></path></svg>';
 
-    // Dynamic HTML instructions based on configuration state
-    $instructionsHtml =
-        '<div class="paddle-webhook-instructions" style="padding:12px 0;">'
-        . '<p><strong>' . esc_html__('Webhook URL:', 'fluent-cart-pro') . '</strong> '
-        . '<code class="copyable-content" data-copy="' . esc_attr($webhook_url) . '">' . esc_html($webhook_url) . '</code></p>'
-        . '<p>' . esc_html__('You should configure your Paddle webhooks to get all updates of your payments remotely.', 'fluent-cart-pro') . '</p>'
-        . '<p>' . esc_html__('Select the following events:', 'fluent-cart-pro') . '</p>'
-        . '<p style="display:flex; align-items:center; flex-wrap:wrap; gap:8px 4px;">' . wp_kses_post($eventsHtml) . '</p>'
-        . '</div>';
+    /* translators: %1$s: "Add webhook" link with icon */
+    $step = fn($url) => sprintf(
+        '<p>%s</p>',
+        sprintf(
+            esc_html__('Click %1$s and paste the webhook URL above', 'fluent-cart-pro'),
+            sprintf(
+                '<a href="%s" target="_blank" rel="noopener noreferrer">%s %s</a>',
+                esc_url($url),
+                esc_html__('Add webhook', 'fluent-cart-pro'),
+                $svg
+            )
+        )
+    );
 
-    return $instructionsHtml;
+    // Return a structured array. FluentCart's `html_attr` renderer turns this
+    // into the webhook-instructions UI (title, copyable URL, steps, events).
+    return [
+        'title'       => __('Webhook URL', 'fluent-cart-pro'),
+        'webhook_url' => $this->getWebhookUrl(),
+        'description' => __('You should configure your Paddle webhooks to get all updates of your payments remotely. You can do it by following the instructions below. Or provide valid API Key and save the settings and reload.', 'fluent-cart-pro'),
+        'steps'       => [
+            'title' => __('How to configure?', 'fluent-cart-pro'),
+            'list'  => [
+                __('In your Paddle Dashboard, go to Developer Tools → Notifications', 'fluent-cart-pro'),
+                $step('https://developer.paddle.com/webhooks/overview'),
+            ],
+        ],
+        'events'      => [
+            'title' => __('Select these events', 'fluent-cart-pro'),
+            'list'  => [
+                'transaction.completed',
+                'transaction.paid',
+                'transaction.payment_failed',
+                'adjustment.created',
+                'adjustment.updated',
+                'subscription.created',
+                'subscription.activated',
+                'subscription.updated',
+                'subscription.past_due',
+                'subscription.paused',
+                'subscription.resumed',
+                'subscription.canceled',
+            ],
+        ],
+    ];
 }
 ```
 

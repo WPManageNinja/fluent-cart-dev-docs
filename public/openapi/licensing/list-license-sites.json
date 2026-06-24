@@ -1,0 +1,298 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/licensing/sites": {
+      "get": {
+        "operationId": "listLicenseSites",
+        "summary": "GET List License Sites",
+        "description": "Retrieve a paginated list of sites that have activated a license, with aggregated product, customer, and activity data. Requires the FluentCart Pro plugin. Authorization is handled by the `LicensePolicy` and requires the `licenses/view` permission.",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Number of records per page (default: 10)"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term. Matches against the activated site URL (`site_url`). Also supports operator syntax (e.g., `site_url = https://example.com`)"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "id"
+            },
+            "description": "Column to sort by (default: `id`). Must be a fillable column on the LicenseSite model"
+          },
+          {
+            "name": "sort_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            },
+            "description": "Sort direction: `asc` or `desc` (default: `desc`)"
+          },
+          {
+            "name": "filter_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "simple",
+                "advanced"
+              ],
+              "default": "simple"
+            },
+            "description": "Filter mode: `simple` (default) or `advanced`"
+          },
+          {
+            "name": "with",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Eager-load relations. Supports relation names and `{relation}Count` for counts"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sites": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "site_url": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "created_at": {
+                                "type": "string"
+                              },
+                              "products": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "variation": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "description": "Unique products licensed on this site (injected)"
+                              },
+                              "customers": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "description": "Full names of customers whose licenses are activated on this site (injected)"
+                              },
+                              "is_local": {
+                                "type": "boolean",
+                                "description": "Whether any activation on this site is a local/development install (injected)"
+                              },
+                              "last_activity": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Most recent activation update timestamp across the site (injected)"
+                              }
+                            }
+                          }
+                        },
+                        "per_page": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "last_page": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "sites": {
+                      "total": 12,
+                      "per_page": 15,
+                      "current_page": 1,
+                      "last_page": 1,
+                      "data": [
+                        {
+                          "id": 5,
+                          "site_url": "https://customer-site.com",
+                          "status": "active",
+                          "created_at": "2026-01-10 09:00:00",
+                          "products": [
+                            {
+                              "name": "Pro Plugin",
+                              "variation": "Yearly"
+                            }
+                          ],
+                          "customers": [
+                            "Jane Doe"
+                          ],
+                          "is_local": false,
+                          "last_activity": "2026-06-01 12:00:00"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "sites": {
+                    "total": 12,
+                    "per_page": 15,
+                    "current_page": 1,
+                    "last_page": 1,
+                    "data": [
+                      {
+                        "id": 5,
+                        "site_url": "https://customer-site.com",
+                        "status": "active",
+                        "created_at": "2026-01-10 09:00:00",
+                        "products": [
+                          {
+                            "name": "Pro Plugin",
+                            "variation": "Yearly"
+                          }
+                        ],
+                        "customers": [
+                          "Jane Doe"
+                        ],
+                        "is_local": false,
+                        "last_activity": "2026-06-01 12:00:00"
+                      }
+                    ]
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "sites": {
+                        "total": 12,
+                        "per_page": 15,
+                        "current_page": 1,
+                        "last_page": 1,
+                        "data": [
+                          {
+                            "id": 5,
+                            "site_url": "https://customer-site.com",
+                            "status": "active",
+                            "created_at": "2026-01-10 09:00:00",
+                            "products": [
+                              {
+                                "name": "Pro Plugin",
+                                "variation": "Yearly"
+                              }
+                            ],
+                            "customers": [
+                              "Jane Doe"
+                            ],
+                            "is_local": false,
+                            "last_activity": "2026-06-01 12:00:00"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/inventory/export": {
+      "post": {
+        "operationId": "exportInventory",
+        "summary": "POST Export Inventory",
+        "description": "Export stock-managed inventory as CSV data returned inline in the response. Only variations with `manage_stock` enabled are included. The `available` state exports the columns ID, SKU, Product Title, Variation Title, Available; the `full` state adds Total Stock, On Hold, and Delivered. When `format` is `csv_spreadsheet` a UTF-8 BOM is prepended for spreadsheet compatibility. Requires the FluentCart Pro plugin with Advanced Inventory enabled. Permission: `products/view`.",
+        "tags": [
+          "Inventory"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "scope",
+                  "inventoryState"
+                ],
+                "properties": {
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "all",
+                      "current_page",
+                      "selected"
+                    ],
+                    "description": "Which variations to export. `selected` uses the `items` array."
+                  },
+                  "inventoryState": {
+                    "type": "string",
+                    "enum": [
+                      "available",
+                      "full"
+                    ],
+                    "description": "Column set to export."
+                  },
+                  "format": {
+                    "type": "string",
+                    "default": "csv_spreadsheet",
+                    "description": "Output format. `csv_spreadsheet` (default) prepends a UTF-8 BOM."
+                  },
+                  "items": {
+                    "type": "array",
+                    "description": "Variations to export when `scope` is `selected`.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Variation ID."
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "scope": "all",
+                  "inventoryState": "full",
+                  "format": "csv_spreadsheet"
+                }
+              },
+              "example": {
+                "scope": "all",
+                "inventoryState": "full",
+                "format": "csv_spreadsheet"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "scope": "all",
+                    "inventoryState": "full",
+                    "format": "csv_spreadsheet"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Inventory exported successfully",
+                  "filename": "inventory-export-2026-06-24-12-00-00.csv",
+                  "csvData": "ID,SKU,Product Title,Variation Title,Total Stock,Available,On Hold,Delivered\n460,EX-SM,Example Product,Small,50,48,0,2\n"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Inventory exported successfully",
+                    "filename": "inventory-export-2026-06-24-12-00-00.csv",
+                    "csvData": "ID,SKU,Product Title,Variation Title,Total Stock,Available,On Hold,Delivered\n460,EX-SM,Example Product,Small,50,48,0,2\n"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Inventory exported successfully",
+                      "filename": "inventory-export-2026-06-24-12-00-00.csv",
+                      "csvData": "ID,SKU,Product Title,Variation Title,Total Stock,Available,On Hold,Delivered\n460,EX-SM,Example Product,Small,50,48,0,2\n"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid_scope": {
+                    "summary": "Invalid scope",
+                    "value": {
+                      "message": "Invalid scope."
+                    }
+                  },
+                  "invalid_state": {
+                    "summary": "Invalid inventoryState",
+                    "value": {
+                      "message": "Invalid inventoryState."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

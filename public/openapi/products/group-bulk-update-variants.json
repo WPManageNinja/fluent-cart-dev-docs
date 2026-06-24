@@ -1,0 +1,246 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/variants/group-bulk-update": {
+      "post": {
+        "operationId": "groupBulkUpdateVariants",
+        "summary": "POST Group Bulk Update Variants",
+        "description": "Bulk-update multiple product variations belonging to the same product. Uses PATCH semantics: only the fields provided in the request are written to each variant; omitted fields are left unchanged. All target variants must belong to the same product. Requires the `products/edit` permission.",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "variant_ids"
+                ],
+                "properties": {
+                  "variant_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "maxItems": 500,
+                    "description": "IDs of the variants to update (max 500). All must belong to the same product. When exactly one ID is provided, the `sku` field is applied with uniqueness handling; otherwise `sku` is ignored."
+                  },
+                  "item_price": {
+                    "type": "number",
+                    "description": "New item price in dollars; converted to cents on save."
+                  },
+                  "compare_price": {
+                    "type": "number",
+                    "description": "Compare-at price in dollars; converted to cents. Cleared to 0 when not greater than the resulting item price."
+                  },
+                  "sku": {
+                    "type": "string",
+                    "maxLength": 30,
+                    "description": "SKU. Only applied when exactly one variant ID is given. An empty string clears the SKU."
+                  },
+                  "manage_stock": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "description": "Whether stock is managed for the variant."
+                  },
+                  "total_stock": {
+                    "type": "integer",
+                    "description": "Total stock quantity."
+                  },
+                  "fulfillment_type": {
+                    "type": "string",
+                    "enum": [
+                      "physical",
+                      "digital"
+                    ],
+                    "description": "Fulfillment type."
+                  },
+                  "manage_cost": {
+                    "type": "string",
+                    "enum": [
+                      "true",
+                      "false"
+                    ],
+                    "description": "Whether per-item cost tracking is enabled."
+                  },
+                  "item_cost": {
+                    "type": "number",
+                    "description": "Per-item cost in dollars; converted to cents on save."
+                  },
+                  "other_info": {
+                    "type": "object",
+                    "description": "Subscription/pricing sub-fields (e.g. `payment_type` (`onetime`|`subscription`), `signup_fee`, `manage_setup_fee`). Unknown sub-keys are dropped."
+                  }
+                },
+                "example": {
+                  "variant_ids": [
+                    460,
+                    461
+                  ],
+                  "item_price": 39.99,
+                  "fulfillment_type": "digital",
+                  "manage_stock": 1,
+                  "total_stock": 50
+                }
+              },
+              "example": {
+                "variant_ids": [
+                  460,
+                  461
+                ],
+                "item_price": 39.99,
+                "fulfillment_type": "digital",
+                "manage_stock": 1,
+                "total_stock": 50
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "variant_ids": [
+                      460,
+                      461
+                    ],
+                    "item_price": 39.99,
+                    "fulfillment_type": "digital",
+                    "manage_stock": 1,
+                    "total_stock": 50
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "2 variants updated successfully.",
+                  "updated": 2
+                },
+                "schema": {
+                  "example": {
+                    "message": "2 variants updated successfully.",
+                    "updated": 2
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "2 variants updated successfully.",
+                      "updated": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "One or more variant IDs do not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "One or more variant IDs do not exist."
+                  }
+                },
+                "example": {
+                  "message": "One or more variant IDs do not exist."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "One or more variant IDs do not exist."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failure — no variant IDs provided, no valid updates provided, or variants do not all belong to the same product.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "No valid updates provided."
+                  }
+                },
+                "example": {
+                  "message": "No valid updates provided."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No valid updates provided."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

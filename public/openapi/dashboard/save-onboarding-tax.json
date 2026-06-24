@@ -1,0 +1,200 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/onboarding/save-tax": {
+      "post": {
+        "operationId": "saveOnboardingTax",
+        "summary": "POST Save Onboarding Tax",
+        "description": "Save the tax configuration captured during the onboarding wizard's tax step. When `enable_tax` is `no`, only the disabled flag is persisted. When `enable_tax` is `yes`, tax classes are generated for the store country (and EU OSS/home/specific registration is recorded for EU countries). Authorized by the `AdminPolicy` (requires a WordPress administrator).",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "enable_tax"
+                ],
+                "properties": {
+                  "enable_tax": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "default": "no",
+                    "description": "Whether tax collection is enabled. When `no`, the remaining fields are ignored."
+                  },
+                  "tax_inclusion": {
+                    "type": "string",
+                    "enum": [
+                      "included",
+                      "excluded"
+                    ],
+                    "default": "excluded",
+                    "description": "Whether product prices include tax."
+                  },
+                  "store_country": {
+                    "type": "string",
+                    "description": "Store country as a 1-3 character ISO alpha code (e.g. `DE`)."
+                  },
+                  "eu_method": {
+                    "type": "string",
+                    "enum": [
+                      "oss",
+                      "home",
+                      "specific"
+                    ],
+                    "default": "oss",
+                    "description": "EU VAT registration method. Only validated when `store_country` is an EU country."
+                  },
+                  "vat_number": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "VAT / tax registration number."
+                  }
+                },
+                "example": {
+                  "enable_tax": "yes",
+                  "tax_inclusion": "excluded",
+                  "store_country": "DE",
+                  "eu_method": "oss",
+                  "vat_number": "DE123456789"
+                }
+              },
+              "example": {
+                "enable_tax": "yes",
+                "tax_inclusion": "excluded",
+                "store_country": "DE",
+                "eu_method": "oss",
+                "vat_number": "DE123456789"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "enable_tax": "yes",
+                    "tax_inclusion": "excluded",
+                    "store_country": "DE",
+                    "eu_method": "oss",
+                    "vat_number": "DE123456789"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "data": {
+                    "tax_enabled": true,
+                    "classes_created": true,
+                    "eu_rates_imported": true
+                  },
+                  "message": "Tax settings saved"
+                },
+                "schema": {
+                  "example": {
+                    "data": {
+                      "tax_enabled": true,
+                      "classes_created": true,
+                      "eu_rates_imported": true
+                    },
+                    "message": "Tax settings saved"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "tax_enabled": true,
+                        "classes_created": true,
+                        "eu_rates_imported": true
+                      },
+                      "message": "Tax settings saved"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failure — invalid `enable_tax`, `store_country`, `tax_inclusion`, or `eu_method` value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Invalid store_country value"
+                  }
+                },
+                "example": {
+                  "message": "Invalid store_country value"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Invalid store_country value"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

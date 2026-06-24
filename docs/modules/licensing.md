@@ -154,6 +154,48 @@ class LicenseGenerationHandler
 }
 ```
 
+## Sites
+
+A license can be activated on multiple sites, each tracked as a **License Site**. The Sites surface lets store admins browse every site a license has been activated on, along with the activation details and the product/variation the activation belongs to.
+
+### LicenseSite Model
+
+`FluentCartPro\App\Modules\Licensing\Models\LicenseSite` is backed by the `fct_license_sites` table.
+
+```php
+use FluentCartPro\App\Modules\Licensing\Models\LicenseSite;
+
+$site = LicenseSite::find($siteId);
+
+// Activations recorded against this site
+$activations = $site->activations;
+
+// Whether the site URL is a local/development site
+$isLocal = $site->isLocalSite();
+```
+
+Site URLs are normalized (e.g. a `www.` prefix is stripped) so the same site cannot be double-counted as two distinct activations.
+
+### Sites Controller
+
+`FluentCartPro\App\Modules\Licensing\Http\Controllers\LicenseSiteController` exposes the Sites listing and detail data:
+
+| Method | Description |
+|--------|-------------|
+| `index(Request $request)` | Paginated list of license sites (filtered via `LicenseSiteFilter`), with their activations eager-loaded |
+| `getSite(Request $request, $id)` | A single site with its paginated activations |
+
+### Sites Routes
+
+Registered under the `licensing` prefix with the `LicensePolicy` policy (`app/Modules/Licensing/Http/licensing-api.php`):
+
+| Method (HTTP) | Route | Controller method | Permission |
+|---------------|-------|-------------------|------------|
+| GET | `licensing/sites` | `LicenseSiteController::index` | `licenses/view` |
+| GET | `licensing/sites/{id}` | `LicenseSiteController::getSite` | `licenses/view` |
+
+The admin Sites list page consumes these endpoints to render the per-site activation view.
+
 ## License Hooks and Filters
 
 ### License Generation Hooks

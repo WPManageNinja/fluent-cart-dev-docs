@@ -1,0 +1,185 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/groups/reorder": {
+      "post": {
+        "operationId": "reorderAttributeGroups",
+        "summary": "POST Reorder Attribute Groups",
+        "description": "Persist a new manual display order for attribute groups. Pass the full ordered list of attribute group IDs; a dense `serial` value (1..N) is assigned in array order. Duplicate and non-positive IDs are stripped, and the request is capped at 500 IDs (filterable). Requires the `products/edit` permission.",
+        "tags": [
+          "Labels"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "maxItems": 500,
+                    "description": "The full ordered list of attribute group IDs. The first ID becomes serial 1, the second serial 2, and so on."
+                  }
+                },
+                "example": {
+                  "ids": [
+                    3,
+                    1,
+                    2
+                  ]
+                }
+              },
+              "example": {
+                "ids": [
+                  3,
+                  1,
+                  2
+                ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "ids": [
+                      3,
+                      1,
+                      2
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Groups reordered."
+                },
+                "schema": {
+                  "example": {
+                    "message": "Groups reordered."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Groups reordered."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "One or more group IDs do not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "One or more group IDs do not exist."
+                  }
+                },
+                "example": {
+                  "message": "One or more group IDs do not exist."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "One or more group IDs do not exist."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failure — no group IDs provided, or too many groups in the reorder request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "No group IDs provided."
+                  }
+                },
+                "example": {
+                  "message": "No group IDs provided."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No group IDs provided."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

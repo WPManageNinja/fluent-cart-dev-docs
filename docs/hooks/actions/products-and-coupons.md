@@ -90,6 +90,71 @@ add_action('fluent_cart/product_updated', function($data) {
 ```
 </details>
 
+### <code> product/variants_updated </code>
+<details>
+<summary><code>fluent_cart/product/variants_updated</code> &mdash; Fired after a batch of variants is saved</summary>
+
+**When it runs:**
+This action fires after one or more [ProductVariation](/database/models/product-variation) rows have been persisted via a batch update. It fires from the standard variant-save path, the advanced-variation save path, and the bulk variant update endpoint, so all variant write flows emit the same hook.
+
+**Parameters:**
+
+- `$data` (array): The updated variant batch
+    ```php
+    $data = [
+        'post_id'  => 123,        // (int) The parent product's post ID
+        'variants' => [           // (array) The variant rows that were written
+            // ... variant data arrays
+        ],
+    ];
+    ```
+
+**Source:** `app/Http/Controllers/ProductVariationController.php` (`:386`, `:587`) and `app/Services/AdvancedVariationService.php` (`:280`)
+
+**Usage:**
+```php
+add_action('fluent_cart/product/variants_updated', function($data) {
+    $postId = $data['post_id'];
+
+    // Re-sync the product's variants to an external inventory system
+    do_action('my_plugin/sync_variants', [
+        'product_id' => $postId,
+        'variants'   => $data['variants'],
+    ]);
+}, 10, 1);
+```
+</details>
+
+### <code> product_stock_changed </code>
+<details>
+<summary><code>fluent_cart/product_stock_changed</code> &mdash; Fired when a product's stock actually changes</summary>
+
+**When it runs:**
+This action is dispatched by the `StockChanged` event after an inventory update is persisted, and only when the available stock or stock status actually changed (no-op saves do not fire it). Use it to react to stock movements — sync to an external system, send low-stock notices, or invalidate caches.
+
+**Parameters:**
+
+- `$data` (array): Stock change payload
+    ```php
+    $data = [
+        'post_ids'   => [123],     // (array) Product post IDs whose stock changed
+        'other_info' => null,      // (array|null) Optional contextual data, null by default
+    ];
+    ```
+
+**Source:** dispatched from `app/Http/Controllers/ProductController.php:1389` via `app/Events/StockChanged.php`
+
+**Usage:**
+```php
+add_action('fluent_cart/product_stock_changed', function($data) {
+    foreach ($data['post_ids'] as $postId) {
+        // Invalidate any cached stock data for this product
+        wp_cache_delete('fct_product_' . $postId, 'fluent_cart');
+    }
+}, 10, 1);
+```
+</details>
+
 ---
 
 ## Single Product Page Rendering

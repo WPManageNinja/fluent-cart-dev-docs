@@ -683,6 +683,33 @@ add_action('fluent_cart/after_payment_methods', function ($data) {
 ```
 </details>
 
+### <code> checkout/b2b_extra_fields </code>
+<details>
+<summary><code>fluent_cart/checkout/b2b_extra_fields</code> &mdash; Inside the B2B section of the checkout form</summary>
+
+**When it runs:**
+This action fires inside the business (B2B) section of the checkout form, the designated place to render extra B2B fields (e.g. company registration number, EU VAT ID). It replaces the deprecated practice of injecting VAT fields elsewhere on the form. Output is echoed directly into the form.
+
+**Parameters:**
+
+- `$data` (array): The current cart
+    ```php
+    $data = [
+        'cart' => $cart,  // \FluentCart\App\Models\Cart instance
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CheckoutRenderer.php` (line 420)
+
+**Usage:**
+```php
+add_action('fluent_cart/checkout/b2b_extra_fields', function ($data) {
+    echo '<label>Purchase Order Number</label>';
+    echo '<input type="text" name="po_number" />';
+}, 10, 1);
+```
+</details>
+
 ### <code> after_checkout_button </code>
 <details>
 <summary><code>fluent_cart/after_checkout_button</code> &mdash; After the checkout submit button</summary>
@@ -1056,6 +1083,119 @@ add_action('fluent_cart/cart/line_item/after_main_title', function ($data) {
         $date = date('M j', strtotime("+{$deliveryDays} days"));
         echo '<div class="my-delivery-estimate"><small>Est. delivery: ' . esc_html($date) . '</small></div>';
     }
+}, 10, 1);
+```
+</details>
+
+### <code> unit_price_hint </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/unit_price_hint</code> &mdash; Next to a line item's unit price</summary>
+
+**When it runs:**
+This action fires next to the per-unit price hint of a cart/checkout line item (rendered in both the cart and the modal checkout). Use it to append a small note beside the unit price (e.g. a "per seat" label).
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context
+    ```php
+    $data = [
+        'item'    => $item,     // array — the cart item data
+        'cart'    => $cart,     // \FluentCart\App\Models\Cart|null instance
+        'product' => $product,  // Product model or null
+        'variant' => $variant,  // ProductVariation model or null
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CartItemRenderer.php` (line 217), `app/Services/Renderer/ModalCheckoutRenderer.php` (line 346)
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/unit_price_hint', function ($data) {
+    echo '<small class="per-seat-note"> / seat</small>';
+}, 10, 1);
+```
+</details>
+
+### <code> setup_fee_price_info </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/setup_fee_price_info</code> &mdash; In the setup-fee price area of a line item</summary>
+
+**When it runs:**
+This action fires within the setup-fee price information of a subscription line item, where the one-time signup/setup fee is displayed. Use it to annotate or extend the setup-fee display.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context (same shape as `unit_price_hint`)
+
+**Source:** `app/Services/Renderer/CartItemRenderer.php` (line 251)
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/setup_fee_price_info', function ($data) {
+    echo '<small class="setup-fee-note"> (one-time)</small>';
+}, 10, 1);
+```
+</details>
+
+### <code> after_setup_fee_info </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/after_setup_fee_info</code> &mdash; After the setup-fee info block of a line item</summary>
+
+**When it runs:**
+This action fires immediately after the setup-fee information block of a subscription line item has been rendered.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context (same shape as `unit_price_hint`)
+
+**Source:** `app/Services/Renderer/CartItemRenderer.php` (line 97)
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/after_setup_fee_info', function ($data) {
+    echo '<div class="setup-fee-disclaimer">Setup fee is non-refundable.</div>';
+}, 10, 1);
+```
+</details>
+
+### <code> footer_start </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/footer_start</code> &mdash; At the start of a line item's footer</summary>
+
+**When it runs:**
+This action fires at the start of a cart/checkout line item's footer area, before the footer content is rendered.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context (same shape as `unit_price_hint`)
+
+**Source:** `app/Services/Renderer/CartItemRenderer.php`
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/footer_start', function ($data) {
+    echo '<div class="line-item-footer-banner">Free returns within 30 days.</div>';
+}, 10, 1);
+```
+</details>
+
+### <code> footer_end </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/footer_end</code> &mdash; At the end of a line item's footer</summary>
+
+**When it runs:**
+This action fires at the end of a cart/checkout line item's footer area, after the footer content has been rendered.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context (same shape as `unit_price_hint`)
+
+**Source:** `app/Services/Renderer/CartItemRenderer.php`
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/footer_end', function ($data) {
+    echo '<div class="line-item-footer-note"><small>Ships separately.</small></div>';
 }, 10, 1);
 ```
 </details>

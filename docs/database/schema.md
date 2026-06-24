@@ -778,15 +778,18 @@ This table stores shipping zones configuration
 
 | Column      | Type                                  | Comment |
 |------------|---------------------------------------|---------|
-| id         | BIGINT UNSIGNED _Auto Increment_      | Primary key |
-| name       | VARCHAR(192) NOT NULL                 | Zone name |
-| regions    | LONGTEXT NULL                         | Zone regions (JSON) |
-| order      | INT UNSIGNED NOT NULL DEFAULT 0       | Display order |
-| created_at | DATETIME NULL                         | |
-| updated_at | DATETIME NULL                         | |
+| id                | BIGINT UNSIGNED _Auto Increment_      | Primary key |
+| shipping_class_id | BIGINT UNSIGNED NULL                  | Reference to shipping class |
+| name              | VARCHAR(192) NOT NULL                 | Zone name |
+| region            | VARCHAR(192) NOT NULL                 | Zone region |
+| meta              | JSON DEFAULT NULL                     | Zone metadata |
+| order             | INT UNSIGNED NOT NULL DEFAULT 0       | Display order |
+| created_at        | DATETIME NULL                         | |
+| updated_at        | DATETIME NULL                         | |
 
 Indexes:
 - order
+- shipping_class_id
 
 
 ## fct_shipping_methods Table
@@ -987,10 +990,12 @@ This table stores attribute groups for product attributes
 | Column      | Type                                  | Comment |
 |------------|---------------------------------------|---------|
 | id         | BIGINT(20) UNSIGNED _Auto Increment_  | Primary key |
-| title      | VARCHAR(192) NOT NULL UNIQUE           | Group title |
-| slug       | VARCHAR(192) NOT NULL UNIQUE           | Group slug |
+| title      | VARCHAR(192) NOT NULL                   | Group title |
+| slug       | VARCHAR(192) NOT NULL UNIQUE            | Group slug |
 | description| LONGTEXT NULL                          | Group description |
 | settings   | LONGTEXT NULL                          | Group settings |
+| serial     | INT(11) UNSIGNED NOT NULL DEFAULT 0     | Manual display order |
+| is_system  | TINYINT(1) NOT NULL DEFAULT 0          | System group flag |
 | created_at | DATETIME NULL                          | |
 | updated_at | DATETIME NULL                          | |
 
@@ -1051,6 +1056,36 @@ This table stores polymorphic relationships between labels and objects
 Indexes:
 - label_id
 - labelable_id
+
+
+## fct_retention_snapshots Table
+
+This table stores pre-aggregated subscription cohort retention snapshots used for reporting
+
+| Column                    | Type                                  | Comment |
+|---------------------------|---------------------------------------|---------|
+| id                        | BIGINT UNSIGNED _Auto Increment_      | Primary key |
+| cohort                    | VARCHAR(7) NOT NULL                   | YYYY-MM format, when customer first subscribed |
+| period                    | VARCHAR(7) NOT NULL                   | YYYY-MM format, the month being measured |
+| product_id                | BIGINT(20) UNSIGNED NULL              | NULL means all products combined |
+| cohort_customers          | INT UNSIGNED NOT NULL DEFAULT 0       | Cohort baseline customer count |
+| cohort_mrr                | BIGINT UNSIGNED NOT NULL DEFAULT 0    | Cohort baseline MRR (cents) |
+| retained_customers        | INT UNSIGNED NOT NULL DEFAULT 0       | Customers retained at this period |
+| retained_mrr              | BIGINT UNSIGNED NOT NULL DEFAULT 0    | Retained MRR at this period (cents) |
+| new_customers             | INT UNSIGNED NOT NULL DEFAULT 0       | Recyclers who came back this period |
+| churned_customers         | INT UNSIGNED NOT NULL DEFAULT 0       | Customers who left this period |
+| retention_rate_customers  | DECIMAL(5,2) NULL                     | Pre-calculated customer retention rate |
+| retention_rate_mrr        | DECIMAL(5,2) NULL                     | Pre-calculated MRR retention rate |
+| period_offset             | INT UNSIGNED NOT NULL DEFAULT 0       | Period offset from cohort (Month 1, Month 2, ...) |
+| created_at                | DATETIME NULL                         | |
+| updated_at                | DATETIME NULL                         | |
+
+Indexes:
+- cohort, period, product_id (unique)
+- cohort
+- period
+- product_id
+- period_offset
 
 
 ## Pro Plugin Tables

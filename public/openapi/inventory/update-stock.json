@@ -1,0 +1,191 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/inventory/update-stock": {
+      "post": {
+        "operationId": "updateInventoryStock",
+        "summary": "POST Update Stock",
+        "description": "Set a new total stock level for a single variation and record a stock adjustment. The `available` quantity is recomputed as `max(0, new_stock - committed - on_hold)`. Requires the FluentCart Pro plugin with Advanced Inventory enabled. Permission: `products/edit`.",
+        "tags": [
+          "Inventory"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "variant_id",
+                  "post_id",
+                  "new_stock",
+                  "reason"
+                ],
+                "properties": {
+                  "variant_id": {
+                    "type": "integer",
+                    "description": "The variation ID to update."
+                  },
+                  "post_id": {
+                    "type": "integer",
+                    "description": "The parent product ID the variation belongs to."
+                  },
+                  "new_stock": {
+                    "type": "integer",
+                    "description": "New total stock level. Clamped to a minimum of 0."
+                  },
+                  "reason": {
+                    "type": "string",
+                    "enum": [
+                      "received",
+                      "damage",
+                      "return",
+                      "correction",
+                      "transfer",
+                      "other"
+                    ],
+                    "description": "Adjustment reason."
+                  },
+                  "customReason": {
+                    "type": "string",
+                    "description": "Free-text reason. Required only when `reason` is `other`."
+                  }
+                },
+                "example": {
+                  "variant_id": 460,
+                  "post_id": 123,
+                  "new_stock": 50,
+                  "reason": "received"
+                }
+              },
+              "example": {
+                "variant_id": 460,
+                "post_id": 123,
+                "new_stock": 50,
+                "reason": "received"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "variant_id": 460,
+                    "post_id": 123,
+                    "new_stock": 50,
+                    "reason": "received"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Stock updated successfully",
+                  "variant_id": 460,
+                  "new_stock": 50
+                },
+                "schema": {
+                  "example": {
+                    "message": "Stock updated successfully",
+                    "variant_id": 460,
+                    "new_stock": 50
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Stock updated successfully",
+                      "variant_id": 460,
+                      "new_stock": 50
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missing": {
+                    "summary": "Missing required parameters",
+                    "value": {
+                      "message": "Required parameters are missing"
+                    }
+                  },
+                  "invalid_reason": {
+                    "summary": "Invalid reason",
+                    "value": {
+                      "message": "Invalid reason."
+                    }
+                  },
+                  "custom_required": {
+                    "summary": "Custom reason required",
+                    "value": {
+                      "message": "Custom reason is required when reason is \"other\"."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Variant not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Variant not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

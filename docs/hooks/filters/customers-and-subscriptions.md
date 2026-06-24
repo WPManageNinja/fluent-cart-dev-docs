@@ -330,6 +330,42 @@ add_filter('fluent_cart/payment_methods/paypal_client_id', function($clientId, $
 ```
 </details>
 
+### <code> customer/subscription_details_section_parts </code>
+<details>
+<summary><code>fluent_cart/customer/subscription_details_section_parts</code> &mdash; Add custom HTML sections to the customer subscription details view</summary>
+
+**When it runs:**
+This filter is applied when the customer portal builds the subscription details response. It lets you inject extra named HTML fragments (such as a note rendered at the end of the subscription) into the `section_parts` returned to the frontend. Each returned value is passed through `wp_kses_post()`, so only safe HTML survives.
+
+**Parameters:**
+
+- `$sectionParts` (array): The named HTML fragments, keyed by section
+    ```php
+    $sectionParts = [
+        'end_of_subscription' => '',   // (string) HTML rendered at the end of the subscription details
+    ];
+    ```
+- `$context` (array): Subscription context
+    ```php
+    $context = [
+        'subscription'  => $subscription,   // \FluentCart\App\Models\Subscription instance
+        'formattedData' => $formattedData,  // (array) The formatted subscription data sent to the frontend
+    ];
+    ```
+
+**Returns:** `array` — The section parts (each value sanitized via `wp_kses_post()`)
+
+**Source:** `app/Http/Controllers/FrontendControllers/CustomerSubscriptionController.php:162`
+
+**Usage:**
+```php
+add_filter('fluent_cart/customer/subscription_details_section_parts', function ($sectionParts, $context) {
+    $sectionParts['end_of_subscription'] = '<p class="renewal-note">Renews automatically. Cancel anytime.</p>';
+    return $sectionParts;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Customer Statuses & Auth

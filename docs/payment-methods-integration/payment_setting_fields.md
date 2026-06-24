@@ -156,7 +156,9 @@ Displays an informational notice without input.
 
 #### `html_attr`
 
-Displays custom HTML content.
+Displays custom HTML content. The `value` may be either a raw HTML **string** or a **structured array** — the renderer detects which form you pass and renders accordingly.
+
+**String form** — rendered as raw HTML:
 
 ```php
 'webhook_info' => [
@@ -164,6 +166,59 @@ Displays custom HTML content.
     'value' => '<div class="fc-gateway-webhook-info">Webhook URL: ' . $this->getWebhookUrl() . '</div>',
 ],
 ```
+
+**Structured-array form** (recommended for webhook instructions) — the renderer builds a consistent, i18n-friendly webhook-instructions UI from these keys, so you don't hand-assemble HTML. This is the convention used by the built-in Stripe, Paddle, and Authorize.net gateways.
+
+```php
+'webhook_desc' => [
+    'type'  => 'html_attr',
+    'label' => __('Webhook Configuration', 'your-plugin'),
+    'value' => [
+        // Section title shown above the copyable URL.
+        'title'       => __('Webhook URL', 'your-plugin'),
+
+        // Rendered as a click-to-copy <code> block.
+        'webhook_url' => $this->getWebhookUrl(),
+
+        // Short paragraph explaining why/when to configure the webhook.
+        'description' => __('Configure your gateway webhooks to receive payment updates.', 'your-plugin'),
+
+        // Numbered setup steps. Each list item may contain inline HTML
+        // (e.g. a link). Provide `title` + `list`.
+        'steps'       => [
+            'title' => __('How to configure?', 'your-plugin'),
+            'list'  => [
+                __('Open your gateway dashboard → Developer → Webhooks.', 'your-plugin'),
+                __('Click Add endpoint and paste the webhook URL above.', 'your-plugin'),
+            ],
+        ],
+
+        // Events to subscribe to. Each entry is rendered as a copyable tag.
+        'events'      => [
+            'title' => __('Select these events', 'your-plugin'),
+            'list'  => [
+                'payment.completed',
+                'payment.failed',
+                'subscription.created',
+                'subscription.canceled',
+            ],
+        ],
+
+        // Optional notice block (title + description + bullet list).
+        'webhook_notice' => [
+            'title'       => __('Important', 'your-plugin'),
+            'description' => __('Keep webhook verification enabled in production.', 'your-plugin'),
+            'list'        => [
+                __('Use the test endpoint while in sandbox mode.', 'your-plugin'),
+            ],
+        ],
+    ],
+],
+```
+
+All keys are optional, but you will typically provide at least `title` and `webhook_url`. The `steps.list` and `events.list` entries may also be a callable that returns the array, which the renderer resolves automatically.
+
+> Build this array in a dedicated `getWebhookInstructions(): array` method on your gateway and pass it into the field's `value`. See the [implementation guide](./quick-implementation) for the full pattern.
 
 ### Color Selector
 

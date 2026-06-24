@@ -361,6 +361,7 @@ No parameters required.
         "shortcodes": {
           "{{order.id}}": "Order ID",
           "{{order.customer_dashboard_link}}": "Customer Dashboard Link",
+          "{{order.payment_link}}": "Order Payment Link",
           "{{order.status}}": "Order Status",
           "{{order.invoice_no}}": "Order Number",
           "{{order.total_amount_formatted}}": "Order Total Amount (Formatted)",

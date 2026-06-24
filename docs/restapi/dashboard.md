@@ -333,6 +333,64 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/onboarding/create-page"
 
 ---
 
+### Save Onboarding Tax
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/onboarding/save-tax`
+
+Save the tax configuration captured during the onboarding wizard's tax step. When tax is enabled, this also generates tax classes for the store country (and EU OSS/home/specific registration when an EU country is selected).
+
+- **Policy:** `AdminPolicy`
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `enable_tax` | string | body | No | `yes` or `no` (default: `no`). When `no`, only the enable flag is persisted. |
+| `tax_inclusion` | string | body | No | `included` or `excluded` (default: `excluded`). Used when `enable_tax` is `yes`. |
+| `store_country` | string | body | No | ISO country code (1–3 alpha characters). |
+| `eu_method` | string | body | No | `oss`, `home`, or `specific` (default: `oss`). Validated only when `store_country` is an EU country. |
+| `vat_number` | string | body | No | VAT registration number (max 50 characters). |
+
+#### Response
+
+```json
+{
+  "data": {
+    "tax_enabled": true,
+    "classes_created": true,
+    "eu_rates_imported": true
+  },
+  "message": "Tax settings saved"
+}
+```
+
+When `enable_tax` is `no`, all three flags return `false`.
+
+**Errors:**
+
+```json
+{ "message": "Invalid enable_tax value" }
+```
+
+A `422` is returned for an invalid `enable_tax`, `store_country`, `tax_inclusion`, or `eu_method` value.
+
+#### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/onboarding/save-tax" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "enable_tax": "yes",
+    "tax_inclusion": "excluded",
+    "store_country": "DE",
+    "eu_method": "oss",
+    "vat_number": "DE123456789"
+  }'
+```
+
+---
+
 ## App Initialization
 
 Endpoints for initializing the admin SPA and managing media attachments.

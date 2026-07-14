@@ -2,6 +2,7 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^22.7.5",
+    "feed": "^6.0.0",
     "mermaid": "^10.6.1",
     "vitepress": "^1.6.4",
     "vitepress-openapi": "^0.1.15",

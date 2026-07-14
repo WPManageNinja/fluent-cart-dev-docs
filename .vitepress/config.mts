@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 import { copyFileSync, mkdirSync, readdirSync, statSync, existsSync, writeFileSync, readFileSync } from 'fs'
 import { join, dirname, relative } from 'path'
 import { fileURLToPath } from 'url'
+import { genFeed, HOSTNAME } from './genFeed'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -290,6 +291,13 @@ export default defineConfig({
   
   head: [
     ['meta', { name: 'theme-color', content: '#136196' }],
+    // RSS autodiscovery for the Engineering blog (generated in buildEnd)
+    ['link', {
+      rel: 'alternate',
+      type: 'application/rss+xml',
+      title: 'FluentCart Engineering',
+      href: `${HOSTNAME}/engineering/feed.rss`
+    }],
     [
       'script',
       { type: 'module' },
@@ -443,7 +451,8 @@ export default defineConfig({
               { text: '(Payment Gateway) Example', link: '/payment-methods-integration/paddle-example' }
             ]
           },
-          
+          { text: 'Engineering', link: '/engineering/' },
+
           // {
           //   text: 'REST API',
           //   items: [
@@ -745,6 +754,9 @@ export default defineConfig({
     } else {
       console.error('✗ Source directory does not exist:', sourceDir)
     }
+
+    // Generate the Engineering blog RSS feed (engineering/feed.rss)
+    await genFeed(siteConfig)
   }
 })
 

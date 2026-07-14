@@ -1,0 +1,483 @@
+/* Engineering blog module — landing page, post rows, tag chips, post meta.
+   Editorial layout in the spirit of stripe.com/blog/engineering, translated to
+   the FluentCart brand: a dotted hairline grid, small brand tick bars before
+   meta labels, large tight-set titles, and a dedicated date/author column.
+   Uses VitePress theme variables throughout so dark/light mode works for free. */
+
+/* ---------- Landing page (docs/engineering/index.md, layout: page) ---------- */
+
+.fc-blog-home {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 56px 32px 120px;
+}
+
+.fc-blog-hero {
+  padding-bottom: 40px;
+}
+
+.fc-blog-hero h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--vp-c-text-1);
+  margin: 0 0 14px;
+}
+
+.fc-blog-hero p {
+  max-width: 56ch;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+  margin: 0 0 18px;
+}
+
+.fc-blog-rss {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
+.fc-blog-rss:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Brand tick bar (the ▎ before meta labels) ---------- */
+
+.fc-tick::before {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 0.85em;
+  margin-right: 10px;
+  background: var(--vp-c-brand-1);
+  transform: translateY(0.1em);
+}
+
+/* ---------- Tag filter chips ---------- */
+
+.fc-tag-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 20px 0 4px;
+  border-top: 1px dotted var(--vp-c-divider);
+}
+
+.fc-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--vp-c-text-2);
+  background: transparent;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.fc-tag-chip:hover {
+  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+}
+
+.fc-tag-chip--active {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  border-color: var(--vp-c-brand-1);
+}
+
+/* ---------- Post rows (Stripe-style two-column editorial grid) ---------- */
+
+.fc-post-list-empty {
+  color: var(--vp-c-text-2);
+  margin: 40px 0;
+  padding-top: 32px;
+  border-top: 1px dotted var(--vp-c-divider);
+}
+
+.fc-post-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 0 48px;
+  padding: 44px 0;
+  border-top: 1px dotted var(--vp-c-divider);
+}
+
+.fc-post-row:first-of-type {
+  margin-top: 24px;
+}
+
+.fc-post-main {
+  min-width: 0;
+}
+
+/* Eyebrow: brand tick + tag labels above the title */
+
+.fc-post-eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 14px;
+}
+
+.fc-post-eyebrow::before {
+  content: '';
+  width: 2px;
+  height: 0.9em;
+  margin-right: 8px;
+  background: var(--vp-c-brand-1);
+}
+
+.fc-post-eyebrow-tag {
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--vp-c-brand-1);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.fc-post-eyebrow-tag:hover,
+.fc-post-eyebrow-tag--active {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fc-post-eyebrow-tag + .fc-post-eyebrow-tag::before {
+  content: '·';
+  margin-right: 4px;
+  color: var(--vp-c-text-3);
+}
+
+/* Title: large, tight, editorial */
+
+.fc-post-title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin: 0 0 14px;
+  border: none;
+  padding: 0;
+}
+
+.fc-post-title a {
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.fc-post-title a:hover {
+  color: var(--vp-c-brand-1);
+}
+
+.fc-post-desc {
+  max-width: 62ch;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--vp-c-text-2);
+  margin: 0 0 16px;
+}
+
+.fc-post-desc p {
+  margin: 0;
+}
+
+.fc-post-readmore {
+  margin: 0;
+}
+
+.fc-post-readmore a {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
+.fc-post-readmore a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fc-post-readmore a span {
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.fc-post-readmore a:hover span {
+  transform: translateX(3px);
+}
+
+/* Meta column: date over author, divided from the main column by a hairline */
+
+.fc-post-aside {
+  border-left: 1px dotted var(--vp-c-divider);
+  padding-left: 32px;
+}
+
+.fc-post-date {
+  display: grid;
+  grid-template-columns: 2px minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: baseline;
+  font-size: 0.9rem;
+  color: var(--vp-c-text-1);
+  margin: 0 0 20px;
+}
+
+.fc-post-date::before {
+  content: '';
+  width: 2px;
+  height: 0.85em;
+  background: var(--vp-c-brand-1);
+  align-self: center;
+}
+
+.fc-post-date-sub {
+  grid-column: 2;
+  font-size: 0.8rem;
+  color: var(--vp-c-text-3);
+}
+
+.fc-post-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.fc-post-author-names {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+  min-width: 0;
+}
+
+.fc-post-author-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.fc-post-author-role {
+  font-size: 0.8rem;
+  color: var(--vp-c-text-3);
+}
+
+/* ---------- Author avatar (CSS-only initials circle) ---------- */
+
+.fc-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  user-select: none;
+}
+
+/* ---------- Post header (top of each post, via doc-before slot) ----------
+   Editorial order matching Stripe's post pages: breadcrumb → title → date →
+   byline. The title renders here from frontmatter — post markdown has no H1. */
+
+.fc-post-header {
+  border-bottom: 1px dotted var(--vp-c-divider);
+  margin-bottom: 8px;
+  padding-bottom: 24px;
+}
+
+.fc-post-header p {
+  margin: 0;
+}
+
+.fc-post-breadcrumb {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 20px !important;
+}
+
+.fc-post-breadcrumb a {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
+.fc-post-breadcrumb a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.fc-post-heading {
+  font-size: 2.35rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--vp-c-text-1);
+  margin: 0 0 20px;
+}
+
+.fc-post-header-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--vp-c-text-2);
+  margin-bottom: 22px !important;
+}
+
+.fc-post-header-date::before {
+  content: '';
+  width: 2px;
+  height: 0.9em;
+  margin-right: 2px;
+  background: var(--vp-c-brand-1);
+}
+
+.fc-post-meta-dot {
+  color: var(--vp-c-text-3);
+}
+
+.fc-post-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.fc-post-meta-byline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fc-post-meta-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ---------- Post reading column (scoped to /engineering/ doc pages) ----------
+   openapi.css removes every VPDoc max-width with !important so the API
+   playground can go full width. Posts want the opposite: a narrow centered
+   reading column (Stripe-style). This uses the same :has() scoping technique
+   openapi.css itself uses, loads later, and carries higher specificity. */
+
+.VPDoc:has(.vp-doc[class*='_engineering_']) .content-container {
+  max-width: 720px !important;
+  margin: 0 auto !important;
+}
+
+/* ---------- Post body typography (scoped to /engineering/ doc pages) ----------
+   VPDoc stamps the route as a class (e.g. "_engineering_my-post") on .vp-doc,
+   which lets us give posts editorial body type without touching other docs. */
+
+.vp-doc[class*='_engineering_'] {
+  font-size: 17px;
+}
+
+.vp-doc[class*='_engineering_'] p {
+  line-height: 1.75;
+  margin: 20px 0;
+}
+
+.vp-doc[class*='_engineering_'] h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  border-top: 1px dotted var(--vp-c-divider);
+  margin-top: 44px;
+  padding-top: 32px;
+}
+
+.vp-doc[class*='_engineering_'] h3 {
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  margin-top: 32px;
+}
+
+.vp-doc[class*='_engineering_'] a {
+  font-weight: 500;
+}
+
+.vp-doc[class*='_engineering_'] li {
+  line-height: 1.7;
+  margin: 10px 0;
+}
+
+.vp-doc[class*='_engineering_'] strong {
+  color: var(--vp-c-text-1);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 760px) {
+  .fc-blog-home {
+    padding: 36px 24px 80px;
+  }
+
+  .fc-blog-hero h1 {
+    font-size: 2rem;
+  }
+
+  .fc-post-row {
+    grid-template-columns: 1fr;
+    gap: 20px 0;
+    padding: 32px 0;
+  }
+
+  .fc-post-title {
+    font-size: 1.5rem;
+  }
+
+  .fc-post-aside {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .fc-post-date {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 8px;
+    margin: 0;
+  }
+
+  .fc-post-date::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-post-readmore a span,
+  .fc-tag-chip,
+  .fc-post-title a {
+    transition: none;
+  }
+}

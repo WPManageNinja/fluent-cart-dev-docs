@@ -90,10 +90,14 @@ Two inputs: a **store setting** and a **gateway capability**.
 | gateway_managed | (ignored) | has `subscriptions` | `automatic` |
 | gateway_managed | (ignored) | no `subscriptions` (COD, bank transfer) | `manual` |
 | store_managed | off | any | `manual` |
-| store_managed | on | has `system_subscription` (Stripe only) | `system` |
-| store_managed | on | no `system_subscription` (PayPal, COD…) | `manual` |
+| store_managed | on | has `system_subscription` (Stripe, PayPal) | `system` |
+| store_managed | on | no `system_subscription` (COD, bank transfer…) | `manual` |
 
 A per-gateway filter gets the last word: `fluent_cart/subscription_collection_method_{gateway}`.
+
+::: tip Both Stripe and PayPal do `system`
+Off-session auto-charge is the `system_subscription` capability, and **both Stripe and PayPal declare it** (each overrides `chargeRenewal()` / `reconcileRenewalCharge()`). The Stripe-only axis is a *narrower* one — `zero_recurring` / `supportsSetupWithoutCharge()`, the ability to vault a card at **\$0 on a free-trial cart**. PayPal must take a payable-now charge to vault its token, so it can run `system` on a paid-now cart but **cannot start a `system` sub from a \$0 trial**.
+:::
 
 ### The durable stamp — why flipping the setting is safe
 
@@ -115,15 +119,17 @@ This exists because **payment paths must consult the stamp, not the live setting
 
 Declared as `$supportedFeatures` on each gateway; tested with `AbstractPaymentGateway::has()`.
 
-| Gateway | `subscriptions` | `manual_subscription` | `system_subscription` | `switch_payment_method` | `card_update` |
-|---|---|---|---|---|---|
-| **Stripe** | ✅ | ✅ | ✅ **(only one)** | ✅ | ✅ |
-| **PayPal** | ✅ | ✅ | — | ✅ | ✅ |
-| COD / offline | — | ✅ | — | — | — |
-| Paddle (pro) | ✅ | — | — | — | ✅ |
-| Mollie, Authorize.net (pro) | ✅ | — | — | — | — |
-| Square, Paystack, Flutterwave, Razorpay (addons) | ✅ | — | — | — | — |
-| MercadoPago, SSLCommerz (addons) | — | ✅ | — | — | — |
+| Gateway | `subscriptions` | `manual_subscription` | `system_subscription` | `zero_recurring` | `switch_payment_method` | `card_update` |
+|---|---|---|---|---|---|---|
+| **Stripe** | ✅ | ✅ | ✅ | ✅ **(only one)** | ✅ | ✅ |
+| **PayPal** | ✅ | ✅ | ✅ | — | ✅ | ✅ |
+| COD / offline | — | ✅ | — | — | — | — |
+| Paddle (pro) | ✅ | — | — | — | — | ✅ |
+| Mollie, Authorize.net (pro) | ✅ | — | — | — | — | — |
+| Square, Paystack, Flutterwave, Razorpay (addons) | ✅ | — | — | — | — | — |
+| MercadoPago, SSLCommerz (addons) | — | ✅ | — | — | — | — |
+
+`zero_recurring` (backed by `supportsSetupWithoutCharge()`) is what lets a gateway vault a card at **\$0** — the free-trial `system` case. Only Stripe has it; PayPal does `system` but only when the cart charges something now.
 
 Two traps worth knowing:
 
@@ -137,7 +143,7 @@ Two traps worth knowing:
 Under store-managed:
 
 - A gateway **without** `subscriptions` (COD, bank transfer, MercadoPago, SSLCommerz) — always shown (it can't auto-bill anyway; the sub is `manual`)
-- A gateway **with** `subscriptions` (Stripe, PayPal, …) — shown when the cart has a payable-now amount > 0 (it takes a one-time charge, forced by the store-managed stamp), but **hidden on free-trial carts** (payable-now 0) unless it can save a card without charging **and** auto-charge is enabled — i.e. Stripe with `system_subscription`
+- A gateway **with** `subscriptions` (Stripe, PayPal, …) — shown when the cart has a payable-now amount > 0 (it takes a one-time charge, forced by the store-managed stamp), but **hidden on free-trial carts** (payable-now 0) unless it can save a card without charging (`zero_recurring`) **and** auto-charge is enabled — i.e. **Stripe only**. PayPal supports `system` but not \$0 vaulting, so it drops off free-trial carts.
 
 ## Gateway-managed (`automatic`)
 
@@ -338,7 +344,7 @@ token       (pm_…)   →  active_payment_method SubscriptionMeta    (existing 
 
 **Two shapes in the wild.** `active_payment_method` is written top-level (`vendor_method_id`) by the checkout/confirmation paths, but nested (`details.payment_method_id`) by the card-update/switch-payment-method flow. **Every reader must check both** — e.g. `Arr::get($meta, 'vendor_method_id') ?: Arr::get($meta, 'details.payment_method_id')`. A single-shape read risks re-persisting a stale token or wrongly demoting a subscription whose current token came from a card update.
 
-At checkout the first payment is a **one-time charge with `setup_future_usage = off_session`** — not a Stripe subscription. The card is saved with explicit consent copy. **The token is read at charge time, never snapshotted** into the scheduled action, so a card updated mid-dunning is picked up by the next retry automatically.
+At checkout the first payment is a **one-time charge that also vaults the method** — not a vendor subscription. On **Stripe** that is a PaymentIntent with `setup_future_usage = off_session`; on **PayPal** the initial capture is taken vault-enabled and the resulting token is stored the same way (later charged via `Processor::chargeVaultedRenewal()`). The card is saved with explicit consent copy. **The token is read at charge time, never snapshotted** into the scheduled action, so a card updated mid-dunning is picked up by the next retry automatically.
 
 **Webhook fallback for vaulting.** The zero-payable trial SetupIntent confirm normally completes via AJAX. If that call is lost (network drop, closed tab), the `setup_intent.succeeded` webhook recovers it — same write path, same demote-to-manual fallback if the gateway returns no token. Self-idempotent: a duplicate/late webhook after the AJAX call already succeeded fails its `vendor_charge_id` lookup and no-ops.
 

@@ -498,16 +498,16 @@ add_action('fluent_cart/subscription_trial_end_reminder', function ($data) {
 ```
 </details>
 
-### <code> invoice_reminder_overdue </code>
+### <code> renewal_reminder_overdue </code>
 <details>
-<summary><code>fluent_cart/invoice_reminder_overdue</code> &mdash; Fires when an overdue invoice reminder is triggered</summary>
+<summary><code>fluent_cart/renewal_reminder_overdue</code> &mdash; Fires when an overdue renewal reminder is triggered</summary>
 
 **When it runs:**
-This action fires on a scheduled basis when an [Order](/database/models/order) with an outstanding balance has passed its due date by a configured number of days. The stage name indicates how many days overdue (e.g., `overdue_1`, `overdue_3`, `overdue_7`). Only fires for orders with `pending`, `partially_paid`, `failed`, or `authorized` payment statuses. The overdue days are configurable via the `invoice_reminder_overdue_days` store setting (defaults to `1,3,7`).
+This action fires on a scheduled basis when a renewal [Order](/database/models/order) with an outstanding balance has passed its due date by a configured number of days. The stage name indicates how many days overdue (e.g., `overdue_1`, `overdue_3`, `overdue_7`). The overdue offsets are configurable via the `renewal_reminder_overdue_days` store setting (defaults to `1,3,7`) and the `fluent_cart/reminders/renewal_overdue_days` filter. Reminders as a whole are gated by the `renewal_reminders_enabled` setting.
 
 **Parameters:**
 
-- `$data` (array): Invoice overdue reminder data
+- `$data` (array): Renewal overdue reminder data
     ```php
     $data = [
         'order'    => $order, // \FluentCart\App\Models\Order
@@ -523,11 +523,11 @@ This action fires on a scheduled basis when an [Order](/database/models/order) w
     ];
     ```
 
-**Source:** `app/Services/Reminders/InvoiceReminderService.php`
+**Source:** `app/Services/Reminders/RenewalReminderService.php`
 
 **Usage:**
 ```php
-add_action('fluent_cart/invoice_reminder_overdue', function ($data) {
+add_action('fluent_cart/renewal_reminder_overdue', function ($data) {
     $order    = $data['order'];
     $customer = $data['customer'];
     $reminder = $data['reminder'];
@@ -547,24 +547,22 @@ add_action('fluent_cart/invoice_reminder_overdue', function ($data) {
 ```
 </details>
 
-### <code> invoice_reminder_due </code>
+### <code> renewal_reminder_due </code>
 <details>
-<summary><code>fluent_cart/invoice_reminder_due</code> &mdash; Fires when an invoice due-date reminder is triggered</summary>
+<summary><code>fluent_cart/renewal_reminder_due</code> &mdash; Fires when a renewal due-date reminder is triggered</summary>
 
 **When it runs:**
-This action fires on a scheduled basis when an order with an outstanding balance has reached its due date (stage `before_0`). This is the on-due-date notification, as opposed to the overdue reminders that fire after the due date has passed. Shares the same parameter structure as the overdue reminder.
-
-> **Note:** This hook is currently defined in the codebase but the queueing logic for the `before_0` stage is commented out pending the full invoice feature deployment. It is documented here for forward compatibility.
+This action fires on a scheduled basis when a renewal order with an outstanding balance reaches its due-date reminder window. This is the pre-/on-due-date notification, as opposed to the overdue reminders that fire after the due date has passed. Shares the same parameter structure as the overdue reminder. Gated by the `renewal_reminder_due_days` store setting (default `0` — no due reminder until set) and the `fluent_cart/reminders/renewal_due_days` filter.
 
 **Parameters:**
 
-- `$data` (array): Invoice due reminder data
+- `$data` (array): Renewal due reminder data
     ```php
     $data = [
         'order'    => $order, // \FluentCart\App\Models\Order
         'customer' => $order->customer, // \FluentCart\App\Models\Customer
         'reminder' => [
-            'stage'        => 'before_0', // string — always 'before_0' for due-date reminders
+            'stage'        => 'before_0', // string — due-date reminder stage
             'order_id'     => 123, // int — order ID
             'order_ref'    => 'INV-00123', // string — invoice number or '#123' fallback
             'due_at'       => '2025-01-15 00:00:00', // string — GMT formatted due date
@@ -574,26 +572,592 @@ This action fires on a scheduled basis when an order with an outstanding balance
     ];
     ```
 
-**Source:** `app/Services/Reminders/InvoiceReminderService.php`
+**Source:** `app/Services/Reminders/RenewalReminderService.php`
 
 **Usage:**
 ```php
-add_action('fluent_cart/invoice_reminder_due', function ($data) {
+add_action('fluent_cart/renewal_reminder_due', function ($data) {
     $order    = $data['order'];
     $customer = $data['customer'];
     $reminder = $data['reminder'];
 
-    // Notify customer that their invoice is due today
+    // Notify customer that their renewal is due
     wp_mail(
         $customer->email,
-        sprintf('Payment Due Today for %s', $reminder['order_ref']),
+        sprintf('Payment Due for %s', $reminder['order_ref']),
         sprintf(
-            "Your payment of %s for order %s is due today.\n\nPay now: %s",
+            "Your payment of %s for order %s is due.\n\nPay now: %s",
             number_format($reminder['due_amount'] / 100, 2),
             $reminder['order_ref'],
             $reminder['payment_link']
         )
     );
+}, 10, 1);
+```
+</details>
+
+---
+
+## Renewal Lifecycle <Badge type="tip" text="Store-managed" />
+
+These fire for **store-managed** renewals (the `manual` / `system` collection methods), where FluentCart generates renewal orders on a schedule rather than mirroring a gateway subscription. See the [Subscriptions Module](/modules/subscriptions) for the full engine.
+
+### <code> renewal_created </code>
+<details open>
+<summary><code>fluent_cart/renewal_created</code> &mdash; Fires when a renewal order is generated</summary>
+
+**When it runs:**
+This action fires whenever the renewal engine creates a renewal [Order](/database/models/order) for a store-managed [Subscription](/database/models/subscription) — from the advance-window cron (`system`/`manual`), from a `system` auto-charge cycle, and from the admin "Create Renewal Now" action.
+
+**Parameters:**
+
+- `$data` (array): Renewal creation data
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'order'        => $order,        // \FluentCart\App\Models\Order — the new renewal order
+        'parent_order' => $parentOrder,  // \FluentCart\App\Models\Order — the original order
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer
+        'transaction'  => $transaction,  // \FluentCart\App\Models\OrderTransaction
+    ];
+    ```
+
+**Source:** `app/Http/Controllers/RenewalController.php:155`, `app/Modules/Subscriptions/Services/SystemChargeService.php:310`, `app/Modules/StoreManagedRenewal/Services/RenewalService.php:237`
+
+**Usage:**
+```php
+add_action('fluent_cart/renewal_created', function ($data) {
+    $order = $data['order'];
+    // Sync the freshly generated renewal order to an external ledger
+}, 10, 1);
+```
+</details>
+
+### <code> renewal_paid </code>
+<details>
+<summary><code>fluent_cart/renewal_paid</code> &mdash; Fires once when a renewal order is paid</summary>
+
+**When it runs:**
+This action fires exactly once when a renewal [Order](/database/models/order) transitions to paid — the single edge-triggered "a renewal was collected" signal, whether the payment came from a `system` off-session charge, a customer Pay-Now, or a gateway-managed renewal webhook. It is the canonical place to grant/extend access on renewal.
+
+**Parameters:**
+
+- `$data` (array): Renewal payment data
+    ```php
+    $data = [
+        'order' => $order, // \FluentCart\App\Models\Order — the paid renewal order
+    ];
+    ```
+
+**Source:** `app/Helpers/StatusHelper.php:208`
+
+**Usage:**
+```php
+add_action('fluent_cart/renewal_paid', function ($data) {
+    $order = $data['order'];
+    // Extend the customer's access period for this renewal
+}, 10, 1);
+```
+</details>
+
+### <code> renewal_payment_scheduled </code>
+<details>
+<summary><code>fluent_cart/renewal_payment_scheduled</code> &mdash; Fires when a gateway renewal payment is scheduled (positional args)</summary>
+
+**When it runs:**
+This action fires when a gateway confirms a renewal payment is scheduled at the vendor (Stripe/PayPal confirmation paths). Fires alongside `fluent_cart/renewal/payment_scheduled` (array shape) — this is the legacy positional-argument variant.
+
+::: warning Positional arguments
+This hook passes **two positional arguments**, not a single array. Register with `, 10, 2`.
+:::
+
+**Parameters:**
+
+- `$order` ([Order](/database/models/order)): The renewal order
+- `$subscription` ([Subscription](/database/models/subscription)): The subscription
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:476`, `app/Modules/PaymentMethods/StripeGateway/Confirmations.php:485`
+
+**Usage:**
+```php
+add_action('fluent_cart/renewal_payment_scheduled', function ($order, $subscription) {
+    // React to a scheduled gateway renewal payment
+}, 10, 2);
+```
+</details>
+
+### <code> renewal/payment_scheduled </code>
+<details>
+<summary><code>fluent_cart/renewal/payment_scheduled</code> &mdash; Fires when a gateway renewal payment is scheduled (array payload)</summary>
+
+**When it runs:**
+The array-payload variant of the hook above, fired back-to-back with `fluent_cart/renewal_payment_scheduled`. Prefer this one for new integrations.
+
+**Parameters:**
+
+- `$data` (array): Scheduled renewal payment data
+    ```php
+    $data = [
+        'order'        => $order,        // \FluentCart\App\Models\Order
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+    ];
+    ```
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:477`, `app/Modules/PaymentMethods/StripeGateway/Confirmations.php:486`
+
+**Usage:**
+```php
+add_action('fluent_cart/renewal/payment_scheduled', function ($data) {
+    $order = $data['order'];
+}, 10, 1);
+```
+</details>
+
+### <code> renewal_voided </code>
+<details>
+<summary><code>fluent_cart/renewal_voided</code> &mdash; Fires when a renewal order is voided</summary>
+
+**When it runs:**
+This action fires when an open renewal order is voided (e.g., superseded or cancelled before payment).
+
+**Parameters:**
+
+- `$data` (array): Voided renewal data
+    ```php
+    $data = [
+        'order'    => $order,    // \FluentCart\App\Models\Order — the voided renewal order
+        'customer' => $customer, // \FluentCart\App\Models\Customer
+    ];
+    ```
+
+**Source:** `app/Http/Controllers/RenewalController.php:126`
+
+**Usage:**
+```php
+add_action('fluent_cart/renewal_voided', function ($data) {
+    // Clean up any external state tied to the voided renewal
+}, 10, 1);
+```
+</details>
+
+### <code> subscriptions/system_renewal_scheduled </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_renewal_scheduled</code> &mdash; Fires when a store-managed renewal is scheduled for auto-charge</summary>
+
+**When it runs:**
+This action fires when the renewal engine schedules a store-managed renewal order for its due-date off-session charge attempt.
+
+**Parameters:**
+
+- `$data` (array): Scheduled renewal data
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'order'        => $order,        // \FluentCart\App\Models\Order
+        'parent_order' => $parentOrder,  // \FluentCart\App\Models\Order
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer
+        'transaction'  => $transaction,  // \FluentCart\App\Models\OrderTransaction
+    ];
+    ```
+
+**Source:** `app/Modules/StoreManagedRenewal/Services/RenewalService.php:227`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscriptions/system_renewal_scheduled', function ($data) {
+    // Notify the customer that an automatic charge is upcoming
+}, 10, 1);
+```
+</details>
+
+---
+
+## Collection Method & Status <Badge type="tip" text="Store-managed" />
+
+### <code> subscription_converted_to_automatic </code>
+<details>
+<summary><code>fluent_cart/subscription_converted_to_automatic</code> &mdash; Fires when a subscription becomes gateway-managed</summary>
+
+**When it runs:**
+This action fires when a subscription's collection method is converted to `automatic` — a live vendor subscription now owns the billing schedule (legacy manual→automatic conversion at a subscription-capable gateway).
+
+**Parameters:**
+
+- `$data` (array): Conversion data
+    ```php
+    $data = [
+        'subscription'   => $subscription,   // \FluentCart\App\Models\Subscription
+        'payment_method' => $paymentMethod,  // string — gateway slug now managing billing
+    ];
+    ```
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/PayPal.php:128`, `app/Modules/PaymentMethods/StripeGateway/Stripe.php:140`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_converted_to_automatic', function ($data) {
+    $subscription = $data['subscription'];
+}, 10, 1);
+```
+</details>
+
+### <code> subscription_converted_to_manual </code>
+<details>
+<summary><code>fluent_cart/subscription_converted_to_manual</code> &mdash; Fires when a subscription falls back to manual invoicing</summary>
+
+**When it runs:**
+This action fires when a subscription is demoted to the `manual` collection method — for example, a `system` subscription whose gateway can no longer token-charge (see [demotion](/modules/subscriptions#store-managed-auto-charge-system)).
+
+**Parameters:**
+
+- `$data` (array): Conversion data
+    ```php
+    $data = [
+        'subscription'   => $subscription,   // \FluentCart\App\Models\Subscription
+        'payment_method' => $paymentMethod,  // string — current payment method slug
+    ];
+    ```
+
+**Source:** `app/Modules/PaymentMethods/Core/AbstractPaymentGateway.php:340`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_converted_to_manual', function ($data) {
+    // Alert staff that automatic billing was lost for this subscription
+}, 10, 1);
+```
+</details>
+
+### <code> subscription_past_due </code>
+<details>
+<summary><code>fluent_cart/subscription_past_due</code> &mdash; Fires when a store-managed subscription enters dunning</summary>
+
+**When it runs:**
+This action fires when a store-managed subscription's renewal passes its grace anchor and the subscription enters the past-due (dunning) window, before eventual expiry.
+
+**Parameters:**
+
+- `$data` (array): Past-due data
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'order'        => $order,        // \FluentCart\App\Models\Order — the unpaid renewal
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer
+    ];
+    ```
+
+**Source:** `app/Modules/StoreManagedRenewal/Services/RenewalService.php:696`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_past_due', function ($data) {
+    // Trigger a custom dunning sequence
+}, 10, 1);
+```
+</details>
+
+### <code> subscription/reactivated_locally </code>
+<details>
+<summary><code>fluent_cart/subscription/reactivated_locally</code> &mdash; Fires when a store-managed subscription is reactivated locally (positional arg)</summary>
+
+**When it runs:**
+This action fires when a store-managed subscription is reactivated by FluentCart itself (no vendor call), e.g., after a successful late payment.
+
+::: warning Positional argument
+This hook passes the **Subscription model directly**, not an array. Register with `, 10, 1` and type-hint the model.
+:::
+
+**Parameters:**
+
+- `$subscription` ([Subscription](/database/models/subscription)): The reactivated subscription
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:814`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription/reactivated_locally', function ($subscription) {
+    // Restore access for the reactivated subscription
+}, 10, 1);
+```
+</details>
+
+---
+
+## Native Subscription Events <Badge type="tip" text="Store-managed" />
+
+::: tip Distinct from the `payments/subscription_{status}` bus
+These `fluent_cart/subscription_*` events carry richer payloads (`reason`, `updates`, `changes`) and are **separate hooks** from the like-named [status bus](#subscription-status-changes) (`fluent_cart/payments/subscription_paused`, etc.). Both may fire for the same transition.
+:::
+
+### <code> subscription_paused </code>
+<details>
+<summary><code>fluent_cart/subscription_paused</code> &mdash; Native event: subscription paused</summary>
+
+**When it runs:**
+Dispatched when a subscription is paused, via the subscription event dispatcher.
+
+**Parameters:**
+
+- `$data` (array): Pause event data
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'reason'       => 'user_request', // string — pause reason
+        'order'        => $order,        // \FluentCart\App\Models\Order
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer
+        'old_status'   => 'active',      // string — status before pause
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:527` (via `EventDispatcher`)
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_paused', function ($data) {
+    $reason = $data['reason'];
+}, 10, 1);
+```
+</details>
+
+### <code> subscription_resumed </code>
+<details>
+<summary><code>fluent_cart/subscription_resumed</code> &mdash; Native event: subscription resumed</summary>
+
+**When it runs:**
+Dispatched when a paused subscription is resumed.
+
+**Parameters:**
+
+- `$data` (array): Resume event data
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'reason'       => 'user_request', // string — resume reason
+        'order'        => $order,        // \FluentCart\App\Models\Order
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer
+        'old_status'   => 'paused',      // string — status before resume
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:530` (via `EventDispatcher`)
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_resumed', function ($data) {
+    $subscription = $data['subscription'];
+}, 10, 1);
+```
+</details>
+
+### <code> subscription_updated </code>
+<details>
+<summary><code>fluent_cart/subscription_updated</code> &mdash; Native event: subscription terms updated</summary>
+
+**When it runs:**
+Dispatched when a store-managed subscription's editable terms change (amount, interval, next billing date, etc.).
+
+**Parameters:**
+
+- `$data` (array): Update event data
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'updates'      => [ /* ... */ ], // array — fields submitted for update
+        'changes'      => [ /* ... */ ], // array — fields that actually changed
+        'order'        => $order,        // \FluentCart\App\Models\Order
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:533` (via `EventDispatcher`)
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_updated', function ($data) {
+    $changes = $data['changes'];
+}, 10, 1);
+```
+</details>
+
+---
+
+## System Auto-Charge <Badge type="tip" text="system" />
+
+These fire only for `system` subscriptions — store-managed subscriptions that auto-charge a saved token each renewal. See [Store-managed + auto-charge](/modules/subscriptions#store-managed-auto-charge-system).
+
+### <code> subscriptions/system_charge_succeeded </code>
+<details open>
+<summary><code>fluent_cart/subscriptions/system_charge_succeeded</code> &mdash; Fires when an off-session renewal charge succeeds</summary>
+
+**When it runs:**
+This action fires when a `system` subscription's off-session renewal charge is confirmed successful.
+
+**Parameters:**
+
+- `$data` (array): Successful charge data
+    ```php
+    $data = [
+        'order'        => $order,        // \FluentCart\App\Models\Order — the renewal order
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'attempt'      => 1,             // int — which retry attempt succeeded
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SystemChargeService.php:584`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscriptions/system_charge_succeeded', function ($data) {
+    $order = $data['order'];
+}, 10, 1);
+```
+</details>
+
+### <code> subscriptions/system_charge_failed </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_charge_failed</code> &mdash; Fires when an off-session renewal charge fails</summary>
+
+**When it runs:**
+This action fires when a `system` renewal charge attempt fails. The retry ladder may schedule further attempts within the grace window before the subscription is marked past due.
+
+**Parameters:**
+
+- `$data` (array): Failed charge data
+    ```php
+    $data = [
+        'order'         => $order,        // \FluentCart\App\Models\Order
+        'subscription'  => $subscription, // \FluentCart\App\Models\Subscription
+        'attempt'       => 2,             // int — attempt number that failed
+        'error'         => 'card_declined', // string — gateway error
+        'next_retry_at' => '2025-01-18 00:00:00', // string|null — GMT time of next attempt, null if exhausted
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SystemChargeService.php:730`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscriptions/system_charge_failed', function ($data) {
+    if (empty($data['next_retry_at'])) {
+        // Retries exhausted — escalate
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> subscriptions/system_charge_failed_notification </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_charge_failed_notification</code> &mdash; Fires when a charge-failure notification should be sent</summary>
+
+**When it runs:**
+This action fires when a `system` charge failure warrants notifying the customer (gated by `fluent_cart/subscriptions/system_charge_failure_notify`). Carries the full context needed to render an email.
+
+**Parameters:**
+
+- `$data` (array): Failure notification data
+    ```php
+    $data = [
+        'order'         => $order,        // \FluentCart\App\Models\Order
+        'subscription'  => $subscription, // \FluentCart\App\Models\Subscription
+        'parent_order'  => $parentOrder,  // \FluentCart\App\Models\Order
+        'customer'      => $customer,     // \FluentCart\App\Models\Customer
+        'transaction'   => $transaction,  // \FluentCart\App\Models\OrderTransaction
+        'error'         => 'card_declined', // string — gateway error
+        'attempt'       => 2,             // int — attempt number
+        'next_retry_at' => '2025-01-18 00:00:00', // string|null — GMT time of next attempt
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SystemChargeService.php:746`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscriptions/system_charge_failed_notification', function ($data) {
+    // Send a custom "payment failed" email
+}, 10, 1);
+```
+</details>
+
+### <code> subscriptions/system_charge_disabled </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_charge_disabled</code> &mdash; Fires when auto-charge is turned off for a subscription</summary>
+
+**When it runs:**
+This action fires when a subscription loses `system` auto-charge and is handed back to plain manual invoicing (`demoteToManual()`), e.g., its gateway can no longer token-charge.
+
+**Parameters:**
+
+- `$data` (array): Disable data
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'reason'       => 'gateway_incapable', // string — why auto-charge was disabled
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SystemChargeService.php:325`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscriptions/system_charge_disabled', function ($data) {
+    $reason = $data['reason'];
+}, 10, 1);
+```
+</details>
+
+### <code> subscriptions/system_charge_manual_triggered </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_charge_manual_triggered</code> &mdash; Fires when an admin triggers an off-session charge</summary>
+
+**When it runs:**
+This action fires when a store admin manually triggers a `system` charge (the "Charge Now" / "Charge Next Renewal Now" actions).
+
+**Parameters:**
+
+- `$data` (array): Manual trigger data
+    ```php
+    $data = [
+        'order'        => $order,        // \FluentCart\App\Models\Order
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'attempt'      => 1,             // int — attempt number
+        'actor_id'     => 5,             // int — admin user ID who triggered it
+        'result'       => 'success',     // mixed — charge result
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SystemChargeService.php:444`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscriptions/system_charge_manual_triggered', function ($data) {
+    // Audit-log the admin-initiated charge
+}, 10, 1);
+```
+</details>
+
+### <code> subscriptions/system_payment_method_updated </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_payment_method_updated</code> &mdash; Fires when the saved token for a system subscription changes</summary>
+
+**When it runs:**
+This action fires when the vaulted payment method (token) backing a `system` subscription is updated — e.g., the customer updates the card on file.
+
+**Parameters:**
+
+- `$data` (array): Payment method update data
+    ```php
+    $data = [
+        'subscription'   => $subscription,  // \FluentCart\App\Models\Subscription
+        'payment_method' => $paymentMethod, // array|string — the new vaulted method reference
+    ];
+    ```
+
+**Source:** `app/Modules/PaymentMethods/StripeGateway/UpdateCustomerPaymentMethod.php:129`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscriptions/system_payment_method_updated', function ($data) {
+    // Confirm the new card to the customer
 }, 10, 1);
 ```
 </details>

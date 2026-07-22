@@ -864,50 +864,50 @@ add_filter('fluent_cart/reminders/scan_batch_size', function($batchSize) {
 ```
 </details>
 
-### <code> reminders/invoice_due_days </code>
+### <code> reminders/renewal_due_days </code>
 <details>
-<summary><code>fluent_cart/reminders/invoice_due_days</code> &mdash; Filter invoice due reminder days</summary>
+<summary><code>fluent_cart/reminders/renewal_due_days</code> &mdash; Filter renewal due-reminder days</summary>
 
 **When it runs:**
-This filter is applied when determining how many days before an invoice is due to send a reminder. The value comes from store settings but can be overridden.
+This filter is applied when determining how many days before a renewal is due to send a reminder. The value comes from the `renewal_reminder_due_days` store setting (default `0`) but can be overridden.
 
 **Parameters:**
 
-- `$days` (int): Number of days before due date to send reminder (from store settings, min: `0`)
+- `$days` (int): Number of days before the due date to send a reminder (min: `0`)
 
 **Returns:**
 - `$days` (int): The modified number of days
 
-**Source:** `app/Services/Reminders/InvoiceReminderService.php:288`
+**Source:** `app/Services/Reminders/RenewalReminderService.php:294`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/reminders/invoice_due_days', function($days) {
-    // Always remind 3 days before invoice is due
+add_filter('fluent_cart/reminders/renewal_due_days', function($days) {
+    // Always remind 3 days before a renewal is due
     return 3;
 });
 ```
 </details>
 
-### <code> reminders/invoice_overdue_days </code>
+### <code> reminders/renewal_overdue_days </code>
 <details>
-<summary><code>fluent_cart/reminders/invoice_overdue_days</code> &mdash; Filter overdue invoice reminder intervals</summary>
+<summary><code>fluent_cart/reminders/renewal_overdue_days</code> &mdash; Filter overdue renewal reminder intervals</summary>
 
 **When it runs:**
-This filter is applied when determining at which day intervals after an invoice becomes overdue to send follow-up reminders.
+This filter is applied when determining at which day intervals after a renewal becomes overdue to send follow-up reminders. The list is parsed from the `renewal_reminder_overdue_days` store setting (default `1,3,7`) into an array before the filter runs.
 
 **Parameters:**
 
-- `$days` (array): Array of day intervals for overdue reminders (default from settings: `[1, 3, 7]`)
+- `$days` (array): Array of day intervals for overdue reminders (default `[1, 3, 7]`)
 
 **Returns:**
 - `$days` (array): The modified array of overdue reminder day intervals
 
-**Source:** `app/Services/Reminders/InvoiceReminderService.php:299`
+**Source:** `app/Services/Reminders/RenewalReminderService.php:305`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/reminders/invoice_overdue_days', function($days) {
+add_filter('fluent_cart/reminders/renewal_overdue_days', function($days) {
     // Send overdue reminders at 1, 3, 7, and 14 days past due
     return [1, 3, 7, 14];
 });
@@ -1064,6 +1064,235 @@ This filter is applied when determining at which day intervals before a trial pe
 add_filter('fluent_cart/reminders/trial_end_days', function($days) {
     // Remind at 7, 3, and 1 day before trial ends
     return [7, 3, 1];
+});
+```
+</details>
+
+---
+
+## Collection Method & Auto-Charge <Badge type="tip" text="Store-managed" />
+
+Filters for the [store-managed subscription engine](/modules/subscriptions) — how the collection method is chosen, how renewals are scheduled, and how the `system` auto-charge retry/notification behaviour is tuned.
+
+### <code> subscription/management_mode </code>
+<details open>
+<summary><code>fluent_cart/subscription/management_mode</code> &mdash; Filter the effective subscription management mode</summary>
+
+**When it runs:**
+This filter is applied when resolving the store's subscription management mode — `gateway_managed` or `store_managed` — which decides whether new subscriptions are billed by the gateway or by FluentCart's renewal engine.
+
+**Parameters:**
+
+- `$mode` (string): The management mode (`'gateway_managed'` or `'store_managed'`)
+
+**Returns:**
+- `$mode` (string): The (possibly overridden) mode
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionManagementMode.php:58`
+
+**Usage:**
+```php
+add_filter('fluent_cart/subscription/management_mode', function($mode) {
+    return 'store_managed';
+});
+```
+</details>
+
+### <code> subscription_collection_method_{gateway} </code>
+<details>
+<summary><code>fluent_cart/subscription_collection_method_{gateway}</code> &mdash; Per-gateway override of the resolved collection method</summary>
+
+**When it runs:**
+This **dynamic** filter is applied at checkout after the collection method (`automatic` / `manual` / `system`) has been resolved for the chosen gateway. The `{gateway}` suffix is the payment method slug (e.g. `stripe`, `paypal`), so you can target a single gateway. It gets the last word over the decision matrix.
+
+**Parameters:**
+
+- `$collectionMethod` (string): The resolved collection method
+
+**Returns:**
+- `$collectionMethod` (string): The (possibly overridden) collection method
+
+**Source:** `app/Helpers/CheckoutProcessor.php:953`
+
+**Usage:**
+```php
+// Force PayPal subscriptions onto the store-managed manual engine
+add_filter('fluent_cart/subscription_collection_method_paypal', function($collectionMethod) {
+    return 'manual';
+});
+```
+</details>
+
+### <code> subscription/allowed_intervals </code>
+<details>
+<summary><code>fluent_cart/subscription/allowed_intervals</code> &mdash; Filter the intervals a subscription may be changed to</summary>
+
+**When it runs:**
+This filter is applied when validating an edit to a store-managed subscription's billing interval, controlling which target intervals are permitted.
+
+**Parameters:**
+
+- `$intervals` (array): Allowed interval identifiers
+- `$context` (array): `['subscription' => Subscription, 'current_interval' => string, 'new_interval' => string]`
+
+**Returns:**
+- `$intervals` (array): The (possibly modified) allowed intervals
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:916`
+
+**Usage:**
+```php
+add_filter('fluent_cart/subscription/allowed_intervals', function($intervals, $context) {
+    return $intervals;
+}, 10, 2);
+```
+</details>
+
+### <code> renewal/advance_creation_days </code>
+<details>
+<summary><code>fluent_cart/renewal/advance_creation_days</code> &mdash; Filter how many days ahead a renewal order is generated</summary>
+
+**When it runs:**
+This filter is applied by the renewal engine when deciding how far in advance of the due date to generate the next renewal order. The map is keyed by billing interval.
+
+**Parameters:**
+
+- `$map` (array): Interval => advance-days map (e.g. `['month' => 3, 'year' => 7]`)
+- `$interval` (string): The subscription's billing interval being resolved
+
+**Returns:**
+- `$map` (array): The (possibly modified) advance-days map
+
+**Source:** `app/Modules/StoreManagedRenewal/Services/RenewalService.php:914`
+
+**Usage:**
+```php
+add_filter('fluent_cart/renewal/advance_creation_days', function($map, $interval) {
+    $map['month'] = 5; // generate monthly renewals 5 days early
+    return $map;
+}, 10, 2);
+```
+</details>
+
+### <code> subscriptions/system_charge_retry_offsets </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_charge_retry_offsets</code> &mdash; Filter the off-session charge retry ladder</summary>
+
+**When it runs:**
+This filter is applied when building the retry schedule for a failed `system` auto-charge. Offsets are day fractions from the anchor, bounded by the grace window.
+
+**Parameters:**
+
+- `$offsets` (array): Retry offsets in days (floats)
+- `$context` (array): `['subscription' => Subscription, 'grace_days' => int]`
+
+**Returns:**
+- `$offsets` (array): The (possibly modified) retry offsets
+
+**Source:** `app/Modules/Subscriptions/Services/SystemChargeService.php:213`
+
+**Usage:**
+```php
+add_filter('fluent_cart/subscriptions/system_charge_retry_offsets', function($offsets, $context) {
+    return [0, 1, 3]; // retry immediately, after 1 day, after 3 days
+}, 10, 2);
+```
+</details>
+
+### <code> subscriptions/system_charge_failure_notify </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_charge_failure_notify</code> &mdash; Decide whether to notify the customer on a failed charge</summary>
+
+**When it runs:**
+This filter is applied when a `system` charge attempt fails, to decide whether the customer should be emailed for this attempt. Defaults to `true` only on the first attempt.
+
+**Parameters:**
+
+- `$notify` (bool): Whether to send a notification (default: `$attempt === 1`)
+- `$context` (array): `['order' => Order, 'subscription' => Subscription, 'attempt' => int]`
+
+**Returns:**
+- `$notify` (bool): Whether to notify
+
+**Source:** `app/Modules/Subscriptions/Services/SystemChargeService.php:739`
+
+**Usage:**
+```php
+add_filter('fluent_cart/subscriptions/system_charge_failure_notify', function($notify, $context) {
+    return true; // notify on every failed attempt
+}, 10, 2);
+```
+</details>
+
+### <code> subscriptions/upcoming_charge_notification </code>
+<details>
+<summary><code>fluent_cart/subscriptions/upcoming_charge_notification</code> &mdash; Toggle the upcoming auto-charge notice</summary>
+
+**When it runs:**
+This filter is applied before sending the "an automatic charge is coming up" notification for a `system` renewal.
+
+**Parameters:**
+
+- `$send` (bool): Whether to send the upcoming-charge notice (default: `true`)
+- `$data` (array): The renewal notification payload
+
+**Returns:**
+- `$send` (bool): Whether to send
+
+**Source:** `app/Services/Email/EmailNotificationMailer.php:80`
+
+**Usage:**
+```php
+add_filter('fluent_cart/subscriptions/upcoming_charge_notification', function($send, $data) {
+    return $send;
+}, 10, 2);
+```
+</details>
+
+### <code> subscriptions/system_billing_enabled </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_billing_enabled</code> &mdash; Master switch for system auto-charge billing</summary>
+
+**When it runs:**
+This filter is checked before the `system` charge engine runs. Returning `false` disables off-session auto-charging store-wide (subscriptions bill as `manual`).
+
+**Parameters:**
+
+- `$enabled` (bool): Whether system billing is enabled (default: `true`)
+
+**Returns:**
+- `$enabled` (bool): Whether to allow system billing
+
+**Source:** `app/Modules/Subscriptions/Services/SystemChargeService.php:57`
+
+**Usage:**
+```php
+add_filter('fluent_cart/subscriptions/system_billing_enabled', function($enabled) {
+    return false; // turn off all automatic renewal charges
+});
+```
+</details>
+
+### <code> subscriptions/system_collection_enabled </code>
+<details>
+<summary><code>fluent_cart/subscriptions/system_collection_enabled</code> &mdash; Whether new subscriptions may resolve to <code>system</code></summary>
+
+**When it runs:**
+This filter gates whether a new subscription is allowed to be created with the `system` collection method at checkout. Returning `false` keeps store-managed subscriptions on `manual` even when the gateway supports auto-charge.
+
+**Parameters:**
+
+- `$enabled` (bool): Whether system collection is enabled (default: `true`)
+
+**Returns:**
+- `$enabled` (bool): Whether to allow the `system` collection method
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionManagementMode.php:82`
+
+**Usage:**
+```php
+add_filter('fluent_cart/subscriptions/system_collection_enabled', function($enabled) {
+    return false; // customers pay each renewal by hand, no saved-card auto-charge
 });
 ```
 </details>

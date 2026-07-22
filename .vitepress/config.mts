@@ -445,7 +445,6 @@ export default defineConfig({
           {
             text: 'Tutorials',
             items: [
-              { text: 'Subscription Engine', link: '/modules/subscriptions' },
               { text: 'Fee System (Surcharges)', link: '/modules/fee-system' },
               { text: 'Ghost Product Selling', link: '/modules/ghost-product-selling' },
               { text: 'Custom Payment Gateway', link: '/payment-methods-integration/' },

@@ -19,9 +19,9 @@ description: FluentCart OrderTaxRate model documentation with attributes, scopes
 | id                 | Integer   | Primary Key (guarded) |
 | order_id           | Integer   | Reference to order |
 | tax_rate_id        | Integer   | Reference to tax rate |
-| shipping_tax       | Decimal   | Shipping tax amount (in cents) |
-| order_tax          | Decimal   | Order tax amount (in cents) |
-| total_tax          | Decimal   | Total tax amount (in cents) |
+| shipping_tax       | Bigint    | Shipping tax amount (in cents) |
+| order_tax          | Bigint    | Order tax amount (in cents) |
+| total_tax          | Bigint    | Total tax amount (in cents) |
 | meta               | JSON      | Additional tax data |
 | filed_at           | Date Time | Tax filing date |
 | created_at         | Date Time | Creation timestamp |
@@ -50,7 +50,7 @@ This model has the following scopes that you can use
 
 ### validOrder()
 
-Filter tax rates to only include those belonging to completed orders. Uses a `whereHas` on the `order` relationship with `status = 'completed'`.
+Filter tax rates to only include those belonging to paid orders. Uses a `whereHas` on the `order` relationship with `payment_status` in `('paid', 'partially_paid')`.
 
 * Parameters
    * none
@@ -58,7 +58,7 @@ Filter tax rates to only include those belonging to completed orders. Uses a `wh
 #### Usage:
 
 ```php
-// Get tax rates for completed orders only
+// Get tax rates for paid (or partially paid) orders only
 $taxRates = FluentCart\App\Models\OrderTaxRate::validOrder()->get();
 ```
 
@@ -148,10 +148,10 @@ foreach ($taxRates as $taxRate) {
 }
 ```
 
-### Get Tax Rates for Completed Orders
+### Get Tax Rates for Paid Orders
 
 ```php
-$completedOrderTaxRates = FluentCart\App\Models\OrderTaxRate::validOrder()->get();
+$paidOrderTaxRates = FluentCart\App\Models\OrderTaxRate::validOrder()->get();
 ```
 
 ### Create Order Tax Rate

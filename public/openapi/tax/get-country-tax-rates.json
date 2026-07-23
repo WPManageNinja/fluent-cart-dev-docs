@@ -25,16 +25,16 @@
   "paths": {
     "/tax/rates/country/rates/{country_code}": {
       "get": {
-        "operationId": "getCountryTaxRates",
-        "summary": "GET Get Country Tax Rates",
-        "description": "Retrieve all tax rates for a specific country, including the associated tax class and country-level configuration settings.",
-        "tags": [
-          "Tax"
-        ],
         "security": [
           {
             "ApplicationPasswords": []
           }
+        ],
+        "operationId": "getCountryTaxRates",
+        "summary": "GET Get Country Tax Rates",
+        "description": "Retrieve all tax rates for a specific country (ordered by priority, then ID), the country-level form configuration, and whether tax is enabled for the country.",
+        "tags": [
+          "Tax"
         ],
         "parameters": [
           {
@@ -45,6 +45,16 @@
             "schema": {
               "type": "string",
               "example": "DE"
+            }
+          },
+          {
+            "name": "class_id",
+            "in": "query",
+            "description": "Optional tax class ID to filter the rates",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1
             }
           }
         ],
@@ -64,17 +74,27 @@
                     },
                     "settings": {
                       "type": "object",
+                      "nullable": true,
+                      "description": "Country-level form configuration from the built-in tax config. Falls back to the continent configuration (e.g., EU) and is null when neither defines one",
                       "properties": {
-                        "compound_tax": {
-                          "type": "boolean"
-                        },
-                        "tax_id_label": {
-                          "type": "string"
-                        },
-                        "states": {
-                          "type": "object"
+                        "hidden": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Address fields hidden in the rate form for this country (e.g., city, zip, state)",
+                          "example": [
+                            "city",
+                            "zip",
+                            "state"
+                          ]
                         }
                       }
+                    },
+                    "tax_enabled": {
+                      "type": "boolean",
+                      "description": "Whether tax collection is enabled for this country (default: true)",
+                      "example": true
                     }
                   },
                   "example": {
@@ -93,24 +113,17 @@
                         "is_compound": 0,
                         "for_shipping": null,
                         "for_order": 0,
-                        "formatted_state": "",
-                        "tax_class": {
-                          "id": 1,
-                          "title": "Standard"
-                        }
+                        "formatted_state": ""
                       }
                     ],
                     "settings": {
-                      "compound_tax": true,
-                      "tax_id_label": "VAT",
-                      "states": {
-                        "BW": "Baden-W\u00fcrttemberg",
-                        "BY": "Bavaria",
-                        "BE": "Berlin",
-                        "HH": "Hamburg",
-                        "NW": "North Rhine-Westphalia"
-                      }
-                    }
+                      "hidden": [
+                        "city",
+                        "zip",
+                        "state"
+                      ]
+                    },
+                    "tax_enabled": true
                   }
                 },
                 "example": {
@@ -129,24 +142,17 @@
                       "is_compound": 0,
                       "for_shipping": null,
                       "for_order": 0,
-                      "formatted_state": "",
-                      "tax_class": {
-                        "id": 1,
-                        "title": "Standard"
-                      }
+                      "formatted_state": ""
                     }
                   ],
                   "settings": {
-                    "compound_tax": true,
-                    "tax_id_label": "VAT",
-                    "states": {
-                      "BW": "Baden-W\u00fcrttemberg",
-                      "BY": "Bavaria",
-                      "BE": "Berlin",
-                      "HH": "Hamburg",
-                      "NW": "North Rhine-Westphalia"
-                    }
-                  }
+                    "hidden": [
+                      "city",
+                      "zip",
+                      "state"
+                    ]
+                  },
+                  "tax_enabled": true
                 },
                 "examples": {
                   "default": {
@@ -167,24 +173,17 @@
                           "is_compound": 0,
                           "for_shipping": null,
                           "for_order": 0,
-                          "formatted_state": "",
-                          "tax_class": {
-                            "id": 1,
-                            "title": "Standard"
-                          }
+                          "formatted_state": ""
                         }
                       ],
                       "settings": {
-                        "compound_tax": true,
-                        "tax_id_label": "VAT",
-                        "states": {
-                          "BW": "Baden-W\u00fcrttemberg",
-                          "BY": "Bavaria",
-                          "BE": "Berlin",
-                          "HH": "Hamburg",
-                          "NW": "North Rhine-Westphalia"
-                        }
-                      }
+                        "hidden": [
+                          "city",
+                          "zip",
+                          "state"
+                        ]
+                      },
+                      "tax_enabled": true
                     }
                   }
                 }
@@ -256,9 +255,9 @@
             "example": 0
           },
           "for_shipping": {
-            "type": "integer",
+            "type": "string",
             "nullable": true,
-            "description": "Shipping tax override rate",
+            "description": "Shipping tax override rate (null when no override)",
             "example": null
           },
           "for_order": {
@@ -270,19 +269,6 @@
             "type": "string",
             "description": "Formatted state name",
             "example": ""
-          },
-          "tax_class": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "integer",
-                "example": 1
-              },
-              "title": {
-                "type": "string",
-                "example": "Standard"
-              }
-            }
           }
         }
       }
@@ -292,7 +278,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

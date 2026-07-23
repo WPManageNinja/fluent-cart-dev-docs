@@ -1513,7 +1513,7 @@ Applied when retrieving the mapping of country codes to their tax identification
 
 **Returns:** `array` — The modified country tax titles array
 
-**Source:** `app/Modules/Tax/TaxModule.php:821`
+**Source:** `app/Modules/Tax/TaxModule.php (line 1730)`
 
 **Usage:**
 ```php
@@ -1523,6 +1523,36 @@ add_filter('fluent_cart/tax/country_tax_titles', function ($taxTitles) {
     $taxTitles['US'] = __('Tax ID', 'my-plugin');     // Simplify US label
     return $taxTitles;
 }, 10, 1);
+```
+</details>
+
+### <code> tax_summary_should_render </code>
+<details>
+<summary><code>fluent_cart/tax_summary_should_render</code> &mdash; Filter whether the tax summary is rendered for an order receipt</summary>
+
+**When it runs:**
+Applied in `TaxSummaryHelper::computeTaxSummary()` while building the tax summary for an order's receipt surfaces (thank-you page, receipts, emails, PDFs). It runs after the zero-tax short-circuit — when the order has no tax at all and no reverse charge, the summary is already skipped without this filter firing — so it lets you hide the tax summary for orders that do carry tax data.
+
+**Parameters:**
+
+- `$shouldRender` (bool): Whether the tax summary should render (default `true`)
+- `$order` (\FluentCart\App\Models\Order): The order being rendered
+
+**Returns:**
+- `bool` — `false` to hide the tax summary block
+
+**Source:** `app/Services/Renderer/Receipt/TaxSummaryHelper.php (line 172)`
+
+**Usage:**
+```php
+add_filter('fluent_cart/tax_summary_should_render', function ($shouldRender, $order) {
+    // Hide the tax summary for test-mode orders
+    if ($order->mode === 'test') {
+        return false;
+    }
+
+    return $shouldRender;
+}, 10, 2);
 ```
 </details>
 
@@ -1675,20 +1705,31 @@ add_filter('fluent_cart/mollie/subscription_description', function ($description
 <summary><code>fluent_cart/paddle_product_tax_category</code> <Badge type="warning" text="Pro" /> &mdash; Filter Paddle product tax category</summary>
 
 **When it runs:**
-Applied when determining the tax category for a product in Paddle. Paddle uses tax categories to apply the correct tax rates.
+Applied when FluentCart creates the corresponding product on Paddle, to determine the tax category sent with the product data. Paddle uses tax categories to apply the correct tax rates.
 
 **Parameters:**
 - `$taxCategory` (string): The tax category (default `'standard'`)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'product'      => $fctProduct,  // \FluentCart\App\Models\Product|null — the FluentCart product
+        'variation_id' => $variationId, // int|null — the product variation ID
+    ];
+    ```
 
 **Returns:** `string` — The Paddle tax category (e.g., `'standard'`, `'digital-goods'`, `'saas'`)
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Product.php (line 44)`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_product_tax_category', function ($taxCategory) {
-    return 'digital-goods';
-}, 10, 1);
+add_filter('fluent_cart/paddle_product_tax_category', function ($taxCategory, $data) {
+    if ($data['product'] && $data['product']->ID === 123) {
+        return 'digital-goods';
+    }
+
+    return $taxCategory;
+}, 10, 2);
 ```
 </details>
 

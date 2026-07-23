@@ -861,7 +861,7 @@ This table stores tax rate configurations
 | group        | VARCHAR(45) NULL                      | Tax group |
 | priority     | INT UNSIGNED NULL DEFAULT 1           | Priority |
 | is_compound  | TINYINT UNSIGNED NULL DEFAULT 0       | Compound tax flag |
-| for_shipping | TINYINT UNSIGNED NULL DEFAULT 0       | Apply to shipping |
+| for_shipping | DECIMAL(10,2) NULL DEFAULT NULL       | Shipping-tax rate override percentage (NULL = inherit base rate; 0 = no shipping tax) |
 | for_order    | TINYINT UNSIGNED NULL DEFAULT 0       | Apply to order |
 
 Indexes:
@@ -926,7 +926,7 @@ This table stores order tax rate information
 |--------------|---------------------------------------|---------|
 | id           | BIGINT(20) UNSIGNED _Auto Increment_  | Primary key |
 | order_id     | BIGINT(20) UNSIGNED NOT NULL          | Reference to order |
-| tax_rate_id  | BIGINT(20) UNSIGNED NOT NULL          | Reference to tax rate |
+| tax_rate_id  | BIGINT(20) NOT NULL                   | Reference to tax rate (signed; virtual EU VAT rates use negative IDs) |
 | shipping_tax | BIGINT NULL                           | Shipping tax amount |
 | order_tax    | BIGINT NULL                           | Order tax amount |
 | total_tax    | BIGINT NULL                           | Total tax amount |
@@ -934,6 +934,9 @@ This table stores order tax rate information
 | filed_at     | DATETIME NULL                         | Filed at |
 | created_at   | DATETIME NULL                         | |
 | updated_at   | DATETIME NULL                         | |
+
+Indexes:
+- (order_id, tax_rate_id) (unique)
 
 
 ## fct_webhook_logger Table

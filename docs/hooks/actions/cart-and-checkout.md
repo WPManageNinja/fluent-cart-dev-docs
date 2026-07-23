@@ -335,35 +335,60 @@ add_action('fluent_cart/checkout/customer_data_saved', function ($data) {
 ```
 </details>
 
-### <code> tax_data_changed </code>
+### <code> tax/reverse_charge_applied </code>
 <details>
-<summary><code>fluent_cart/checkout/tax_data_changed</code> &mdash; Fired when tax-relevant data changes</summary>
+<summary><code>fluent_cart/tax/reverse_charge_applied</code> &mdash; Fired when the EU VAT reverse charge is applied to the cart</summary>
 
 **When it runs:**
-This action fires when customer data changes in a way that could affect tax calculations (e.g., billing country, state, or VAT number changes). It is dispatched from within the `customer_data_saved` listener and shares the same parameter structure.
+This action fires during cart tax calculation (`TaxModule::calculateCartTax()`) when the reverse charge mechanism has just been applied — a qualifying business customer (e.g. validated EU VAT number) is liable for the VAT, so tax has been removed and inclusive product lines and fees have been adjusted to net prices. It fires after those adjustments are written into the cart's checkout data.
 
 **Parameters:**
 
-- `$data` (array): Same structure as `customer_data_saved`
+- `$data` (array): Reverse charge context
     ```php
     $data = [
-        'cart'      => $cart,            // \FluentCart\App\Models\Cart instance
-        'key'       => $key,             // string — the data key that changed
-        'value'     => $value,           // mixed — the new value
-        'old_value' => $prevValue,       // mixed — the previous value
-        'old_data'  => $oldCheckoutData, // array — the full previous checkout_data array
+        'checkout_data' => $checkoutData, // array — the cart's checkout_data (includes the updated 'tax_data')
+        'product_lines' => $productLines, // array — cart product line items, already adjusted to net prices
     ];
     ```
 
-**Source:** `app/Hooks/Cart/WebCheckoutHandler.php`
+**Source:** `app/Modules/Tax/TaxModule.php (line 750)`
 
 **Usage:**
 ```php
-add_action('fluent_cart/checkout/tax_data_changed', function ($data) {
-    $cart = $data['cart'];
+add_action('fluent_cart/tax/reverse_charge_applied', function ($data) {
+    $taxData = $data['checkout_data']['tax_data'] ?? [];
 
-    // Trigger a third-party tax service recalculation
-    my_tax_service_recalculate($cart);
+    // Log or sync with an external tax service
+    my_tax_service_flag_reverse_charge($taxData);
+}, 10, 1);
+```
+</details>
+
+### <code> tax/reverse_charge_removed </code>
+<details>
+<summary><code>fluent_cart/tax/reverse_charge_removed</code> &mdash; Fired when the EU VAT reverse charge is removed from the cart</summary>
+
+**When it runs:**
+This action fires during cart tax calculation (`TaxModule::calculateCartTax()`) when a previously applicable reverse charge no longer applies (e.g. the VAT number was removed or the billing country changed). Product lines have already been restored to gross prices and the reverse charge fee adjustments cleared before it fires.
+
+**Parameters:**
+
+- `$data` (array): Reverse charge context
+    ```php
+    $data = [
+        'checkout_data' => $checkoutData, // array — the cart's checkout_data (includes 'tax_data')
+        'product_lines' => $productLines, // array — cart product line items, restored to gross prices
+    ];
+    ```
+
+**Source:** `app/Modules/Tax/TaxModule.php (line 762)`
+
+**Usage:**
+```php
+add_action('fluent_cart/tax/reverse_charge_removed', function ($data) {
+    // React to the customer no longer qualifying for reverse charge
+    my_tax_service_clear_reverse_charge($data['checkout_data']);
 }, 10, 1);
 ```
 </details>

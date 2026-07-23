@@ -23,44 +23,34 @@
     }
   ],
   "paths": {
-    "/tax/configuration/settings/eu-vat/oss/override": {
+    "/tax/product-overrides/{id}": {
       "delete": {
-        "operationId": "deleteOssTaxOverride",
-        "summary": "DELETE Delete OSS Tax Override",
-        "description": "Delete all EU tax rate overrides for a specific country. Optionally filter by state/region.",
-        "tags": [
-          "Tax"
-        ],
         "security": [
           {
             "ApplicationPasswords": []
           }
         ],
+        "operationId": "deleteProductOverride",
+        "summary": "DELETE Delete Product Category Tax Override",
+        "description": "Delete a product category tax override by its ID.",
+        "tags": [
+          "Tax"
+        ],
         "parameters": [
           {
-            "name": "country",
-            "in": "query",
-            "description": "ISO 3166-1 alpha-2 country code",
+            "name": "id",
+            "in": "path",
+            "description": "Override (meta row) ID",
             "required": true,
             "schema": {
-              "type": "string",
-              "example": "FR"
-            }
-          },
-          {
-            "name": "state",
-            "in": "query",
-            "description": "State/region code to narrow the deletion scope",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "example": "IDF"
+              "type": "integer",
+              "example": 12
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OSS tax override deleted successfully.",
+            "description": "Override deleted.",
             "content": {
               "application/json": {
                 "schema": {
@@ -68,29 +58,29 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "OSS tax override deleted successfully"
+                      "example": "Product category tax override deleted"
                     }
                   },
                   "example": {
-                    "message": "OSS tax override deleted successfully"
+                    "message": "Product category tax override deleted"
                   }
                 },
                 "example": {
-                  "message": "OSS tax override deleted successfully"
+                  "message": "Product category tax override deleted"
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "message": "OSS tax override deleted successfully"
+                      "message": "Product category tax override deleted"
                     }
                   }
                 }
               }
             }
           },
-          "423": {
-            "description": "Validation failed or no matching records found.",
+          "422": {
+            "description": "Override not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -98,21 +88,21 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "No matching OSS tax override found to delete"
+                      "example": "Override not found"
                     }
                   },
                   "example": {
-                    "message": "No matching OSS tax override found to delete"
+                    "message": "Override not found"
                   }
                 },
                 "example": {
-                  "message": "No matching OSS tax override found to delete"
+                  "message": "Override not found"
                 },
                 "examples": {
                   "default": {
                     "summary": "Error response",
                     "value": {
-                      "message": "No matching OSS tax override found to delete"
+                      "message": "Override not found"
                     }
                   }
                 }
@@ -130,7 +120,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

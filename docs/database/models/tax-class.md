@@ -17,14 +17,14 @@ description: FluentCart TaxClass model documentation with attributes, scopes, re
 This model uses both `$guarded` and `$fillable`:
 
 - **Guarded:** `['id']`
-- **Fillable:** `['title', 'description', 'meta', 'slug']`
+- **Fillable:** `['title', 'meta', 'slug']`
 
 ## Lifecycle Hooks (booted)
 
 The model registers lifecycle hooks in the `booted()` method:
 
 - **Creating:** Automatically generates a unique slug from `title` via `generateUniqueSlug()`.
-- **Updating:** If `title` has changed (is dirty), the slug is regenerated to match the new title.
+- **Updating:** If `title` has changed (is dirty), the slug is regenerated to match the new title. The built-in slugs `standard`, `reduced`, and `zero` are protected -- classes with those slugs are never re-slugged on title change.
 
 ## Attributes
 
@@ -49,7 +49,7 @@ $taxClass = FluentCart\App\Models\TaxClass::find(1);
 
 $taxClass->id; // returns id
 $taxClass->title; // returns title
-$taxClass->description; // returns description
+$taxClass->description; // returns description (column exists but is not mass-assignable)
 $taxClass->slug; // returns slug
 $taxClass->meta; // returns array (accessor)
 ```
@@ -118,7 +118,6 @@ echo "Slug: " . $taxClass->slug;
 ```php
 $taxClass = FluentCart\App\Models\TaxClass::create([
     'title' => 'Standard Tax',
-    'description' => 'Standard tax rate for most products',
     'meta' => [
         'tax_rate' => 8.5,
         'exempt_products' => [],
@@ -150,7 +149,6 @@ $taxClass = FluentCart\App\Models\TaxClass::where('slug', 'standard-tax')->first
 $taxClass = FluentCart\App\Models\TaxClass::find(1);
 $taxClass->update([
     'title' => 'Updated Tax Class',
-    'description' => 'Updated description',
     'meta' => ['tax_rate' => 9.0, 'updated' => true]
 ]);
 // Slug will be automatically updated if title changes

@@ -138,7 +138,9 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/taxes" \
 Manage tax classes that group tax rates by category (e.g., Standard, Reduced, Zero).
 
 **Prefix:** `/fluent-cart/v2/tax/classes`
-**Policy:** `StoreSensitivePolicy`
+**Policy:** `StoreSettingsPolicy`
+
+A maximum of **6** tax classes is allowed. The built-in `standard` class always exists and cannot be deleted; `reduced` and `zero` are built-in classes that can be created on demand.
 
 ---
 
@@ -146,7 +148,7 @@ Manage tax classes that group tax rates by category (e.g., Standard, Reduced, Ze
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/tax/classes`
 
-Retrieve all tax classes, sorted by priority (highest first), then by newest first when priority is equal.
+Retrieve all tax classes ordered by ID (oldest first), along with the maximum allowed number of classes and the next built-in class (`reduced` or `zero`) that has not been created yet.
 
 ### Parameters
 
@@ -156,17 +158,12 @@ No query parameters required.
 
 ```json
 {
-  "tax_classes": [
+  "classes": [
     {
       "id": 1,
       "title": "Standard",
       "slug": "standard",
-      "description": "Standard tax rate for most products",
-      "meta": {
-        "categories": [],
-        "priority": 10
-      },
-      "categories": [],
+      "meta": [],
       "created_at": "2025-01-01 00:00:00",
       "updated_at": "2025-01-01 00:00:00"
     },
@@ -174,31 +171,20 @@ No query parameters required.
       "id": 2,
       "title": "Reduced",
       "slug": "reduced",
-      "description": "Reduced tax rate for essential goods",
-      "meta": {
-        "categories": [],
-        "priority": 5
-      },
-      "categories": [],
-      "created_at": "2025-01-01 00:00:00",
-      "updated_at": "2025-01-01 00:00:00"
-    },
-    {
-      "id": 3,
-      "title": "Zero",
-      "slug": "zero",
-      "description": "Zero tax rate for exempt products",
-      "meta": {
-        "categories": [],
-        "priority": 2
-      },
-      "categories": [],
+      "meta": [],
       "created_at": "2025-01-01 00:00:00",
       "updated_at": "2025-01-01 00:00:00"
     }
-  ]
+  ],
+  "max_classes": 6,
+  "next_builtin": {
+    "slug": "zero",
+    "title": "Zero"
+  }
 }
 ```
+
+`next_builtin` is `null` when both built-in classes (`reduced`, `zero`) already exist.
 
 ### Example
 
@@ -213,41 +199,38 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/tax/classes" \
 
 <badge type="warning">POST</badge> `/fluent-cart/v2/tax/classes`
 
-Create a new tax class. A unique slug is auto-generated from the title.
+Create a new tax class. A unique slug is auto-generated from the title. Pass `slug` `"reduced"` or `"zero"` to create one of the built-in classes (the title is then set automatically).
 
 ### Parameters
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
-| `title` | string | body | Yes | Tax class title (max 192 characters) |
-| `description` | string | body | No | Description of the tax class |
-| `categories` | array of integers | body | No | Array of product category IDs associated with this tax class |
-| `priority` | integer | body | No | Sort priority (higher values appear first, default: `0`) |
+| `title` | string | body | Yes* | Tax class title (max 30 characters). Required unless a built-in `slug` is passed |
+| `slug` | string | body | No | Pass a built-in slug (`reduced` or `zero`) to create that built-in class; otherwise the slug is auto-generated from the title |
 
-### Validation Rules
+### Constraints
 
-| Field | Rules |
-|-------|-------|
-| `title` | Required, sanitized text, max 192 characters |
-| `description` | Nullable, sanitized text |
-| `categories` | Nullable, array of integers |
+| Condition | Status | Error |
+|-----------|--------|-------|
+| 6 tax classes already exist | 423 | `"Maximum of 6 tax classes allowed"` |
+| Built-in class already exists | 423 | `"This tax class already exists"` |
+| Title missing (non-built-in) | 423 | `"Tax class name is required"` |
+| Title longer than 30 characters | 422 | `"Tax class name must be 30 characters or fewer"` |
+| A class with the same slug exists | 423 | `"A tax class with this name already exists"` |
 
 ### Response
 
 ```json
 {
-  "message": "Tax class has been created successfully"
-}
-```
-
-### Error Response (422)
-
-```json
-{
-  "errors": {
-    "title": ["Tax class title is required."]
+  "class": {
+    "id": 4,
+    "title": "Digital Goods",
+    "slug": "digital-goods",
+    "meta": [],
+    "created_at": "2025-06-01 12:00:00",
+    "updated_at": "2025-06-01 12:00:00"
   },
-  "message": "Validation failed"
+  "message": "Tax class created successfully"
 }
 ```
 
@@ -257,60 +240,7 @@ Create a new tax class. A unique slug is auto-generated from the title.
 curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/classes" \
   -u "username:app_password" \
   -H "Content-Type: application/json" \
-  -d '{
-    "title": "Digital Goods",
-    "description": "Tax class for digital products",
-    "categories": [12, 15],
-    "priority": 7
-  }'
-```
-
----
-
-### Update Tax Class
-
-<badge type="info">PUT</badge> `/fluent-cart/v2/tax/classes/{id}`
-
-Update an existing tax class. The slug is automatically regenerated if the title changes.
-
-### Parameters
-
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `id` | integer | path | Yes | Tax class ID |
-| `title` | string | body | Yes | Tax class title (max 192 characters) |
-| `description` | string | body | No | Description of the tax class |
-| `categories` | array of integers | body | No | Array of product category IDs associated with this tax class |
-| `priority` | integer | body | No | Sort priority (higher values appear first, default: `0`) |
-
-### Validation Rules
-
-| Field | Rules |
-|-------|-------|
-| `title` | Required, sanitized text, max 192 characters |
-| `description` | Nullable, sanitized text |
-| `categories` | Nullable, array of integers |
-
-### Response
-
-```json
-{
-  "message": "Tax class has been updated successfully"
-}
-```
-
-### Example
-
-```bash
-curl -X PUT "https://example.com/wp-json/fluent-cart/v2/tax/classes/4" \
-  -u "username:app_password" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Digital Goods Updated",
-    "description": "Updated description",
-    "categories": [12, 15, 20],
-    "priority": 8
-  }'
+  -d '{"title": "Digital Goods"}'
 ```
 
 ---
@@ -319,7 +249,7 @@ curl -X PUT "https://example.com/wp-json/fluent-cart/v2/tax/classes/4" \
 
 <badge type="danger">DELETE</badge> `/fluent-cart/v2/tax/classes/{id}`
 
-Delete a tax class by ID.
+Delete a tax class by ID. The built-in `standard` class cannot be deleted. Products, variations, EU registrations, product overrides, and tax rates referencing the deleted class fall back to the Standard class.
 
 ### Parameters
 
@@ -331,17 +261,17 @@ Delete a tax class by ID.
 
 ```json
 {
-  "message": "Tax class has been deleted successfully"
+  "message": "Tax class deleted successfully"
 }
 ```
 
-### Error Response
+### Error Responses
 
-```json
-{
-  "message": "Failed to delete tax class"
-}
-```
+| Status | Error |
+|--------|-------|
+| 423 | `"Cannot delete the Standard tax class"` |
+| 423 | `"Standard tax class could not be found"` |
+| 400 | `"Failed to delete tax class"` |
 
 ### Example
 
@@ -357,7 +287,7 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/classes/4" \
 Manage country-specific tax rates, shipping tax overrides, and country tax IDs.
 
 **Prefix:** `/fluent-cart/v2/tax`
-**Policy:** `StoreSensitivePolicy`
+**Policy:** `StoreSettingsPolicy`
 
 ---
 
@@ -441,13 +371,14 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/tax/rates" \
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/tax/rates/country/rates/{country_code}`
 
-Retrieve all tax rates for a specific country, including the associated tax class and country-level configuration settings.
+Retrieve all tax rates for a specific country (ordered by priority, then ID), the country-level form configuration, and whether tax is enabled for the country.
 
 ### Parameters
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `country_code` | string | path | Yes | ISO 3166-1 alpha-2 country code (e.g., `US`, `DE`, `GB`) |
+| `class_id` | integer | query | No | Filter rates by tax class ID |
 
 ### Response
 
@@ -468,26 +399,68 @@ Retrieve all tax rates for a specific country, including the associated tax clas
       "is_compound": 0,
       "for_shipping": null,
       "for_order": 0,
-      "formatted_state": "",
-      "tax_class": {
-        "id": 1,
-        "title": "Standard"
-      }
+      "formatted_state": ""
     }
   ],
   "settings": {
-    "compound_tax": true,
-    "tax_id_label": "VAT",
-    "states": {}
-  }
+    "hidden": ["city", "zip", "state"]
+  },
+  "tax_enabled": true
 }
 ```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tax_rates` | array | Tax rate rows for the country |
+| `settings` | object/null | Country-level form configuration from the built-in tax config. `hidden` lists address fields hidden in the rate form. Falls back to the continent configuration (e.g., `EU`); `null` when neither defines one |
+| `tax_enabled` | boolean | Whether tax collection is enabled for this country (default: `true`) |
 
 ### Example
 
 ```bash
 curl -X GET "https://example.com/wp-json/fluent-cart/v2/tax/rates/country/rates/DE" \
   -u "username:app_password"
+```
+
+---
+
+### Update Country Tax Status
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/tax/country-status/{country_code}`
+
+Enable or disable tax collection for a specific country. Accepts an ISO country code or the special code `EU` to toggle the whole EU group. By default every country is enabled; disabling stores a flag in the `fct_meta` table.
+
+### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `country_code` | string | path | Yes | ISO 3166-1 alpha-2 country code (e.g., `US`, `DE`) or `EU` for the EU group |
+| `enabled` | integer | body | Yes | `1` to enable tax for the country, `0` to disable |
+
+### Response
+
+```json
+{
+  "enabled": true,
+  "message": "Tax has been enabled successfully"
+}
+```
+
+### Error Response (422)
+
+```json
+{
+  "message": "Invalid country code"
+}
+```
+
+### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/country-status/DE" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{"enabled": 0}'
 ```
 
 ---
@@ -682,43 +655,6 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/country/rate/10" 
 
 ---
 
-### Delete All Rates for a Country
-
-<badge type="danger">DELETE</badge> `/fluent-cart/v2/tax/country/{country_code}`
-
-Delete all tax rates for a specific country.
-
-### Parameters
-
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `country_code` | string | path | Yes | ISO 3166-1 alpha-2 country code (e.g., `US`, `DE`) |
-
-### Response
-
-```json
-{
-  "message": "Country has been deleted successfully"
-}
-```
-
-### Error Response
-
-```json
-{
-  "message": "Failed to delete country"
-}
-```
-
-### Example
-
-```bash
-curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/country/FR" \
-  -u "username:app_password"
-```
-
----
-
 ### Save Shipping Tax Override
 
 <badge type="warning">POST</badge> `/fluent-cart/v2/tax/rates/country/override`
@@ -786,6 +722,175 @@ Remove the shipping tax override from a tax rate, resetting `for_shipping` to `n
 
 ```bash
 curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/rates/country/override/5" \
+  -u "username:app_password"
+```
+
+---
+
+### Get Product Category Tax Overrides
+
+<badge type="tip">GET</badge> `/fluent-cart/v2/tax/product-overrides/{country_code}`
+
+Retrieve all product category tax overrides for a specific country. Each override is a meta row whose `meta_value` holds the location, category, rate, and tax class data; `class_id` and `class_label` are appended for convenience.
+
+### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `country_code` | string | path | Yes | ISO 3166-1 alpha-2 country code (e.g., `US`, `DE`) |
+
+### Response
+
+```json
+{
+  "overrides": [
+    {
+      "id": 12,
+      "object_type": "tax_override",
+      "object_id": 15,
+      "meta_key": "product_category_override",
+      "meta_value": {
+        "country": "DE",
+        "state": "",
+        "city": "",
+        "postcode": "",
+        "category_id": 15,
+        "category_name": "Books",
+        "tax_label": "Reduced VAT",
+        "override_state_tax": "no",
+        "rate": 7,
+        "class_id": 1
+      },
+      "class_id": 1,
+      "class_label": "Standard",
+      "created_at": "2025-06-01 12:00:00",
+      "updated_at": "2025-06-01 12:00:00"
+    }
+  ]
+}
+```
+
+### Example
+
+```bash
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/tax/product-overrides/DE" \
+  -u "username:app_password"
+```
+
+---
+
+### Save Product Category Tax Override
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/tax/product-overrides`
+
+Create or update a product category tax override. Pass `id` to update an existing override. Without `id`, an existing override matching the same category, location, and tax class is updated in place; otherwise a new override is created.
+
+Pass `source_type` `"shipping"` together with `source_id` (a tax rate ID) to convert an existing shipping tax override into a product override — the shipping override is removed on success.
+
+### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `country` | string | body | Yes | ISO 3166-1 alpha-2 country code |
+| `category_id` | integer | body | Yes | Product category (`product-categories` term) ID |
+| `id` | integer | body | No | Existing override ID to update |
+| `state` | string | body | No | State/province code |
+| `city` | string | body | No | City name (max 45 characters) |
+| `postcode` | string | body | No | Postcode/ZIP code |
+| `tax_label` | string | body | No | Display label for the override tax |
+| `override_state_tax` | string | body | No | `"yes"` or `"no"` — whether the override replaces state-level tax (default: `"no"`) |
+| `rate` | number | body | No | Override tax rate percentage (negative values are clamped to `0`) |
+| `class_id` | integer | body | No | Tax class ID the override applies to (`0` = none; must exist when non-zero) |
+| `source_type` | string | body | No | Set to `"shipping"` with `source_id` to convert a shipping override |
+| `source_id` | integer | body | No | Tax rate ID of the shipping override being converted |
+
+### Response
+
+```json
+{
+  "override": {
+    "id": 12,
+    "object_type": "tax_override",
+    "object_id": 15,
+    "meta_key": "product_category_override",
+    "meta_value": {
+      "country": "DE",
+      "state": "",
+      "city": "",
+      "postcode": "",
+      "category_id": 15,
+      "category_name": "Books",
+      "tax_label": "Reduced VAT",
+      "override_state_tax": "no",
+      "rate": 7,
+      "class_id": 1
+    }
+  },
+  "message": "Product category tax override saved"
+}
+```
+
+### Error Responses
+
+| Status | Error |
+|--------|-------|
+| 422 | `"Country and category are required"` |
+| 422 | `"Invalid country code"` |
+| 422 | `"Invalid tax class"` |
+| 422 | `"Invalid product category"` |
+| 422 | `"An override already exists for the selected category, location, and tax class"` |
+| 404 | `"Override not found"` (when `id` does not match an existing override) |
+
+### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/product-overrides" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "country": "DE",
+    "category_id": 15,
+    "tax_label": "Reduced VAT",
+    "override_state_tax": "no",
+    "rate": 7,
+    "class_id": 1
+  }'
+```
+
+---
+
+### Delete Product Category Tax Override
+
+<badge type="danger">DELETE</badge> `/fluent-cart/v2/tax/product-overrides/{id}`
+
+Delete a product category tax override by its ID.
+
+### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `id` | integer | path | Yes | Override (meta row) ID |
+
+### Response
+
+```json
+{
+  "message": "Product category tax override deleted"
+}
+```
+
+### Error Response (422)
+
+```json
+{
+  "message": "Override not found"
+}
+```
+
+### Example
+
+```bash
+curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/product-overrides/12" \
   -u "username:app_password"
 ```
 
@@ -871,7 +976,7 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/country-tax-id/DE" 
 Manage global tax settings including enabling/disabling tax, inclusion/exclusion behavior, calculation basis, and rounding.
 
 **Prefix:** `/fluent-cart/v2/tax/configuration`
-**Policy:** `StoreSensitivePolicy`
+**Policy:** `StoreSettingsPolicy`
 
 ---
 
@@ -981,7 +1086,7 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/count
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/tax/configuration/settings`
 
-Retrieve the current global tax configuration settings.
+Retrieve the current global tax configuration settings along with the store country.
 
 ### Parameters
 
@@ -995,17 +1100,35 @@ No query parameters required.
     "tax_inclusion": "included",
     "tax_calculation_basis": "shipping",
     "tax_rounding": "item",
+    "checkout_tax_breakdown_display": "itemized",
+    "tax_display_label": "Tax",
     "enable_tax": "yes",
-    "price_suffix": "",
+    "price_suffix_included": "",
+    "price_suffix_excluded": "",
     "eu_vat_settings": {
       "require_vat_number": "no",
       "local_reverse_charge": "yes",
+      "reverse_charge_price_mode": "fixed",
       "vat_reverse_excluded_categories": [],
       "method": "oss",
       "oss_country": "DE",
-      "oss_vat": "DE123456789"
+      "oss_vat": "DE123456789",
+      "country_wise_vat": [],
+      "country_registrations": [
+        {
+          "country": "DE",
+          "vat": "DE123456789",
+          "rate": 19,
+          "rates": {
+            "standard": {"rate": 19, "label": "VAT"},
+            "reduced": {"rate": 7, "label": "Reduced VAT"}
+          },
+          "tax_label": "VAT"
+        }
+      ]
     }
-  }
+  },
+  "store_country": "DE"
 }
 ```
 
@@ -1016,9 +1139,14 @@ No query parameters required.
 | `enable_tax` | string | `"yes"`, `"no"` | Whether tax calculation is enabled |
 | `tax_inclusion` | string | `"included"`, `"excluded"` | Whether product prices include tax |
 | `tax_calculation_basis` | string | `"shipping"`, `"billing"`, `"store"` | Address used for tax calculation |
-| `tax_rounding` | string | `"item"`, `"subtotal"` | Whether rounding is applied per item or on the subtotal |
-| `price_suffix` | string | any | Text appended after product prices (e.g., "incl. VAT") |
+| `tax_rounding` | string | `"item"`, `"total"`, `"subtotal"` | Where tax rounding is applied |
+| `checkout_tax_breakdown_display` | string | `"itemized"`, `"simplified"` | How the tax breakdown is displayed at checkout |
+| `tax_display_label` | string | any | Label used when displaying tax amounts (default: `"Tax"`) |
+| `price_suffix_included` | string | any | Text appended after prices that include tax (e.g., "incl. VAT") |
+| `price_suffix_excluded` | string | any | Text appended after prices that exclude tax (e.g., "excl. VAT") |
 | `eu_vat_settings` | object | see below | EU VAT-specific configuration |
+
+The top-level `store_country` key holds the store country code from store settings (empty string when unset).
 
 ### EU VAT Settings Object
 
@@ -1026,6 +1154,7 @@ No query parameters required.
 |-------|------|-------------|
 | `require_vat_number` | string | `"yes"` or `"no"` -- whether EU VAT number field is shown at checkout |
 | `local_reverse_charge` | string | `"yes"` or `"no"` -- whether reverse charge applies for domestic B2B |
+| `reverse_charge_price_mode` | string | `"fixed"` (default) or `"dynamic"` -- how reverse-charged prices are displayed: `fixed` keeps the tax-inclusive price, `dynamic` removes the VAT amount |
 | `vat_reverse_excluded_categories` | array of integers | Product category IDs excluded from VAT reverse charge |
 | `method` | string | Cross-border method: `"oss"`, `"home"`, or `"specific"` |
 | `oss_country` | string | Country of OSS registration (when method is `"oss"`) |
@@ -1033,6 +1162,7 @@ No query parameters required.
 | `home_country` | string | Home country (when method is `"home"`) |
 | `home_vat` | string | Home VAT number (when method is `"home"`) |
 | `country_wise_vat` | array | Country-specific VAT settings (when method is `"specific"`) |
+| `country_registrations` | array | Per-country EU VAT registrations (`{country, vat, rate, rates, tax_label}`), stored in `fct_meta` and injected into GET responses only |
 
 ### Example
 
@@ -1047,7 +1177,7 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settin
 
 <badge type="warning">POST</badge> `/fluent-cart/v2/tax/configuration/settings`
 
-Save the global tax configuration settings. If tax is enabled for the first time, initial tax classes (Standard, Reduced, Zero) are automatically created.
+Save the global tax configuration settings. Invalid enum values are silently replaced with their defaults. If tax is enabled, initial tax classes are automatically created.
 
 ### Parameters
 
@@ -1057,9 +1187,12 @@ Save the global tax configuration settings. If tax is enabled for the first time
 | `settings.enable_tax` | string | body | No | `"yes"` or `"no"` to enable/disable tax |
 | `settings.tax_inclusion` | string | body | No | `"included"` or `"excluded"` -- whether prices include tax |
 | `settings.tax_calculation_basis` | string | body | No | `"shipping"`, `"billing"`, or `"store"` -- address basis for tax |
-| `settings.tax_rounding` | string | body | No | `"item"` or `"subtotal"` -- rounding method |
-| `settings.price_suffix` | string | body | No | Text appended after product prices |
-| `settings.eu_vat_settings` | object | body | No | EU VAT configuration object (see EU VAT Settings Object above) |
+| `settings.tax_rounding` | string | body | No | `"item"`, `"total"`, or `"subtotal"` -- where rounding is applied |
+| `settings.checkout_tax_breakdown_display` | string | body | No | `"itemized"` or `"simplified"` -- how the tax breakdown is displayed at checkout |
+| `settings.tax_display_label` | string | body | No | Label used when displaying tax amounts |
+| `settings.price_suffix_included` | string | body | No | Text appended after prices that include tax |
+| `settings.price_suffix_excluded` | string | body | No | Text appended after prices that exclude tax |
+| `settings.eu_vat_settings` | object | body | No | EU VAT configuration object (see EU VAT Settings Object above). `reverse_charge_price_mode` accepts `"fixed"` or `"dynamic"` (invalid values become `"fixed"`) |
 
 ### Response
 
@@ -1081,10 +1214,14 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/setti
       "tax_inclusion": "excluded",
       "tax_calculation_basis": "billing",
       "tax_rounding": "subtotal",
-      "price_suffix": "excl. VAT",
+      "checkout_tax_breakdown_display": "itemized",
+      "tax_display_label": "VAT",
+      "price_suffix_included": "incl. VAT",
+      "price_suffix_excluded": "excl. VAT",
       "eu_vat_settings": {
         "require_vat_number": "yes",
         "local_reverse_charge": "yes",
+        "reverse_charge_price_mode": "fixed",
         "vat_reverse_excluded_categories": [12, 15]
       }
     }
@@ -1098,7 +1235,7 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/setti
 Manage European Union VAT settings, OSS (One-Stop Shop) compliance, and cross-border tax configurations.
 
 **Prefix:** `/fluent-cart/v2/tax/configuration/settings/eu-vat`
-**Policy:** `StoreSensitivePolicy`
+**Policy:** `StoreSettingsPolicy`
 
 ---
 
@@ -1106,30 +1243,59 @@ Manage European Union VAT settings, OSS (One-Stop Shop) compliance, and cross-bo
 
 <badge type="warning">POST</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat`
 
-Save EU VAT cross-border registration settings. This endpoint handles the configuration of how cross-border EU VAT is managed (OSS, home country, or specific country registrations).
+Multi-action endpoint for EU VAT settings, dispatched by the `action` field:
 
-### Parameters
+| Action | Purpose |
+|--------|---------|
+| `euCrossBorderSettings` | Save the cross-border registration configuration (OSS, home country, or specific country registrations) |
+| `saveCountryRegistration` | Create or update a per-country VAT registration with per-class rates |
+| `deleteCountryRegistration` | Remove a per-country VAT registration |
+
+### Parameters — `euCrossBorderSettings`
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
-| `action` | string | body | Yes | Must be `"euCrossBorderSettings"` |
-| `eu_vat_settings` | object | body | Yes | EU VAT configuration object |
+| `action` | string | body | Yes | `"euCrossBorderSettings"` |
+| `eu_vat_settings` | object | body | Yes | EU VAT configuration object (merged into the stored settings) |
 | `eu_vat_settings.method` | string | body | Yes | Cross-border method: `"oss"`, `"home"`, or `"specific"` |
-| `eu_vat_settings.oss_country` | string | body | Conditional | Country of OSS registration (required when method is `"oss"`) |
+| `eu_vat_settings.oss_country` | string | body | Conditional | Country of OSS registration (required when method is `"oss"`; must be an EU VAT country) |
 | `eu_vat_settings.oss_vat` | string | body | No | OSS VAT number |
-| `eu_vat_settings.home_country` | string | body | Conditional | Home country code (required when method is `"home"`) |
+| `eu_vat_settings.home_country` | string | body | Conditional | Home country code (required when method is `"home"`; must be an EU VAT country) |
 | `eu_vat_settings.home_vat` | string | body | No | Home VAT number |
 | `reset_registration` | string | body | No | Set to `"yes"` to clear the current method (reset registration) |
+
+### Parameters — `saveCountryRegistration`
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `action` | string | body | Yes | `"saveCountryRegistration"` |
+| `country` | string | body | Yes | ISO 3166-1 alpha-2 code of an EU VAT country |
+| `vat` | string | body | No | VAT registration number (max 50 characters) |
+| `rates` | object | body | Yes | Per-class rates keyed by tax class slug: `{"standard": {"rate": 19, "label": "VAT"}}`. At least one rate must be greater than `0` and every slug must reference an existing tax class |
+
+### Parameters — `deleteCountryRegistration`
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `action` | string | body | Yes | `"deleteCountryRegistration"` |
+| `country` | string | body | Yes | ISO 3166-1 alpha-2 code of an EU VAT country |
 
 ### Validation
 
 | Condition | Error |
 |-----------|-------|
+| Unknown `action` | `"Invalid method"` (HTTP 422) |
 | `method` not one of `oss`, `home`, `specific` | `"Select a cross-border registration type"` |
-| `method` is `oss` and `oss_country` is empty | `"Select country of OSS registration"` |
-| `method` is `home` and `home_country` is empty | `"Select home country of registration"` |
+| `method` is `oss` and `oss_country` is empty or not an EU VAT country | `"Select country of OSS registration"` / `"Select a valid EU VAT country"` |
+| `method` is `home` and `home_country` is empty or not an EU VAT country | `"Select home country of registration"` / `"Select a valid EU VAT country"` |
+| `country` missing or not an EU VAT country | `"Select a registration country"` / `"Select a valid EU VAT registration country"` |
+| `vat` longer than 50 characters | `"VAT number is too long"` |
+| No rate greater than 0 | `"At least one tax rate must be greater than 0%"` |
+| Rate slug references a missing tax class | `"Tax class \"{slug}\" could not be found. Create the class first and try again."` |
 
 ### Response
+
+Depending on the action, `message` is `"EU VAT settings saved successfully"`, `"Country VAT registration saved successfully"`, or `"Country registration removed successfully"`.
 
 ```json
 {
@@ -1137,7 +1303,7 @@ Save EU VAT cross-border registration settings. This endpoint handles the config
 }
 ```
 
-### Error Response (423)
+### Error Response (422)
 
 ```json
 {
@@ -1148,17 +1314,10 @@ Save EU VAT cross-border registration settings. This endpoint handles the config
 }
 ```
 
-### Error Response (423) - Invalid action
-
-```json
-{
-  "message": "Invalid method"
-}
-```
-
-### Example
+### Examples
 
 ```bash
+# Save cross-border configuration
 curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat" \
   -u "username:app_password" \
   -H "Content-Type: application/json" \
@@ -1170,15 +1329,62 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/setti
       "oss_vat": "DE123456789"
     }
   }'
+
+# Save a per-country VAT registration
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "saveCountryRegistration",
+    "country": "DE",
+    "vat": "DE123456789",
+    "rates": {
+      "standard": {"rate": 19, "label": "VAT"},
+      "reduced": {"rate": 7, "label": "Reduced VAT"}
+    }
+  }'
+
+# Delete a per-country VAT registration
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{"action": "deleteCountryRegistration", "country": "DE"}'
 ```
 
 ---
 
-### Get EU Tax Rates
+### Reset EU VAT Rates
 
-<badge type="tip">GET</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/rates`
+<badge type="warning">POST</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/reset-rates`
 
-Retrieve all tax rates in the EU group from the database, grouped by region and country. This returns only rates where `group` is `EU`.
+Reset all country-level EU standard VAT rates back to the built-in defaults. Custom rate values and auto-generated labels are overwritten; state-specific entries and shipping overrides on the rows are preserved.
+
+### Parameters
+
+No request body required.
+
+### Response
+
+```json
+{
+  "message": "EU tax rates have been reset to defaults"
+}
+```
+
+### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/reset-rates" \
+  -u "username:app_password"
+```
+
+---
+
+### Get EU VAT Product Overrides
+
+<badge type="tip">GET</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/product-overrides`
+
+Retrieve product category tax overrides for all EU countries, plus every EU tax rate that has a shipping tax override set. `class_id` and `class_label` are appended to each row for convenience.
 
 ### Parameters
 
@@ -1188,45 +1394,46 @@ No query parameters required.
 
 ```json
 {
-  "tax_rates": [
+  "overrides": [
     {
-      "group_name": "European Union",
-      "group_code": "EU",
-      "countries": [
-        {
-          "country_code": "DE",
-          "country_name": "Germany",
-          "rates": [
-            {
-              "class_id": 1,
-              "name": "standard",
-              "rate": "19.0000",
-              "for_shipping": null
-            },
-            {
-              "class_id": 2,
-              "name": "reduced",
-              "rate": "7.0000",
-              "for_shipping": null
-            }
-          ],
-          "total_rates": 2
-        },
-        {
-          "country_code": "FR",
-          "country_name": "France",
-          "rates": [
-            {
-              "class_id": 1,
-              "name": "standard",
-              "rate": "20.0000",
-              "for_shipping": null
-            }
-          ],
-          "total_rates": 1
-        }
-      ],
-      "total_countries": 2
+      "id": 12,
+      "object_type": "tax_override",
+      "object_id": 15,
+      "meta_key": "product_category_override",
+      "meta_value": {
+        "country": "DE",
+        "state": "",
+        "city": "",
+        "postcode": "",
+        "category_id": 15,
+        "category_name": "Books",
+        "tax_label": "Reduced VAT",
+        "override_state_tax": "no",
+        "rate": 7,
+        "class_id": 1
+      },
+      "class_id": 1,
+      "class_label": "Standard",
+      "created_at": "2025-06-01 12:00:00",
+      "updated_at": "2025-06-01 12:00:00"
+    }
+  ],
+  "shipping_overrides": [
+    {
+      "id": 8,
+      "class_id": 1,
+      "country": "DE",
+      "state": "",
+      "postcode": "",
+      "city": "",
+      "rate": "19.0000",
+      "name": "DE Standard Tax",
+      "group": "EU",
+      "priority": 1,
+      "is_compound": 0,
+      "for_shipping": "7.0000",
+      "for_order": 0,
+      "class_label": "Standard"
     }
   ]
 }
@@ -1235,48 +1442,100 @@ No query parameters required.
 ### Example
 
 ```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/rates" \
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/product-overrides" \
   -u "username:app_password"
 ```
 
 ---
 
-### Save OSS Tax Override
+### Get OSS Country Rates
 
-<badge type="warning">POST</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/override`
+<badge type="tip">GET</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/oss-rates`
 
-Save or update OSS (One-Stop Shop) tax rate overrides for a specific EU country. This allows overriding the standard, reduced, or zero tax rates for a country within the EU group. If a rate already exists for the country and tax class, it is updated; otherwise a new rate is created.
+Retrieve per-country EU VAT rates for every tax class. Each country entry includes the effective rate per class (custom database value or built-in default), plus top-level standard-class values for backward compatibility, and the list of tax classes.
 
 ### Parameters
 
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `country_code` | string | body | Yes | ISO 3166-1 alpha-2 country code of the EU member state |
-| `overrides` | array | body | Yes | Array of override objects |
-| `overrides[].type` | string | body | Yes | Tax class slug: `"standard"`, `"reduced"`, or `"zero"` |
-| `overrides[].rate` | string/number | body | Yes | The overridden tax rate percentage |
-
-### Validation
-
-| Condition | Error |
-|-----------|-------|
-| `country_code` is empty | `"Select country of OSS registration"` |
+No query parameters required.
 
 ### Response
 
 ```json
 {
-  "message": "OSS tax override saved successfully"
+  "rates": [
+    {
+      "country": "DE",
+      "label": "Germany",
+      "rate": 19,
+      "tax_label": "VAT",
+      "default_rate": 19,
+      "has_custom": true,
+      "class_rates": {
+        "standard": {"rate": 19, "default_rate": 19, "has_custom": true, "label": ""},
+        "reduced": {"rate": 7, "default_rate": 7, "has_custom": true, "label": ""},
+        "zero": {"rate": 0, "default_rate": 0, "has_custom": false, "label": ""}
+      }
+    }
+  ],
+  "classes": [
+    {"slug": "standard", "title": "Standard", "id": 1},
+    {"slug": "reduced", "title": "Reduced", "id": 2},
+    {"slug": "zero", "title": "Zero", "id": 3}
+  ]
 }
 ```
 
-### Error Response (423)
+| Field | Type | Description |
+|-------|------|-------------|
+| `rates[].country` | string | ISO 3166-1 alpha-2 country code |
+| `rates[].label` | string | Country display name |
+| `rates[].rate` | number | Standard-class effective rate (backward compatibility) |
+| `rates[].tax_label` | string | Standard-class label, defaults to `"VAT"` |
+| `rates[].default_rate` | number | Built-in default standard rate |
+| `rates[].has_custom` | boolean | Whether the standard class has a custom rate row |
+| `rates[].class_rates` | object | Per-class rates keyed by tax class slug: `{rate, default_rate, has_custom, label}` |
+| `classes` | array | All tax classes: `{slug, title, id}` |
+
+### Example
+
+```bash
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss-rates" \
+  -u "username:app_password"
+```
+
+---
+
+### Save OSS Country Rates
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/oss-rates`
+
+Save per-country EU VAT rates. Each entry may provide `class_rates` keyed by tax class slug (`{rate, label}`); rates are upserted per country and class in the `EU` group. When `class_rates` is omitted, the single `rate` value is applied to the standard class (backward compatibility). Entries with unknown tax class slugs or without a country are skipped.
+
+### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `rates` | array | body | Yes | Array of country rate entries |
+| `rates[].country` | string | body | Yes | ISO 3166-1 alpha-2 code of an EU VAT country |
+| `rates[].tax_label` | string | body | No | Shared label fallback for classes without their own label |
+| `rates[].rate` | number | body | No | Standard-class rate (used only when `class_rates` is omitted) |
+| `rates[].class_rates` | object | body | No | Per-class rates keyed by tax class slug: `{"standard": {"rate": 19, "label": "VAT"}}` |
+
+### Response
 
 ```json
 {
-  "message": "Validation failed for OSS tax override",
+  "message": "OSS country rates saved successfully"
+}
+```
+
+### Error Response (422)
+
+```json
+{
+  "message": "Validation failed for OSS country rates",
   "errors": {
-    "country_code": "Select country of OSS registration"
+    "rates.0.country": "Select a valid EU VAT country"
   }
 }
 ```
@@ -1284,175 +1543,19 @@ Save or update OSS (One-Stop Shop) tax rate overrides for a specific EU country.
 ### Example
 
 ```bash
-curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/override" \
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss-rates" \
   -u "username:app_password" \
   -H "Content-Type: application/json" \
   -d '{
-    "country_code": "FR",
-    "overrides": [
-      {"type": "standard", "rate": "20.0000"},
-      {"type": "reduced", "rate": "5.5000"},
-      {"type": "zero", "rate": "0.0000"}
+    "rates": [
+      {
+        "country": "DE",
+        "tax_label": "VAT",
+        "class_rates": {
+          "standard": {"rate": 19, "label": "VAT"},
+          "reduced": {"rate": 7, "label": "Reduced VAT"}
+        }
+      }
     ]
   }'
-```
-
----
-
-### Save OSS Shipping Tax Override
-
-<badge type="warning">POST</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/shipping-override`
-
-Save or update OSS shipping tax rate overrides for a specific EU country. Similar to the tax override endpoint, but also supports the `for_shipping` field. If a rate already exists for the country and tax class, it is updated; otherwise a new rate is created.
-
-### Parameters
-
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `country_code` | string | body | Yes | ISO 3166-1 alpha-2 country code of the EU member state |
-| `overrides` | array | body | Yes | Array of override objects |
-| `overrides[].type` | string | body | Yes | Tax class slug: `"standard"`, `"reduced"`, or `"zero"` |
-| `overrides[].rate` | string/number | body | Yes | The overridden tax rate percentage |
-| `overrides[].for_shipping` | integer | body | No | Shipping-specific tax rate override (default: `0`) |
-
-### Validation
-
-| Condition | Error |
-|-----------|-------|
-| `country_code` is empty | `"Select country of OSS registration"` |
-
-### Response
-
-```json
-{
-  "message": "OSS tax override saved successfully"
-}
-```
-
-### Error Response (423)
-
-```json
-{
-  "message": "Validation failed for OSS tax override",
-  "errors": {
-    "country_code": "Select country of OSS registration"
-  }
-}
-```
-
-### Example
-
-```bash
-curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/shipping-override" \
-  -u "username:app_password" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "country_code": "IT",
-    "overrides": [
-      {"type": "standard", "rate": "22.0000", "for_shipping": 10},
-      {"type": "reduced", "rate": "10.0000", "for_shipping": 5}
-    ]
-  }'
-```
-
----
-
-### Delete OSS Tax Override
-
-<badge type="danger">DELETE</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/override`
-
-Delete all EU tax rate overrides for a specific country. Optionally filter by state/region within the country.
-
-### Parameters
-
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `country` | string | query | Yes | ISO 3166-1 alpha-2 country code |
-| `state` | string | query | No | State/region code to narrow the deletion scope |
-
-### Validation
-
-| Condition | Error |
-|-----------|-------|
-| `country` is empty | `"Country code is required"` (HTTP 423) |
-
-### Response
-
-```json
-{
-  "message": "OSS tax override deleted successfully"
-}
-```
-
-### Error Response (423)
-
-When no matching records are found:
-
-```json
-{
-  "message": "No matching OSS tax override found to delete"
-}
-```
-
-### Example
-
-```bash
-# Delete all EU tax overrides for France
-curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/override?country=FR" \
-  -u "username:app_password"
-
-# Delete EU tax overrides for a specific French region
-curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/override?country=FR&state=IDF" \
-  -u "username:app_password"
-```
-
----
-
-### Delete OSS Shipping Tax Override
-
-<badge type="danger">DELETE</badge> `/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/shipping-override`
-
-Delete all EU shipping tax rate overrides for a specific country. Optionally filter by state/region within the country.
-
-### Parameters
-
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `country` | string | query | Yes | ISO 3166-1 alpha-2 country code |
-| `state` | string | query | No | State/region code to narrow the deletion scope |
-
-### Validation
-
-| Condition | Error |
-|-----------|-------|
-| `country` is empty | `"Country code is required"` (HTTP 423) |
-
-### Response
-
-```json
-{
-  "message": "OSS shipping override deleted successfully"
-}
-```
-
-### Error Response (423)
-
-When no matching records are found:
-
-```json
-{
-  "message": "No matching OSS shipping override found to delete"
-}
-```
-
-### Example
-
-```bash
-# Delete all EU shipping tax overrides for Italy
-curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/shipping-override?country=IT" \
-  -u "username:app_password"
-
-# Delete EU shipping tax overrides for a specific Italian region
-curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/configuration/settings/eu-vat/oss/shipping-override?country=IT&state=RM" \
-  -u "username:app_password"
 ```

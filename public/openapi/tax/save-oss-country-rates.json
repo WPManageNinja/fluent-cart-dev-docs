@@ -1,0 +1,249 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings/eu-vat/oss-rates": {
+      "post": {
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "operationId": "saveOssCountryRates",
+        "summary": "POST Save OSS Country Rates",
+        "description": "Save per-country EU VAT rates. Each entry may provide class_rates keyed by tax class slug ({rate, label}); rates are upserted per country and class in the EU group. When class_rates is omitted, the single rate value is applied to the standard class (backward compatibility). Entries with unknown tax class slugs or without a country are skipped.",
+        "tags": [
+          "Tax"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rates"
+                ],
+                "properties": {
+                  "rates": {
+                    "type": "array",
+                    "description": "Array of country rate entries",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "country"
+                      ],
+                      "properties": {
+                        "country": {
+                          "type": "string",
+                          "description": "ISO 3166-1 alpha-2 code of an EU VAT country",
+                          "example": "DE"
+                        },
+                        "tax_label": {
+                          "type": "string",
+                          "description": "Shared label fallback for classes without their own label",
+                          "example": "VAT"
+                        },
+                        "rate": {
+                          "type": "number",
+                          "description": "Standard-class rate (used only when class_rates is omitted)",
+                          "example": 19
+                        },
+                        "class_rates": {
+                          "type": "object",
+                          "description": "Per-class rates keyed by tax class slug",
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "rate": {
+                                "type": "number",
+                                "description": "Tax rate percentage",
+                                "example": 19
+                              },
+                              "label": {
+                                "type": "string",
+                                "description": "Rate label for this class",
+                                "example": "VAT"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "rates": [
+                    {
+                      "country": "DE",
+                      "tax_label": "VAT",
+                      "class_rates": {
+                        "standard": {
+                          "rate": 19,
+                          "label": "VAT"
+                        },
+                        "reduced": {
+                          "rate": 7,
+                          "label": "Reduced VAT"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "example": {
+                "rates": [
+                  {
+                    "country": "DE",
+                    "tax_label": "VAT",
+                    "class_rates": {
+                      "standard": {
+                        "rate": 19,
+                        "label": "VAT"
+                      },
+                      "reduced": {
+                        "rate": 7,
+                        "label": "Reduced VAT"
+                      }
+                    }
+                  }
+                ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "rates": [
+                      {
+                        "country": "DE",
+                        "tax_label": "VAT",
+                        "class_rates": {
+                          "standard": {
+                            "rate": 19,
+                            "label": "VAT"
+                          },
+                          "reduced": {
+                            "rate": 7,
+                            "label": "Reduced VAT"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OSS country rates saved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "OSS country rates saved successfully"
+                    }
+                  },
+                  "example": {
+                    "message": "OSS country rates saved successfully"
+                  }
+                },
+                "example": {
+                  "message": "OSS country rates saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "OSS country rates saved successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed — one or more entries reference a non-EU VAT country.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "Validation failed for OSS country rates",
+                    "errors": {
+                      "rates.0.country": "Select a valid EU VAT country"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Validation failed for OSS country rates",
+                  "errors": {
+                    "rates.0.country": "Select a valid EU VAT country"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Validation failed for OSS country rates",
+                      "errors": {
+                        "rates.0.country": "Select a valid EU VAT country"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

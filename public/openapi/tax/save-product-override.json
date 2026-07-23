@@ -1,0 +1,434 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/product-overrides": {
+      "post": {
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "operationId": "saveProductOverride",
+        "summary": "POST Save Product Category Tax Override",
+        "description": "Create or update a product category tax override. Pass id to update an existing override. Without id, an existing override matching the same category, location, and tax class is updated in place; otherwise a new override is created. Pass source_type \"shipping\" with source_id to convert an existing shipping tax override into a product override (the shipping override is removed).",
+        "tags": [
+          "Tax"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "country",
+                  "category_id"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "Existing override ID to update (omit to create or upsert by category/location/class)",
+                    "example": 12
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "ISO 3166-1 alpha-2 country code",
+                    "example": "DE"
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "State/province code (optional)",
+                    "example": ""
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "City name (optional, max 45 characters)",
+                    "example": ""
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Postcode/ZIP code (optional)",
+                    "example": ""
+                  },
+                  "category_id": {
+                    "type": "integer",
+                    "description": "Product category (product-categories term) ID",
+                    "example": 15
+                  },
+                  "tax_label": {
+                    "type": "string",
+                    "description": "Display label for the override tax",
+                    "example": "Reduced VAT"
+                  },
+                  "override_state_tax": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "description": "Whether the override replaces state-level tax (default: no)",
+                    "example": "no"
+                  },
+                  "rate": {
+                    "type": "number",
+                    "description": "Override tax rate percentage (negative values are clamped to 0)",
+                    "example": 7
+                  },
+                  "class_id": {
+                    "type": "integer",
+                    "description": "Tax class ID the override applies to (0 = none; must exist when non-zero)",
+                    "example": 1
+                  },
+                  "source_type": {
+                    "type": "string",
+                    "description": "Set to \"shipping\" together with source_id to convert a shipping override into this product override",
+                    "example": ""
+                  },
+                  "source_id": {
+                    "type": "integer",
+                    "description": "Tax rate ID of the shipping override being converted (used with source_type \"shipping\")",
+                    "example": 0
+                  }
+                },
+                "example": {
+                  "country": "DE",
+                  "category_id": 15,
+                  "tax_label": "Reduced VAT",
+                  "override_state_tax": "no",
+                  "rate": 7,
+                  "class_id": 1
+                }
+              },
+              "example": {
+                "country": "DE",
+                "category_id": 15,
+                "tax_label": "Reduced VAT",
+                "override_state_tax": "no",
+                "rate": 7,
+                "class_id": 1
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "country": "DE",
+                    "category_id": 15,
+                    "tax_label": "Reduced VAT",
+                    "override_state_tax": "no",
+                    "rate": 7,
+                    "class_id": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Override saved or updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "override": {
+                      "$ref": "#/components/schemas/ProductCategoryTaxOverride"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Product category tax override saved"
+                    }
+                  },
+                  "example": {
+                    "override": {
+                      "id": 12,
+                      "object_type": "tax_override",
+                      "object_id": 15,
+                      "meta_key": "product_category_override",
+                      "meta_value": {
+                        "country": "DE",
+                        "state": "",
+                        "city": "",
+                        "postcode": "",
+                        "category_id": 15,
+                        "category_name": "Books",
+                        "tax_label": "Reduced VAT",
+                        "override_state_tax": "no",
+                        "rate": 7,
+                        "class_id": 1
+                      },
+                      "class_id": 1,
+                      "class_label": "Standard",
+                      "created_at": "2025-06-01 12:00:00",
+                      "updated_at": "2025-06-01 12:00:00"
+                    },
+                    "message": "Product category tax override saved"
+                  }
+                },
+                "example": {
+                  "override": {
+                    "id": 12,
+                    "object_type": "tax_override",
+                    "object_id": 15,
+                    "meta_key": "product_category_override",
+                    "meta_value": {
+                      "country": "DE",
+                      "state": "",
+                      "city": "",
+                      "postcode": "",
+                      "category_id": 15,
+                      "category_name": "Books",
+                      "tax_label": "Reduced VAT",
+                      "override_state_tax": "no",
+                      "rate": 7,
+                      "class_id": 1
+                    },
+                    "class_id": 1,
+                    "class_label": "Standard",
+                    "created_at": "2025-06-01 12:00:00",
+                    "updated_at": "2025-06-01 12:00:00"
+                  },
+                  "message": "Product category tax override saved"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "override": {
+                        "id": 12,
+                        "object_type": "tax_override",
+                        "object_id": 15,
+                        "meta_key": "product_category_override",
+                        "meta_value": {
+                          "country": "DE",
+                          "state": "",
+                          "city": "",
+                          "postcode": "",
+                          "category_id": 15,
+                          "category_name": "Books",
+                          "tax_label": "Reduced VAT",
+                          "override_state_tax": "no",
+                          "rate": 7,
+                          "class_id": 1
+                        },
+                        "class_id": 1,
+                        "class_label": "Standard",
+                        "created_at": "2025-06-01 12:00:00",
+                        "updated_at": "2025-06-01 12:00:00"
+                      },
+                      "message": "Product category tax override saved"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Override (or shipping override source) not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Override not found"
+                    }
+                  },
+                  "example": {
+                    "message": "Override not found"
+                  }
+                },
+                "example": {
+                  "message": "Override not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Override not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed — missing country/category, invalid country code, invalid tax class, invalid product category, or a conflicting override already exists for the same category, location, and tax class.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "An override already exists for the selected category, location, and tax class"
+                  }
+                },
+                "example": {
+                  "message": "An override already exists for the selected category, location, and tax class"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "An override already exists for the selected category, location, and tax class"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProductCategoryTaxOverride": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Override (meta row) ID",
+            "example": 12
+          },
+          "object_type": {
+            "type": "string",
+            "description": "Always tax_override",
+            "example": "tax_override"
+          },
+          "object_id": {
+            "type": "integer",
+            "description": "Product category (term) ID",
+            "example": 15
+          },
+          "meta_key": {
+            "type": "string",
+            "description": "Always product_category_override",
+            "example": "product_category_override"
+          },
+          "meta_value": {
+            "type": "object",
+            "description": "Override data",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "ISO 3166-1 alpha-2 country code",
+                "example": "DE"
+              },
+              "state": {
+                "type": "string",
+                "description": "State/province code (empty for country-wide)",
+                "example": ""
+              },
+              "city": {
+                "type": "string",
+                "description": "City name (max 45 characters)",
+                "example": ""
+              },
+              "postcode": {
+                "type": "string",
+                "description": "Postcode/ZIP code",
+                "example": ""
+              },
+              "category_id": {
+                "type": "integer",
+                "description": "Product category (term) ID",
+                "example": 15
+              },
+              "category_name": {
+                "type": "string",
+                "description": "Product category name (resolved server-side)",
+                "example": "Books"
+              },
+              "tax_label": {
+                "type": "string",
+                "description": "Display label for the override tax",
+                "example": "Reduced VAT"
+              },
+              "override_state_tax": {
+                "type": "string",
+                "enum": [
+                  "yes",
+                  "no"
+                ],
+                "description": "Whether the override replaces state-level tax",
+                "example": "no"
+              },
+              "rate": {
+                "type": "number",
+                "description": "Override tax rate percentage (minimum 0)",
+                "example": 7
+              },
+              "class_id": {
+                "type": "integer",
+                "description": "Tax class ID the override applies to (0 = none)",
+                "example": 1
+              }
+            }
+          },
+          "class_id": {
+            "type": "integer",
+            "description": "Tax class ID (appended for convenience)",
+            "example": 1
+          },
+          "class_label": {
+            "type": "string",
+            "description": "Tax class title (empty string when the class no longer exists)",
+            "example": "Standard"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-01 12:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-01 12:00:00"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

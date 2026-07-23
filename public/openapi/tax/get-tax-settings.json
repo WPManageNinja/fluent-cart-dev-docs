@@ -25,20 +25,20 @@
   "paths": {
     "/tax/configuration/settings": {
       "get": {
-        "operationId": "getTaxSettings",
-        "summary": "GET Get Tax Settings",
-        "description": "Retrieve the current global tax configuration settings.",
-        "tags": [
-          "Tax"
-        ],
         "security": [
           {
             "ApplicationPasswords": []
           }
         ],
+        "operationId": "getTaxSettings",
+        "summary": "GET Get Tax Settings",
+        "description": "Retrieve the current global tax configuration settings along with the store country.",
+        "tags": [
+          "Tax"
+        ],
         "responses": {
           "200": {
-            "description": "Successful response. Returns the current tax settings.",
+            "description": "Successful response. Returns the current tax settings and the store country.",
             "content": {
               "application/json": {
                 "schema": {
@@ -46,6 +46,11 @@
                   "properties": {
                     "settings": {
                       "$ref": "#/components/schemas/TaxSettings"
+                    },
+                    "store_country": {
+                      "type": "string",
+                      "description": "The store country code from store settings (empty string when unset)",
+                      "example": "DE"
                     }
                   },
                   "example": {
@@ -53,20 +58,44 @@
                       "tax_inclusion": "included",
                       "tax_calculation_basis": "shipping",
                       "tax_rounding": "item",
+                      "checkout_tax_breakdown_display": "itemized",
+                      "tax_display_label": "Tax",
                       "enable_tax": "yes",
-                      "price_suffix": "",
+                      "price_suffix_included": "",
+                      "price_suffix_excluded": "",
                       "eu_vat_settings": {
                         "require_vat_number": "no",
                         "local_reverse_charge": "yes",
+                        "reverse_charge_price_mode": "fixed",
                         "vat_reverse_excluded_categories": [
                           30,
                           42
                         ],
                         "method": "oss",
                         "oss_country": "DE",
-                        "oss_vat": "DE123456789"
+                        "oss_vat": "DE123456789",
+                        "country_wise_vat": [],
+                        "country_registrations": [
+                          {
+                            "country": "DE",
+                            "vat": "DE123456789",
+                            "rate": 19,
+                            "rates": {
+                              "standard": {
+                                "rate": 19,
+                                "label": "VAT"
+                              },
+                              "reduced": {
+                                "rate": 7,
+                                "label": "Reduced VAT"
+                              }
+                            },
+                            "tax_label": "VAT"
+                          }
+                        ]
                       }
-                    }
+                    },
+                    "store_country": "DE"
                   }
                 },
                 "example": {
@@ -74,20 +103,44 @@
                     "tax_inclusion": "included",
                     "tax_calculation_basis": "shipping",
                     "tax_rounding": "item",
+                    "checkout_tax_breakdown_display": "itemized",
+                    "tax_display_label": "Tax",
                     "enable_tax": "yes",
-                    "price_suffix": "",
+                    "price_suffix_included": "",
+                    "price_suffix_excluded": "",
                     "eu_vat_settings": {
                       "require_vat_number": "no",
                       "local_reverse_charge": "yes",
+                      "reverse_charge_price_mode": "fixed",
                       "vat_reverse_excluded_categories": [
                         30,
                         42
                       ],
                       "method": "oss",
                       "oss_country": "DE",
-                      "oss_vat": "DE123456789"
+                      "oss_vat": "DE123456789",
+                      "country_wise_vat": [],
+                      "country_registrations": [
+                        {
+                          "country": "DE",
+                          "vat": "DE123456789",
+                          "rate": 19,
+                          "rates": {
+                            "standard": {
+                              "rate": 19,
+                              "label": "VAT"
+                            },
+                            "reduced": {
+                              "rate": 7,
+                              "label": "Reduced VAT"
+                            }
+                          },
+                          "tax_label": "VAT"
+                        }
+                      ]
                     }
-                  }
+                  },
+                  "store_country": "DE"
                 },
                 "examples": {
                   "default": {
@@ -97,20 +150,44 @@
                         "tax_inclusion": "included",
                         "tax_calculation_basis": "shipping",
                         "tax_rounding": "item",
+                        "checkout_tax_breakdown_display": "itemized",
+                        "tax_display_label": "Tax",
                         "enable_tax": "yes",
-                        "price_suffix": "",
+                        "price_suffix_included": "",
+                        "price_suffix_excluded": "",
                         "eu_vat_settings": {
                           "require_vat_number": "no",
                           "local_reverse_charge": "yes",
+                          "reverse_charge_price_mode": "fixed",
                           "vat_reverse_excluded_categories": [
                             30,
                             42
                           ],
                           "method": "oss",
                           "oss_country": "DE",
-                          "oss_vat": "DE123456789"
+                          "oss_vat": "DE123456789",
+                          "country_wise_vat": [],
+                          "country_registrations": [
+                            {
+                              "country": "DE",
+                              "vat": "DE123456789",
+                              "rate": 19,
+                              "rates": {
+                                "standard": {
+                                  "rate": 19,
+                                  "label": "VAT"
+                                },
+                                "reduced": {
+                                  "rate": 7,
+                                  "label": "Reduced VAT"
+                                }
+                              },
+                              "tax_label": "VAT"
+                            }
+                          ]
                         }
-                      }
+                      },
+                      "store_country": "DE"
                     }
                   }
                 }
@@ -156,16 +233,36 @@
           },
           "tax_rounding": {
             "type": "string",
-            "description": "Whether rounding is applied per item or on the subtotal",
+            "description": "Where tax rounding is applied",
             "enum": [
               "item",
+              "total",
               "subtotal"
             ],
             "example": "item"
           },
-          "price_suffix": {
+          "checkout_tax_breakdown_display": {
             "type": "string",
-            "description": "Text appended after product prices",
+            "description": "How the tax breakdown is displayed at checkout",
+            "enum": [
+              "itemized",
+              "simplified"
+            ],
+            "example": "itemized"
+          },
+          "tax_display_label": {
+            "type": "string",
+            "description": "Label used when displaying tax amounts (default: Tax)",
+            "example": "Tax"
+          },
+          "price_suffix_included": {
+            "type": "string",
+            "description": "Text appended after prices that include tax (e.g., incl. VAT)",
+            "example": ""
+          },
+          "price_suffix_excluded": {
+            "type": "string",
+            "description": "Text appended after prices that exclude tax (e.g., excl. VAT)",
             "example": ""
           },
           "eu_vat_settings": {
@@ -193,6 +290,16 @@
               "no"
             ],
             "example": "yes"
+          },
+          "reverse_charge_price_mode": {
+            "type": "string",
+            "description": "How reverse-charged prices are displayed: fixed keeps the tax-inclusive price, dynamic removes the VAT amount",
+            "enum": [
+              "fixed",
+              "dynamic"
+            ],
+            "default": "fixed",
+            "example": "fixed"
           },
           "vat_reverse_excluded_categories": {
             "type": "array",
@@ -239,6 +346,52 @@
             "items": {
               "type": "object"
             }
+          },
+          "country_registrations": {
+            "type": "array",
+            "description": "Per-country EU VAT registrations (stored in fct_meta; present in GET responses only)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "country": {
+                  "type": "string",
+                  "description": "ISO 3166-1 alpha-2 country code",
+                  "example": "DE"
+                },
+                "vat": {
+                  "type": "string",
+                  "description": "VAT registration number",
+                  "example": "DE123456789"
+                },
+                "rate": {
+                  "type": "number",
+                  "description": "Standard-class rate (backward compatibility)",
+                  "example": 19
+                },
+                "rates": {
+                  "type": "object",
+                  "description": "Per-class rates keyed by tax class slug",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "rate": {
+                        "type": "number",
+                        "example": 19
+                      },
+                      "label": {
+                        "type": "string",
+                        "example": "VAT"
+                      }
+                    }
+                  }
+                },
+                "tax_label": {
+                  "type": "string",
+                  "description": "Standard-class label (backward compatibility)",
+                  "example": "VAT"
+                }
+              }
+            }
           }
         }
       }
@@ -248,7 +401,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

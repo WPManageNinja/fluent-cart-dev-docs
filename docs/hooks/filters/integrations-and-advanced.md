@@ -1489,6 +1489,97 @@ add_filter('fluent_cart/outside_addon/handle_install', function ($result) {
 
 ---
 
+## Pro: E-Invoicing <Badge type="warning" text="Pro" />
+
+::: info Pro Feature
+E-invoicing hooks require FluentCart Pro to be installed and activated.
+:::
+
+### <code> einvoice/buyer_vat_id </code>
+<details>
+<summary><code>fluent_cart/einvoice/buyer_vat_id</code> <Badge type="warning" text="Pro" /> &mdash; Filter the buyer VAT identifier written to the e-invoice</summary>
+
+**When it runs:**
+Applied in `En16931InvoiceMapper` while mapping an order to an EN 16931 e-invoice, just before the resolved buyer VAT identifier (BT-48) is written to the invoice XML. Lets integrations normalize or override the value (e.g. strip or add a country prefix).
+
+**Parameters:**
+
+- `$buyerVatId` (string): The resolved buyer VAT identifier
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order' => $order, // \FluentCart\App\Models\Order — the order being invoiced
+    ];
+    ```
+
+**Returns:**
+- `string` — The buyer VAT identifier to write to the e-invoice
+
+**Source:** `fluent-cart-pro/app/Services/Invoice/Mapper/En16931InvoiceMapper.php (line 154)`
+
+**Usage:**
+```php
+add_filter('fluent_cart/einvoice/buyer_vat_id', function ($buyerVatId, $context) {
+    // Ensure the VAT ID carries the billing-country prefix
+    $country = $context['order']->billing_address->country ?? '';
+    if ($country && strpos($buyerVatId, $country) !== 0) {
+        $buyerVatId = $country . $buyerVatId;
+    }
+
+    return $buyerVatId;
+}, 10, 2);
+```
+</details>
+
+### <code> einvoice/tax_category </code>
+<details>
+<summary><code>fluent_cart/einvoice/tax_category</code> <Badge type="warning" text="Pro" /> &mdash; Filter the derived EN 16931 VAT category for an e-invoice line</summary>
+
+**When it runs:**
+Applied in `En16931InvoiceMapper` after the EN 16931 VAT category has been resolved for an invoice line (or shipping charge), before it is written to the XML. Reverse charge orders resolve to category `AE` (rate 0, VATEX-EU-AE); other lines resolve from the rate percent and exemption state. Lets regional add-ons map a line to a different category (e.g. force `E` with a VATEX reason). The filter must return the same array shape it received — a non-array return value is ignored and the resolved category is used.
+
+**Parameters:**
+
+- `$resolved` (array): The resolved VAT category data
+    ```php
+    $resolved = [
+        'categoryCode'        => 'S',   // string — EN 16931 category code (e.g. 'S', 'Z', 'E', 'AE')
+        'ratePercent'         => 19.0,  // float — VAT rate percent
+        'exemptionReasonCode' => '',    // string — VATEX exemption reason code, if any
+        'exemptionReasonText' => '',    // string — exemption reason text, if any
+    ];
+    ```
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order' => $order, // \FluentCart\App\Models\Order — the order being invoiced
+        'line'  => $line,  // object|null — the order line item (null for e.g. shipping charges)
+    ];
+    ```
+
+**Returns:**
+- `array` — The VAT category data, same shape as `$resolved`
+
+**Source:** `fluent-cart-pro/app/Services/Invoice/Mapper/En16931InvoiceMapper.php (line 357)`
+
+**Usage:**
+```php
+add_filter('fluent_cart/einvoice/tax_category', function ($resolved, $context) {
+    // Force category E (exempt) for a specific product line
+    if ($context['line'] && ($context['line']->post_id ?? 0) === 123) {
+        $resolved['categoryCode']        = 'E';
+        $resolved['ratePercent']         = 0.0;
+        $resolved['exemptionReasonCode'] = 'VATEX-EU-O';
+        $resolved['exemptionReasonText'] = 'Exempt supply';
+    }
+
+    return $resolved;
+}, 10, 2);
+```
+</details>
+
+---
+
 ## Pro: Licensing API <Badge type="warning" text="Pro" />
 
 ### <code> license/checking_error </code>

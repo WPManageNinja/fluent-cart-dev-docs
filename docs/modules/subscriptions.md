@@ -105,6 +105,8 @@ A store-managed subscription also gets `config['management_mode'] = 'store_manag
 
 This exists because **payment paths must consult the stamp, not the live setting**. Gateways contain legacy logic that converts a `manual` subscription to `automatic` when it is paid through a subscription-capable gateway. Without the stamp, a merchant who flipped back to `gateway_managed` would silently convert every store-managed subscription into a vendor subscription the next time a customer paid a renewal.
 
+An unstamped `manual` subscription — one born on a gateway-managed store — can still convert, and that is intentional. When it may is covered under [which gateways appear on a renewal](#which-gateways-appear-on-a-renewal-or-reactivation).
+
 `AbstractPaymentGateway::shouldChargeSubscriptionAsOneTime()` is the enforcement point:
 
 - `automatic` subscription → `false` (keeps billing at the vendor, untouched by a flip to store-managed)
@@ -136,14 +138,22 @@ Two traps worth knowing:
 1. **`has('subscriptions')` is auto-appended** by the constructor whenever a subscription module is injected — so the literal `$supportedFeatures` array under-reports it.
 2. **`has('switch_payment_method')` always returns `false`.** It is an *associative* entry, and `has()` does `in_array` over values. Every call site reads it with `Arr::get($gateway->supportedFeatures, 'switch_payment_method')` instead.
 
-### Which gateways appear at checkout
+### Which gateways appear on a new subscription cart
 
-`StoreManagedGatewayGate` capability-gates the payment methods on a subscription cart. It only acts under **store-managed** mode; under gateway-managed it is a no-op and non-auto gateways stay visible (they fall back to `manual`).
+`SubscriptionGatewayGate` capability-gates the payment methods on every subscription cart, on `fluent_cart/checkout_active_payment_methods`. It is the only filter on that list. **Both modes gate, in opposite directions** — store-managed keeps schedule-owning gateways out, gateway-managed keeps them in.
 
-Under store-managed:
+| Mode | Amount due today | Gateways offered |
+|---|---|---|
+| `gateway_managed` | any | Gateways **with** `subscriptions` only — a gateway-managed store has no renewal engine, so a subscription needs a gateway that can run its own schedule. Filter the [manual-fallback opt-in](/hooks/filters/customers-and-subscriptions#enable-manual-subscription-on-gateway-manage) to `true` (default `false`) and gateways without it are offered again, billing `manual` |
+| `store_managed` | > 0 | Gateways **without** `subscriptions` (COD, bank transfer, MercadoPago, SSLCommerz) — they can't auto-bill anyway — **plus** `system_subscription` gateways (Stripe, PayPal), which take a single charge here because the stamp forces it. Vendor-billing-only gateways hidden |
+| `store_managed`, auto-charge **on** | 0 (free trial) | Offline methods, plus a `system_subscription` gateway that can vault without charging (`supportsSetupWithoutCharge()`) — Stripe in `onsite` mode, PayPal in `paypal_pro` mode. Either gateway in another checkout mode drops off |
+| `store_managed`, auto-charge **off** | 0 (free trial) | Offline methods only — nothing would ever charge a saved token |
 
-- A gateway **without** `subscriptions` (COD, bank transfer, MercadoPago, SSLCommerz) — always shown (it can't auto-bill anyway; the sub is `manual`)
-- A gateway **with** `subscriptions` (Stripe, PayPal, …) — shown when the cart has a payable-now amount > 0 (it takes a one-time charge, forced by the store-managed stamp), but **hidden on free-trial carts** (payable-now 0) unless it can save a card without charging (`zero_recurring`) **and** auto-charge is enabled — i.e. **Stripe only**. PayPal supports `system` but not \$0 vaulting, so it drops off free-trial carts.
+Admission under `store_managed` is deliberately **opt-in**: a gateway is shown only when it is known not to run its own schedule. An unrecognised third-party gateway is hidden rather than trusted, because a gateway that creates a vendor subscription inside its own payment flow would bill in parallel with the renewals the engine generates.
+
+Renewal and reactivation carts follow the *subscription*, not the store setting — see [which gateways appear on a renewal](#which-gateways-appear-on-a-renewal-or-reactivation).
+
+**None of this is a security boundary.** The same filter re-runs server-side against the single posted gateway at order placement and returns `423` on a mismatch, so hiding a method in the UI is not what enforces it.
 
 ## Gateway-managed (`automatic`)
 
@@ -327,9 +337,32 @@ Edge-triggered: `renewal && (pending|payment_scheduled|failed) → paid`. Two li
 - Accepts an **`expired`** subscription and brings it back — a late payment revives.
 - Calls `syncSubscriptionStates()`, then dispatches `SubscriptionRenewed` — unless the sync just completed the subscription (EOT), in which case it returns first.
 
-### Gateway lock-out before the due date
+### Which gateways appear on a renewal or reactivation
 
-`RenewalModule` removes subscription-capable gateways from the checkout for a renewal **before its due date**, to stop the legacy manual→automatic conversion from firing early. Under store-managed, conversion can't happen anyway (the stamp forces a one-time charge) — the block stands down for a `system` subscription, but still applies for `manual`: paying early via Stripe/PayPal is deferred to the due date rather than offered as an advance one-time charge.
+The same `SubscriptionGatewayGate` handles these, but the decision comes from the *subscription* — its `collection_method` and how it was **born** (the `management_mode` stamp) — never from the store's current setting for an already-stamped subscription. Nothing in the renewal engine gates the list separately.
+
+| Subscription | Gateways offered |
+|---|---|
+| `automatic` | Gateways with `subscriptions` only — it owns a vendor schedule, and a one-time gateway would strand it. Ignores the manual-fallback filter |
+| `manual`, unstamped, store `gateway_managed`, invoice **not yet due** | One-time gateways only — see below |
+| `manual`, unstamped, store `gateway_managed`, invoice **due or overdue** | The conversion window: capable gateways offered, and paying through one converts the subscription to `automatic` |
+| `manual` stamped `store_managed`, or unstamped while the store is store-managed today | One-time only: `system_subscription` gateways plus gateways with no `subscriptions` support. Never converts |
+| `system` | Same one-time-only list; no conversion path exists for `system` at all |
+
+Whatever survives is reordered so the subscription's `current_payment_method` renders first. A cart naming a subscription that cannot be resolved is left **ungated** — there is nothing to reason about, and the charge itself fails safely with `no_subscription` before any gateway API call.
+
+#### Why an early renewal payment is restricted
+
+Renewal invoices are generated days *ahead* of their due date so the customer has time to pay, and `handleRenewalPaid()` anchors the next date to `due_date` when they pay on or before it — the cadence is preserved and the advance days are honoured.
+
+The legacy manual→automatic conversion cannot honour them. It creates a vendor subscription anchored to **now** (no trial anchor is set unless the plan itself carries trial days), so an early payer is charged immediately and their `next_billing_date` is reset to `today + interval`, forfeiting every day between now and the original due date. So the gate closes that window until the due date arrives, when there is nothing left to lose.
+
+Two consequences worth knowing:
+
+- The restriction uses a strict "no `subscriptions` support" test, not the store-billed list above. Stripe and PayPal declare `system_subscription`, but the one-time routing that flag implies does not apply to an unstamped `manual` subscription on a gateway-managed store — they would still take the subscription route and convert.
+- If such a store has no one-time gateway active, that one checkout renders **no** payment methods. Deliberate: the customer pays from the due date onward instead of silently losing days.
+
+A reactivation rarely hits this rule — a reactivation cart only reaches checkout when payment is already due, so its invoice is not in advance.
 
 ## Store-managed + auto-charge (`system`)
 
@@ -504,6 +537,9 @@ Two asymmetries deserve explanation.
 | `fluent_cart/payments/subscription_{status}` | `SubscriptionService` (dynamic) |
 | `fluent_cart/subscription/data_updated` | `SubscriptionService` (dirty diff, no status change) |
 | `fluent_cart/subscription_collection_method_{gateway}` | filter — `CheckoutProcessor` |
+| `fluent_cart/subscription/management_mode` | filter — `SubscriptionManagementMode`, store-wide mode override |
+| `fluent_cart/checkout_active_payment_methods` | filter — `SubscriptionGatewayGate` gates every subscription cart here |
+| `fluent_cart/enable_manual_subscription_on_gateway_manage` | filter — offer non-subscription gateways on a gateway-managed store (default `false`) |
 
 ### Renewal engine
 
@@ -545,6 +581,7 @@ Recorded so nobody rediscovers them the hard way.
 - **`pause_subscription` is declared by no gateway and implemented by none** — pausing an `automatic` subscription from FluentCart always fails.
 - **The final installment of a store-billed subscription emits `SubscriptionEOT` but no `SubscriptionRenewed`** (`handleRenewalPaid` returns early once the sync marks it `completed`).
 - **A lost Action Scheduler job** leaves a system renewal sitting in `payment_scheduled` with its reminders suppressed. The overdue scanner still escalates it once the due date passes, so it is not stranded — just quiet until then.
+- **`store_managed` does not fully stop a gateway schedule for an `automatic` subscription.** The gate admits Stripe and PayPal on a store-managed cart because they declare `system_subscription`, on the assumption they will take a single charge — but that one-time routing only applies to `manual` and `system` subscriptions. An `automatic` subscription paid through them still gets a vendor schedule. Closing it means widening the one-time rule itself, not the gate.
 
 ## Quick reference
 

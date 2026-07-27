@@ -1098,6 +1098,38 @@ add_filter('fluent_cart/subscription/management_mode', function($mode) {
 ```
 </details>
 
+### <code> enable_manual_subscription_on_gateway_manage </code>
+<details>
+<summary><code>fluent_cart/enable_manual_subscription_on_gateway_manage</code> &mdash; Allow non-subscription gateways on a gateway-managed store</summary>
+
+**When it runs:**
+Applied every time the checkout gateway list is built for a subscription cart while the store is in `gateway_managed` mode. By default those carts only offer gateways that can create a vendor subscription, because a gateway-managed store has no renewal engine running behind them. Returning `true` restores the legacy behaviour: a gateway without `subscriptions` support (COD, bank transfer, a regional card gateway) is offered again, and a subscription bought through it is created with `collection_method = manual` — invoiced by FluentCart, paid by hand each cycle.
+
+Governs `manual` subscriptions only. An `automatic` subscription's renewal or reactivation checkout ignores this filter — it already owns a vendor schedule, and a one-time gateway would leave it with nothing to bill it next cycle.
+
+**Parameters:**
+
+- `$enabled` (bool): `false` by default
+
+**Returns:**
+- `$enabled` (bool): Whether non-subscription gateways may fall back to manual billing
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionGatewayGate.php`
+
+**Usage:**
+```php
+add_filter('fluent_cart/enable_manual_subscription_on_gateway_manage', '__return_true');
+```
+
+::: warning Read at every use, never cached
+The gate reads this filter on each call rather than once at registration, because the class is registered during plugin bootstrap — before a theme or an `init`-hooked plugin has had a chance to add the filter. Do not mirror it into a static property.
+:::
+
+::: tip Enabling it later does not convert existing subscriptions
+The filter only decides which gateways render. Subscriptions already created under either behaviour keep their `collection_method` and their billing model.
+:::
+</details>
+
 ### <code> subscription_collection_method_{gateway} </code>
 <details>
 <summary><code>fluent_cart/subscription_collection_method_{gateway}</code> &mdash; Per-gateway override of the resolved collection method</summary>

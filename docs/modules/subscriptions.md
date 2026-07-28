@@ -128,18 +128,35 @@ Declared as `$supportedFeatures` on each gateway; tested with `AbstractPaymentGa
 |---|---|---|---|---|---|---|
 | **Stripe** | ✅ | ✅ | ✅ | ✅ **(only one)** | ✅ | ✅ |
 | **PayPal** | ✅ | ✅ | ✅ | — | ✅ | ✅ |
-| COD / offline | — | ✅ | — | — | — | — |
-| Paddle (pro) | ✅ | — | — | — | — | ✅ |
-| Mollie, Authorize.net (pro) | ✅ | — | — | — | — | — |
+| COD / offline | — | — | — | — | — | — |
+| Authorize.net, Mollie, Paddle (pro) | ✅ | ✅ | — | — | — | Paddle only |
 | Square, Paystack, Flutterwave, Razorpay (addons) | ✅ | — | — | — | — | — |
-| MercadoPago, SSLCommerz (addons) | — | ✅ | — | — | — | — |
+| MercadoPago, SSLCommerz (addons) | — | — | — | — | — | — |
 
 `zero_recurring` (backed by `supportsSetupWithoutCharge()`) is what lets a gateway vault a card at **\$0** — the free-trial `system` case. Only Stripe has it; PayPal does `system` but only when the cart charges something now.
+
+`manual_subscription` is independent of `system_subscription` — it only claims a gateway routes a store-managed subscription's first payment through its existing one-time-charge path instead of creating a vendor subscription (`shouldChargeSubscriptionAsOneTime()`, below). COD/offline and the plain one-time addons don't need it: `storeBilledOnly()` already admits them via `!has('subscriptions')` / `has('offline')`.
 
 Two traps worth knowing:
 
 1. **`has('subscriptions')` is auto-appended** by the constructor whenever a subscription module is injected — so the literal `$supportedFeatures` array under-reports it.
 2. **`has('switch_payment_method')` always returns `false`.** It is an *associative* entry, and `has()` does `in_array` over values. Every call site reads it with `Arr::get($gateway->supportedFeatures, 'switch_payment_method')` instead.
+
+### `manual_subscription` — wiring a third-party gateway for store-managed billing
+
+A gateway earns `manual_subscription` by proving it can take a subscription's first payment as a plain one-time charge, with no vendor subscription object created. Two changes, both in the gateway class:
+
+1. Add `'manual_subscription'` to `$supportedFeatures`.
+2. In `makePaymentFromPaymentInstance()`, consult `shouldChargeSubscriptionAsOneTime()` **before** any vendor-subscription/conversion logic, routing to the gateway's existing single-payment path when it returns `true`:
+
+```php
+// AuthorizeDotNet.php — makePaymentFromPaymentInstance()
+if ($this->shouldChargeSubscriptionAsOneTime($paymentInstance)) {
+    return (new AuthorizeDotNetProcessor($this->authorizeSettings))->handleSinglePayment($paymentInstance);
+}
+```
+
+That's the whole pattern — Mollie and Paddle (fluent-cart-pro) mirror it, each calling their own existing `handleSinglePayment()`. Don't add `system_subscription` alongside it unless the gateway also overrides `chargeRenewal()` / `reconcileRenewalCharge()` — `manual_subscription` alone only unlocks the non-zero-payable case; a gateway with no auto-charge implementation correctly stays hidden on \$0-due carts.
 
 ### Which gateways appear on a new subscription cart
 
@@ -148,7 +165,7 @@ Two traps worth knowing:
 | Mode | Amount due today | Gateways offered |
 |---|---|---|
 | `gateway_managed` | any | Gateways **with** `subscriptions` only — a gateway-managed store has no renewal engine, so a subscription needs a gateway that can run its own schedule. Turn on the `subscription_manual_fallback` setting (default `no`) and gateways without it are offered again, billing `manual` |
-| `store_managed` | > 0 | Gateways **without** `subscriptions` (COD, bank transfer, MercadoPago, SSLCommerz) — they can't auto-bill anyway — **plus** `system_subscription` gateways (Stripe, PayPal), which take a single charge here because the stamp forces it. Vendor-billing-only gateways hidden |
+| `store_managed` | > 0 | Gateways **without** `subscriptions` (COD, bank transfer, MercadoPago, SSLCommerz) — they can't auto-bill anyway — **plus** `manual_subscription` gateways (Stripe, PayPal, Authorize.net, Mollie, Paddle), which take a single charge here because `shouldChargeSubscriptionAsOneTime()` forces it. Vendor-billing-only gateways hidden |
 | `store_managed`, auto-charge **on** | 0 (free trial) | Offline methods, plus a `system_subscription` gateway that can vault without charging (`supportsSetupWithoutCharge()`) — Stripe in `onsite` mode, PayPal in `paypal_pro` mode. Either gateway in another checkout mode drops off |
 | `store_managed`, auto-charge **off** | 0 (free trial) | Offline methods only — nothing would ever charge a saved token |
 
@@ -349,7 +366,7 @@ The same `SubscriptionGatewayGate` handles these, but the decision comes from th
 | `automatic` | Gateways with `subscriptions` only — it owns a vendor schedule, and a one-time gateway would strand it. Ignores the `subscription_manual_fallback` setting |
 | `manual`, unstamped, store `gateway_managed`, invoice **not yet due** | One-time gateways only — see below |
 | `manual`, unstamped, store `gateway_managed`, invoice **due or overdue** | The conversion window: capable gateways offered, and paying through one converts the subscription to `automatic` |
-| `manual` stamped `store_managed`, or unstamped while the store is store-managed today | One-time only: `system_subscription` gateways plus gateways with no `subscriptions` support. Never converts |
+| `manual` stamped `store_managed`, or unstamped while the store is store-managed today | One-time only: `manual_subscription` gateways plus gateways with no `subscriptions` support. Never converts |
 | `system` | Same one-time-only list; no conversion path exists for `system` at all |
 
 Whatever survives is reordered so the subscription's `current_payment_method` renders first. A cart naming a subscription that cannot be resolved is left **ungated** — there is nothing to reason about, and the charge itself fails safely with `no_subscription` before any gateway API call.
@@ -362,7 +379,7 @@ The legacy manual→automatic conversion cannot honour them. It creates a vendor
 
 Two consequences worth knowing:
 
-- The restriction uses a strict "no `subscriptions` support" test, not the store-billed list above. Stripe and PayPal declare `system_subscription`, but the one-time routing that flag implies does not apply to an unstamped `manual` subscription on a gateway-managed store — they would still take the subscription route and convert.
+- The restriction uses a strict "no `subscriptions` support" test, not the store-billed list above. Stripe and PayPal declare `manual_subscription`, but the one-time routing that flag implies does not apply to an unstamped `manual` subscription on a gateway-managed store — `shouldChargeSubscriptionAsOneTime()` returns `false` there, so they would still take the subscription route and convert.
 - If such a store has no one-time gateway active, that one checkout renders **no** payment methods. Deliberate: the customer pays from the due date onward instead of silently losing days.
 
 A reactivation rarely hits this rule — a reactivation cart only reaches checkout when payment is already due, so its invoice is not in advance.
@@ -583,7 +600,7 @@ Recorded so nobody rediscovers them the hard way.
 - **`pause_subscription` is declared by no gateway and implemented by none** — pausing an `automatic` subscription from FluentCart always fails.
 - **The final installment of a store-billed subscription emits `SubscriptionEOT` but no `SubscriptionRenewed`** (`handleRenewalPaid` returns early once the sync marks it `completed`).
 - **A lost Action Scheduler job** leaves a system renewal sitting in `payment_scheduled` with its reminders suppressed. The overdue scanner still escalates it once the due date passes, so it is not stranded — just quiet until then.
-- **`store_managed` does not fully stop a gateway schedule for an `automatic` subscription.** The gate admits Stripe and PayPal on a store-managed cart because they declare `system_subscription`, on the assumption they will take a single charge — but that one-time routing only applies to `manual` and `system` subscriptions. An `automatic` subscription paid through them still gets a vendor schedule. Closing it means widening the one-time rule itself, not the gate.
+- **`store_managed` does not fully stop a gateway schedule for an `automatic` subscription.** The gate admits Stripe and PayPal on a store-managed cart because they declare `manual_subscription`, on the assumption they will take a single charge — but that one-time routing only applies to `manual` and `system` subscriptions. An `automatic` subscription paid through them still gets a vendor schedule. Closing it means widening the one-time rule itself, not the gate.
 
 ## Quick reference
 

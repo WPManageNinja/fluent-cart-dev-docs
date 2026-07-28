@@ -80,15 +80,18 @@ Two inputs: a **store setting** and a **gateway capability**.
 |---|---|---|
 | `subscription_management_mode` | `gateway_managed` \| `store_managed` | `gateway_managed` |
 | `subscription_system_charge` | `yes` \| `no` | `no` |
+| `subscription_manual_fallback` | `yes` \| `no` | `no` |
 
 `subscription_system_charge` is inert under `gateway_managed` — `isSystemChargeEnabled()` returns `false` outright unless the mode is store-managed.
+
+`subscription_manual_fallback` is inert under `store_managed` — `isManualFallbackEnabled()` returns `false` outright unless the mode is gateway-managed. When on, gateways without `subscriptions` support are offered on a gateway-managed subscription cart instead of being hidden, and the resulting subscription is created with `collection_method = manual` — invoiced by FluentCart, paid by hand each cycle.
 
 ### The full decision matrix
 
 | Mode | System charge | Gateway | Result |
 |---|---|---|---|
 | gateway_managed | (ignored) | has `subscriptions` | `automatic` |
-| gateway_managed | (ignored) | no `subscriptions` (COD, bank transfer) | `manual` |
+| gateway_managed, manual fallback **on** | (ignored) | no `subscriptions` (COD, bank transfer) | `manual` |
 | store_managed | off | any | `manual` |
 | store_managed | on | has `system_subscription` (Stripe, PayPal) | `system` |
 | store_managed | on | no `system_subscription` (COD, bank transfer…) | `manual` |
@@ -144,7 +147,7 @@ Two traps worth knowing:
 
 | Mode | Amount due today | Gateways offered |
 |---|---|---|
-| `gateway_managed` | any | Gateways **with** `subscriptions` only — a gateway-managed store has no renewal engine, so a subscription needs a gateway that can run its own schedule. Filter the [manual-fallback opt-in](/hooks/filters/customers-and-subscriptions#enable-manual-subscription-on-gateway-manage) to `true` (default `false`) and gateways without it are offered again, billing `manual` |
+| `gateway_managed` | any | Gateways **with** `subscriptions` only — a gateway-managed store has no renewal engine, so a subscription needs a gateway that can run its own schedule. Turn on the `subscription_manual_fallback` setting (default `no`) and gateways without it are offered again, billing `manual` |
 | `store_managed` | > 0 | Gateways **without** `subscriptions` (COD, bank transfer, MercadoPago, SSLCommerz) — they can't auto-bill anyway — **plus** `system_subscription` gateways (Stripe, PayPal), which take a single charge here because the stamp forces it. Vendor-billing-only gateways hidden |
 | `store_managed`, auto-charge **on** | 0 (free trial) | Offline methods, plus a `system_subscription` gateway that can vault without charging (`supportsSetupWithoutCharge()`) — Stripe in `onsite` mode, PayPal in `paypal_pro` mode. Either gateway in another checkout mode drops off |
 | `store_managed`, auto-charge **off** | 0 (free trial) | Offline methods only — nothing would ever charge a saved token |
@@ -343,7 +346,7 @@ The same `SubscriptionGatewayGate` handles these, but the decision comes from th
 
 | Subscription | Gateways offered |
 |---|---|
-| `automatic` | Gateways with `subscriptions` only — it owns a vendor schedule, and a one-time gateway would strand it. Ignores the manual-fallback filter |
+| `automatic` | Gateways with `subscriptions` only — it owns a vendor schedule, and a one-time gateway would strand it. Ignores the `subscription_manual_fallback` setting |
 | `manual`, unstamped, store `gateway_managed`, invoice **not yet due** | One-time gateways only — see below |
 | `manual`, unstamped, store `gateway_managed`, invoice **due or overdue** | The conversion window: capable gateways offered, and paying through one converts the subscription to `automatic` |
 | `manual` stamped `store_managed`, or unstamped while the store is store-managed today | One-time only: `system_subscription` gateways plus gateways with no `subscriptions` support. Never converts |
@@ -539,7 +542,6 @@ Two asymmetries deserve explanation.
 | `fluent_cart/subscription_collection_method_{gateway}` | filter — `CheckoutProcessor` |
 | `fluent_cart/subscription/management_mode` | filter — `SubscriptionManagementMode`, store-wide mode override |
 | `fluent_cart/checkout_active_payment_methods` | filter — `SubscriptionGatewayGate` gates every subscription cart here |
-| `fluent_cart/enable_manual_subscription_on_gateway_manage` | filter — offer non-subscription gateways on a gateway-managed store (default `false`) |
 
 ### Renewal engine
 

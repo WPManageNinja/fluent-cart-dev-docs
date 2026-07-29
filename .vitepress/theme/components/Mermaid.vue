@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 
 interface Props {
   content: string
@@ -19,96 +19,136 @@ const props = defineProps<Props>()
 const mermaidContainer = ref<HTMLElement>()
 const renderedContent = ref('')
 
+let themeObserver: MutationObserver | null = null
+let rendering = false
+
 const handleClick = (event: MouseEvent) => {
-  // This will be handled by the global click handler in the theme
-  console.log('Mermaid component clicked')
+  // Handled by the global click handler in the theme.
 }
 
-onMounted(async () => {
-  await nextTick()
-  
+const lightVars = {
+  primaryColor: '#ffffff',
+  primaryTextColor: '#1e293b',
+  primaryBorderColor: '#3b82f6',
+  lineColor: '#3b82f6',
+  secondaryColor: '#f8fafc',
+  tertiaryColor: '#e2e8f0',
+  background: '#ffffff',
+  mainBkg: '#ffffff',
+  secondBkg: '#f8fafc',
+  tertiaryBkg: '#e2e8f0',
+  entityBkg: '#ffffff',
+  entityTextColor: '#1e293b',
+  relationLabelColor: '#1e293b',
+  relationLabelBackground: '#ffffff'
+}
+
+const darkVars = {
+  primaryColor: '#1e293b',
+  primaryTextColor: '#e2e8f0',
+  primaryBorderColor: '#60a5fa',
+  lineColor: '#60a5fa',
+  secondaryColor: '#334155',
+  tertiaryColor: '#0f172a',
+  background: '#0f172a',
+  mainBkg: '#1e293b',
+  secondBkg: '#334155',
+  tertiaryBkg: '#0f172a',
+  entityBkg: '#1e293b',
+  entityTextColor: '#e2e8f0',
+  relationLabelColor: '#e2e8f0',
+  relationLabelBackground: '#1e293b'
+}
+
+const renderDiagram = async () => {
+  if (rendering) return
+  rendering = true
+
   try {
     const { default: mermaid } = await import('mermaid')
-    
-    // Initialize Mermaid with better settings for ER diagrams
+    const dark = document.documentElement.classList.contains('dark')
+
     mermaid.initialize({
       startOnLoad: false,
-      theme: 'base',
+      theme: dark ? 'dark' : 'base',
       securityLevel: 'loose',
-      themeVariables: {
-        primaryColor: '#ffffff',
-        primaryTextColor: '#1e293b',
-        primaryBorderColor: '#3b82f6',
-        lineColor: '#3b82f6',
-        secondaryColor: '#f8fafc',
-        tertiaryColor: '#e2e8f0',
-        background: '#ffffff',
-        mainBkg: '#ffffff',
-        secondBkg: '#f8fafc',
-        tertiaryBkg: '#e2e8f0',
-        entityBkg: '#ffffff',
-        entityTextColor: '#1e293b',
-        relationLabelColor: '#1e293b',
-        relationLabelBackground: '#ffffff'
-      },
+      themeVariables: dark ? darkVars : lightVars,
       er: {
         diagramPadding: 40,
         layoutDirection: 'TB',
         minEntityWidth: 180,
         minEntityHeight: 120,
         entityPadding: 30,
-        stroke: '#3b82f6',
-        fill: '#ffffff',
+        stroke: dark ? '#60a5fa' : '#3b82f6',
+        fill: dark ? '#1e293b' : '#ffffff',
         fontSize: 13,
         useMaxWidth: true,
-        relationColor: '#3b82f6'
+        relationColor: dark ? '#60a5fa' : '#3b82f6'
       },
       flowchart: {
         useMaxWidth: true,
         htmlLabels: true
       }
     })
-    
-    // Create unique ID for this diagram
+
     const id = 'mermaid-' + Math.random().toString(36).substr(2, 9)
-    
-    // Render the diagram
+
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready
+    }
+
     const { svg } = await mermaid.render(id, props.content)
     renderedContent.value = svg
-    
-    // Trigger zoom setup after render
+
     setTimeout(() => {
       if (mermaidContainer.value) {
         mermaidContainer.value.dataset.rendered = 'true'
-        
-        // Modify foreignObject elements
+
         const foreignObjects = mermaidContainer.value.querySelectorAll('foreignObject')
         foreignObjects.forEach(foreignObj => {
-          // Set height to 40 if it's currently 21
+          // ER-diagram label rows only (height 21) — give them room; leave flowchart labels sized to their box.
           if (foreignObj.getAttribute('height') === '21') {
             foreignObj.setAttribute('height', '40')
-          }
-          
-          // Add 20 to the width value
-          const currentWidth = foreignObj.getAttribute('width')
-          if (currentWidth) {
-            const newWidth = parseFloat(currentWidth) + 20
-            foreignObj.setAttribute('width', newWidth.toString())
+            const currentWidth = foreignObj.getAttribute('width')
+            if (currentWidth) {
+              foreignObj.setAttribute('width', (parseFloat(currentWidth) + 20).toString())
+            }
           }
         })
-        
-        // Dispatch a custom event to trigger zoom setup
-        const event = new CustomEvent('mermaidRendered', { 
-          detail: { element: mermaidContainer.value } 
+
+        const event = new CustomEvent('mermaidRendered', {
+          detail: { element: mermaidContainer.value }
         })
         window.dispatchEvent(event)
       }
     }, 100)
-    
+
   } catch (error) {
-    console.error('Mermaid rendering error:', error)
-    // Fallback to showing the raw content
     renderedContent.value = `<pre style="background: #f6f8fa; padding: 1rem; border-radius: 8px; overflow: auto;"><code>${props.content}</code></pre>`
+  } finally {
+    rendering = false
+  }
+}
+
+onMounted(async () => {
+  await nextTick()
+  await renderDiagram()
+
+  let lastDark = document.documentElement.classList.contains('dark')
+  themeObserver = new MutationObserver(() => {
+    const dark = document.documentElement.classList.contains('dark')
+    if (dark !== lastDark) {
+      lastDark = dark
+      renderDiagram()
+    }
+  })
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+})
+
+onUnmounted(() => {
+  if (themeObserver) {
+    themeObserver.disconnect()
+    themeObserver = null
   }
 })
 </script>

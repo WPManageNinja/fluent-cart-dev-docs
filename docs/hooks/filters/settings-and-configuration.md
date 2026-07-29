@@ -369,6 +369,12 @@ add_filter('fluent_cart/module_settings/plugin_addons', function ($addons) {
 
 ---
 
+## Subscription System Billing <Badge type="tip" text="Store-managed" />
+
+Kill-switches for the `system` (auto-charge) side of the store-managed subscription engine — `system_billing_enabled` (master switch) and `system_collection_enabled` (per-checkout gate) — are documented with the rest of the subscription filters under [Customers &amp; Subscriptions &rarr; Collection Method &amp; Auto-Charge](/hooks/filters/customers-and-subscriptions#collection-method-auto-charge).
+
+---
+
 ## Currency & Formatting
 
 ### <code> global_currency_setting </code>

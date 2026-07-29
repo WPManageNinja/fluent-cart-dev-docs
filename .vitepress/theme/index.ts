@@ -7,10 +7,16 @@ import { useRoute, useData } from 'vitepress'
 import { theme } from 'vitepress-openapi/client'
 import 'vitepress-openapi/dist/style.css'
 import Mermaid from './components/Mermaid.vue'
+// Engineering blog components (see docs/engineering/)
+import PostList from './components/PostList.vue'
+import PostMeta from './components/PostMeta.vue'
+import TagFilter from './components/TagFilter.vue'
 import CopyPage from './components/CopyPage.vue'
 import './custom.css'
 // OpenAPI styles - loaded globally but scoped to OpenAPI pages via CSS selectors
 import './openapi.css'
+// Engineering blog styles
+import './blog.css'
 
 // Fluent Comments widget component
 const FluentCommentsWidget = defineComponent({
@@ -81,13 +87,19 @@ export default {
   Layout: () => {
     return h(DefaultTheme.Layout, null, {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
-      'doc-before': () => h(CopyPage),
+      // PostMeta renders the byline on /engineering/ posts and nothing elsewhere
+      'doc-before': () => h('div', null, [h(PostMeta), h(CopyPage)]),
       'doc-after': () => h(FluentCommentsWidget),
     })
   },
   async enhanceApp({ app, router, siteData }) {
     app.component('Mermaid', Mermaid)
-    
+
+    // Engineering blog components
+    app.component('PostList', PostList)
+    app.component('PostMeta', PostMeta)
+    app.component('TagFilter', TagFilter)
+
     // Register OpenAPI theme components (OAOperation loads specs lazily via specUrl prop)
     theme.enhanceApp({ app, router, siteData })
 

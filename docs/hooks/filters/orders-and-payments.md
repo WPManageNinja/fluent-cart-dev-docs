@@ -1485,6 +1485,38 @@ add_filter('fluent_cart/payments/paypal/verify_webhook', function ($verify, $con
 ```
 </details>
 
+### <code> paypal/vault_attributes </code>
+<details>
+<summary><code>fluent_cart/paypal/vault_attributes</code> &mdash; Filter PayPal Vault v3 attributes when saving a buyer for auto-charge</summary>
+
+**When it runs:**
+This filter is applied during a **`system` (auto-charged, store-billed) subscription** checkout when PayPal vaults the buyer's account (Vault v3 save-on-success), so future renewal invoices can be charged merchant-initiated. It lets you adjust the vault attributes sent to PayPal. See [Store-managed + auto-charge](/modules/subscriptions#store-managed-auto-charge-system).
+
+**Parameters:**
+
+- `$defaults` (array): The vault attributes
+    ```php
+    [
+        'store_in_vault' => 'ON_SUCCESS', // string
+        'usage_type'     => 'MERCHANT',   // string
+        'customer_type'  => 'CONSUMER',   // string
+    ]
+    ```
+- `$context` (array): `['order' => Order, 'subscription' => Subscription]`
+
+**Returns:**
+- `$defaults` (array): The (possibly modified) vault attributes
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:154`
+
+**Usage:**
+```php
+add_filter('fluent_cart/paypal/vault_attributes', function($attributes, $context) {
+    return $attributes;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Tax

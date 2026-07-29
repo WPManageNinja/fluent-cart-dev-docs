@@ -1510,3 +1510,147 @@ add_filter('fluent_cart/instant_checkout/allowed_redirect_hosts', function ($hos
 </details>
 
 ---
+
+## Tax & VAT
+
+### <code> checkout/is_business </code>
+<details>
+<summary><code>fluent_cart/checkout/is_business</code> &mdash; Filter whether the checkout is a business (B2B) purchase</summary>
+
+**When it runs:**
+This filter is applied in `TaxModule::storeBusinessInfoOnOrder()` (hooked to `fluent_cart/checkout/prepare_other_data`) right after an order is placed. It decides whether the checkout counts as a business purchase — and therefore whether business info (company name, VAT number, etc.) is persisted onto the order. The default value is taken from the submitted `is_business` request field, falling back to the cart's saved `form_data.is_business` when the key was never submitted.
+
+**Parameters:**
+
+- `$isBusinessCheckout` (bool): Whether the checkout is treated as a business purchase
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'checkout_data' => $checkoutData, // array — the cart's checkout_data
+        'order'         => $order,        // \FluentCart\App\Models\Order — the just-created order
+    ];
+    ```
+
+**Returns:**
+- `bool` — `true` to treat the checkout as a business purchase
+
+**Source:** `app/Modules/Tax/TaxModule.php (line 1047)`
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/is_business', function ($isBusiness, $data) {
+    // Treat every checkout with a company name as a business purchase
+    $company = $data['checkout_data']['form_data']['company_name'] ?? '';
+
+    return $isBusiness || $company !== '';
+}, 10, 2);
+```
+</details>
+
+### <code> tax/reverse_charge_line_adjustment </code>
+<details>
+<summary><code>fluent_cart/tax/reverse_charge_line_adjustment</code> &mdash; Filter the per-line price adjustment when reverse charge is applied</summary>
+
+**When it runs:**
+This filter is applied in `TaxModule::calculateCartTax()` while applying the EU VAT reverse charge to tax-inclusive product lines. For each inclusive line, the included tax amount (in cents) is calculated and then passed through this filter before being subtracted from the line's unit price. The result is re-clamped to `0..subtotal` after filtering, so a filter cannot produce a negative unit price.
+
+**Parameters:**
+
+- `$adjustment` (int): The amount in cents to deduct from the line (default: the line's included tax total, clamped to the line subtotal)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'line'    => $line,   // array — the cart product line (unit_price, quantity, subtotal, line_meta, ...)
+        'rc_mode' => $rcMode, // string — the effective reverse charge price mode
+    ];
+    ```
+
+**Returns:**
+- `int` — The adjustment amount in cents
+
+**Source:** `app/Modules/Tax/TaxModule.php (line 689)`
+
+**Usage:**
+```php
+add_filter('fluent_cart/tax/reverse_charge_line_adjustment', function ($adjustment, $data) {
+    // Keep gross prices (no deduction) for a specific product line
+    if (($data['line']['post_id'] ?? 0) === 123) {
+        return 0;
+    }
+
+    return $adjustment;
+}, 10, 2);
+```
+</details>
+
+### <code> tax/reverse_charge_notice_text </code>
+<details>
+<summary><code>fluent_cart/tax/reverse_charge_notice_text</code> &mdash; Filter the reverse charge notice shown on receipts and invoices</summary>
+
+**When it runs:**
+This filter is applied in `TaxModule::getReverseChargeNoticeText()` whenever the reverse charge notice is rendered — on the thank-you page, order receipts, and order emails. EU VAT Directive 2006/112/EC Article 226(11a) requires the invoice to carry the literal mention "Reverse charge", so any override should keep those words; stores supplying intra-EU goods (Art. 138) or needing other jurisdiction-specific wording can adjust the rest of the sentence.
+
+**Parameters:**
+
+- `$text` (string): The notice text (default: `'Reverse charge — Article 196, Council Directive 2006/112/EC. Customer is liable for VAT.'`)
+
+**Returns:**
+- `string` — The notice text to display
+
+**Source:** `app/Modules/Tax/TaxModule.php (line 1688)`
+
+**Usage:**
+```php
+add_filter('fluent_cart/tax/reverse_charge_notice_text', function ($text) {
+    // Intra-EU supply of goods wording
+    return __('Reverse charge — Article 138, Council Directive 2006/112/EC. Customer is liable for VAT.', 'my-plugin');
+}, 10, 1);
+```
+</details>
+
+### <code> tax/validate_eu_vat_number </code>
+<details>
+<summary><code>fluent_cart/tax/validate_eu_vat_number</code> &mdash; Short-circuit EU VAT number validation with a custom validator</summary>
+
+**When it runs:**
+This filter is applied in `TaxModule::validateEuVatNumber()` before FluentCart contacts the EU VIES SOAP service to validate a VAT number (during checkout VAT validation and admin-side validation). Returning a non-`null` value short-circuits the remote VIES call: return an `array` to report a successful validation, or a `WP_Error` to report a validation failure (its message is shown to the customer). Return `null` (the default) to let FluentCart perform its normal VIES SOAP validation.
+
+**Parameters:**
+
+- `$result` (null): Always `null` by default
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'country_code' => $countryCode, // string — two-letter country code (e.g. 'DE')
+        'vat_number'   => $vatNumber,   // string — the VAT number being validated
+    ];
+    ```
+
+**Returns:**
+- `null` — perform the default VIES SOAP validation
+- `array` — treated as a successful validation result, same shape as the VIES response: `['country' => ..., 'vat_number' => ..., 'valid' => true, 'name' => ..., 'address' => ...]`
+- `WP_Error` — treated as a validation error; the message is forwarded to the customer
+
+**Source:** `app/Modules/Tax/TaxModule.php (line 1430)`
+
+**Usage:**
+```php
+add_filter('fluent_cart/tax/validate_eu_vat_number', function ($result, $data) {
+    $response = my_vat_api_check($data['country_code'], $data['vat_number']);
+
+    if (!$response['ok']) {
+        return new \WP_Error('invalid_vat', __('The VAT number could not be validated.', 'my-plugin'));
+    }
+
+    return [
+        'country'    => $data['country_code'],
+        'vat_number' => $data['vat_number'],
+        'valid'      => true,
+        'name'       => $response['company_name'],
+        'address'    => $response['address'],
+    ];
+}, 10, 2);
+```
+</details>
+
+---

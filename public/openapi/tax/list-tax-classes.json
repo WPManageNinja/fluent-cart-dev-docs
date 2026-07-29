@@ -25,16 +25,16 @@
   "paths": {
     "/tax/classes": {
       "get": {
-        "operationId": "listTaxClasses",
-        "summary": "GET List Tax Classes",
-        "description": "Retrieve all tax classes, sorted by priority (highest first), then by newest first when priority is equal.",
-        "tags": [
-          "Tax"
-        ],
         "security": [
           {
             "ApplicationPasswords": []
           }
+        ],
+        "operationId": "listTaxClasses",
+        "summary": "GET List Tax Classes",
+        "description": "Retrieve all tax classes ordered by ID (oldest first), along with the maximum allowed number of classes and the next built-in class (Reduced or Zero) that has not been created yet.",
+        "tags": [
+          "Tax"
         ],
         "responses": {
           "200": {
@@ -44,33 +44,40 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "tax_classes": {
+                    "classes": {
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/TaxClass"
                       }
+                    },
+                    "max_classes": {
+                      "type": "integer",
+                      "description": "Maximum number of tax classes allowed (6)",
+                      "example": 6
+                    },
+                    "next_builtin": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "The next built-in class not yet created (null when both reduced and zero exist)",
+                      "properties": {
+                        "slug": {
+                          "type": "string",
+                          "example": "zero"
+                        },
+                        "title": {
+                          "type": "string",
+                          "example": "Zero"
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "tax_classes": [
+                    "classes": [
                       {
                         "id": 1,
                         "title": "Standard",
                         "slug": "standard",
-                        "description": "Standard tax rate for most products",
-                        "meta": {
-                          "categories": [
-                            5,
-                            12,
-                            18
-                          ],
-                          "priority": 10
-                        },
-                        "categories": [
-                          5,
-                          12,
-                          18
-                        ],
+                        "meta": [],
                         "created_at": "2025-01-15 10:00:00",
                         "updated_at": "2025-01-15 10:00:00"
                       },
@@ -78,61 +85,33 @@
                         "id": 2,
                         "title": "Reduced",
                         "slug": "reduced",
-                        "description": "Reduced tax rate for essential goods",
-                        "meta": {
-                          "categories": [
-                            8,
-                            22
-                          ],
-                          "priority": 5
-                        },
-                        "categories": [
-                          8,
-                          22
-                        ],
+                        "meta": [],
                         "created_at": "2025-01-15 10:15:00",
                         "updated_at": "2025-01-15 10:15:00"
                       },
                       {
                         "id": 3,
-                        "title": "Zero",
-                        "slug": "zero",
-                        "description": "Zero tax rate for exempt products",
-                        "meta": {
-                          "categories": [
-                            30
-                          ],
-                          "priority": 2
-                        },
-                        "categories": [
-                          30
-                        ],
+                        "title": "Digital Goods",
+                        "slug": "digital-goods",
+                        "meta": [],
                         "created_at": "2025-01-15 10:30:00",
                         "updated_at": "2025-01-15 10:30:00"
                       }
-                    ]
+                    ],
+                    "max_classes": 6,
+                    "next_builtin": {
+                      "slug": "zero",
+                      "title": "Zero"
+                    }
                   }
                 },
                 "example": {
-                  "tax_classes": [
+                  "classes": [
                     {
                       "id": 1,
                       "title": "Standard",
                       "slug": "standard",
-                      "description": "Standard tax rate for most products",
-                      "meta": {
-                        "categories": [
-                          5,
-                          12,
-                          18
-                        ],
-                        "priority": 10
-                      },
-                      "categories": [
-                        5,
-                        12,
-                        18
-                      ],
+                      "meta": [],
                       "created_at": "2025-01-15 10:00:00",
                       "updated_at": "2025-01-15 10:00:00"
                     },
@@ -140,63 +119,35 @@
                       "id": 2,
                       "title": "Reduced",
                       "slug": "reduced",
-                      "description": "Reduced tax rate for essential goods",
-                      "meta": {
-                        "categories": [
-                          8,
-                          22
-                        ],
-                        "priority": 5
-                      },
-                      "categories": [
-                        8,
-                        22
-                      ],
+                      "meta": [],
                       "created_at": "2025-01-15 10:15:00",
                       "updated_at": "2025-01-15 10:15:00"
                     },
                     {
                       "id": 3,
-                      "title": "Zero",
-                      "slug": "zero",
-                      "description": "Zero tax rate for exempt products",
-                      "meta": {
-                        "categories": [
-                          30
-                        ],
-                        "priority": 2
-                      },
-                      "categories": [
-                        30
-                      ],
+                      "title": "Digital Goods",
+                      "slug": "digital-goods",
+                      "meta": [],
                       "created_at": "2025-01-15 10:30:00",
                       "updated_at": "2025-01-15 10:30:00"
                     }
-                  ]
+                  ],
+                  "max_classes": 6,
+                  "next_builtin": {
+                    "slug": "zero",
+                    "title": "Zero"
+                  }
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "tax_classes": [
+                      "classes": [
                         {
                           "id": 1,
                           "title": "Standard",
                           "slug": "standard",
-                          "description": "Standard tax rate for most products",
-                          "meta": {
-                            "categories": [
-                              5,
-                              12,
-                              18
-                            ],
-                            "priority": 10
-                          },
-                          "categories": [
-                            5,
-                            12,
-                            18
-                          ],
+                          "meta": [],
                           "created_at": "2025-01-15 10:00:00",
                           "updated_at": "2025-01-15 10:00:00"
                         },
@@ -204,39 +155,24 @@
                           "id": 2,
                           "title": "Reduced",
                           "slug": "reduced",
-                          "description": "Reduced tax rate for essential goods",
-                          "meta": {
-                            "categories": [
-                              8,
-                              22
-                            ],
-                            "priority": 5
-                          },
-                          "categories": [
-                            8,
-                            22
-                          ],
+                          "meta": [],
                           "created_at": "2025-01-15 10:15:00",
                           "updated_at": "2025-01-15 10:15:00"
                         },
                         {
                           "id": 3,
-                          "title": "Zero",
-                          "slug": "zero",
-                          "description": "Zero tax rate for exempt products",
-                          "meta": {
-                            "categories": [
-                              30
-                            ],
-                            "priority": 2
-                          },
-                          "categories": [
-                            30
-                          ],
+                          "title": "Digital Goods",
+                          "slug": "digital-goods",
+                          "meta": [],
                           "created_at": "2025-01-15 10:30:00",
                           "updated_at": "2025-01-15 10:30:00"
                         }
-                      ]
+                      ],
+                      "max_classes": 6,
+                      "next_builtin": {
+                        "slug": "zero",
+                        "title": "Zero"
+                      }
                     }
                   }
                 }
@@ -264,48 +200,16 @@
           },
           "slug": {
             "type": "string",
-            "description": "Tax class slug",
+            "description": "Tax class slug (unique, auto-generated from the title)",
             "example": "standard"
           },
-          "description": {
-            "type": "string",
-            "description": "Tax class description",
-            "example": "Standard tax rate for most products"
-          },
           "meta": {
-            "type": "object",
-            "description": "Tax class metadata",
-            "properties": {
-              "categories": {
-                "type": "array",
-                "items": {
-                  "type": "integer"
-                },
-                "description": "Product category IDs",
-                "example": [
-                  5,
-                  12,
-                  18
-                ]
-              },
-              "priority": {
-                "type": "integer",
-                "description": "Display priority",
-                "example": 10
-              }
-            }
-          },
-          "categories": {
             "type": "array",
+            "description": "Tax class metadata (empty array when unset)",
             "items": {
-              "type": "integer"
+              "type": "object"
             },
-            "description": "Product category IDs",
-            "example": [
-              5,
-              12,
-              18
-            ]
+            "example": []
           },
           "created_at": {
             "type": "string",
@@ -327,7 +231,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

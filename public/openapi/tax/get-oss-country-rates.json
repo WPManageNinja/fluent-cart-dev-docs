@@ -1,0 +1,306 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings/eu-vat/oss-rates": {
+      "get": {
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "operationId": "getOssCountryRates",
+        "summary": "GET Get OSS Country Rates",
+        "description": "Retrieve per-country EU VAT rates for every tax class. Each country entry includes the effective rate per class (custom database value or built-in default), plus top-level standard-class values for backward compatibility, and the list of tax classes.",
+        "tags": [
+          "Tax"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns EU country rates per tax class.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "country": {
+                            "type": "string",
+                            "description": "ISO 3166-1 alpha-2 country code",
+                            "example": "DE"
+                          },
+                          "label": {
+                            "type": "string",
+                            "description": "Country display name",
+                            "example": "Germany"
+                          },
+                          "rate": {
+                            "type": "number",
+                            "description": "Standard-class effective rate (backward compatibility)",
+                            "example": 19
+                          },
+                          "tax_label": {
+                            "type": "string",
+                            "description": "Standard-class label, defaults to VAT",
+                            "example": "VAT"
+                          },
+                          "default_rate": {
+                            "type": "number",
+                            "description": "Built-in default standard rate",
+                            "example": 19
+                          },
+                          "has_custom": {
+                            "type": "boolean",
+                            "description": "Whether the standard class has a custom rate row",
+                            "example": true
+                          },
+                          "class_rates": {
+                            "type": "object",
+                            "description": "Per-class rates keyed by tax class slug",
+                            "additionalProperties": {
+                              "type": "object",
+                              "properties": {
+                                "rate": {
+                                  "type": "number",
+                                  "description": "Effective rate (custom DB value if present, otherwise the built-in default)",
+                                  "example": 19
+                                },
+                                "default_rate": {
+                                  "type": "number",
+                                  "description": "Built-in default rate for this country and class",
+                                  "example": 19
+                                },
+                                "has_custom": {
+                                  "type": "boolean",
+                                  "description": "Whether a custom rate row exists in the database",
+                                  "example": true
+                                },
+                                "label": {
+                                  "type": "string",
+                                  "description": "Custom rate label (empty when unset or auto-generated)",
+                                  "example": ""
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "classes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slug": {
+                            "type": "string",
+                            "example": "standard"
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Standard"
+                          },
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "rates": [
+                      {
+                        "country": "DE",
+                        "label": "Germany",
+                        "rate": 19,
+                        "tax_label": "VAT",
+                        "default_rate": 19,
+                        "has_custom": true,
+                        "class_rates": {
+                          "standard": {
+                            "rate": 19,
+                            "default_rate": 19,
+                            "has_custom": true,
+                            "label": ""
+                          },
+                          "reduced": {
+                            "rate": 7,
+                            "default_rate": 7,
+                            "has_custom": true,
+                            "label": ""
+                          },
+                          "zero": {
+                            "rate": 0,
+                            "default_rate": 0,
+                            "has_custom": false,
+                            "label": ""
+                          }
+                        }
+                      }
+                    ],
+                    "classes": [
+                      {
+                        "slug": "standard",
+                        "title": "Standard",
+                        "id": 1
+                      },
+                      {
+                        "slug": "reduced",
+                        "title": "Reduced",
+                        "id": 2
+                      },
+                      {
+                        "slug": "zero",
+                        "title": "Zero",
+                        "id": 3
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "rates": [
+                    {
+                      "country": "DE",
+                      "label": "Germany",
+                      "rate": 19,
+                      "tax_label": "VAT",
+                      "default_rate": 19,
+                      "has_custom": true,
+                      "class_rates": {
+                        "standard": {
+                          "rate": 19,
+                          "default_rate": 19,
+                          "has_custom": true,
+                          "label": ""
+                        },
+                        "reduced": {
+                          "rate": 7,
+                          "default_rate": 7,
+                          "has_custom": true,
+                          "label": ""
+                        },
+                        "zero": {
+                          "rate": 0,
+                          "default_rate": 0,
+                          "has_custom": false,
+                          "label": ""
+                        }
+                      }
+                    }
+                  ],
+                  "classes": [
+                    {
+                      "slug": "standard",
+                      "title": "Standard",
+                      "id": 1
+                    },
+                    {
+                      "slug": "reduced",
+                      "title": "Reduced",
+                      "id": 2
+                    },
+                    {
+                      "slug": "zero",
+                      "title": "Zero",
+                      "id": 3
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "rates": [
+                        {
+                          "country": "DE",
+                          "label": "Germany",
+                          "rate": 19,
+                          "tax_label": "VAT",
+                          "default_rate": 19,
+                          "has_custom": true,
+                          "class_rates": {
+                            "standard": {
+                              "rate": 19,
+                              "default_rate": 19,
+                              "has_custom": true,
+                              "label": ""
+                            },
+                            "reduced": {
+                              "rate": 7,
+                              "default_rate": 7,
+                              "has_custom": true,
+                              "label": ""
+                            },
+                            "zero": {
+                              "rate": 0,
+                              "default_rate": 0,
+                              "has_custom": false,
+                              "label": ""
+                            }
+                          }
+                        }
+                      ],
+                      "classes": [
+                        {
+                          "slug": "standard",
+                          "title": "Standard",
+                          "id": 1
+                        },
+                        {
+                          "slug": "reduced",
+                          "title": "Reduced",
+                          "id": 2
+                        },
+                        {
+                          "slug": "zero",
+                          "title": "Zero",
+                          "id": 3
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

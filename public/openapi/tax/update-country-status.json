@@ -1,0 +1,178 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/country-status/{country_code}": {
+      "post": {
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "operationId": "updateCountryStatus",
+        "summary": "POST Update Country Tax Status",
+        "description": "Enable or disable tax collection for a specific country. Accepts an ISO 3166-1 alpha-2 country code or the special code EU to toggle the whole EU group. By default every country is enabled; disabling stores a flag in the fct_meta table.",
+        "tags": [
+          "Tax"
+        ],
+        "parameters": [
+          {
+            "name": "country_code",
+            "in": "path",
+            "description": "ISO 3166-1 alpha-2 country code (e.g., US, DE) or EU for the EU group",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "DE"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "enabled"
+                ],
+                "properties": {
+                  "enabled": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "description": "1 to enable tax for the country, 0 to disable",
+                    "example": 1
+                  }
+                },
+                "example": {
+                  "enabled": 1
+                }
+              },
+              "example": {
+                "enabled": 1
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "enabled": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Country tax status updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "description": "The new status",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tax has been enabled successfully"
+                    }
+                  },
+                  "example": {
+                    "enabled": true,
+                    "message": "Tax has been enabled successfully"
+                  }
+                },
+                "example": {
+                  "enabled": true,
+                  "message": "Tax has been enabled successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "enabled": true,
+                      "message": "Tax has been enabled successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid country code or validation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "Invalid country code"
+                  }
+                },
+                "example": {
+                  "message": "Invalid country code"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Invalid country code"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

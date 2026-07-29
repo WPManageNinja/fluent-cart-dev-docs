@@ -44,7 +44,7 @@ The following computed attributes are automatically appended to the model's arra
 | group              | String    | Tax group |
 | priority           | Integer   | Priority order |
 | is_compound        | Boolean   | Whether tax is compound |
-| for_shipping       | Boolean   | Whether tax applies to shipping |
+| for_shipping       | Decimal   | Shipping-tax rate override percentage (NULL = inherit base rate; 0 = no shipping tax) |
 | for_order          | Boolean   | Whether tax applies to order |
 
 ::: warning No Timestamps
@@ -135,7 +135,7 @@ $taxRate = FluentCart\App\Models\TaxRate::create([
     'group' => 'sales_tax',
     'priority' => 1,
     'is_compound' => false,
-    'for_shipping' => true,
+    'for_shipping' => 5.00, // shipping-tax rate override percentage (NULL = inherit base rate)
     'for_order' => true
 ]);
 ```
@@ -179,10 +179,10 @@ $compoundTaxRates = FluentCart\App\Models\TaxRate::where('is_compound', true)->g
 $nonCompoundTaxRates = FluentCart\App\Models\TaxRate::where('is_compound', false)->get();
 ```
 
-### Get Tax Rates for Shipping
+### Get Tax Rates with a Shipping Override
 
 ```php
-$shippingTaxRates = FluentCart\App\Models\TaxRate::where('for_shipping', true)->get();
+$shippingOverrideRates = FluentCart\App\Models\TaxRate::whereNotNull('for_shipping')->get();
 ```
 
 ### Get Tax Rates for Orders

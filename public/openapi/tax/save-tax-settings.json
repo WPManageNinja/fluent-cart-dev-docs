@@ -25,16 +25,16 @@
   "paths": {
     "/tax/configuration/settings": {
       "post": {
-        "operationId": "saveTaxSettings",
-        "summary": "POST Save Tax Settings",
-        "description": "Save the global tax configuration settings. If tax is enabled for the first time, initial tax classes are automatically created.",
-        "tags": [
-          "Tax"
-        ],
         "security": [
           {
             "ApplicationPasswords": []
           }
+        ],
+        "operationId": "saveTaxSettings",
+        "summary": "POST Save Tax Settings",
+        "description": "Save the global tax configuration settings. Invalid enum values are silently replaced with their defaults. If tax is enabled, initial tax classes are automatically created.",
+        "tags": [
+          "Tax"
         ],
         "requestBody": {
           "required": true,
@@ -79,16 +79,36 @@
                       },
                       "tax_rounding": {
                         "type": "string",
-                        "description": "Rounding method",
+                        "description": "Where tax rounding is applied",
                         "enum": [
                           "item",
+                          "total",
                           "subtotal"
                         ],
                         "example": "subtotal"
                       },
-                      "price_suffix": {
+                      "checkout_tax_breakdown_display": {
                         "type": "string",
-                        "description": "Text appended after product prices",
+                        "description": "How the tax breakdown is displayed at checkout",
+                        "enum": [
+                          "itemized",
+                          "simplified"
+                        ],
+                        "example": "itemized"
+                      },
+                      "tax_display_label": {
+                        "type": "string",
+                        "description": "Label used when displaying tax amounts",
+                        "example": "VAT"
+                      },
+                      "price_suffix_included": {
+                        "type": "string",
+                        "description": "Text appended after prices that include tax",
+                        "example": "incl. VAT"
+                      },
+                      "price_suffix_excluded": {
+                        "type": "string",
+                        "description": "Text appended after prices that exclude tax",
                         "example": "excl. VAT"
                       },
                       "eu_vat_settings": {
@@ -109,10 +129,25 @@
                               "no"
                             ]
                           },
+                          "reverse_charge_price_mode": {
+                            "type": "string",
+                            "enum": [
+                              "fixed",
+                              "dynamic"
+                            ],
+                            "default": "fixed",
+                            "description": "Invalid values are replaced with fixed"
+                          },
                           "vat_reverse_excluded_categories": {
                             "type": "array",
                             "items": {
                               "type": "integer"
+                            }
+                          },
+                          "country_wise_vat": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
                             }
                           }
                         }
@@ -126,14 +161,19 @@
                     "tax_inclusion": "excluded",
                     "tax_calculation_basis": "billing",
                     "tax_rounding": "subtotal",
-                    "price_suffix": "excl. VAT",
+                    "checkout_tax_breakdown_display": "itemized",
+                    "tax_display_label": "VAT",
+                    "price_suffix_included": "incl. VAT",
+                    "price_suffix_excluded": "excl. VAT",
                     "eu_vat_settings": {
                       "require_vat_number": "yes",
                       "local_reverse_charge": "yes",
+                      "reverse_charge_price_mode": "fixed",
                       "vat_reverse_excluded_categories": [
                         12,
                         15
-                      ]
+                      ],
+                      "country_wise_vat": []
                     }
                   }
                 }
@@ -144,14 +184,19 @@
                   "tax_inclusion": "excluded",
                   "tax_calculation_basis": "billing",
                   "tax_rounding": "subtotal",
-                  "price_suffix": "excl. VAT",
+                  "checkout_tax_breakdown_display": "itemized",
+                  "tax_display_label": "VAT",
+                  "price_suffix_included": "incl. VAT",
+                  "price_suffix_excluded": "excl. VAT",
                   "eu_vat_settings": {
                     "require_vat_number": "yes",
                     "local_reverse_charge": "yes",
+                    "reverse_charge_price_mode": "fixed",
                     "vat_reverse_excluded_categories": [
                       12,
                       15
-                    ]
+                    ],
+                    "country_wise_vat": []
                   }
                 }
               },
@@ -164,14 +209,19 @@
                       "tax_inclusion": "excluded",
                       "tax_calculation_basis": "billing",
                       "tax_rounding": "subtotal",
-                      "price_suffix": "excl. VAT",
+                      "checkout_tax_breakdown_display": "itemized",
+                      "tax_display_label": "VAT",
+                      "price_suffix_included": "incl. VAT",
+                      "price_suffix_excluded": "excl. VAT",
                       "eu_vat_settings": {
                         "require_vat_number": "yes",
                         "local_reverse_charge": "yes",
+                        "reverse_charge_price_mode": "fixed",
                         "vat_reverse_excluded_categories": [
                           12,
                           15
-                        ]
+                        ],
+                        "country_wise_vat": []
                       }
                     }
                   }
@@ -222,7 +272,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

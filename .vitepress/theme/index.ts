@@ -11,6 +11,7 @@ import Mermaid from './components/Mermaid.vue'
 import PostList from './components/PostList.vue'
 import PostMeta from './components/PostMeta.vue'
 import TagFilter from './components/TagFilter.vue'
+import CopyPage from './components/CopyPage.vue'
 import './custom.css'
 // OpenAPI styles - loaded globally but scoped to OpenAPI pages via CSS selectors
 import './openapi.css'
@@ -87,7 +88,7 @@ export default {
     return h(DefaultTheme.Layout, null, {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
       // PostMeta renders the byline on /engineering/ posts and nothing elsewhere
-      'doc-before': () => h(PostMeta),
+      'doc-before': () => h('div', null, [h(PostMeta), h(CopyPage)]),
       'doc-after': () => h(FluentCommentsWidget),
     })
   },

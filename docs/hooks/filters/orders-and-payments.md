@@ -1545,7 +1545,7 @@ Applied when retrieving the mapping of country codes to their tax identification
 
 **Returns:** `array` — The modified country tax titles array
 
-**Source:** `app/Modules/Tax/TaxModule.php:821`
+**Source:** `app/Modules/Tax/TaxModule.php (line 1730)`
 
 **Usage:**
 ```php
@@ -1555,6 +1555,36 @@ add_filter('fluent_cart/tax/country_tax_titles', function ($taxTitles) {
     $taxTitles['US'] = __('Tax ID', 'my-plugin');     // Simplify US label
     return $taxTitles;
 }, 10, 1);
+```
+</details>
+
+### <code> tax_summary_should_render </code>
+<details>
+<summary><code>fluent_cart/tax_summary_should_render</code> &mdash; Filter whether the tax summary is rendered for an order receipt</summary>
+
+**When it runs:**
+Applied in `TaxSummaryHelper::computeTaxSummary()` while building the tax summary for an order's receipt surfaces (thank-you page, receipts, emails, PDFs). It runs after the zero-tax short-circuit — when the order has no tax at all and no reverse charge, the summary is already skipped without this filter firing — so it lets you hide the tax summary for orders that do carry tax data.
+
+**Parameters:**
+
+- `$shouldRender` (bool): Whether the tax summary should render (default `true`)
+- `$order` (\FluentCart\App\Models\Order): The order being rendered
+
+**Returns:**
+- `bool` — `false` to hide the tax summary block
+
+**Source:** `app/Services/Renderer/Receipt/TaxSummaryHelper.php (line 172)`
+
+**Usage:**
+```php
+add_filter('fluent_cart/tax_summary_should_render', function ($shouldRender, $order) {
+    // Hide the tax summary for test-mode orders
+    if ($order->mode === 'test') {
+        return false;
+    }
+
+    return $shouldRender;
+}, 10, 2);
 ```
 </details>
 
@@ -1707,20 +1737,31 @@ add_filter('fluent_cart/mollie/subscription_description', function ($description
 <summary><code>fluent_cart/paddle_product_tax_category</code> <Badge type="warning" text="Pro" /> &mdash; Filter Paddle product tax category</summary>
 
 **When it runs:**
-Applied when determining the tax category for a product in Paddle. Paddle uses tax categories to apply the correct tax rates.
+Applied when FluentCart creates the corresponding product on Paddle, to determine the tax category sent with the product data. Paddle uses tax categories to apply the correct tax rates.
 
 **Parameters:**
 - `$taxCategory` (string): The tax category (default `'standard'`)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'product'      => $fctProduct,  // \FluentCart\App\Models\Product|null — the FluentCart product
+        'variation_id' => $variationId, // int|null — the product variation ID
+    ];
+    ```
 
 **Returns:** `string` — The Paddle tax category (e.g., `'standard'`, `'digital-goods'`, `'saas'`)
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Product.php (line 44)`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_product_tax_category', function ($taxCategory) {
-    return 'digital-goods';
-}, 10, 1);
+add_filter('fluent_cart/paddle_product_tax_category', function ($taxCategory, $data) {
+    if ($data['product'] && $data['product']->ID === 123) {
+        return 'digital-goods';
+    }
+
+    return $taxCategory;
+}, 10, 2);
 ```
 </details>
 
@@ -1997,3 +2038,170 @@ add_filter('fluent_cart/authorize_dot_net_supported_currencies', function ($curr
 }, 10, 1);
 ```
 </details>
+
+### <code> authorize_dot_net/transaction_request </code>
+<details>
+<summary><code>fluent_cart/authorize_dot_net/transaction_request</code> <Badge type="warning" text="Pro" /> &mdash; Filter the Authorize.net transaction request before it is sent to the API</summary>
+
+**When it runs:**
+Applied to the assembled `transactionRequest` payload immediately before it is sent to the Authorize.net API. Fires on both the one-time payment path and the subscription first-payment path, so developers can override any Auth.net field (invoice number, customer ID/email, `userFields`, line items, billing/shipping, etc.) without core changes.
+
+**Parameters:**
+- `$transactionRequest` (array): The Authorize.net transaction request payload (amount, payment, billTo, shipTo, lineItems, etc.)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'order'       => $order,        // Order model instance
+        'transaction' => $transaction,  // OrderTransaction model instance
+    ];
+    ```
+
+**Returns:** `array` — The modified transaction request payload
+
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetProcessor.php:71` (one-time) and `:542` (subscription first payment)
+
+**Usage:**
+```php
+add_filter('fluent_cart/authorize_dot_net/transaction_request', function ($transactionRequest, $data) {
+    // Attach a custom purchase order number via userFields
+    $transactionRequest['userFields'] = [
+        'userField' => [
+            ['name' => 'po_number', 'value' => 'PO-' . $data['order']->id],
+        ],
+    ];
+    return $transactionRequest;
+}, 10, 2);
+```
+</details>
+
+### <code> authorize_dot_net/order_description </code>
+<details>
+<summary><code>fluent_cart/authorize_dot_net/order_description</code> <Badge type="warning" text="Pro" /> &mdash; Filter the order description sent to Authorize.net</summary>
+
+**When it runs:**
+Applied when building the order metadata (invoice number and description) for an Authorize.net transaction. The default description is the comma-separated list of item names, or `Order #{id}` when no names are available. The returned value is truncated to 255 characters.
+
+**Parameters:**
+- `$default` (string): The default order description (item names or `Order #{id}`)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'order' => $order,  // Order model instance
+    ];
+    ```
+
+**Returns:** `string` — The order description (truncated to 255 chars)
+
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetHelper.php:222`
+
+**Usage:**
+```php
+add_filter('fluent_cart/authorize_dot_net/order_description', function ($description, $data) {
+    // Prefix the description with the store name
+    return 'My Store — ' . $description;
+}, 10, 2);
+```
+</details>
+
+### <code> should_send_email_notification </code>
+<details>
+<summary><code>fluent_cart/should_send_email_notification</code> &mdash; Control whether an automatic email notification should be sent</summary>
+
+**When it runs:**
+This filter is applied before each automatic email notification is sent for an order event. It allows you to selectively block or allow specific email notifications, for example when using a Merchant of Record payment gateway (like Paddle) that handles its own transactional emails.
+
+**Parameters:**
+
+- `$should` (bool): Whether the email should be sent (default: `true`)
+- `$args` (array): Context data about the notification
+    ```php
+    $args = [
+        'event'     => 'order_paid',          // The event triggering the email
+        'mail_name' => 'order_paid_customer',  // The specific notification identifier
+        'order'     => $order,                 // Order model instance
+    ];
+    ```
+
+**Available `mail_name` values:**
+- `order_paid_customer` — Purchase receipt to customer
+- `order_paid_admin` — New order alert to admin
+- `order_refunded_customer` — Refund confirmation to customer
+- `order_refunded_admin` — Refund alert to admin
+- `subscription_renewed_customer` — Renewal receipt to customer
+- `subscription_renewed_admin` — Renewal alert to admin
+- `subscription_canceled_customer` — Cancellation notice to customer
+- `subscription_canceled_admin` — Cancellation alert to admin
+- `order_placed_customer` — Order confirmation to customer (offline payment)
+- `order_placed_admin` — Order placed alert to admin (offline payment)
+
+**Returns:**
+- `$should` (bool): Whether the email notification should be sent
+
+**Usage:**
+```php
+// Block all customer-facing emails for a specific payment gateway
+add_filter('fluent_cart/should_send_email_notification', function($should, $args) {
+    $order = $args['order'];
+
+    if ($order->payment_method !== 'my_gateway') {
+        return $should;
+    }
+
+    // Only allow order confirmation and admin notifications
+    $allowedEmails = [
+        'order_paid_customer',
+        'order_paid_admin',
+    ];
+
+    return in_array($args['mail_name'], $allowedEmails, true);
+}, 10, 2);
+```
+
+**Note:** This filter only affects automatic event-driven emails. Manual actions like generating invoices or printing receipts from the admin panel are not affected.
+</details>
+
+### <code> paddle_allowed_email_notifications </code>
+<details>
+<summary><code>fluent_cart/paddle_allowed_email_notifications</code> &mdash; Control which email notifications are allowed for Paddle orders</summary>
+
+**When it runs:**
+This filter is applied when determining whether to send an automatic email notification for a Paddle order. Since Paddle is a Merchant of Record and handles its own payment receipts, refund confirmations, and subscription billing emails, FluentCart blocks most automatic emails for Paddle orders by default. Use this filter to customize which emails are still sent by FluentCart.
+
+**Parameters:**
+
+- `$allowedEmails` (array): List of notification identifiers that FluentCart is allowed to send for Paddle orders
+    ```php
+    // Default allowed emails
+    $allowedEmails = [
+        'order_paid_customer',  // Order confirmation to customer
+        'order_paid_admin',     // New order alert to admin
+    ];
+    ```
+
+**Returns:**
+- `$allowedEmails` (array): The modified list of allowed notification identifiers
+
+**Usage:**
+```php
+// Allow shipping notifications for Paddle orders
+add_filter('fluent_cart/paddle_allowed_email_notifications', function($allowedEmails) {
+    $allowedEmails[] = 'shipping_status_changed_to_shipped_customer';
+    $allowedEmails[] = 'shipping_status_changed_to_delivered_customer';
+    return $allowedEmails;
+});
+```
+
+**Available notification identifiers:**
+- `order_paid_customer` — Purchase receipt / order confirmation to customer (allowed by default)
+- `order_paid_admin` — New order alert to admin (allowed by default)
+- `order_refunded_customer` — Refund confirmation to customer
+- `order_refunded_admin` — Refund alert to admin
+- `subscription_renewed_customer` — Renewal receipt to customer
+- `subscription_renewed_admin` — Renewal alert to admin
+- `subscription_canceled_customer` — Cancellation notice to customer
+- `subscription_canceled_admin` — Cancellation alert to admin
+
+**Note:** This filter is specific to Paddle orders. For general email notification control across all payment gateways, use the `fluent_cart/should_send_email_notification` filter instead.
+</details>
+
+---

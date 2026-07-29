@@ -66,17 +66,16 @@ const MODULE_ORDER: Record<string, string[]> = {
   ],
   tax: [
     'get-tax-settings', 'save-tax-settings',
-    'list-tax-classes', 'create-tax-class', 'update-tax-class', 'delete-tax-class',
+    'list-tax-classes', 'create-tax-class', 'delete-tax-class',
     'list-all-tax-rates', 'create-tax-rate', 'update-tax-rate', 'delete-tax-rate',
     'list-tax-records', 'mark-taxes-as-filed',
-    'get-country-tax-rates', 'get-country-tax-id', 'save-country-tax-id',
+    'get-country-tax-rates', 'update-country-status', 'get-country-tax-id', 'save-country-tax-id',
     'save-configured-countries',
-    'get-eu-tax-rates', 'save-eu-vat-cross-border-settings',
-    'get-preconfigured-tax-rates',
-    'save-oss-tax-override', 'delete-oss-tax-override',
-    'save-oss-shipping-tax-override', 'delete-oss-shipping-tax-override',
     'save-shipping-tax-override', 'delete-shipping-tax-override',
-    'delete-country-rates',
+    'get-product-overrides', 'save-product-override', 'delete-product-override',
+    'get-preconfigured-tax-rates',
+    'save-eu-vat-cross-border-settings', 'reset-eu-vat-rates', 'get-eu-vat-product-overrides',
+    'get-oss-country-rates', 'save-oss-country-rates',
   ],
   shipping: [
     'list-shipping-zones', 'get-shipping-zone', 'create-shipping-zone', 'update-shipping-zone', 'delete-shipping-zone',
@@ -291,6 +290,8 @@ export default defineConfig({
   
   head: [
     ['meta', { name: 'theme-color', content: '#136196' }],
+    ['link', { rel: 'icon', href: '/icon.webp' }],
+    ['meta', { property: 'og:image', content: '/fluent-cart-featured.png' }],
     // RSS autodiscovery for the Engineering blog (generated in buildEnd)
     ['link', {
       rel: 'alternate',
@@ -448,7 +449,8 @@ export default defineConfig({
               { text: 'Fee System (Surcharges)', link: '/modules/fee-system' },
               { text: 'Ghost Product Selling', link: '/modules/ghost-product-selling' },
               { text: 'Custom Payment Gateway', link: '/payment-methods-integration/' },
-              { text: '(Payment Gateway) Example', link: '/payment-methods-integration/paddle-example' }
+              { text: '(Payment Gateway) Example', link: '/payment-methods-integration/paddle-example' },
+              { text: 'Subscription Customization', link: '/guides/subscriptions' },
             ]
           },
           { text: 'Engineering', link: '/engineering/' },
@@ -642,24 +644,41 @@ export default defineConfig({
       //     ]
       //   }
       // ],
-      // '/modules/': [
-      //   {
-      //     text: 'Modules',
-      //     items: [
-      //       { text: 'Overview', link: '/modules/' },
-      //       { text: 'Payment Methods', link: '/modules/payment-methods' },
-      //       { text: 'Shipping', link: '/modules/shipping' },
-      //       { text: 'Storage Drivers', link: '/modules/storage' }
-      //     ]
-      //   },
-      //   {
-      //     text: 'Pro Modules',
-      //     items: [
-      //       { text: 'Licensing Module (Pro)', link: '/modules/licensing' },
-      //       { text: 'Order Bump Module (Pro)', link: '/modules/order-bump' }
-      //     ]
-      //   }
-      // ],
+      '/modules/': [
+        {
+          text: 'Tutorials',
+          items: [
+            { text: 'Fee System (Surcharges)', link: '/modules/fee-system' },
+            { text: 'Ghost Product Selling', link: '/modules/ghost-product-selling' }
+          ]
+        },
+        {
+          text: 'Modules',
+          items: [
+            { text: 'Payment Methods', link: '/modules/payment-methods' },
+            { text: 'Shipping', link: '/modules/shipping' },
+            { text: 'Storage Drivers', link: '/modules/storage' }
+          ]
+        },
+        {
+          text: 'Pro Modules',
+          items: [
+            { text: 'Licensing Module (Pro)', link: '/modules/licensing' },
+            { text: 'Order Bump Module (Pro)', link: '/modules/order-bump' }
+          ]
+        }
+      ],
+      '/payment-methods-integration/': [
+        {
+          text: 'Payment Methods Integration',
+          items: [
+            { text: 'Overview', link: '/payment-methods-integration/' },
+            { text: 'Quick Implementation', link: '/payment-methods-integration/quick-implementation' },
+            { text: 'Payment Setting Fields', link: '/payment-methods-integration/payment_setting_fields' },
+            { text: 'Paddle Example', link: '/payment-methods-integration/paddle-example' }
+          ]
+        }
+      ],
       // '/guides/': [
       //   {
       //     text: 'Developer Guides',

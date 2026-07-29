@@ -1,0 +1,389 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/tax/configuration/settings/eu-vat/product-overrides": {
+      "get": {
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "operationId": "getEuVatProductOverrides",
+        "summary": "GET Get EU VAT Product Overrides",
+        "description": "Retrieve product category tax overrides for all EU countries, plus every EU tax rate that has a shipping tax override set. class_id and class_label are appended to each row for convenience.",
+        "tags": [
+          "Tax"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns EU product category overrides and shipping overrides.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "overrides": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProductCategoryTaxOverride"
+                      }
+                    },
+                    "shipping_overrides": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EuShippingOverride"
+                      }
+                    }
+                  },
+                  "example": {
+                    "overrides": [
+                      {
+                        "id": 12,
+                        "object_type": "tax_override",
+                        "object_id": 15,
+                        "meta_key": "product_category_override",
+                        "meta_value": {
+                          "country": "DE",
+                          "state": "",
+                          "city": "",
+                          "postcode": "",
+                          "category_id": 15,
+                          "category_name": "Books",
+                          "tax_label": "Reduced VAT",
+                          "override_state_tax": "no",
+                          "rate": 7,
+                          "class_id": 1
+                        },
+                        "class_id": 1,
+                        "class_label": "Standard",
+                        "created_at": "2025-06-01 12:00:00",
+                        "updated_at": "2025-06-01 12:00:00"
+                      }
+                    ],
+                    "shipping_overrides": [
+                      {
+                        "id": 8,
+                        "class_id": 1,
+                        "country": "DE",
+                        "state": "",
+                        "postcode": "",
+                        "city": "",
+                        "rate": "19.0000",
+                        "name": "DE Standard Tax",
+                        "group": "EU",
+                        "priority": 1,
+                        "is_compound": 0,
+                        "for_shipping": "7.0000",
+                        "for_order": 0,
+                        "class_label": "Standard"
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "overrides": [
+                    {
+                      "id": 12,
+                      "object_type": "tax_override",
+                      "object_id": 15,
+                      "meta_key": "product_category_override",
+                      "meta_value": {
+                        "country": "DE",
+                        "state": "",
+                        "city": "",
+                        "postcode": "",
+                        "category_id": 15,
+                        "category_name": "Books",
+                        "tax_label": "Reduced VAT",
+                        "override_state_tax": "no",
+                        "rate": 7,
+                        "class_id": 1
+                      },
+                      "class_id": 1,
+                      "class_label": "Standard",
+                      "created_at": "2025-06-01 12:00:00",
+                      "updated_at": "2025-06-01 12:00:00"
+                    }
+                  ],
+                  "shipping_overrides": [
+                    {
+                      "id": 8,
+                      "class_id": 1,
+                      "country": "DE",
+                      "state": "",
+                      "postcode": "",
+                      "city": "",
+                      "rate": "19.0000",
+                      "name": "DE Standard Tax",
+                      "group": "EU",
+                      "priority": 1,
+                      "is_compound": 0,
+                      "for_shipping": "7.0000",
+                      "for_order": 0,
+                      "class_label": "Standard"
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "overrides": [
+                        {
+                          "id": 12,
+                          "object_type": "tax_override",
+                          "object_id": 15,
+                          "meta_key": "product_category_override",
+                          "meta_value": {
+                            "country": "DE",
+                            "state": "",
+                            "city": "",
+                            "postcode": "",
+                            "category_id": 15,
+                            "category_name": "Books",
+                            "tax_label": "Reduced VAT",
+                            "override_state_tax": "no",
+                            "rate": 7,
+                            "class_id": 1
+                          },
+                          "class_id": 1,
+                          "class_label": "Standard",
+                          "created_at": "2025-06-01 12:00:00",
+                          "updated_at": "2025-06-01 12:00:00"
+                        }
+                      ],
+                      "shipping_overrides": [
+                        {
+                          "id": 8,
+                          "class_id": 1,
+                          "country": "DE",
+                          "state": "",
+                          "postcode": "",
+                          "city": "",
+                          "rate": "19.0000",
+                          "name": "DE Standard Tax",
+                          "group": "EU",
+                          "priority": 1,
+                          "is_compound": 0,
+                          "for_shipping": "7.0000",
+                          "for_order": 0,
+                          "class_label": "Standard"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProductCategoryTaxOverride": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Override (meta row) ID",
+            "example": 12
+          },
+          "object_type": {
+            "type": "string",
+            "description": "Always tax_override",
+            "example": "tax_override"
+          },
+          "object_id": {
+            "type": "integer",
+            "description": "Product category (term) ID",
+            "example": 15
+          },
+          "meta_key": {
+            "type": "string",
+            "description": "Always product_category_override",
+            "example": "product_category_override"
+          },
+          "meta_value": {
+            "type": "object",
+            "description": "Override data",
+            "properties": {
+              "country": {
+                "type": "string",
+                "description": "ISO 3166-1 alpha-2 country code",
+                "example": "DE"
+              },
+              "state": {
+                "type": "string",
+                "description": "State/province code (empty for country-wide)",
+                "example": ""
+              },
+              "city": {
+                "type": "string",
+                "description": "City name (max 45 characters)",
+                "example": ""
+              },
+              "postcode": {
+                "type": "string",
+                "description": "Postcode/ZIP code",
+                "example": ""
+              },
+              "category_id": {
+                "type": "integer",
+                "description": "Product category (term) ID",
+                "example": 15
+              },
+              "category_name": {
+                "type": "string",
+                "description": "Product category name (resolved server-side)",
+                "example": "Books"
+              },
+              "tax_label": {
+                "type": "string",
+                "description": "Display label for the override tax",
+                "example": "Reduced VAT"
+              },
+              "override_state_tax": {
+                "type": "string",
+                "enum": [
+                  "yes",
+                  "no"
+                ],
+                "description": "Whether the override replaces state-level tax",
+                "example": "no"
+              },
+              "rate": {
+                "type": "number",
+                "description": "Override tax rate percentage (minimum 0)",
+                "example": 7
+              },
+              "class_id": {
+                "type": "integer",
+                "description": "Tax class ID the override applies to (0 = none)",
+                "example": 1
+              }
+            }
+          },
+          "class_id": {
+            "type": "integer",
+            "description": "Tax class ID (appended for convenience)",
+            "example": 1
+          },
+          "class_label": {
+            "type": "string",
+            "description": "Tax class title (empty string when the class no longer exists)",
+            "example": "Standard"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-01 12:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-06-01 12:00:00"
+          }
+        }
+      },
+      "EuShippingOverride": {
+        "type": "object",
+        "description": "A tax rate row in the EU group that has a shipping tax override set",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 8
+          },
+          "class_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "country": {
+            "type": "string",
+            "example": "DE"
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "example": ""
+          },
+          "postcode": {
+            "type": "string",
+            "nullable": true,
+            "example": ""
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "example": ""
+          },
+          "rate": {
+            "type": "string",
+            "example": "19.0000"
+          },
+          "name": {
+            "type": "string",
+            "example": "DE Standard Tax"
+          },
+          "group": {
+            "type": "string",
+            "example": "EU"
+          },
+          "priority": {
+            "type": "integer",
+            "example": 1
+          },
+          "is_compound": {
+            "type": "integer",
+            "example": 0
+          },
+          "for_shipping": {
+            "type": "string",
+            "description": "The shipping override rate",
+            "example": "7.0000"
+          },
+          "for_order": {
+            "type": "integer",
+            "example": 0
+          },
+          "class_label": {
+            "type": "string",
+            "description": "Tax class title (appended for convenience)",
+            "example": "Standard"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

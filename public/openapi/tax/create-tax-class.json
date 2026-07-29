@@ -25,16 +25,16 @@
   "paths": {
     "/tax/classes": {
       "post": {
-        "operationId": "createTaxClass",
-        "summary": "POST Create Tax Class",
-        "description": "Create a new tax class. A unique slug is auto-generated from the title.",
-        "tags": [
-          "Tax"
-        ],
         "security": [
           {
             "ApplicationPasswords": []
           }
+        ],
+        "operationId": "createTaxClass",
+        "summary": "POST Create Tax Class",
+        "description": "Create a new tax class. A unique slug is auto-generated from the title. Pass slug \"reduced\" or \"zero\" to create one of the built-in classes (title is then set automatically). A maximum of 6 tax classes is allowed; the built-in \"standard\" class always exists and cannot be deleted.",
+        "tags": [
+          "Tax"
         ],
         "requestBody": {
           "required": true,
@@ -48,62 +48,28 @@
                 "properties": {
                   "title": {
                     "type": "string",
-                    "description": "Tax class title (max 192 characters)",
+                    "maxLength": 30,
+                    "description": "Tax class title (max 30 characters). Required unless a built-in slug is passed",
                     "example": "Digital Goods"
                   },
-                  "description": {
+                  "slug": {
                     "type": "string",
-                    "description": "Description of the tax class",
-                    "example": "Tax class for digital products"
-                  },
-                  "categories": {
-                    "type": "array",
-                    "items": {
-                      "type": "integer"
-                    },
-                    "description": "Array of product category IDs associated with this tax class",
-                    "example": [
-                      12,
-                      15
-                    ]
-                  },
-                  "priority": {
-                    "type": "integer",
-                    "description": "Sort priority (higher values appear first, default: 0)",
-                    "default": 0,
-                    "example": 7
+                    "description": "Optional. Pass a built-in slug (reduced or zero) to create that built-in class; otherwise the slug is auto-generated from the title",
+                    "example": ""
                   }
                 },
                 "example": {
-                  "title": "Digital Goods",
-                  "description": "Tax class for digital products",
-                  "categories": [
-                    12,
-                    15
-                  ],
-                  "priority": 7
+                  "title": "Digital Goods"
                 }
               },
               "example": {
-                "title": "Digital Goods",
-                "description": "Tax class for digital products",
-                "categories": [
-                  12,
-                  15
-                ],
-                "priority": 7
+                "title": "Digital Goods"
               },
               "examples": {
                 "default": {
                   "summary": "Example request",
                   "value": {
-                    "title": "Digital Goods",
-                    "description": "Tax class for digital products",
-                    "categories": [
-                      12,
-                      15
-                    ],
-                    "priority": 7
+                    "title": "Digital Goods"
                   }
                 }
               }
@@ -118,23 +84,50 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "class": {
+                      "$ref": "#/components/schemas/TaxClass"
+                    },
                     "message": {
                       "type": "string",
-                      "example": "Tax class has been created successfully"
+                      "example": "Tax class created successfully"
                     }
                   },
                   "example": {
-                    "message": "Tax class has been created successfully"
+                    "class": {
+                      "id": 4,
+                      "title": "Digital Goods",
+                      "slug": "digital-goods",
+                      "meta": [],
+                      "created_at": "2025-06-01 12:00:00",
+                      "updated_at": "2025-06-01 12:00:00"
+                    },
+                    "message": "Tax class created successfully"
                   }
                 },
                 "example": {
-                  "message": "Tax class has been created successfully"
+                  "class": {
+                    "id": 4,
+                    "title": "Digital Goods",
+                    "slug": "digital-goods",
+                    "meta": [],
+                    "created_at": "2025-06-01 12:00:00",
+                    "updated_at": "2025-06-01 12:00:00"
+                  },
+                  "message": "Tax class created successfully"
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "message": "Tax class has been created successfully"
+                      "class": {
+                        "id": 4,
+                        "title": "Digital Goods",
+                        "slug": "digital-goods",
+                        "meta": [],
+                        "created_at": "2025-06-01 12:00:00",
+                        "updated_at": "2025-06-01 12:00:00"
+                      },
+                      "message": "Tax class created successfully"
                     }
                   }
                 }
@@ -142,54 +135,59 @@
             }
           },
           "422": {
-            "description": "Validation failed.",
+            "description": "Title exceeds 30 characters.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "errors": {
-                      "type": "object",
-                      "properties": {
-                        "title": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Tax class name must be 30 characters or fewer"
                     }
                   },
                   "example": {
-                    "errors": {
-                      "title": [
-                        "Tax class title is required."
-                      ]
-                    },
-                    "message": "Validation failed"
+                    "message": "Tax class name must be 30 characters or fewer"
                   }
                 },
                 "example": {
-                  "errors": {
-                    "title": [
-                      "Tax class title is required."
-                    ]
-                  },
-                  "message": "Validation failed"
+                  "message": "Tax class name must be 30 characters or fewer"
                 },
                 "examples": {
                   "default": {
                     "summary": "Error response",
                     "value": {
-                      "errors": {
-                        "title": [
-                          "Tax class title is required."
-                        ]
-                      },
-                      "message": "Validation failed"
+                      "message": "Tax class name must be 30 characters or fewer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "Limit reached, missing title, or duplicate class. Returned when 6 classes already exist, the title is missing, or a class with the same slug already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Maximum of 6 tax classes allowed"
+                    }
+                  },
+                  "example": {
+                    "message": "Maximum of 6 tax classes allowed"
+                  }
+                },
+                "example": {
+                  "message": "Maximum of 6 tax classes allowed"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Maximum of 6 tax classes allowed"
                     }
                   }
                 }
@@ -201,13 +199,54 @@
     }
   },
   "components": {
-    "schemas": {},
+    "schemas": {
+      "TaxClass": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Tax class ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Tax class title",
+            "example": "Standard"
+          },
+          "slug": {
+            "type": "string",
+            "description": "Tax class slug (unique, auto-generated from the title)",
+            "example": "standard"
+          },
+          "meta": {
+            "type": "array",
+            "description": "Tax class metadata (empty array when unset)",
+            "items": {
+              "type": "object"
+            },
+            "example": []
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2025-01-01 00:00:00"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp",
+            "example": "2025-01-01 00:00:00"
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

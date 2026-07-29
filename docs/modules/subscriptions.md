@@ -131,11 +131,21 @@ Declared as `$supportedFeatures` on each gateway; tested with `AbstractPaymentGa
 | COD / offline | — | — | — | — | — | — |
 | Authorize.net, Mollie, Paddle (pro) | ✅ | ✅ | — | — | — | Paddle only |
 | Square, Paystack, Flutterwave, Razorpay (addons) | ✅ | — | — | — | — | — |
-| MercadoPago, SSLCommerz (addons) | — | — | — | — | — | — |
+| MercadoPago, SSLCommerz (addons) | — | ✅ | — | — | — | — |
 
 `zero_recurring` (backed by `supportsSetupWithoutCharge()`) is what lets a gateway vault a card at **\$0** — the free-trial `system` case. Only Stripe has it; PayPal does `system` but only when the cart charges something now.
 
-`manual_subscription` is independent of `system_subscription` — it only claims a gateway routes a store-managed subscription's first payment through its existing one-time-charge path instead of creating a vendor subscription (`shouldChargeSubscriptionAsOneTime()`, below). COD/offline and the plain one-time addons don't need it: `storeBilledOnly()` already admits them via `!has('subscriptions')` / `has('offline')`.
+`manual_subscription` is independent of `system_subscription` — it only claims a gateway routes a store-managed subscription's first payment through its existing one-time-charge path instead of creating a vendor subscription (`shouldChargeSubscriptionAsOneTime()`, below). COD/offline don't need it: `storeBilledOnly()` already admits them via `has('offline')` / `!has('subscriptions')`. MercadoPago and SSLCommerz declare it anyway even though the same `!has('subscriptions')` short-circuit already admits them — it's redundant, not load-bearing.
+
+The actual admit/hide decision for store-managed checkout lives in `SubscriptionGatewayGate::storeBilledOnly()` (`app/Modules/Subscriptions/Services/SubscriptionGatewayGate.php`):
+
+```php
+return $gateway->has('offline')
+    || !$gateway->has('subscriptions')
+    || $gateway->has('manual_subscription');
+```
+
+A gateway is eligible if it's offline, or doesn't declare `subscriptions` at all, or declares `subscriptions` **and** `manual_subscription`. That third branch is the only case where `manual_subscription` changes anything — it's what lets Stripe/PayPal/Authorize.net/Mollie/Paddle (subscription-capable gateways) also be offered on a store-managed cart instead of being excluded.
 
 Two traps worth knowing:
 

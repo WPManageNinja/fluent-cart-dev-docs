@@ -428,7 +428,7 @@ add_filter('fluent_cart/cart/fees', function (array $fees, array $context) {
 ## Related Documentation
 
 - [Developer Hooks](/hooks/) - Complete hooks and filters reference
-- [Orders API](/restapi/operations/orders/) - Order management API
+- [Orders API](/restapi/orders/) - Order management API
 - [Database Models](/database/models/) - Data model documentation
 - [Ghost Product Selling](/modules/ghost-product-selling) - Custom product selling guide
 

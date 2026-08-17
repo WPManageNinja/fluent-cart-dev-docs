@@ -289,7 +289,7 @@ Hooks for the custom FluentCart block editor used to compose email templates. Th
 
 ### <code> fluent_cart_enqueue_block_editor_assets </code>
 <details>
-<summary><code>fluent_cart_enqueue_block_editor_assets</code> &mdash; Block editor assets being enqueued</summary>
+<summary><code>fluent_cart_enqueue_block_editor_assets</code> <Badge type="warning" text="Pro" /> &mdash; Block editor assets being enqueued</summary>
 
 **When it runs:**
 Fires at the end of `FluentCartBlockEditorHandler::enqueueEditorStyles()`, after all core WordPress block editor styles (`wp-edit-post`, `wp-block-library`, etc.) have been enqueued. WordPress's own `wp_enqueue_editor_format_library_assets` is also attached to this hook. Use it to add custom styles or scripts to the email block editor.
@@ -311,7 +311,7 @@ add_action('fluent_cart_enqueue_block_editor_assets', function () {
 
 ### <code> fluent_cart_block_editor/head </code>
 <details>
-<summary><code>fluent_cart_block_editor/head</code> &mdash; In <code>&lt;head&gt;</code> of custom block editor page</summary>
+<summary><code>fluent_cart_block_editor/head</code> <Badge type="warning" text="Pro" /> &mdash; In <code>&lt;head&gt;</code> of custom block editor page</summary>
 
 **When it runs:**
 Fires inside the `<head>` tag of the custom block editor HTML page. WordPress core hooks (`wp_enqueue_scripts`, `wp_print_styles`, `wp_print_head_scripts`, etc.) are pre-attached to this action so that editor stylesheets and scripts are output in the correct location. Use this to inject additional `<meta>`, `<link>`, or `<style>` tags into the editor page head.
@@ -333,7 +333,7 @@ add_action('fluent_cart_block_editor/head', function () {
 
 ### <code> fluent_cart/block_editor_head </code>
 <details>
-<summary><code>fluent_cart/block_editor_head</code> &mdash; Second head hook in block editor page</summary>
+<summary><code>fluent_cart/block_editor_head</code> <Badge type="warning" text="Pro" /> &mdash; Second head hook in block editor page</summary>
 
 **When it runs:**
 Fires immediately after `fluent_cart_block_editor/head` inside the `<head>` tag, right before the closing `</head>`. This is a secondary head hook — use it for last-minute style overrides or scripts that must load after everything else in the head.
@@ -355,7 +355,7 @@ add_action('fluent_cart/block_editor_head', function () {
 
 ### <code> fluent_cart/new_block_editor_footer </code>
 <details>
-<summary><code>fluent_cart/new_block_editor_footer</code> &mdash; Footer of custom block editor page (for JS)</summary>
+<summary><code>fluent_cart/new_block_editor_footer</code> <Badge type="warning" text="Pro" /> &mdash; Footer of custom block editor page (for JS)</summary>
 
 **When it runs:**
 Fires inside the `<body>` of the custom block editor page, after the editor `<div>` and before `</body>`. This is the recommended place to inject footer JavaScript for the email editor.
@@ -377,7 +377,7 @@ add_action('fluent_cart/new_block_editor_footer', function () {
 
 ### <code> fluent_cart/block_editor/enqueue_assets </code>
 <details>
-<summary><code>fluent_cart/block_editor/enqueue_assets</code> &mdash; After email editor block assets enqueued</summary>
+<summary><code>fluent_cart/block_editor/enqueue_assets</code> <Badge type="warning" text="Pro" /> &mdash; After email editor block assets enqueued</summary>
 
 **When it runs:**
 Fires at the end of `FluentCartBlockEditorHandler::enqueueEmailEditorBlocks()`, after all FluentCart-specific email editor block scripts, styles, and global editor SCSS have been enqueued. Use this to register additional custom blocks or scripts for the email editor.
@@ -399,7 +399,7 @@ add_action('fluent_cart/block_editor/enqueue_assets', function () {
 
 ### <code> fluent_cart/block_editor/render_block </code>
 <details>
-<summary><code>fluent_cart/block_editor/render_block</code> &mdash; Render unknown block types in email parser</summary>
+<summary><code>fluent_cart/block_editor/render_block</code> <Badge type="warning" text="Pro" /> &mdash; Render unknown block types in email parser</summary>
 
 **When it runs:**
 Fires inside `FluentBlockParser` when processing a block whose name is not recognised by any built-in handler and is not a standard email editor block. The hook runs inside `ob_start()` — any output you `echo` will be captured and used as the block's rendered HTML in the email. If nothing is output, the parser falls back to raw `innerHTML`.
@@ -953,23 +953,22 @@ add_action('fluent_cart/email_notification_updated', function ($notification, $s
 <summary><code>fluent_cart/store_digest/send</code> &mdash; Trigger the store performance digest email to be sent</summary>
 
 **When it runs:**
-This is a **trigger** hook, not just a listener hook — the hourly scheduler calls `do_action('fluent_cart/store_digest/send', $frequency)` when a digest is due, and FluentCart's own listener (registered on this same hook) builds and sends the digest email. You can also call it yourself (e.g. from WP-CLI or a debugging script) to force an on-demand digest send for a given frequency.
+This is an **inbound** hook — FluentCart *listens* on it, and nothing in core fires it. `HourlyScheduler::register()` attaches a handler that calls `StoreDigestService::sendDigest($frequency)`, so firing this action yourself sends a digest on demand (from WP-CLI or a debugging script).
+
+::: warning It does not observe scheduled digests
+Scheduled digests do **not** pass through this hook. `HourlyScheduler::handle()` calls `StoreDigestService::runDueDigests()` directly, bypassing it. A callback added here will therefore fire only for digests *you* trigger, never for the automatic daily/weekly/monthly sends. To observe every digest, filter [`fluent_cart/store_digest/data`](../filters/settings-and-configuration) or [`fluent_cart/store_digest/recipients`](../filters/settings-and-configuration) instead, both of which run on the scheduled path.
+:::
 
 **Parameters:**
 
-- `$frequency` (string): The digest frequency/period to send, e.g. `'daily'`
+- `$frequency` (string): The digest period to send — `'daily'`, `'weekly'` or `'monthly'`
 
-**Source:** `app/Hooks/Scheduler/AutoSchedules/HourlyScheduler.php:18`
+**Source:** `app/Hooks/Scheduler/AutoSchedules/HourlyScheduler.php:19` (the listener FluentCart registers)
 
 **Usage:**
 ```php
-// Force-send today's daily digest on demand (e.g. from wp-cli eval-file.php)
+// Force-send today's daily digest on demand (e.g. from wp eval-file)
 do_action('fluent_cart/store_digest/send', 'daily');
-
-// Or listen alongside the core handler to also notify Slack
-add_action('fluent_cart/store_digest/send', function ($frequency) {
-    my_plugin_notify_slack_digest_sent($frequency);
-}, 20, 1);
 ```
 </details>
 

@@ -1498,7 +1498,7 @@ add_filter('fluent_cart/payments_translations', function ($translations, $data) 
 
 ### <code> pro/admin_translations </code> <Badge type="warning" text="Pro" />
 <details>
-<summary><code>fluent_cart_pro/admin_translations</code> &mdash; Filter Pro admin translations</summary>
+<summary><code>fluent_cart_pro/admin_translations</code> <Badge type="warning" text="Pro" /> &mdash; Filter Pro admin translations</summary>
 
 **When it runs:**
 This filter is applied when loading translation strings specific to FluentCart Pro features in the admin panel.
@@ -1849,7 +1849,7 @@ add_filter('fluent_cart/condition_presets', function ($presets) {
 
 ### <code> evaluate_condition_preset </code>
 <details>
-<summary><code>fluent_cart/evaluate_condition_preset</code> &mdash; Filter evaluate condition preset</summary>
+<summary><code>fluent_cart/evaluate_condition_preset</code> <Badge type="warning" text="Pro" /> &mdash; Filter evaluate condition preset</summary>
 
 **When it runs:**
 This filter is applied when evaluating a condition preset that has no shortcode and no callback defined. It serves as a fallback for custom condition evaluation logic.
@@ -2183,7 +2183,7 @@ add_filter('fluent_cart/report/sources_query', function ($query, $params) {
 
 ### <code> block_editor_require_nonce </code>
 <details>
-<summary><code>fluent_cart/block_editor_require_nonce</code> &mdash; Filter whether the block editor requires nonce verification</summary>
+<summary><code>fluent_cart/block_editor_require_nonce</code> <Badge type="warning" text="Pro" /> &mdash; Filter whether the block editor requires nonce verification</summary>
 
 **When it runs:**
 This filter is applied when loading the FluentCart block editor (email template editor). It controls whether nonce verification is enforced for editor access.
@@ -2239,7 +2239,7 @@ add_filter('fluent_cart/disable_pro_email_templates', function ($disable) {
 
 ### <code> skip_no_conflict (editor) </code>
 <details>
-<summary><code>fluent_cart_editor/skip_no_conflict</code> &mdash; Filter whether to skip script unloading in the block editor</summary>
+<summary><code>fluent_cart_editor/skip_no_conflict</code> <Badge type="warning" text="Pro" /> &mdash; Filter whether to skip script unloading in the block editor</summary>
 
 **When it runs:**
 This filter is applied when the email block editor loads. FluentCart aggressively unloads third-party scripts to prevent conflicts. Return `true` to skip this behavior and allow all scripts.
@@ -2263,7 +2263,7 @@ add_filter('fluent_cart_editor/skip_no_conflict', function ($skip) {
 
 ### <code> asset_listed_slugs (editor) </code>
 <details>
-<summary><code>fluent_cart_editor/asset_listed_slugs</code> &mdash; Filter approved script slugs in block editor</summary>
+<summary><code>fluent_cart_editor/asset_listed_slugs</code> <Badge type="warning" text="Pro" /> &mdash; Filter approved script slugs in block editor</summary>
 
 **When it runs:**
 This filter is applied when unloading third-party scripts from the email block editor. Only scripts matching these slug patterns (regex) will be kept.
@@ -2294,7 +2294,7 @@ add_filter('fluent_cart_editor/asset_listed_slugs', function ($approvedSlugs) {
 
 ### <code> skip_no_conflict (styles) </code>
 <details>
-<summary><code>fluent_cart/skip_no_conflict</code> &mdash; Filter whether to skip style unloading in the block editor</summary>
+<summary><code>fluent_cart/skip_no_conflict</code> <Badge type="warning" text="Pro" /> &mdash; Filter whether to skip style unloading in the block editor</summary>
 
 **When it runs:**
 This filter is applied when unloading third-party stylesheets from the email block editor. Return `true` to allow all styles to load without filtering.
@@ -2321,7 +2321,7 @@ add_filter('fluent_cart/skip_no_conflict', function ($skip, $type) {
 
 ### <code> asset_listed_slugs (styles) </code>
 <details>
-<summary><code>fluent_cart/asset_listed_slugs</code> &mdash; Filter approved style slugs in block editor</summary>
+<summary><code>fluent_cart/asset_listed_slugs</code> <Badge type="warning" text="Pro" /> &mdash; Filter approved style slugs in block editor</summary>
 
 **When it runs:**
 This filter is applied when filtering third-party stylesheets from the email block editor. Only styles matching these slug patterns (regex) will be kept.
@@ -2352,7 +2352,7 @@ add_filter('fluent_cart/asset_listed_slugs', function ($approvedSlugs) {
 
 ### <code> block_editor_unregister_all_patterns </code>
 <details>
-<summary><code>fluent_cart/block_editor_unregister_all_patterns</code> &mdash; Filter whether to unregister default block patterns</summary>
+<summary><code>fluent_cart/block_editor_unregister_all_patterns</code> <Badge type="warning" text="Pro" /> &mdash; Filter whether to unregister default block patterns</summary>
 
 **When it runs:**
 This filter is applied when loading the email block editor. By default, all WordPress core block patterns are removed since they are designed for web pages, not emails.
@@ -2381,7 +2381,7 @@ add_filter('fluent_cart/block_editor_unregister_all_patterns', function ($should
 
 ### <code> block_editor_settings </code>
 <details>
-<summary><code>fluent_cart/block_editor_settings</code> &mdash; Filter block editor settings</summary>
+<summary><code>fluent_cart/block_editor_settings</code> <Badge type="warning" text="Pro" /> &mdash; Filter block editor settings</summary>
 
 **When it runs:**
 This filter is applied when preparing the settings object for the Gutenberg-based email block editor. It includes styles, image sizes, block categories, and editor configuration.
@@ -2418,7 +2418,7 @@ add_filter('fluent_cart/block_editor_settings', function ($editor_settings) {
 
 ### <code> editor_allowed_block_types </code>
 <details>
-<summary><code>fluent_cart/editor_allowed_block_types</code> &mdash; Filter allowed block types in the email editor</summary>
+<summary><code>fluent_cart/editor_allowed_block_types</code> <Badge type="warning" text="Pro" /> &mdash; Filter allowed block types in the email editor</summary>
 
 **When it runs:**
 This filter is applied when determining which Gutenberg block types are available in the email block editor. Only whitelisted blocks appear in the inserter.

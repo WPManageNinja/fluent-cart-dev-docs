@@ -589,7 +589,7 @@ This filter is applied when rendering the "Buy Now" button on single product pag
 **Returns:**
 - `$text` (string): The modified button text
 
-**Source:** `app/Services/Renderer/ProductRenderer.php:1081,1181`, `app/Modules/Templating/AssetLoader.php:87,261`
+**Source:** `app/Services/Renderer/ProductRenderer.php:1500,1606`, `app/Modules/Templating/AssetLoader.php:87,261`
 
 **Usage:**
 ```php
@@ -623,7 +623,7 @@ This filter is applied when rendering the "Add to Cart" button text across multi
 **Returns:**
 - `$text` (string): The modified button text
 
-**Source:** `app/Services/Renderer/ProductRenderer.php:1227,1314`, `app/Hooks/Handlers/ShortCodes/SingleProductShortCode.php:81`, `app/Hooks/Handlers/BlockEditors/ShopApp/InnerBlocks/InnerBlocks.php:1025,1104`, `app/Modules/Templating/AssetLoader.php:83,258`, `app/Hooks/Handlers/BlockEditors/ProductCarousel/InnerBlocks/InnerBlocks.php:493`
+**Source:** `app/Services/Renderer/ProductRenderer.php:1659,1775`, `app/Hooks/Handlers/ShortCodes/SingleProductShortCode.php:81`, `app/Hooks/Handlers/BlockEditors/ShopApp/InnerBlocks/InnerBlocks.php:1025,1104`, `app/Modules/Templating/AssetLoader.php:83,258`, `app/Hooks/Handlers/BlockEditors/ProductCarousel/InnerBlocks/InnerBlocks.php:493`
 
 **Usage:**
 ```php

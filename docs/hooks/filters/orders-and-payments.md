@@ -551,7 +551,7 @@ Applied when checking how many licenses should exist for an order. Used to detec
 
 **Returns:** `int` — The expected number of licenses
 
-**Source:** `app/Http/Controllers/OrderController.php:215,585`
+**Source:** `app/Http/Controllers/OrderController.php:314,696`
 
 **Usage:**
 ```php
@@ -1816,7 +1816,7 @@ Applied when checking and enforcing the rate limit for Stripe SetupIntent creati
 
 **Returns:** `int` — The modified daily rate limit
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/SubscriptionsManager.php:85,101`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/SubscriptionsManager.php:92,108`
 
 **Usage:**
 ```php
@@ -2723,7 +2723,7 @@ add_filter('fluent_cart/should_send_email_notification', function($should, $args
 
 ### <code> paddle_allowed_email_notifications </code>
 <details>
-<summary><code>fluent_cart/paddle_allowed_email_notifications</code> &mdash; Control which email notifications are allowed for Paddle orders</summary>
+<summary><code>fluent_cart/paddle_allowed_email_notifications</code> <Badge type="warning" text="Pro" /> &mdash; Control which email notifications are allowed for Paddle orders</summary>
 
 **When it runs:**
 This filter is applied when determining whether to send an automatic email notification for a Paddle order. Since Paddle is a Merchant of Record and handles its own payment receipts, refund confirmations, and subscription billing emails, FluentCart blocks most automatic emails for Paddle orders by default. Use this filter to customize which emails are still sent by FluentCart.

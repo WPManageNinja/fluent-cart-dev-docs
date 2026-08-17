@@ -106,7 +106,7 @@ This filter is applied when preparing the customer portal dashboard data, includ
 **Returns:**
 - `$data` (array): The modified dashboard data
 
-**Source:** `app/Http/Controllers/FrontendControllers/CustomerProfileController.php:58,114`
+**Source:** `app/Http/Controllers/FrontendControllers/CustomerProfileController.php:65,122`
 
 **Usage:**
 ```php
@@ -1480,7 +1480,7 @@ add_filter('fluent_cart/subscriptions/system_collection_enabled', function($enab
 
 ### <code> subscription/early_payment_enabled </code>
 <details>
-<summary><code>fluent_cart/subscription/early_payment_enabled</code> <Badge type="warning" text="Pro" /> &mdash; Filter whether early installment payments are enabled</summary>
+<summary><code>fluent_cart/subscription/early_payment_enabled</code> &mdash; Filter whether early installment payments are enabled</summary>
 
 **When it runs:**
 This filter is applied when checking if the early payment feature for installment subscriptions is globally enabled. Requires FluentCart Pro to be active.
@@ -1508,7 +1508,7 @@ add_filter('fluent_cart/subscription/early_payment_enabled', function($isEnabled
 
 ### <code> subscription/can_early_pay </code>
 <details>
-<summary><code>fluent_cart/subscription/can_early_pay</code> <Badge type="warning" text="Pro" /> &mdash; Filter whether a specific subscription can make an early payment</summary>
+<summary><code>fluent_cart/subscription/can_early_pay</code> &mdash; Filter whether a specific subscription can make an early payment</summary>
 
 **When it runs:**
 This filter is applied when checking if a specific installment subscription is eligible for early payment. The default check requires that early payments are globally enabled, the subscription has a finite bill count, there are remaining installments, and the subscription status is `active` or `trialing`.

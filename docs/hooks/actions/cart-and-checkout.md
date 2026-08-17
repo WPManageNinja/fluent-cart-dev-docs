@@ -391,10 +391,18 @@ add_action('fluent_cart/checkout/form_data_changed', function ($data) {
 
 ### <code> customer_data_saved </code>
 <details>
-<summary><code>fluent_cart/checkout/customer_data_saved</code> &mdash; Fired when customer checkout data is saved</summary>
+<summary><code>fluent_cart/checkout/customer_data_saved</code> &mdash; Removed in 1.4.0 — no longer fired</summary>
 
-**When it runs:**
-This action fires when a specific piece of customer data is saved during the checkout process. The hook provides both the old and new values, making it useful for detecting changes. It fires after the data has already been persisted to the cart model.
+::: danger Removed in 1.4.0 — this hook no longer fires
+`fluent_cart/checkout/customer_data_saved` was removed from the checkout refactor in commit `ebeae0dc3` (2026-05-14, shipped in **1.4.0**). It does not exist anywhere in FluentCart or FluentCart Pro today, so a callback registered on it will **never run** — silently, with no error.
+
+This entry is kept only so that anyone whose integration stopped working can find out why. Do not write new code against it.
+
+**What to use instead:** the checkout data is now persisted without a per-key notification. To react to checkout field changes, hook [`fluent_cart/checkout/validate_data`](../filters/cart-and-checkout) before persistence, or read the final state from the order lifecycle actions in [Orders](./orders) after checkout completes.
+:::
+
+**When it fired (historical, prior to 1.4.0):**
+It fired when a specific piece of customer data was saved during checkout, after the value had been persisted to the cart model, and passed both the old and new values so a listener could detect changes.
 
 **Parameters:**
 

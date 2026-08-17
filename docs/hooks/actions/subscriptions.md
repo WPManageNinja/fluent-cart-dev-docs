@@ -65,7 +65,7 @@ This action fires when a subscription's status transitions to `active`. This may
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:852`
 
 **Usage:**
 ```php
@@ -372,7 +372,7 @@ This action fires when [Subscription](/database/models/subscription) attributes 
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:418,1141`
 
 **Usage:**
 ```php

@@ -863,7 +863,7 @@ add_filter('fluent_cart/checkout/summary_extra_lines', function ($extraLines, $d
 **When it runs:**
 This filter fires after the billing address fields have been assembled and rearranged in the checkout renderer. It allows modification of the fully prepared billing field HTML structures before output.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:448`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:559`
 
 **Parameters:**
 

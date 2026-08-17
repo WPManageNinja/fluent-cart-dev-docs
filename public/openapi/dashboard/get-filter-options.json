@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getFilterOptions",
         "summary": "GET Get Filter Options",
-        "description": "Retrieve dynamic filter options for the advanced filter dropdowns. Supports loading product variations, labels, and extensible custom data keys via WordPress filters.",
+        "description": "Retrieve dynamic filter options for the advanced filter dropdowns. Supports loading product variations, labels, and extensible custom data keys via WordPress filters.\n\n**Access policy:** `AdvanceFilterPolicy`\n\n**Access policy:** `AdvanceFilterPolicy`",
         "tags": [
           "Dashboard"
         ],
@@ -147,6 +147,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

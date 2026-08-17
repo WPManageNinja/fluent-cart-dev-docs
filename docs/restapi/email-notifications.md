@@ -239,7 +239,7 @@ Update an email notification template's settings including subject, body content
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `notification` | string | path | Yes | The notification key (e.g., `order_paid_customer`) |
-| `settings.subject` | string | body | Yes | Email subject line (max 255 characters). Supports shortcodes like `{{order.invoice_no}}` |
+| `settings.subject` | string | body | Yes | Email subject line (max 255 characters). Supports shortcodes like <code v-pre>{{order.invoice_no}}</code> |
 | `settings.email_body` | string | body | No | Custom email body content (HTML). Sanitized with `wp_kses_post` |
 | `settings.active` | string | body | No | Enable or disable the notification: `yes` or `no` |
 | `settings.is_default_body` | string | body | No | Whether to use the default template body: `yes` or `no`. When set to `yes`, the custom `email_body` is cleared |
@@ -523,7 +523,7 @@ Update the global email configuration settings for all notification emails.
 | `reply_to_name` | string | body | No | Reply-to name (max 255 characters) |
 | `reply_to_email` | string | body | No | Reply-to email address (must be valid email, max 255 characters) |
 | `email_footer` | string | body | No | HTML content for the email footer. Sanitized with `wp_kses_post` |
-| `admin_email` | string | body | Yes | Admin notification recipient email(s). Supports shortcodes like `{{wp.admin_email}}` |
+| `admin_email` | string | body | Yes | Admin notification recipient email(s). Supports shortcodes like <code v-pre>{{wp.admin_email}}</code> |
 | `show_email_footer` | string | body | No | Show or hide the email footer: `yes` or `no`. Note: On free plans, this is always forced to `yes` |
 
 ### Validation Rules

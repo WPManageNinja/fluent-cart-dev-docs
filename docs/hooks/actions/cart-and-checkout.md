@@ -158,11 +158,102 @@ add_action('fluent_cart/cart_completed', function ($data) {
 ```
 </details>
 
+### <code> before_totals_calculation </code>
+<details>
+<summary><code>fluent_cart/cart/before_totals_calculation</code> &mdash; Before the cart's grand total is recalculated</summary>
+
+**When it runs:**
+This action fires at the start of `Cart::getEstimatedTotal()` (or equivalent total-calculation path), before dynamic discounts (`fluent_cart/cart/item_dynamic_discount`) are applied and before line items are re-summed. A `self::$calculatingTotal` guard is set to `true` immediately before this fires, preventing re-entrant recalculation.
+
+**Parameters:**
+
+- `$data` (array): The cart about to be recalculated
+    ```php
+    $data = [
+        'cart' => $this,  // \FluentCart\App\Models\Cart instance
+    ];
+    ```
+
+**Source:** `app/Models/Cart.php:1194`
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/before_totals_calculation', function ($data) {
+    $cart = $data['cart'];
+    // Warm a cache needed by a custom pricing rule before totals run
+    my_plugin_prime_pricing_cache($cart->id);
+}, 10, 1);
+```
+</details>
+
+### <code> after_totals_calculation </code>
+<details>
+<summary><code>fluent_cart/cart/after_totals_calculation</code> &mdash; After the cart's grand total has been recalculated</summary>
+
+**When it runs:**
+This action fires at the end of `Cart::getEstimatedTotal()`, after fees, discounts, prorate credits, and upgrade discounts have all been applied to produce the final total. It fires right before the `self::$calculatingTotal` guard is released.
+
+**Parameters:**
+
+- `$data` (array): The cart and its computed total
+    ```php
+    $data = [
+        'cart'  => $this,        // \FluentCart\App\Models\Cart instance
+        'total' => $finalTotal,  // int — the final cart total in cents
+    ];
+    ```
+
+**Source:** `app/Models/Cart.php:1244`
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/after_totals_calculation', function ($data) {
+    $cart = $data['cart'];
+    $total = \FluentCart\App\Helpers\Helper::toDecimal($data['total']);
+    error_log('Cart #' . $cart->id . ' recalculated total: ' . $total);
+}, 10, 1);
+```
+</details>
+
 ---
 
 ## Checkout Data Events
 
 ---
+
+### <code> order/after_items_calculated </code>
+<details>
+<summary><code>fluent_cart/order/after_items_calculated</code> &mdash; After the draft order's items/totals are calculated</summary>
+
+**When it runs:**
+This action fires during the checkout submission flow (`CheckoutApi`), right after the draft [Order](/database/models/order)'s line items and totals have been calculated, and immediately before the `fluent_cart/checkout/prepare_other_data` hook below (same request, same method).
+
+**Parameters:**
+
+- `$data` (array): Order and cart context
+    ```php
+    $data = [
+        'order'      => $createdOrder,                    // \FluentCart\App\Models\Order — the newly created draft order
+        'cart'       => $cart,                             // \FluentCart\App\Models\Cart instance
+        'cart_items' => $cartCheckoutHelper->getItems(),    // array — resolved cart items
+    ];
+    ```
+
+**Source:** `api/Checkout/CheckoutApi.php:269`
+
+**Usage:**
+```php
+add_action('fluent_cart/order/after_items_calculated', function ($data) {
+    $order = $data['order'];
+    // Attach a custom line-item summary before other modules touch the order
+    fluent_cart_add_log(
+        'Order Items Calculated',
+        sprintf('Order #%d totals calculated with %d items.', $order->id, count($data['cart_items'])),
+        'info'
+    );
+}, 10, 1);
+```
+</details>
 
 ### <code> prepare_other_data </code>
 <details>
@@ -434,6 +525,10 @@ add_action('fluent_cart/before_checkout_page_start', function ($data) {
 <details>
 <summary><code>fluent_cart/afrer_checkout_page_start</code> &mdash; After the checkout page wrapper div opens</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart/afrer_checkout_page_start` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/after_checkout_page_start`** instead — it receives the same value.
+:::
 **When it runs:**
 This action fires right after the main checkout page `<div>` wrapper opens. Note the typo in the hook name (`afrer` instead of `after`) — this matches the actual hook name in the source code and must be used as-is.
 
@@ -453,6 +548,33 @@ This action fires right after the main checkout page `<div>` wrapper opens. Note
 add_action('fluent_cart/afrer_checkout_page_start', function ($data) {
     $cart = $data['cart'];
     // Insert a progress indicator at the top of the checkout page
+    echo '<div class="my-checkout-progress-bar">Step 1 of 3: Checkout</div>';
+}, 10, 1);
+```
+</details>
+
+### <code> after_checkout_page_start </code>
+<details>
+<summary><code>fluent_cart/after_checkout_page_start</code> &mdash; After the checkout page wrapper div opens (corrected hook name)</summary>
+
+**When it runs:**
+This is the corrected, non-deprecated replacement for `fluent_cart/afrer_checkout_page_start` above (both fire back-to-back from the same call site, via `do_action_deprecated()` followed by `do_action()`). Use this hook name going forward.
+
+**Parameters:**
+
+- `$data` (array): The current cart
+    ```php
+    $data = [
+        'cart' => $cart,  // \FluentCart\App\Models\Cart instance
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:155`
+
+**Usage:**
+```php
+add_action('fluent_cart/after_checkout_page_start', function ($data) {
+    $cart = $data['cart'];
     echo '<div class="my-checkout-progress-bar">Step 1 of 3: Checkout</div>';
 }, 10, 1);
 ```
@@ -597,6 +719,35 @@ add_action('fluent_cart/after_billing_fields_section', function ($data) {
 ```
 </details>
 
+### <code> checkout/b2b_extra_fields </code>
+<details>
+<summary><code>fluent_cart/checkout/b2b_extra_fields</code> &mdash; Inside the billing fields area, for custom B2B fields</summary>
+
+**When it runs:**
+This action fires within the billing address fields section of the checkout form (`CheckoutRenderer::renderBillingAddressFields()`), after the standard billing fields. Use it to render extra business-oriented fields such as a company name, tax ID/VAT number, or purchase-order reference.
+
+**Parameters:**
+
+- `$data` (array): The current cart
+    ```php
+    $data = [
+        'cart' => $this->cart,  // \FluentCart\App\Models\Cart instance
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:420`
+
+**Usage:**
+```php
+add_action('fluent_cart/checkout/b2b_extra_fields', function ($data) {
+    echo '<div class="fct-field-wrap">';
+    echo '<label for="company_vat_number">VAT Number</label>';
+    echo '<input type="text" id="company_vat_number" name="company_vat_number" />';
+    echo '</div>';
+}, 10, 1);
+```
+</details>
+
 ### <code> before_shipping_fields_section </code>
 <details>
 <summary><code>fluent_cart/before_shipping_fields_section</code> &mdash; Before the shipping address field section</summary>
@@ -704,6 +855,37 @@ add_action('fluent_cart/after_payment_methods', function ($data) {
     echo '<img src="/wp-content/uploads/visa.svg" alt="Visa" />';
     echo '<img src="/wp-content/uploads/mastercard.svg" alt="Mastercard" />';
     echo '</div>';
+}, 10, 1);
+```
+</details>
+
+### <code> checkout_embed_payment_method_content </code>
+<details>
+<summary><code>fluent_cart/checkout_embed_payment_method_content</code> &mdash; Inside each embedded payment method's container div</summary>
+
+**When it runs:**
+This action fires inside the per-method `fluent-cart-checkout_embed_payment_container_{route}` wrapper `<div>` for each registered payment method on the checkout page (and the equivalent container in the modal checkout renderer). The container itself starts `aria-hidden="true"` and is revealed by JS when that method is selected. Use it to render gateway-specific embedded fields (e.g. a card element mount point).
+
+**Parameters:**
+
+- `$data` (array): Payment method render context
+    ```php
+    $data = [
+        'method' => $method,       // \FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway instance
+        'cart'   => $this->cart,   // \FluentCart\App\Models\Cart instance
+        'route'  => $route,        // string — the gateway's route/slug (e.g. 'stripe', 'paypal')
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:818` (modal checkout) and `app/Services/Renderer/CheckoutRenderer.php:944` (full checkout page)
+
+**Usage:**
+```php
+add_action('fluent_cart/checkout_embed_payment_method_content', function ($data) {
+    if ($data['route'] !== 'my_gateway') {
+        return;
+    }
+    echo '<div id="my-gateway-card-element"></div>';
 }, 10, 1);
 ```
 </details>
@@ -1081,6 +1263,188 @@ add_action('fluent_cart/cart/line_item/after_main_title', function ($data) {
         $date = date('M j', strtotime("+{$deliveryDays} days"));
         echo '<div class="my-delivery-estimate"><small>Est. delivery: ' . esc_html($date) . '</small></div>';
     }
+}, 10, 1);
+```
+</details>
+
+### <code> footer_start </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/footer_start</code> &mdash; Start of the line item footer area</summary>
+
+**When it runs:**
+This action fires at the beginning of the `.fct_line_item_footer` area of a cart line item, before the payment-type info, setup-fee info, and any license activation-limit details. Fires in both the modal checkout renderer and the full checkout page renderer.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context (from `CartItemRenderer::getEventInfo()` / the modal renderer's equivalent)
+    ```php
+    $data = [
+        'item'    => $item,     // array — the cart item data
+        'cart'    => $cart,     // \FluentCart\App\Models\Cart|null instance
+        'product' => $product,  // Product model or null
+        'variant' => $variant,  // ProductVariation model or null
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:326` (modal checkout) and `app/Services/Renderer/CartItemRenderer.php:92` (full checkout page)
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/footer_start', function ($data) {
+    $item = $data['item'];
+    if (!empty($item['other_info']['gift_wrapped'])) {
+        echo '<span class="my-gift-wrap-icon">🎁 Gift wrapped</span>';
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> unit_price_hint </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/unit_price_hint</code> &mdash; After the "$X each" unit price text</summary>
+
+**When it runs:**
+This action fires right after the per-unit price hint (e.g. "$10.00 each") is printed for a line item, inside both the modal checkout renderer and the full checkout page's cart item renderer.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context
+    ```php
+    $data = [
+        'item'    => $item,     // array — the cart item data
+        'cart'    => $cart,     // \FluentCart\App\Models\Cart|null instance
+        'product' => $product,  // Product model or null
+        'variant' => $variant,  // ProductVariation model or null
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:404` (modal checkout) and `app/Services/Renderer/CartItemRenderer.php:221` (full checkout page)
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/unit_price_hint', function ($data) {
+    echo '<small class="my-price-note">(tax excl.)</small>';
+}, 10, 1);
+```
+</details>
+
+### <code> setup_fee_price_info </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/setup_fee_price_info</code> &mdash; After a line item's setup fee amount</summary>
+
+**When it runs:**
+This action fires inside `maybeRenderSetupFeeInfo()`, right after the setup-fee amount is printed for a subscription line item that has one. Only reachable for items with `other_info.payment_type === 'subscription'` and a non-zero setup fee.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context
+    ```php
+    $data = [
+        'item'    => $item,     // array — the cart item data
+        'cart'    => $cart,     // \FluentCart\App\Models\Cart|null instance
+        'product' => $product,  // Product model or null
+        'variant' => $variant,  // ProductVariation model or null
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CartItemRenderer.php:255`
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/setup_fee_price_info', function ($data) {
+    echo '<span class="my-setup-fee-note">(one-time)</span>';
+}, 10, 1);
+```
+</details>
+
+### <code> after_setup_fee_info </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/after_setup_fee_info</code> &mdash; After the entire setup fee block</summary>
+
+**When it runs:**
+This action fires immediately after `renderSetupFeeInfo()` completes for a line item — i.e. after the whole setup-fee row (label + amount) has been printed, not just the amount. Only fires when the item actually has a setup fee.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context
+    ```php
+    $data = [
+        'item'    => $item,     // array — the cart item data
+        'cart'    => $cart,     // \FluentCart\App\Models\Cart|null instance
+        'product' => $product,  // Product model or null
+        'variant' => $variant,  // ProductVariation model or null
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CartItemRenderer.php:97`
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/after_setup_fee_info', function ($data) {
+    echo '<div class="my-setup-fee-disclaimer"><small>Setup fee charged once at signup.</small></div>';
+}, 10, 1);
+```
+</details>
+
+### <code> footer_end </code>
+<details>
+<summary><code>fluent_cart/cart/line_item/footer_end</code> &mdash; End of the line item footer area</summary>
+
+**When it runs:**
+This action fires at the very end of the `.fct_line_item_footer` area, after the setup-fee block (if any) and after `fluent_cart/cart/line_item/after_setup_fee_info`. It is the last hook in a cart line item's footer.
+
+**Parameters:**
+
+- `$data` (array): Line item rendering context
+    ```php
+    $data = [
+        'item'    => $item,     // array — the cart item data
+        'cart'    => $cart,     // \FluentCart\App\Models\Cart|null instance
+        'product' => $product,  // Product model or null
+        'variant' => $variant,  // ProductVariation model or null
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CartItemRenderer.php:99`
+
+**Usage:**
+```php
+add_action('fluent_cart/cart/line_item/footer_end', function ($data) {
+    $item = $data['item'];
+    // Append a closing note after everything else in the item footer
+    echo '<div class="my-line-item-footer-note"></div>';
+}, 10, 1);
+```
+</details>
+
+---
+
+## Modal Checkout
+
+Hooks specific to the modal (popup) checkout renderer, distinct from the full checkout page.
+
+### <code> modal_checkout/after_shipping_methods </code>
+<details>
+<summary><code>fluent_cart/modal_checkout/after_shipping_methods</code> &mdash; After the shipping methods list in the modal checkout</summary>
+
+**When it runs:**
+This action fires in the modal checkout renderer right after the shipping methods list is rendered. If the store is configured to place payment methods in the "details" section (via `fluent_cart/modal_checkout/before_payment_methods_placement`), the `fluent_cart/before_payment_methods` hook fires immediately after this one, at this same location.
+
+**Parameters:**
+
+- `$data` (array): The current cart
+    ```php
+    $data = [
+        'cart' => $this->cart,  // \FluentCart\App\Models\Cart instance
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:253`
+
+**Usage:**
+```php
+add_action('fluent_cart/modal_checkout/after_shipping_methods', function ($data) {
+    echo '<p class="my-modal-shipping-note">Free shipping over $50!</p>';
 }, 10, 1);
 ```
 </details>

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "selectAddressForCheckout",
         "summary": "GET Select Address for Checkout",
-        "description": "Select an existing address and apply it to the current cart/checkout session. Updates the cart's checkout data with the selected address and returns the rendered address HTML along with updated checkout fragments.",
+        "description": "Select an existing address and apply it to the current cart/checkout session. Updates the cart's checkout data with the selected address and returns the rendered address HTML along with updated checkout fragments.\n\n**Access policy:** `PublicPolicy`\n\n**Access policy:** `PublicPolicy`",
         "tags": [
           "Customer Profile"
         ],
@@ -157,6 +157,35 @@
                     "value": {
                       "message": "You are not authorized to view this address"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

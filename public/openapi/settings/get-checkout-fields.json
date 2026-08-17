@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getCheckoutFields",
         "summary": "GET Get Checkout Fields",
-        "description": "Retrieve the checkout field configuration including the schema definition and current settings.",
+        "description": "Retrieve the checkout field configuration including the schema definition and current settings.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Settings"
         ],
@@ -644,6 +644,34 @@
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

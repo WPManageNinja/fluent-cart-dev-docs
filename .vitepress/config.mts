@@ -21,6 +21,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'create-custom-order-item', 'update-statuses', 'sync-order-statuses',
     'get-shipping-methods', 'calculate-shipping',
     'generate-missing-licenses', 'bulk-actions',
+    'charge-now', 'create-renewal-now', 'skip-renewal', 'update-subscription-details', 'sync-pending-transaction', 'calculate-tax', 'list-renewals', 'get-renewal', 'resend-renewal-invoice', 'void-renewal',
   ],
   products: [
     'list-products', 'get-product', 'create-product', 'update-product-detail', 'delete-product', 'duplicate-product',
@@ -40,6 +41,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'get-product-integration-settings', 'get-product-integration-feeds', 'save-product-integration',
     'change-integration-status', 'delete-product-integration',
     'bulk-edit-fetch', 'bulk-insert-products', 'bulk-update-products', 'do-bulk-action', 'create-dummy-products',
+    'bulk-update-variants', 'group-bulk-update-variants', 'toggle-product-tax-exemption', 'update-variant-tax-exemption',
   ],
   customers: [
     'list-customers', 'get-customer', 'create-customer', 'update-customer',
@@ -83,6 +85,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'update-zone-order', 'get-zone-states',
     'create-shipping-method', 'update-shipping-method', 'delete-shipping-method',
     'list-shipping-classes', 'get-shipping-class', 'create-shipping-class', 'update-shipping-class', 'delete-shipping-class',
+    'get-shipping-class-profile', 'get-shipping-packages', 'save-shipping-packages', 'get-zone-countries',
   ],
   settings: [
     'get-store-settings', 'save-store-settings',
@@ -98,6 +101,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'save-storage-driver-settings', 'verify-storage-driver-connection',
     'get-plugin-addons', 'activate-plugin-addon', 'install-plugin-addon',
     'get-email-shortcodes',
+    'get-mcp-status', 'toggle-mcp', 'install-mcp-adapter', 'get-mcp-config-snippets', 'list-storage-buckets', 'create-storage-bucket', 'change-storage-driver-status', 'reset-storage-driver-settings', 'verify-turnstile-keys',
   ],
   'email-notification': [
     'list-notifications', 'get-notification', 'update-notification', 'enable-notification',
@@ -105,6 +109,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'get-settings', 'save-settings',
     'get-shortcodes',
     'get-reminders', 'save-reminders',
+    'get-digest-settings', 'save-digest-settings', 'send-digest-test', 'send-manual-reminder',
   ],
   reports: [
     'get-overview', 'report-overview', 'get-dashboard-summary', 'dashboard-stats',
@@ -127,8 +132,8 @@ const MODULE_ORDER: Record<string, string[]> = {
     'get-global-settings', 'set-global-settings',
     'get-global-feeds', 'get-feed-lists', 'get-feed-settings', 'save-feed-settings',
     'change-feed-status', 'delete-feed',
-    'list-product-feeds', 'get-product-integration-settings', 'save-product-integration',
-    'change-product-feed-status', 'delete-product-integration',
+    // The five product-scoped integration operations are ordered under the
+    // `products` group instead, because the routes are /products/{id}/integrations/*.
     'get-dynamic-options', 'chained-data-request',
   ],
   files: [
@@ -137,8 +142,9 @@ const MODULE_ORDER: Record<string, string[]> = {
   'labels-attributes': [
     'list-labels', 'create-label', 'update-label-selections',
     'list-attribute-groups', 'get-attribute-group', 'create-attribute-group', 'update-attribute-group', 'delete-attribute-group',
-    'list-attribute-terms', 'create-attribute-term', 'update-attribute-term', 'delete-attribute-term',
-    'change-term-sort-order',
+    'reorder-groups', 'get-attribute-library',
+    'list-attribute-terms', 'create-terms', 'update-attribute-term', 'delete-attribute-term',
+    'reorder-terms',
   ],
   dashboard: [
     'initialize-app', 'get-dashboard-stats', 'get-widgets',
@@ -149,6 +155,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'list-attachments', 'upload-attachment',
     'get-print-templates', 'save-print-templates',
     'create-all-pages', 'create-single-page',
+    'run-data-backfills', 'save-onboarding-tax-settings',
   ],
   'public-shop': [
     'list-products', 'get-product-views', 'search-products',
@@ -158,16 +165,20 @@ const MODULE_ORDER: Record<string, string[]> = {
     'get-available-shipping-methods', 'get-shipping-methods-list-view',
     'get-order-info', 'place-order', 'login',
   ],
+  // The six admin `/customers/*` operations that used to be listed here are now
+  // documented once, in the `customers` group, with a note covering the customer
+  // portal's use of the same routes. Listing them here too produced two pages
+  // for one endpoint.
   'customer-profile': [
     'get-profile-details', 'update-profile-details',
-    'get-customer-details', 'update-customer-details',
     'dashboard-overview',
-    'list-orders', 'get-order-details', 'get-customer-orders',
+    'list-orders', 'get-order-details',
     'list-downloads',
+    'get-portal-sections',
     'get-upgrade-paths',
     'create-profile-address', 'update-profile-address', 'delete-profile-address', 'make-profile-address-primary',
-    'create-address-checkout', 'update-address-checkout', 'delete-address-checkout', 'select-address-for-checkout',
-    'set-address-as-primary',
+    'create-address-checkout', 'select-address-for-checkout',
+    'pause-subscription', 'resume-subscription',
     'get-transaction-billing-address', 'save-transaction-billing-address',
   ],
   licensing: [
@@ -176,20 +187,44 @@ const MODULE_ORDER: Record<string, string[]> = {
     'regenerate-license-key', 'extend-license-validity',
     'get-customer-licenses-admin', 'get-customer-license-details', 'list-customer-licenses',
     'get-product-license-settings', 'save-product-license-settings',
-    'get-license-chart', 'get-license-pie-chart', 'get-license-summary',
+    // License reporting is ordered under the reports group instead, because the
+    // routes are /reports/license-chart, -pie-chart and -summary.
     'activate-plugin-license', 'deactivate-plugin-license', 'get-plugin-license-status',
     'public-activate-license', 'public-deactivate-license', 'public-check-license',
     'public-get-license-version', 'public-download-license-package',
+    'list-license-sites', 'get-license-site',
     'activate-site-admin', 'deactivate-site-admin', 'deactivate-site-customer',
   ],
+  // `get-permissions` / `save-permissions` document `/settings/permissions`,
+  // so they live in the `settings` group now — one page per endpoint.
   'roles-permissions': [
     'list-roles', 'get-role', 'update-role',
     'list-managers', 'assign-role', 'delete-role-assignment',
     'search-users',
-    'get-permissions', 'save-permissions',
   ],
   'order-bumps': [
     'list-order-bumps', 'get-order-bump', 'create-order-bump', 'update-order-bump', 'delete-order-bump',
+  ],
+  'pdf-templates': [
+    'get-pdf-status',
+    'list-pdf-templates', 'get-pdf-template', 'save-pdf-template',
+    'create-pdf-template', 'delete-pdf-template',
+    'get-factory-default-templates', 'get-saved-templates',
+    'get-seller-details', 'save-seller-details',
+    'download-pdf-preview',
+  ],
+  'data-export': [
+    'get-orders-export-schema', 'export-orders-batch',
+    'get-customers-export-schema', 'export-customers-batch',
+    'get-subscriptions-export-schema', 'export-subscriptions-batch',
+    'get-licenses-export-schema', 'export-licenses-batch',
+  ],
+  inventory: [
+    'list-inventory', 'get-inventory-stats', 'get-adjustment-history',
+    'update-stock', 'bulk-update-stock', 'export-inventory',
+  ],
+  'saved-views': [
+    'list-saved-views', 'create-saved-view', 'update-saved-view', 'delete-saved-view',
   ],
 }
 
@@ -254,6 +289,10 @@ function buildRestApiSidebar() {
       { text: 'Licensing', link: '/restapi/licensing', dir: 'licensing' },
       { text: 'Roles & Permissions', link: '/restapi/roles', dir: 'roles-permissions' },
       { text: 'Order Bumps', link: '/restapi/order-bumps', dir: 'order-bumps' },
+      { text: 'PDF Templates', link: '/restapi/pdf-templates', dir: 'pdf-templates' },
+      { text: 'Data Export', link: '/restapi/data-export', dir: 'data-export' },
+      { text: 'Advanced Inventory', link: '/restapi/inventory', dir: 'inventory' },
+      { text: 'Saved Views', link: '/restapi/saved-views', dir: 'saved-views' },
     ]},
   ]
 
@@ -606,6 +645,8 @@ export default defineConfig({
                   { text: 'Products & Coupons', link: '/hooks/actions/products-and-coupons' },
                   { text: 'Payments & Integrations', link: '/hooks/actions/payments-and-integrations' },
                   { text: 'Admin & Templates', link: '/hooks/actions/admin-and-templates' },
+                  { text: 'Modules (MCP & Variations)', link: '/hooks/actions/modules' },
+                  { text: 'Pro Modules', link: '/hooks/actions/pro-modules' },
                 ]
               },
             { text: 'Filter Hooks', 
@@ -617,6 +658,8 @@ export default defineConfig({
                   { text: 'Orders & Payments', link: '/hooks/filters/orders-and-payments' },
                   { text: 'Products & Pricing', link: '/hooks/filters/products-and-pricing' },
                   { text: 'Settings & Configuration', link: '/hooks/filters/settings-and-configuration' },
+                  { text: 'Modules (MCP & Variations)', link: '/hooks/filters/modules' },
+                  { text: 'Pro Modules', link: '/hooks/filters/pro-modules' },
                 ]
              },
             // { text: 'Event System', link: '/hooks/events' }

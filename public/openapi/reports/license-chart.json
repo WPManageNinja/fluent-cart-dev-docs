@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getLicenseChart",
         "summary": "GET Get License Line Chart",
-        "description": "Retrieve license creation/activation data as time-series chart data, grouped by the specified interval.",
+        "description": "Retrieve license creation/activation data as time-series chart data, grouped by the specified interval.\n\n**Also used by the licensing UI.** Retrieve license data formatted for a line chart visualization.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -124,6 +124,28 @@
             },
             "description": "Time grouping interval.",
             "required": false
+          },
+          {
+            "name": "params",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "description": "Request parameters object containing filters, date range, and grouping",
+            "style": "deepObject",
+            "explode": true
+          },
+          {
+            "name": "params[filters]",
+            "in": "query",
+            "schema": {
+              "type": "object"
+            },
+            "description": "Filter criteria",
+            "required": false,
+            "style": "deepObject",
+            "explode": true
           }
         ],
         "responses": {
@@ -133,153 +155,113 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Time-series chart data for license metrics",
-                  "additionalProperties": true,
+                  "description": "Time-series license-count data. The shape of each `lineChartData` entry depends on `params[groupKey]`: `daily` (default) yields `{date, license_count}`, `monthly` yields `{year, month, license_count}`, and `yearly` yields `{year, license_count}`. Requires FluentCart Pro's Licensing module.",
+                  "properties": {
+                    "lineChartData": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "date": {
+                            "type": "string",
+                            "description": "Date bucket (Y-m-d), present when groupKey is \"daily\""
+                          },
+                          "year": {
+                            "type": "integer",
+                            "description": "Present when groupKey is \"monthly\" or \"yearly\""
+                          },
+                          "month": {
+                            "type": "integer",
+                            "description": "Present when groupKey is \"monthly\""
+                          },
+                          "license_count": {
+                            "type": "integer",
+                            "description": "Number of licenses created in this bucket"
+                          }
+                        }
+                      }
+                    }
+                  },
                   "example": {
-                    "labels": [
-                      "2025-01",
-                      "2025-02",
-                      "2025-03",
-                      "2025-04",
-                      "2025-05",
-                      "2025-06",
-                      "2025-07",
-                      "2025-08",
-                      "2025-09"
-                    ],
-                    "datasets": [
+                    "lineChartData": [
                       {
-                        "label": "Licenses Issued",
-                        "data": [
-                          18,
-                          22,
-                          28,
-                          24,
-                          32,
-                          30,
-                          35,
-                          29,
-                          38
-                        ]
+                        "date": "2026-08-01",
+                        "license_count": 4
                       },
                       {
-                        "label": "Activations",
-                        "data": [
-                          25,
-                          30,
-                          38,
-                          35,
-                          45,
-                          42,
-                          50,
-                          40,
-                          52
-                        ]
+                        "date": "2026-08-02",
+                        "license_count": 7
+                      },
+                      {
+                        "date": "2026-08-03",
+                        "license_count": 2
                       }
-                    ],
-                    "summary": {
-                      "total_licenses_issued": 256,
-                      "total_activations": 357
-                    }
+                    ]
                   }
                 },
                 "example": {
-                  "labels": [
-                    "2025-01",
-                    "2025-02",
-                    "2025-03",
-                    "2025-04",
-                    "2025-05",
-                    "2025-06",
-                    "2025-07",
-                    "2025-08",
-                    "2025-09"
-                  ],
-                  "datasets": [
+                  "lineChartData": [
                     {
-                      "label": "Licenses Issued",
-                      "data": [
-                        18,
-                        22,
-                        28,
-                        24,
-                        32,
-                        30,
-                        35,
-                        29,
-                        38
-                      ]
+                      "date": "2026-08-01",
+                      "license_count": 4
                     },
                     {
-                      "label": "Activations",
-                      "data": [
-                        25,
-                        30,
-                        38,
-                        35,
-                        45,
-                        42,
-                        50,
-                        40,
-                        52
-                      ]
+                      "date": "2026-08-02",
+                      "license_count": 7
+                    },
+                    {
+                      "date": "2026-08-03",
+                      "license_count": 2
                     }
-                  ],
-                  "summary": {
-                    "total_licenses_issued": 256,
-                    "total_activations": 357
-                  }
+                  ]
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "labels": [
-                        "2025-01",
-                        "2025-02",
-                        "2025-03",
-                        "2025-04",
-                        "2025-05",
-                        "2025-06",
-                        "2025-07",
-                        "2025-08",
-                        "2025-09"
-                      ],
-                      "datasets": [
+                      "lineChartData": [
                         {
-                          "label": "Licenses Issued",
-                          "data": [
-                            18,
-                            22,
-                            28,
-                            24,
-                            32,
-                            30,
-                            35,
-                            29,
-                            38
-                          ]
+                          "date": "2026-08-01",
+                          "license_count": 4
                         },
                         {
-                          "label": "Activations",
-                          "data": [
-                            25,
-                            30,
-                            38,
-                            35,
-                            45,
-                            42,
-                            50,
-                            40,
-                            52
-                          ]
+                          "date": "2026-08-02",
+                          "license_count": 7
+                        },
+                        {
+                          "date": "2026-08-03",
+                          "license_count": 2
                         }
-                      ],
-                      "summary": {
-                        "total_licenses_issued": 256,
-                        "total_activations": 357
-                      }
+                      ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

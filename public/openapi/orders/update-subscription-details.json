@@ -1,0 +1,288 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/subscriptions/{subscription}/update": {
+      "put": {
+        "operationId": "updateSubscription",
+        "summary": "PUT Update Subscription",
+        "description": "Update a manual subscription's billing details — recurring amount, remaining bill count, billing interval, status, or next billing date. Only subscriptions with a manual collection method can be updated through this endpoint; system (auto-charge) and gateway-managed subscriptions are rejected. Note `recurring_total` is submitted as a decimal amount in the store's currency (e.g. `29.99`), not cents, unlike most other money fields in this API.\n\n**Required permission:** `subscriptions/manage`",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Parent order ID the subscription belongs to."
+          },
+          {
+            "name": "subscription",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Subscription ID."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "paused",
+                      "trialing",
+                      "canceled",
+                      "expired",
+                      "completed",
+                      "past_due"
+                    ],
+                    "description": "New subscription status."
+                  },
+                  "recurring_total": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "New recurring amount, as a decimal in the store's currency (e.g. 29.99) — not cents."
+                  },
+                  "bill_times": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Number of remaining billing cycles."
+                  },
+                  "billing_interval": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "Billing interval label (e.g. monthly, yearly)."
+                  },
+                  "next_billing_date": {
+                    "type": "string",
+                    "maxLength": 25,
+                    "description": "Next billing date. Any string `strtotime()` can parse."
+                  }
+                },
+                "example": {
+                  "status": "active",
+                  "recurring_total": 29.99,
+                  "bill_times": 0,
+                  "billing_interval": "monthly",
+                  "next_billing_date": "2026-09-18 00:00:00"
+                }
+              },
+              "example": {
+                "status": "active",
+                "recurring_total": 29.99,
+                "bill_times": 0,
+                "billing_interval": "monthly",
+                "next_billing_date": "2026-09-18 00:00:00"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "status": "active",
+                    "recurring_total": 29.99,
+                    "bill_times": 0,
+                    "billing_interval": "monthly",
+                    "next_billing_date": "2026-09-18 00:00:00"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "subscription": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Subscription has been updated successfully!",
+                  "subscription": {
+                    "id": 15,
+                    "customer_id": 12,
+                    "parent_order_id": 42,
+                    "product_id": 123,
+                    "item_name": "Developer Toolkit Pro - Annual License",
+                    "variation_id": 456,
+                    "billing_interval": "yearly",
+                    "recurring_amount": 9900,
+                    "recurring_total": 10692,
+                    "status": "active",
+                    "next_billing_date": "2026-09-20 14:25:00",
+                    "created_at": "2025-09-20 14:25:00",
+                    "updated_at": "2026-08-18 10:00:00"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Subscription has been updated successfully!",
+                      "subscription": {
+                        "id": 15,
+                        "customer_id": 12,
+                        "parent_order_id": 42,
+                        "product_id": 123,
+                        "item_name": "Developer Toolkit Pro - Annual License",
+                        "variation_id": 456,
+                        "billing_interval": "yearly",
+                        "recurring_amount": 9900,
+                        "recurring_total": 10692,
+                        "status": "active",
+                        "next_billing_date": "2026-09-20 14:25:00",
+                        "created_at": "2025-09-20 14:25:00",
+                        "updated_at": "2026-08-18 10:00:00"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The 404 fires for whichever route-bound model resolves first: `order` or `subscription`. No order matches the given ID. Thrown by the framework's route-model-binding, not an explicit controller check, so the message is generic and names the model class.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\Order]."
+                },
+                "schema": {
+                  "example": {
+                    "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\Order]."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\Order]."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed (e.g. missing/invalid status, or the subscription is not manual and cannot be updated).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Only manual subscriptions can be updated."
+                  }
+                },
+                "example": {
+                  "message": "Only manual subscriptions can be updated."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Only manual subscriptions can be updated."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

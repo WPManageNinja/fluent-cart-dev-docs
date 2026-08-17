@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSubscriptionCohorts",
         "summary": "GET Get Subscription Cohorts",
-        "description": "Retrieve cohort analysis data for subscriptions. Groups subscribers by their signup period and tracks retention over subsequent periods. Uses pre-generated retention snapshots for efficient querying.",
+        "description": "Retrieve cohort analysis data for subscriptions. Groups subscribers by their signup period and tracks retention over subsequent periods. Uses pre-generated retention snapshots for efficient querying.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -378,6 +378,34 @@
                         "month_6": 75
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

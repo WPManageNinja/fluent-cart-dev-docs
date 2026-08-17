@@ -27,7 +27,7 @@
       "post": {
         "operationId": "changeCustomer",
         "summary": "POST Change Customer",
-        "description": "Reassign an order to a different existing customer. Updates all connected orders (parent/child/renewals), subscriptions, and customer statistics.",
+        "description": "Reassign an order to a different existing customer. Updates all connected orders (parent/child/renewals), subscriptions, and customer statistics.\n\n**Required permission:** `orders/manage`",
         "tags": [
           "Orders"
         ],
@@ -135,6 +135,49 @@
                     "value": {
                       "message": "Customer id is required"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

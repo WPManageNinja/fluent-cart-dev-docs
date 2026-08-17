@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSubscription",
         "summary": "GET Get Subscription Details",
-        "description": "Retrieve the full details of a single subscription including customer addresses, labels, activities, and related orders.",
+        "description": "Retrieve the full details of a single subscription including customer addresses, labels, activities, and related orders.\n\n**Required permission:** `subscriptions/view`",
         "tags": [
           "Subscriptions"
         ],
@@ -64,6 +64,18 @@
                         "type": "integer"
                       },
                       "description": "Array of label IDs applied to the subscription"
+                    },
+                    "reminder_permissions": {
+                      "type": "object",
+                      "description": "Flags indicating whether renewal/trial-end reminder emails can be sent for this subscription.",
+                      "properties": {
+                        "canSendRenewal": {
+                          "type": "boolean"
+                        },
+                        "canSendTrialEnd": {
+                          "type": "boolean"
+                        }
+                      }
                     }
                   },
                   "example": {
@@ -168,7 +180,11 @@
                     "selected_labels": [
                       2,
                       5
-                    ]
+                    ],
+                    "reminder_permissions": {
+                      "canSendRenewal": false,
+                      "canSendTrialEnd": false
+                    }
                   }
                 },
                 "example": {
@@ -273,7 +289,11 @@
                   "selected_labels": [
                     2,
                     5
-                  ]
+                  ],
+                  "reminder_permissions": {
+                    "canSendRenewal": false,
+                    "canSendTrialEnd": false
+                  }
                 },
                 "examples": {
                   "default": {
@@ -380,7 +400,11 @@
                       "selected_labels": [
                         2,
                         5
-                      ]
+                      ],
+                      "reminder_permissions": {
+                        "canSendRenewal": false,
+                        "canSendTrialEnd": false
+                      }
                     }
                   }
                 }
@@ -412,6 +436,49 @@
                       "action_text": "Back to Subscription list",
                       "action_url": "/subscriptions"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`subscriptions/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

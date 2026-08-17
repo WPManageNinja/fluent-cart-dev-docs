@@ -27,7 +27,7 @@
       "put": {
         "operationId": "updateCoupon",
         "summary": "PUT Update Coupon",
-        "description": "Update an existing coupon. Accepts the same fields as Create Coupon. The code uniqueness check excludes the current coupon.",
+        "description": "Update an existing coupon. Accepts the same fields as Create Coupon. The code uniqueness check excludes the current coupon.\n\n**Required permission:** `coupons/manage`",
         "tags": [
           "Coupons"
         ],
@@ -388,6 +388,35 @@
                     "value": {
                       "message": "Coupon update failed."
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

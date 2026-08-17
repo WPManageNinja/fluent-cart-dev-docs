@@ -27,7 +27,7 @@
       "delete": {
         "operationId": "deleteAttributeTerm",
         "summary": "DELETE Delete Attribute Term",
-        "description": "Delete an attribute term. The term can only be deleted if it is not currently in use by any product variations.",
+        "description": "Delete an attribute term. The term can only be deleted if it is not currently in use by any product variations.\n\n**Required permission:** `products/delete`",
         "tags": [
           "Labels"
         ],
@@ -165,6 +165,35 @@
                       "message": "Term not found in database, failed to remove.",
                       "code": 404
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

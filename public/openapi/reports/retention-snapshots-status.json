@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getRetentionSnapshotStatus",
         "summary": "GET Check Retention Snapshot Status",
-        "description": "Check the status of a previously queued retention snapshot generation job.",
+        "description": "Check the status of a previously queued retention snapshot generation job.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -58,23 +58,33 @@
                   "properties": {
                     "success": {
                       "type": "boolean",
-                      "description": "Whether the lookup was successful"
+                      "description": "Whether the lookup was successful. `false` when `params[job_id]` is missing or no job is found for that ID \u2014 in that case `status` and `data` are omitted."
                     },
                     "status": {
                       "type": "string",
                       "enum": [
                         "running",
-                        "completed"
+                        "completed",
+                        "failed"
                       ],
-                      "description": "Job status"
+                      "description": "Job status. Only present when a valid job was found (i.e. when `success` is true, or when `success` is false because the job was not found \u2014 see `job_id` in that case)."
                     },
                     "message": {
                       "type": "string",
                       "description": "Status message"
                     },
+                    "job_id": {
+                      "type": "string",
+                      "description": "Echoes back `params[job_id]`. Only present in the 'job not found' error response.",
+                      "example": "1718456789"
+                    },
+                    "stats": {
+                      "type": "object",
+                      "description": "Snapshot generation statistics. Only present once the job has reached `completed` or `failed` status."
+                    },
                     "data": {
                       "type": "object",
-                      "description": "Job details"
+                      "description": "Raw job record as stored for this job ID. Present whenever a job was found (running, completed, or failed)."
                     }
                   },
                   "example": {
@@ -100,7 +110,7 @@
                 },
                 "examples": {
                   "default": {
-                    "summary": "Successful response",
+                    "summary": "Successful response \u2014 job still running",
                     "value": {
                       "success": true,
                       "status": "running",
@@ -111,6 +121,49 @@
                         "product_id": 42
                       }
                     }
+                  },
+                  "missingJobId": {
+                    "summary": "params[job_id] not supplied",
+                    "value": {
+                      "success": false,
+                      "message": "Job ID required"
+                    }
+                  },
+                  "jobNotFound": {
+                    "summary": "No job found for the given job_id",
+                    "value": {
+                      "success": false,
+                      "message": "Job not found",
+                      "job_id": "1718456789"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getAttributeGroup",
         "summary": "GET Get Attribute Group",
-        "description": "Retrieve a single attribute group by ID, optionally with its terms.",
+        "description": "Retrieve a single attribute group by ID, optionally with its terms.\n\n**Required permission:** `products/view`",
         "tags": [
           "Labels"
         ],
@@ -103,7 +103,9 @@
                           "description": null,
                           "settings": null
                         }
-                      ]
+                      ],
+                      "is_system": false,
+                      "serial": "1"
                     }
                   }
                 },
@@ -135,7 +137,9 @@
                         "description": null,
                         "settings": null
                       }
-                    ]
+                    ],
+                    "is_system": false,
+                    "serial": "1"
                   }
                 },
                 "examples": {
@@ -169,9 +173,54 @@
                             "description": null,
                             "settings": null
                           }
-                        ]
+                        ],
+                        "is_system": false,
+                        "serial": "1"
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }
@@ -229,6 +278,16 @@
             "items": {
               "$ref": "#/components/schemas/AttributeTerm"
             }
+          },
+          "is_system": {
+            "type": "boolean",
+            "description": "Whether this is a system-seeded group (e.g. Color, Size) rather than merchant-created",
+            "example": false
+          },
+          "serial": {
+            "type": "string",
+            "description": "Sort order position among attribute groups",
+            "example": "1"
           }
         }
       },

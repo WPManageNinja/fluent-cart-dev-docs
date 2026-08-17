@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getMaxExcerptWordCount",
         "summary": "GET Get Max Excerpt Word Count",
-        "description": "Returns the maximum allowed word count for product excerpts (controlled by the WordPress excerpt_length filter).",
+        "description": "Returns the maximum allowed word count for product excerpts (controlled by the WordPress excerpt_length filter).\n\n**Required permission:** `products/view`",
         "tags": [
           "Products"
         ],
@@ -55,6 +55,34 @@
                     "value": {
                       "count": 55
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

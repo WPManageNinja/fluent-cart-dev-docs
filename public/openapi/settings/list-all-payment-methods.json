@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listAllPaymentMethods",
         "summary": "GET List All Payment Methods",
-        "description": "Retrieve all registered payment method gateways categorized by availability status.",
+        "description": "Retrieve all registered payment method gateways categorized by availability status.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -49,25 +49,53 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "method_key": {
-                            "type": "string",
-                            "example": "stripe"
-                          },
                           "title": {
                             "type": "string",
+                            "description": "Payment type label (e.g. the card brand group)",
+                            "example": "Card"
+                          },
+                          "route": {
+                            "type": "string",
+                            "description": "Gateway route/handler slug",
+                            "example": "stripe"
+                          },
+                          "slug": {
+                            "type": "string",
+                            "description": "Gateway slug identifier",
+                            "example": "stripe"
+                          },
+                          "label": {
+                            "type": "string",
+                            "description": "Gateway display label",
                             "example": "Stripe"
                           },
-                          "is_active": {
+                          "admin_title": {
                             "type": "string",
-                            "example": "yes"
+                            "description": "Admin-facing title for the gateway. Only present for gateways that define one.",
+                            "example": "Stripe"
                           },
                           "description": {
                             "type": "string",
-                            "example": "Accept payments via Stripe"
+                            "example": "Accept credit and debit card payments via Stripe"
                           },
                           "logo": {
                             "type": "string",
-                            "example": "https://example.com/wp-content/plugins/fluent-cart/assets/images/stripe.svg"
+                            "example": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/card.svg"
+                          },
+                          "icon": {
+                            "type": "string",
+                            "description": "Small gateway icon URL",
+                            "example": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/stripe-icon.svg"
+                          },
+                          "status": {
+                            "type": "boolean",
+                            "description": "Whether the gateway is currently enabled/connected",
+                            "example": true
+                          },
+                          "brand_color": {
+                            "type": "string",
+                            "description": "Gateway brand color as a hex code",
+                            "example": "#635bff"
                           },
                           "upcoming": {
                             "type": "boolean",
@@ -75,7 +103,28 @@
                           },
                           "requires_pro": {
                             "type": "boolean",
+                            "description": "Present and set to `true` only for gateways that require FluentCart Pro to activate.",
                             "example": false
+                          },
+                          "supported_features": {
+                            "type": "object",
+                            "description": "Feature flags supported by this gateway. Encoded as a mixed array: numeric keys list supported feature names (e.g. `payment`, `refund`, `webhook`, `subscriptions`), and `switch_payment_method` is an object listing gateways this one can switch to/from.",
+                            "additionalProperties": true,
+                            "example": {
+                              "0": "payment",
+                              "1": "refund",
+                              "2": "webhook",
+                              "3": "custom_payment",
+                              "4": "card_update",
+                              "switch_payment_method": {
+                                "supported_gateways": [
+                                  "stripe",
+                                  "paypal"
+                                ]
+                              },
+                              "5": "dispute_handler",
+                              "6": "subscriptions"
+                            }
                           }
                         }
                       }
@@ -84,40 +133,67 @@
                   "example": {
                     "gateways": [
                       {
-                        "method_key": "stripe",
-                        "title": "Stripe",
-                        "is_active": "yes",
-                        "description": "Accept credit and debit card payments via Stripe",
-                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/stripe.svg",
+                        "title": "Card",
+                        "route": "stripe",
+                        "slug": "stripe",
+                        "label": "Stripe",
+                        "admin_title": "Stripe",
+                        "description": "Stripe's payments platform lets you accept credit cards, debit cards, and popular payment methods around the world all with a single integration.",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/card.svg",
+                        "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/stripe-icon.svg",
+                        "status": true,
+                        "brand_color": "#635bff",
                         "upcoming": false,
-                        "requires_pro": false
+                        "supported_features": {
+                          "0": "payment",
+                          "1": "refund",
+                          "2": "webhook",
+                          "3": "custom_payment",
+                          "4": "card_update",
+                          "switch_payment_method": {
+                            "supported_gateways": [
+                              "stripe",
+                              "paypal"
+                            ]
+                          },
+                          "5": "dispute_handler",
+                          "6": "subscriptions"
+                        }
                       },
                       {
-                        "method_key": "paypal",
                         "title": "PayPal",
-                        "is_active": "yes",
-                        "description": "Accept payments via PayPal",
-                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg",
+                        "route": "paypal",
+                        "slug": "paypal",
+                        "label": "PayPal",
+                        "description": "PayPal is the faster, safer way to send and receive money or make an online payment. Get started or create a merchant account to accept payments.",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/paypal-icon.svg",
+                        "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/paypal-icon.svg",
+                        "brand_color": "#60cdff",
+                        "status": true,
                         "upcoming": false,
-                        "requires_pro": true
+                        "supported_features": {
+                          "0": "payment",
+                          "1": "refund",
+                          "2": "webhook",
+                          "3": "subscriptions"
+                        }
                       },
                       {
-                        "method_key": "cod",
-                        "title": "Cash on Delivery",
-                        "is_active": "no",
-                        "description": "Accept cash payment upon delivery",
-                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/cod.svg",
-                        "upcoming": false,
-                        "requires_pro": false
-                      },
-                      {
-                        "method_key": "square",
                         "title": "Square",
-                        "is_active": "no",
-                        "description": "Accept payments via Square",
-                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/square.svg",
+                        "route": "square",
+                        "slug": "square",
+                        "label": "Square",
+                        "description": "Accept payments via Square.",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/square.svg",
+                        "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/square-icon.svg",
+                        "brand_color": "#000000",
+                        "status": false,
                         "upcoming": false,
-                        "requires_pro": true
+                        "requires_pro": true,
+                        "supported_features": {
+                          "0": "payment",
+                          "1": "refund"
+                        }
                       }
                     ]
                   }
@@ -125,40 +201,67 @@
                 "example": {
                   "gateways": [
                     {
-                      "method_key": "stripe",
-                      "title": "Stripe",
-                      "is_active": "yes",
-                      "description": "Accept credit and debit card payments via Stripe",
-                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/stripe.svg",
+                      "title": "Card",
+                      "route": "stripe",
+                      "slug": "stripe",
+                      "label": "Stripe",
+                      "admin_title": "Stripe",
+                      "description": "Stripe's payments platform lets you accept credit cards, debit cards, and popular payment methods around the world all with a single integration.",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/card.svg",
+                      "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/stripe-icon.svg",
+                      "status": true,
+                      "brand_color": "#635bff",
                       "upcoming": false,
-                      "requires_pro": false
+                      "supported_features": {
+                        "0": "payment",
+                        "1": "refund",
+                        "2": "webhook",
+                        "3": "custom_payment",
+                        "4": "card_update",
+                        "switch_payment_method": {
+                          "supported_gateways": [
+                            "stripe",
+                            "paypal"
+                          ]
+                        },
+                        "5": "dispute_handler",
+                        "6": "subscriptions"
+                      }
                     },
                     {
-                      "method_key": "paypal",
                       "title": "PayPal",
-                      "is_active": "yes",
-                      "description": "Accept payments via PayPal",
-                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg",
+                      "route": "paypal",
+                      "slug": "paypal",
+                      "label": "PayPal",
+                      "description": "PayPal is the faster, safer way to send and receive money or make an online payment. Get started or create a merchant account to accept payments.",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/paypal-icon.svg",
+                      "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/paypal-icon.svg",
+                      "brand_color": "#60cdff",
+                      "status": true,
                       "upcoming": false,
-                      "requires_pro": true
+                      "supported_features": {
+                        "0": "payment",
+                        "1": "refund",
+                        "2": "webhook",
+                        "3": "subscriptions"
+                      }
                     },
                     {
-                      "method_key": "cod",
-                      "title": "Cash on Delivery",
-                      "is_active": "no",
-                      "description": "Accept cash payment upon delivery",
-                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/cod.svg",
-                      "upcoming": false,
-                      "requires_pro": false
-                    },
-                    {
-                      "method_key": "square",
                       "title": "Square",
-                      "is_active": "no",
-                      "description": "Accept payments via Square",
-                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/square.svg",
+                      "route": "square",
+                      "slug": "square",
+                      "label": "Square",
+                      "description": "Accept payments via Square.",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/square.svg",
+                      "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/square-icon.svg",
+                      "brand_color": "#000000",
+                      "status": false,
                       "upcoming": false,
-                      "requires_pro": true
+                      "requires_pro": true,
+                      "supported_features": {
+                        "0": "payment",
+                        "1": "refund"
+                      }
                     }
                   ]
                 },
@@ -168,43 +271,98 @@
                     "value": {
                       "gateways": [
                         {
-                          "method_key": "stripe",
-                          "title": "Stripe",
-                          "is_active": "yes",
-                          "description": "Accept credit and debit card payments via Stripe",
-                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/stripe.svg",
+                          "title": "Card",
+                          "route": "stripe",
+                          "slug": "stripe",
+                          "label": "Stripe",
+                          "admin_title": "Stripe",
+                          "description": "Stripe's payments platform lets you accept credit cards, debit cards, and popular payment methods around the world all with a single integration.",
+                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/card.svg",
+                          "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/stripe-icon.svg",
+                          "status": true,
+                          "brand_color": "#635bff",
                           "upcoming": false,
-                          "requires_pro": false
+                          "supported_features": {
+                            "0": "payment",
+                            "1": "refund",
+                            "2": "webhook",
+                            "3": "custom_payment",
+                            "4": "card_update",
+                            "switch_payment_method": {
+                              "supported_gateways": [
+                                "stripe",
+                                "paypal"
+                              ]
+                            },
+                            "5": "dispute_handler",
+                            "6": "subscriptions"
+                          }
                         },
                         {
-                          "method_key": "paypal",
                           "title": "PayPal",
-                          "is_active": "yes",
-                          "description": "Accept payments via PayPal",
-                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg",
+                          "route": "paypal",
+                          "slug": "paypal",
+                          "label": "PayPal",
+                          "description": "PayPal is the faster, safer way to send and receive money or make an online payment. Get started or create a merchant account to accept payments.",
+                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/paypal-icon.svg",
+                          "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/paypal-icon.svg",
+                          "brand_color": "#60cdff",
+                          "status": true,
                           "upcoming": false,
-                          "requires_pro": true
+                          "supported_features": {
+                            "0": "payment",
+                            "1": "refund",
+                            "2": "webhook",
+                            "3": "subscriptions"
+                          }
                         },
                         {
-                          "method_key": "cod",
-                          "title": "Cash on Delivery",
-                          "is_active": "no",
-                          "description": "Accept cash payment upon delivery",
-                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/cod.svg",
-                          "upcoming": false,
-                          "requires_pro": false
-                        },
-                        {
-                          "method_key": "square",
                           "title": "Square",
-                          "is_active": "no",
-                          "description": "Accept payments via Square",
-                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/square.svg",
+                          "route": "square",
+                          "slug": "square",
+                          "label": "Square",
+                          "description": "Accept payments via Square.",
+                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/square.svg",
+                          "icon": "https://example.com/wp-content/plugins/fluent-cart/assets/images/payment-methods/square-icon.svg",
+                          "brand_color": "#000000",
+                          "status": false,
                           "upcoming": false,
-                          "requires_pro": true
+                          "requires_pro": true,
+                          "supported_features": {
+                            "0": "payment",
+                            "1": "refund"
+                          }
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

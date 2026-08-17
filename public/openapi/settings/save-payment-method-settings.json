@@ -27,7 +27,7 @@
       "post": {
         "operationId": "savePaymentMethodSettings",
         "summary": "POST Save Payment Method Settings",
-        "description": "Create or update the configuration for a specific payment method gateway.",
+        "description": "Create or update the configuration for a specific payment method gateway.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -147,6 +147,49 @@
                       },
                       "message": "Settings saved successfully"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

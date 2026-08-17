@@ -27,7 +27,7 @@
       "post": {
         "operationId": "saveFeedSettings",
         "summary": "POST Save Feed Settings",
-        "description": "Create a new integration feed or update an existing one. Validates required fields defined by the integration provider before saving.",
+        "description": "Create a new integration feed or update an existing one. Validates required fields defined by the integration provider before saving.\n\n**Required permission:** `integrations/manage`",
         "tags": [
           "Integrations"
         ],
@@ -196,6 +196,34 @@
                         "list_id": "Contact List is required."
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`integrations/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

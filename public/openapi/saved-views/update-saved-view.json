@@ -1,0 +1,267 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/saved-views/{id}": {
+      "put": {
+        "operationId": "updateSavedView",
+        "summary": "PUT Update Saved View",
+        "description": "Update a saved view. Only the fields present in the request body are changed — omit a field to leave it untouched.\n\nOnly the **creator** may update a view. `object_type` is not sent for this route; the policy resolves it by looking the record up from the ID in the URL.\n\n**Permission:** varies by the view's stored `object_type` · **Policy:** `SavedViewsPolicy`",
+        "tags": [
+          "Saved Views"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the saved view."
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "New display name, 50 characters or fewer."
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "is_public": {
+                    "type": "boolean"
+                  },
+                  "query_params": {
+                    "type": "object",
+                    "properties": {
+                      "filter_type": {
+                        "type": "string",
+                        "description": "Filter mode, e.g. `simple` or `advanced`."
+                      },
+                      "advanced_filters": {
+                        "type": "string",
+                        "description": "JSON-encoded advanced filter groups. Invalid JSON is stored as `[[]]`."
+                      },
+                      "search": {
+                        "type": "string",
+                        "description": "Free-text search term."
+                      },
+                      "active_view": {
+                        "type": "string",
+                        "description": "Active tab on the table."
+                      }
+                    },
+                    "example": {
+                      "filter_type": "advanced",
+                      "advanced_filters": "[[{\"source\":\"order\",\"property\":\"status\",\"operator\":\"=\",\"value\":\"completed\"}]]",
+                      "search": "",
+                      "active_view": "all"
+                    }
+                  }
+                },
+                "example": {
+                  "name": "Unfulfilled orders (EU)",
+                  "is_public": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "view": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "object_type": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string",
+                          "description": "Auto-generated from the name plus a 6-character random suffix."
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "query_params": {
+                          "type": "object",
+                          "properties": {
+                            "filter_type": {
+                              "type": "string",
+                              "description": "Filter mode, e.g. `simple` or `advanced`."
+                            },
+                            "advanced_filters": {
+                              "type": "string",
+                              "description": "JSON-encoded advanced filter groups. Invalid JSON is stored as `[[]]`."
+                            },
+                            "search": {
+                              "type": "string",
+                              "description": "Free-text search term."
+                            },
+                            "active_view": {
+                              "type": "string",
+                              "description": "Active tab on the table."
+                            }
+                          },
+                          "example": {
+                            "filter_type": "advanced",
+                            "advanced_filters": "[[{\"source\":\"order\",\"property\":\"status\",\"operator\":\"=\",\"value\":\"completed\"}]]",
+                            "search": "",
+                            "active_view": "all"
+                          }
+                        },
+                        "is_public": {
+                          "type": "boolean",
+                          "description": "`true` when the view is shared with every user who can access this table."
+                        },
+                        "owner_id": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "WordPress user ID of the creator."
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "View updated successfully.",
+                    "view": {
+                      "id": 41,
+                      "object_type": "order_table",
+                      "slug": "unfulfilled-orders-x7k2p9",
+                      "name": "Unfulfilled orders (EU)",
+                      "description": "Paid orders still awaiting fulfillment",
+                      "query_params": {
+                        "filter_type": "advanced",
+                        "advanced_filters": "[[{\"source\":\"order\",\"property\":\"fulfillment_type\",\"operator\":\"=\",\"value\":\"unfulfilled\"}]]",
+                        "search": "",
+                        "active_view": "all"
+                      },
+                      "is_public": true,
+                      "owner_id": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The authenticated user is not the creator of this view. A `rest_forbidden` response with the same status is returned earlier by the policy when the user lacks the table capability or the record does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "You do not have permission to update this view."
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "View not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "View not found."
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed — `name` was sent empty or longer than 50 characters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "Name is required and must be 50 characters or fewer."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

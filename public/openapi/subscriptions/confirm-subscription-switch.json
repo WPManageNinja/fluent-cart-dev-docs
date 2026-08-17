@@ -27,7 +27,7 @@
       "post": {
         "operationId": "confirmSubscriptionSwitch",
         "summary": "POST Confirm Subscription Switch",
-        "description": "Confirm a two-step payment method switch. After the initial switch-payment-method call creates a new subscription on the target gateway, this endpoint finalizes the switch by confirming the new subscription and deactivating the old one.",
+        "description": "Confirm a two-step payment method switch. After the initial switch-payment-method call creates a new subscription on the target gateway, this endpoint finalizes the switch by confirming the new subscription and deactivating the old one.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Subscriptions"
         ],
@@ -154,6 +154,34 @@
                     "value": {
                       "message": "Could not confirm subscription switch"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

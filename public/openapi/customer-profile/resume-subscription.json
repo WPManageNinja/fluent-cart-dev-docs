@@ -1,0 +1,147 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/customer-profile/subscriptions/{subscription_uuid}/resume": {
+      "post": {
+        "operationId": "resumeSubscription",
+        "summary": "POST Resume Subscription",
+        "description": "Resume the logged-in customer's own paused subscription from the customer portal. The subscription must belong to the currently authenticated customer and is looked up by its UUID, not its numeric ID.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
+        "tags": [
+          "Customer Profile"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subscription_uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "[a-zA-Z0-9-_]+"
+            },
+            "description": "UUID of the subscription to resume. Must belong to the currently authenticated customer."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription resumed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Your subscription has been successfully resumed"
+                  }
+                },
+                "example": {
+                  "message": "Your subscription has been successfully resumed"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Your subscription has been successfully resumed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The requester is not logged in, has no customer record, the subscription UUID does not belong to them, or the subscription cannot be resumed in its current state (the error message reflects which case occurred).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Subscription not found"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Subscription not found"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Subscription not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

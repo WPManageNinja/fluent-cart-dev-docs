@@ -1,0 +1,367 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/group/{group_id}/terms": {
+      "post": {
+        "operationId": "createTerms",
+        "summary": "POST Create Attribute Terms",
+        "description": "Create up to 10 terms at once inside an attribute group (e.g. add \"Red\", \"Blue\" to a \"Color\" group). Term slugs are unique per group, not globally — the same term title can exist in two different groups. If the group's type is \"color\", every term requires a valid hex `settings.color`; if it is \"image\", every term requires a `settings.image` URL.\n\n**Required permission:** `products/create`",
+        "tags": [
+          "Labels & Attributes"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the attribute group to add terms to."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "terms"
+                ],
+                "properties": {
+                  "terms": {
+                    "type": "array",
+                    "description": "1-10 terms to create.",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "title"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "maxLength": 50,
+                          "description": "Term title."
+                        },
+                        "settings": {
+                          "type": "object",
+                          "description": "Required shape depends on the group's type.",
+                          "properties": {
+                            "color": {
+                              "type": "string",
+                              "description": "Required hex color (#rgb or #rrggbb) for color-type groups."
+                            },
+                            "image": {
+                              "type": "string",
+                              "format": "uri",
+                              "description": "Required image URL for image-type groups."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "terms": [
+                    {
+                      "title": "Red",
+                      "settings": {
+                        "color": "#e53e3e"
+                      }
+                    },
+                    {
+                      "title": "Blue",
+                      "settings": {
+                        "color": "#3182ce"
+                      }
+                    }
+                  ]
+                }
+              },
+              "example": {
+                "terms": [
+                  {
+                    "title": "Red",
+                    "settings": {
+                      "color": "#e53e3e"
+                    }
+                  },
+                  {
+                    "title": "Blue",
+                    "settings": {
+                      "color": "#3182ce"
+                    }
+                  }
+                ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "terms": [
+                      {
+                        "title": "Red",
+                        "settings": {
+                          "color": "#e53e3e"
+                        }
+                      },
+                      {
+                        "title": "Blue",
+                        "settings": {
+                          "color": "#3182ce"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Terms created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "The created term records.",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  },
+                  "example": {
+                    "data": [
+                      {
+                        "id": 21,
+                        "group_id": 4,
+                        "title": "Red",
+                        "slug": "red",
+                        "settings": {
+                          "color": "#e53e3e"
+                        },
+                        "sort_order": 1,
+                        "created_at": "2026-01-12 09:15:00",
+                        "updated_at": "2026-01-12 09:15:00"
+                      },
+                      {
+                        "id": 22,
+                        "group_id": 4,
+                        "title": "Blue",
+                        "slug": "blue",
+                        "settings": {
+                          "color": "#3182ce"
+                        },
+                        "sort_order": 2,
+                        "created_at": "2026-01-12 09:15:00",
+                        "updated_at": "2026-01-12 09:15:00"
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": 21,
+                      "group_id": 4,
+                      "title": "Red",
+                      "slug": "red",
+                      "settings": {
+                        "color": "#e53e3e"
+                      },
+                      "sort_order": 1,
+                      "created_at": "2026-01-12 09:15:00",
+                      "updated_at": "2026-01-12 09:15:00"
+                    },
+                    {
+                      "id": 22,
+                      "group_id": 4,
+                      "title": "Blue",
+                      "slug": "blue",
+                      "settings": {
+                        "color": "#3182ce"
+                      },
+                      "sort_order": 2,
+                      "created_at": "2026-01-12 09:15:00",
+                      "updated_at": "2026-01-12 09:15:00"
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 21,
+                          "group_id": 4,
+                          "title": "Red",
+                          "slug": "red",
+                          "settings": {
+                            "color": "#e53e3e"
+                          },
+                          "sort_order": 1,
+                          "created_at": "2026-01-12 09:15:00",
+                          "updated_at": "2026-01-12 09:15:00"
+                        },
+                        {
+                          "id": 22,
+                          "group_id": 4,
+                          "title": "Blue",
+                          "slug": "blue",
+                          "settings": {
+                            "color": "#3182ce"
+                          },
+                          "sort_order": 2,
+                          "created_at": "2026-01-12 09:15:00",
+                          "updated_at": "2026-01-12 09:15:00"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The authenticated user lacks the products/create permission.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "No terms supplied, more than 10 terms supplied, a term is missing its title, or a term is missing the color/image its group type requires.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "At least one term is required."
+                },
+                "schema": {
+                  "example": {
+                    "message": "At least one term is required."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "At least one term is required."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

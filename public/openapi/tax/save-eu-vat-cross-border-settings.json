@@ -32,7 +32,7 @@
         ],
         "operationId": "saveEuVatCrossBorderSettings",
         "summary": "POST Save EU VAT Cross-Border Settings",
-        "description": "Multi-action endpoint for EU VAT settings, dispatched by the action field: euCrossBorderSettings saves the cross-border registration configuration (OSS, home country, or specific country registrations); saveCountryRegistration creates or updates a per-country VAT registration with per-class rates; deleteCountryRegistration removes a per-country VAT registration.",
+        "description": "Multi-action endpoint for EU VAT settings, dispatched by the action field: euCrossBorderSettings saves the cross-border registration configuration (OSS, home country, or specific country registrations); saveCountryRegistration creates or updates a per-country VAT registration with per-class rates; deleteCountryRegistration removes a per-country VAT registration.\n\n**Required permission:** `store/sensitive`",
         "tags": [
           "Tax"
         ],
@@ -237,6 +237,34 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`store/sensitive`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -249,7 +277,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

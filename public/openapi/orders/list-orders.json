@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listOrders",
         "summary": "GET List Orders",
-        "description": "Retrieve a paginated list of orders with optional filtering, sorting, and search.",
+        "description": "Retrieve a paginated list of orders with optional filtering, sorting, and search.\n\n**Required permission:** `orders/view`",
         "tags": [
           "Orders"
         ],
@@ -245,6 +245,58 @@
                           "type": "integer",
                           "description": "Current page number"
                         },
+                        "first_page_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "URL of the first page"
+                        },
+                        "from": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "Index of first item on this page"
+                        },
+                        "last_page_url": {
+                          "type": "string",
+                          "description": "URL of the last page"
+                        },
+                        "links": {
+                          "type": "array",
+                          "description": "Pagination links (previous, page numbers, next)",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "active": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        },
+                        "next_page_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "URL of the next page"
+                        },
+                        "path": {
+                          "type": "string",
+                          "description": "Base URL without query string"
+                        },
+                        "prev_page_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "URL of the previous page"
+                        },
+                        "to": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "Index of last item on this page"
+                        },
                         "data": {
                           "type": "array",
                           "description": "Array of order objects",
@@ -270,6 +322,35 @@
                   "example": {
                     "orders": {
                       "current_page": 1,
+                      "first_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                      "from": 1,
+                      "last_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=10",
+                      "links": [
+                        {
+                          "url": null,
+                          "label": "pagination.previous",
+                          "active": false
+                        },
+                        {
+                          "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                          "label": "1",
+                          "active": true
+                        },
+                        {
+                          "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                          "label": "2",
+                          "active": false
+                        },
+                        {
+                          "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                          "label": "pagination.next",
+                          "active": false
+                        }
+                      ],
+                      "next_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                      "path": "https://yoursite.com/wp-json/fluent-cart/v2/orders",
+                      "prev_page_url": null,
+                      "to": 10,
                       "data": [
                         {
                           "id": 42,
@@ -383,6 +464,35 @@
                 "example": {
                   "orders": {
                     "current_page": 1,
+                    "first_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                    "from": 1,
+                    "last_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=10",
+                    "links": [
+                      {
+                        "url": null,
+                        "label": "pagination.previous",
+                        "active": false
+                      },
+                      {
+                        "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                        "label": "1",
+                        "active": true
+                      },
+                      {
+                        "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                        "label": "2",
+                        "active": false
+                      },
+                      {
+                        "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                        "label": "pagination.next",
+                        "active": false
+                      }
+                    ],
+                    "next_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                    "path": "https://yoursite.com/wp-json/fluent-cart/v2/orders",
+                    "prev_page_url": null,
+                    "to": 10,
                     "data": [
                       {
                         "id": 42,
@@ -498,6 +608,35 @@
                     "value": {
                       "orders": {
                         "current_page": 1,
+                        "first_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                        "from": 1,
+                        "last_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=10",
+                        "links": [
+                          {
+                            "url": null,
+                            "label": "pagination.previous",
+                            "active": false
+                          },
+                          {
+                            "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=1",
+                            "label": "1",
+                            "active": true
+                          },
+                          {
+                            "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                            "label": "2",
+                            "active": false
+                          },
+                          {
+                            "url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                            "label": "pagination.next",
+                            "active": false
+                          }
+                        ],
+                        "next_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/orders/?page=2",
+                        "path": "https://yoursite.com/wp-json/fluent-cart/v2/orders",
+                        "prev_page_url": null,
+                        "to": 10,
                         "data": [
                           {
                             "id": 42,
@@ -607,6 +746,34 @@
                         "last_page": 10
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

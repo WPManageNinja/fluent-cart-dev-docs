@@ -1,0 +1,364 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/renewals/{id}": {
+      "get": {
+        "operationId": "show",
+        "summary": "GET Get Renewal Invoice Details",
+        "description": "Retrieve a single renewal invoice (an order of type `renewal`), including its customer, order items, and transactions.\n\n**Required permission:** `orders/view`",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Renewal order ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the renewal invoice.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "invoice": {
+                      "type": "object",
+                      "description": "Renewal order with customer, order_items, and transactions relations"
+                    }
+                  },
+                  "example": {
+                    "invoice": {
+                      "id": 5151,
+                      "status": "completed",
+                      "parent_id": "1880",
+                      "receipt_number": "6322",
+                      "invoice_no": "INV-6322",
+                      "fulfillment_type": "digital",
+                      "type": "renewal",
+                      "mode": "live",
+                      "shipping_status": "unshipped",
+                      "customer_id": 1484,
+                      "payment_method": "stripe",
+                      "payment_status": "paid",
+                      "payment_method_title": "",
+                      "currency": "USD",
+                      "subtotal": 9900,
+                      "discount_tax": 0,
+                      "manual_discount_total": 0,
+                      "coupon_discount_total": 0,
+                      "shipping_tax": 0,
+                      "shipping_total": 0,
+                      "fee_total": 0,
+                      "tax_total": 0,
+                      "total_amount": 9900,
+                      "total_paid": "9900",
+                      "total_refund": "0",
+                      "rate": "1.0000",
+                      "tax_behavior": 0,
+                      "note": "",
+                      "ip_address": "",
+                      "completed_at": "2026-05-29 12:35:43",
+                      "refunded_at": null,
+                      "uuid": "a8b1c044193c3e27bd593f31bbfb0f8e",
+                      "config": [],
+                      "created_at": "2026-05-29T12:35:43+00:00",
+                      "updated_at": "2026-05-29T14:40:30+00:00",
+                      "customer": {
+                        "id": 1484,
+                        "user_id": "1848",
+                        "contact_id": "0",
+                        "email": "alex.chen@example.com",
+                        "first_name": "Alex",
+                        "last_name": "Chen",
+                        "status": "active",
+                        "purchase_value": null,
+                        "purchase_count": "26",
+                        "ltv": "257400",
+                        "first_purchase_date": "2025-11-25 17:44:02",
+                        "last_purchase_date": "2026-05-29 12:35:43",
+                        "aov": "9900.00",
+                        "notes": "",
+                        "uuid": "8c9bb480491cdc405d6cb104b76972af",
+                        "country": "FR",
+                        "city": "Paris",
+                        "state": "",
+                        "postcode": "75001",
+                        "created_at": "2025-11-25T17:44:02+00:00",
+                        "updated_at": "2026-05-29T12:35:43+00:00",
+                        "full_name": "Alex Chen",
+                        "photo": "https://www.gravatar.com/avatar/00000000000000000000000000000000?s=128&d=mm&r=g",
+                        "country_name": "France",
+                        "formatted_address": {
+                          "country": "France",
+                          "state": "",
+                          "city": "Paris",
+                          "postcode": "75001",
+                          "first_name": "Alex",
+                          "last_name": "Chen",
+                          "full_name": "Alex Chen"
+                        },
+                        "user_link": "https://example.com/wp-admin/user-edit.php?user_id=1848"
+                      },
+                      "order_items": [
+                        {
+                          "id": 5151,
+                          "order_id": "5151",
+                          "post_id": "21480",
+                          "fulfillment_type": "digital",
+                          "payment_type": "subscription",
+                          "post_title": "Developer Toolkit Pro",
+                          "title": "50 Sites - Lifetime License (Installments)",
+                          "object_id": "12",
+                          "cart_index": "0",
+                          "quantity": "1",
+                          "unit_price": 9900,
+                          "cost": 0,
+                          "subtotal": 9900,
+                          "tax_amount": 0,
+                          "shipping_charge": 0,
+                          "discount_total": 0,
+                          "line_total": 9900,
+                          "refund_total": 0,
+                          "rate": "1",
+                          "other_info": [],
+                          "line_meta": [],
+                          "fulfilled_quantity": "0",
+                          "referrer": null,
+                          "created_at": "2026-05-29T12:35:43+00:00",
+                          "updated_at": "2026-05-29T12:35:43+00:00",
+                          "payment_info": "",
+                          "setup_info": "",
+                          "is_custom": false,
+                          "variation_display_title": "50 Sites - Lifetime License (Installments)",
+                          "formatted_total": "$99.00"
+                        }
+                      ],
+                      "transactions": [
+                        {
+                          "id": 5331,
+                          "order_id": "5151",
+                          "order_type": "renewal",
+                          "transaction_type": "charge",
+                          "subscription_id": "376",
+                          "card_last_4": "6606",
+                          "card_brand": "mastercard",
+                          "vendor_charge_id": "pi_3PxKE2JY8q0aaaaa0aaaaaaa",
+                          "payment_method": "stripe",
+                          "payment_mode": "live",
+                          "payment_method_type": "card",
+                          "status": "succeeded",
+                          "currency": "USD",
+                          "total": "9900",
+                          "rate": "1",
+                          "uuid": "8cdb4f7662c049a1561c36417298aca4",
+                          "meta": [],
+                          "created_at": "2026-05-29T12:35:43+00:00",
+                          "updated_at": "2026-05-29T12:35:43+00:00",
+                          "url": "https://dashboard.stripe.com/payments/pi_3PxKE2JY8q0aaaaa0aaaaaaa",
+                          "refundable": 9900
+                        }
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "invoice": {
+                    "id": 5151,
+                    "status": "completed",
+                    "type": "renewal",
+                    "customer_id": 1484,
+                    "payment_status": "paid",
+                    "total_amount": 9900
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "invoice": {
+                        "id": 5151,
+                        "status": "completed",
+                        "type": "renewal",
+                        "customer_id": 1484,
+                        "payment_status": "paid",
+                        "total_amount": 9900
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user lacks the orders/view permission.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No renewal order matches the given ID. Uses the shared entity-not-found shape (`entityNotFoundError()`), which nests the message under `data` and includes admin-UI hints.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "fluent_cart_entity_not_found",
+                  "data": {
+                    "message": "Renewal order not found",
+                    "buttonText": "Back to Orders",
+                    "route": "/orders"
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "fluent_cart_entity_not_found",
+                    "data": {
+                      "message": "Renewal order not found",
+                      "buttonText": "Back to Orders",
+                      "route": "/orders"
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "fluent_cart_entity_not_found",
+                      "data": {
+                        "message": "Renewal order not found",
+                        "buttonText": "Back to Orders",
+                        "route": "/orders"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

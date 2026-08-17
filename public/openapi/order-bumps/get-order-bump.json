@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getOrderBump",
         "summary": "GET Get Order Bump",
-        "description": "Retrieve detailed information about a specific order bump, including its configuration, conditions, and associated product variant.",
+        "description": "Retrieve detailed information about a specific order bump, including its configuration, conditions, and associated product variant.\n\n**Permission:** `store/sensitive` · **Policy:** `OrderBumpPolicy`",
         "tags": [
           "Order Bumps"
         ],
@@ -386,7 +386,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

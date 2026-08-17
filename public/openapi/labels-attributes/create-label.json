@@ -27,7 +27,7 @@
       "post": {
         "operationId": "createLabel",
         "summary": "POST Create Label",
-        "description": "Create a new label and optionally attach it to an entity (order, customer, etc.) in a single request.",
+        "description": "Create a new label and optionally attach it to an entity (order, customer, etc.) in a single request.\n\n**Required permission:** `labels/manage`",
         "tags": [
           "Labels"
         ],
@@ -136,6 +136,34 @@
                         ]
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`labels/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

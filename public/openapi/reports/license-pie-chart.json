@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getLicensePieChart",
         "summary": "GET Get License Pie Chart",
-        "description": "Retrieve license distribution data suitable for pie/donut chart visualization (e.g., active vs expired vs revoked).",
+        "description": "Retrieve license distribution data suitable for pie/donut chart visualization (e.g., active vs expired vs revoked).\n\n**Also used by the licensing UI.** Retrieve license data formatted for a pie chart visualization.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -109,6 +109,28 @@
             },
             "description": "Order type filter.",
             "required": false
+          },
+          {
+            "name": "params",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "description": "Request parameters object containing filters and date range",
+            "style": "deepObject",
+            "explode": true
+          },
+          {
+            "name": "params[filters]",
+            "in": "query",
+            "schema": {
+              "type": "object"
+            },
+            "description": "Filter criteria",
+            "required": false,
+            "style": "deepObject",
+            "explode": true
           }
         ],
         "responses": {
@@ -118,81 +140,95 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "License status distribution data",
-                  "additionalProperties": true,
-                  "example": {
-                    "distribution": [
-                      {
-                        "label": "Active",
-                        "value": 198,
-                        "percentage": 80.8,
-                        "color": "#67C23A"
-                      },
-                      {
-                        "label": "Expired",
-                        "value": 32,
-                        "percentage": 13.1,
-                        "color": "#E6A23C"
-                      },
-                      {
-                        "label": "Revoked",
-                        "value": 15,
-                        "percentage": 6.1,
-                        "color": "#F56C6C"
+                  "properties": {
+                    "pieChartData": {
+                      "type": "array",
+                      "description": "License activation distribution by product, one entry per product that has licenses",
+                      "items": {
+                        "$ref": "#/components/schemas/LicensePieChartSlice"
                       }
-                    ],
-                    "total_licenses": 245
+                    }
+                  },
+                  "example": {
+                    "pieChartData": [
+                      {
+                        "product_id": "10",
+                        "post_title": "FluentCart Pro",
+                        "activation_count": "198",
+                        "percentage": "80.82"
+                      },
+                      {
+                        "product_id": "14",
+                        "post_title": "FluentCart Pro Add-on",
+                        "activation_count": "47",
+                        "percentage": "19.18"
+                      }
+                    ]
                   }
                 },
                 "example": {
-                  "distribution": [
+                  "pieChartData": [
                     {
-                      "label": "Active",
-                      "value": 198,
-                      "percentage": 80.8,
-                      "color": "#67C23A"
+                      "product_id": "10",
+                      "post_title": "FluentCart Pro",
+                      "activation_count": "198",
+                      "percentage": "80.82"
                     },
                     {
-                      "label": "Expired",
-                      "value": 32,
-                      "percentage": 13.1,
-                      "color": "#E6A23C"
-                    },
-                    {
-                      "label": "Revoked",
-                      "value": 15,
-                      "percentage": 6.1,
-                      "color": "#F56C6C"
+                      "product_id": "14",
+                      "post_title": "FluentCart Pro Add-on",
+                      "activation_count": "47",
+                      "percentage": "19.18"
                     }
-                  ],
-                  "total_licenses": 245
+                  ]
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "distribution": [
+                      "pieChartData": [
                         {
-                          "label": "Active",
-                          "value": 198,
-                          "percentage": 80.8,
-                          "color": "#67C23A"
+                          "product_id": "10",
+                          "post_title": "FluentCart Pro",
+                          "activation_count": "198",
+                          "percentage": "80.82"
                         },
                         {
-                          "label": "Expired",
-                          "value": 32,
-                          "percentage": 13.1,
-                          "color": "#E6A23C"
-                        },
-                        {
-                          "label": "Revoked",
-                          "value": 15,
-                          "percentage": 6.1,
-                          "color": "#F56C6C"
+                          "product_id": "14",
+                          "post_title": "FluentCart Pro Add-on",
+                          "activation_count": "47",
+                          "percentage": "19.18"
                         }
-                      ],
-                      "total_licenses": 245
+                      ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -203,7 +239,33 @@
     }
   },
   "components": {
-    "schemas": {},
+    "schemas": {
+      "LicensePieChartSlice": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "description": "Product post ID",
+            "example": "10"
+          },
+          "post_title": {
+            "type": "string",
+            "description": "Product title",
+            "example": "FluentCart Pro"
+          },
+          "activation_count": {
+            "type": "string",
+            "description": "Number of license activations for this product within the report range",
+            "example": "198"
+          },
+          "percentage": {
+            "type": "string",
+            "description": "Share of total activations this product represents, as a percentage string",
+            "example": "80.82"
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",

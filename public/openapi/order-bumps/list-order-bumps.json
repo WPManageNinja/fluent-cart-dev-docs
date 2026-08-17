@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listOrderBumps",
         "summary": "GET List Order Bumps",
-        "description": "Retrieve a paginated list of order bumps with optional filtering, sorting, and search.",
+        "description": "Retrieve a paginated list of order bumps with optional filtering, sorting, and search.\n\n**Permission:** `store/sensitive` · **Policy:** `OrderBumpPolicy`",
         "tags": [
           "Order Bumps"
         ],
@@ -130,6 +130,50 @@
                           "items": {
                             "$ref": "#/components/schemas/OrderBumpListItem"
                           }
+                        },
+                        "first_page_url": {
+                          "type": "string"
+                        },
+                        "from": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "last_page_url": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "active": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "description": "Rendered pagination links, including the `&laquo; Previous` / `Next &raquo;` entries."
+                        },
+                        "next_page_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "prev_page_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "to": {
+                          "type": "integer",
+                          "nullable": true
                         }
                       }
                     }
@@ -151,28 +195,30 @@
                           "src_object_type": null,
                           "title": "Add Extended Warranty",
                           "description": "<p>Protect your purchase with our 2-year warranty plan.</p>",
-                          "conditions": [
-                            {
-                              "type": "cart_products",
-                              "operator": "contains",
-                              "value": [
-                                123,
-                                124
+                          "conditions": {
+                            "groups": [
+                              [
+                                {
+                                  "key": "order_items",
+                                  "value": [
+                                    "45"
+                                  ],
+                                  "operator": "exist"
+                                }
                               ]
-                            },
-                            {
-                              "type": "cart_total",
-                              "operator": "greater_than",
-                              "value": 2500
-                            }
-                          ],
+                            ],
+                            "is_enabled": "no"
+                          },
                           "config": {
                             "discount": {
                               "discount_type": "percentage",
                               "discount_amount": 10
                             },
                             "display_conditions_if": "",
-                            "call_to_action": "Yes, add warranty!"
+                            "call_to_action": "Yes, add warranty!",
+                            "allow_coupon": "yes",
+                            "enable_coupon": "yes",
+                            "free_shipping": "yes"
                           },
                           "priority": 1,
                           "created_at": "2025-06-01 10:00:00",
@@ -189,7 +235,26 @@
                             }
                           }
                         }
-                      ]
+                      ],
+                      "first_page_url": "https://example.com/wp-json/fluent-cart/v2/order_bump?page=1",
+                      "from": 1,
+                      "last_page_url": "https://example.com/wp-json/fluent-cart/v2/order_bump?page=1",
+                      "links": [
+                        {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "active": false
+                        },
+                        {
+                          "url": "https://example.com/wp-json/fluent-cart/v2/order_bump?page=1",
+                          "label": "1",
+                          "active": true
+                        }
+                      ],
+                      "next_page_url": null,
+                      "path": "https://example.com/wp-json/fluent-cart/v2/order_bump",
+                      "prev_page_url": null,
+                      "to": 5
                     }
                   }
                 },
@@ -369,12 +434,56 @@
             "description": "HTML description shown to customers"
           },
           "conditions": {
-            "type": "array",
-            "description": "JSON-decoded array of display conditions"
+            "type": "object",
+            "nullable": true,
+            "description": "Display conditions. Stored as a filter-group structure and passed through unmodified by the API (the request layer does not reshape it).",
+            "properties": {
+              "is_enabled": {
+                "type": "string",
+                "description": "`yes` or `no` — whether conditions gate this bump at all."
+              },
+              "groups": {
+                "type": "array",
+                "description": "Condition groups. Groups are OR-ed together; conditions within a group are AND-ed.",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "description": "Condition subject, e.g. `order_items`."
+                      },
+                      "operator": {
+                        "type": "string",
+                        "description": "Comparison operator, e.g. `exist`."
+                      },
+                      "value": {
+                        "description": "Comparison value — a string or an array depending on `operator`."
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "config": {
             "type": "object",
-            "description": "JSON-decoded configuration object"
+            "description": "JSON-decoded configuration object",
+            "properties": {
+              "allow_coupon": {
+                "type": "string",
+                "description": "`yes`/`no` — allow coupons to apply to the bump product."
+              },
+              "enable_coupon": {
+                "type": "string",
+                "description": "`yes`/`no` — show the coupon field on the bump."
+              },
+              "free_shipping": {
+                "type": "string",
+                "description": "`yes`/`no` — grant free shipping when the bump is taken."
+              }
+            }
           },
           "priority": {
             "type": "integer",
@@ -429,7 +538,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -27,7 +27,7 @@
       "put": {
         "operationId": "updateShippingZone",
         "summary": "PUT Update Shipping Zone",
-        "description": "Update an existing shipping zone. If the region changes, all associated shipping method states are reset to empty.",
+        "description": "Update an existing shipping zone. If the region changes, all associated shipping method states are reset to empty.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Shipping"
         ],
@@ -150,6 +150,49 @@
                       },
                       "message": "Shipping zone has been updated successfully"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "put": {
         "operationId": "updateAttributeGroup",
         "summary": "PUT Update Attribute Group",
-        "description": "Update an existing attribute group.",
+        "description": "Update an existing attribute group.\n\n**Required permission:** `products/edit`",
         "tags": [
           "Labels"
         ],
@@ -140,6 +140,34 @@
                         ]
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/edit`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getProductPerformance",
         "summary": "GET Get Product Performance",
-        "description": "Retrieve a ranked performance chart of top-performing products within the specified date range.",
+        "description": "Retrieve a ranked performance chart of top-performing products within the specified date range.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -328,6 +328,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

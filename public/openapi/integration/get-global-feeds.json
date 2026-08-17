@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listGlobalIntegrationFeeds",
         "summary": "GET List Global Integration Feeds",
-        "description": "Retrieve all configured global integration feeds along with the list of available integrations that support global scope.",
+        "description": "Retrieve all configured global integration feeds along with the list of available integrations that support global scope.\n\n**Required permission:** `integrations/view`",
         "tags": [
           "Integrations"
         ],
@@ -205,6 +205,34 @@
                       },
                       "all_module_config_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`integrations/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "put": {
         "operationId": "updateOrderBump",
         "summary": "PUT Update Order Bump",
-        "description": "Update an existing order bump's configuration, conditions, status, and display settings.",
+        "description": "Update an existing order bump's configuration, conditions, status, and display settings.\n\n**Permission:** `store/sensitive` · **Policy:** `OrderBumpPolicy`",
         "tags": [
           "Order Bumps"
         ],
@@ -299,7 +299,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

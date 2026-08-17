@@ -22,7 +22,7 @@ This action fires whenever a [License](/database/models/license)'s status transi
     - `old_status` (string) — The previous status value
     - `new_status` (string) — The new status value
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:206`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:227`
 
 **Usage:**
 ```php
@@ -54,7 +54,7 @@ This is a dynamic hook that fires for a specific target status. For example, `fl
     - `old_status` (string) — The previous status value
     - `new_status` (string) — The new status value
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:211`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:232`
 
 **Usage:**
 ```php
@@ -180,7 +180,7 @@ This action fires when a [License](/database/models/license)'s activation count 
     - `license` ([`\FluentCart\App\Models\License`](/database/models/license)) — The license model
     - `old_count` (int) — The previous activation count
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:239`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:260`
 
 **Usage:**
 ```php
@@ -244,7 +244,7 @@ This action fires when a license key is regenerated, replacing the old key with 
     - `license` ([`\FluentCart\App\Models\License`](/database/models/license)) — The license model with the new key
     - `old_key` (string) — The previous license key
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:318`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:352`
 
 **Usage:**
 ```php
@@ -275,7 +275,7 @@ This action fires when a license's expiration date is modified to a new date.
     - `old_date` (string) — The previous expiration date
     - `new_date` (string) — The new expiration date
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:348`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/License.php:382`
 
 **Usage:**
 ```php
@@ -312,7 +312,7 @@ This action fires when a new license is generated as part of an order fulfillmen
     - `order` ([`\FluentCart\App\Models\Order`](/database/models/order)) — The associated order
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)|null) — The associated subscription, if any
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:532`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:566`
 
 **Usage:**
 ```php
@@ -505,7 +505,7 @@ This action fires when a license is upgraded to a different plan, typically thro
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)) — The associated subscription
     - `updates` (array) — The update data applied to the license
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:375`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:378`
 
 **Usage:**
 ```php
@@ -600,7 +600,7 @@ This action fires when a site is successfully activated for a license through th
 - `$license` ([`\FluentCart\App\Models\License`](/database/models/license)) — The associated license
 - `$data` (array) — The activation request data
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseApiHandler.php:255`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseApiHandler.php:265`
 
 **Usage:**
 ```php
@@ -628,7 +628,7 @@ This action fires when a site is successfully deactivated for a license through 
 - `$license` ([`\FluentCart\App\Models\License`](/database/models/license)) — The associated license
 - `$data` (array) — The deactivation request data
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseApiHandler.php:340`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseApiHandler.php:354`
 
 **Usage:**
 ```php

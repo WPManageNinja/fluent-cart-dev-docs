@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getDashboardStats",
         "summary": "GET Get Dashboard Stats",
-        "description": "Retrieve dashboard statistics widgets including total products, orders, net revenue, and refunds for the last 30 days.",
+        "description": "Retrieve dashboard statistics widgets including total products, orders, net revenue, and refunds for the last 30 days.\n\n**Required permission:** `dashboard_stats/view`",
         "tags": [
           "Dashboard"
         ],
@@ -145,6 +145,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`dashboard_stats/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

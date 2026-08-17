@@ -1,0 +1,218 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/send-manual-reminder": {
+      "post": {
+        "operationId": "sendManualReminder",
+        "summary": "POST Send Manual Reminder",
+        "description": "Manually trigger a reminder email for a single entity (for example, a subscription payment reminder) outside of its normal scheduled trigger.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "event",
+                  "entity_id"
+                ],
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "description": "The reminder event type to send."
+                  },
+                  "entity_id": {
+                    "type": "integer",
+                    "description": "ID of the entity (e.g. subscription ID) the reminder relates to."
+                  }
+                },
+                "example": {
+                  "event": "subscription_payment_reminder",
+                  "entity_id": 15
+                }
+              },
+              "example": {
+                "event": "subscription_payment_reminder",
+                "entity_id": 15
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "event": "subscription_payment_reminder",
+                    "entity_id": 15
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reminder sent successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Reminder sent successfully."
+                  }
+                },
+                "example": {
+                  "message": "Reminder sent successfully."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Reminder sent successfully."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The authenticated user lacks store-sensitive access.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing event/entity_id, or the reminder could not be sent for the given entity.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Event type and entity ID are required"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Event type and entity ID are required"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Event type and entity ID are required"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

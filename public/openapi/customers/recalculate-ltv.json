@@ -27,7 +27,7 @@
       "post": {
         "operationId": "recalculateCustomerLtv",
         "summary": "POST Recalculate Lifetime Value",
-        "description": "Recalculate a customer's lifetime value (LTV) by summing net payments from all successful orders. Also updates purchase_count, first_purchase_date, last_purchase_date, and aov (average order value).",
+        "description": "Recalculate a customer's lifetime value (LTV) by summing net payments from all successful orders. Also updates purchase_count, first_purchase_date, last_purchase_date, and aov (average order value).\n\n**Required permission:** `customers/manage`",
         "tags": [
           "Customers"
         ],
@@ -164,6 +164,49 @@
                     "value": {
                       "message": "Customer not found."
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`customers/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

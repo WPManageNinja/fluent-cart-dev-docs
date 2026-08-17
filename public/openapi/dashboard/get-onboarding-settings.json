@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getOnboardingSettings",
         "summary": "GET Get Onboarding Settings",
-        "description": "Retrieve the current store settings, available pages, and currency options for the onboarding wizard.",
+        "description": "Retrieve the current store settings, available pages, and currency options for the onboarding wizard.\n\n**Access policy:** `AdminPolicy` \u2014 requires the `is_super_admin` FluentCart capability.",
         "tags": [
           "Dashboard"
         ],
@@ -46,74 +46,212 @@
                   "properties": {
                     "pages": {
                       "type": "array",
+                      "description": "Pages available for the onboarding wizard's page pickers (e.g. Privacy Policy, Terms & Conditions), formatted as label/value options.",
                       "items": {
                         "$ref": "#/components/schemas/PageOption"
                       }
                     },
                     "currencies": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "string"
-                      },
-                      "description": "Map of currency codes to display labels"
+                      "type": "array",
+                      "description": "Available store currencies, formatted as label/value options.",
+                      "items": {
+                        "$ref": "#/components/schemas/CurrencyOption"
+                      }
                     },
                     "default_settings": {
                       "$ref": "#/components/schemas/OnboardingDefaults"
+                    },
+                    "tax_settings": {
+                      "$ref": "#/components/schemas/OnboardingTaxSettings"
                     }
                   },
                   "example": {
                     "pages": [
                       {
-                        "id": 10,
-                        "title": "Shop",
-                        "link": "https://example.com/shop/"
+                        "label": "Shop( 10 )",
+                        "value": "10"
                       },
                       {
-                        "id": 12,
-                        "title": "Checkout",
-                        "link": "https://example.com/checkout/"
+                        "label": "Checkout( 12 )",
+                        "value": "12"
                       }
                     ],
-                    "currencies": {
-                      "USD": "United States Dollar ($)",
-                      "EUR": "Euro (EUR)",
-                      "GBP": "British Pound (GBP)"
-                    },
+                    "currencies": [
+                      {
+                        "label": "United States Dollar",
+                        "value": "USD"
+                      },
+                      {
+                        "label": "Euro",
+                        "value": "EUR"
+                      },
+                      {
+                        "label": "British Pound",
+                        "value": "GBP"
+                      }
+                    ],
                     "default_settings": {
+                      "reminders_enabled": "no",
+                      "yearly_renewal_reminders_enabled": "yes",
+                      "yearly_renewal_reminder_days": "30",
+                      "trial_end_reminders_enabled": "yes",
+                      "trial_end_reminder_days": "3",
+                      "monthly_renewal_reminders_enabled": "no",
+                      "monthly_renewal_reminder_days": "7",
+                      "quarterly_renewal_reminders_enabled": "no",
+                      "quarterly_renewal_reminder_days": "14",
+                      "half_yearly_renewal_reminders_enabled": "no",
+                      "half_yearly_renewal_reminder_days": "21",
+                      "renewal_reminders_enabled": "no",
+                      "renewal_reminder_overdue_days": "1,3,7",
                       "store_name": "My Store",
-                      "store_logo": "",
+                      "company_name": "",
+                      "legal_registration_id": "",
+                      "seller_vat_id": "",
+                      "seller_tax_id": "",
+                      "note_for_user_account_creation": "An user account will be created",
+                      "checkout_button_text": "Checkout",
+                      "view_cart_button_text": "View Cart",
+                      "cart_button_text": "Add To Cart",
+                      "popup_button_text": "View Product",
+                      "out_of_stock_button_text": "Out of stock",
+                      "currency_position": "before",
+                      "decimal_separator": "dot",
+                      "checkout_method_style": "logo",
+                      "enable_modal_checkout": "no",
+                      "require_logged_in": "no",
+                      "show_cart_icon_in_nav": "no",
+                      "show_cart_icon_in_body": "yes",
+                      "additional_address_field": "yes",
+                      "hide_coupon_field": "yes",
+                      "user_account_creation_mode": "all",
+                      "checkout_page_id": 12,
+                      "custom_payment_page_id": "",
+                      "registration_page_id": "",
+                      "login_page_id": "",
+                      "cart_page_id": 13,
+                      "receipt_page_id": 14,
+                      "shop_page_id": 10,
+                      "customer_profile_page_id": 15,
+                      "customer_profile_page_slug": "account",
                       "currency": "USD",
-                      "shop_page_id": "10",
-                      "checkout_page_id": "12",
-                      "customer_profile_page_id": ""
+                      "store_address1": "",
+                      "store_address2": "",
+                      "store_city": "",
+                      "store_country": "US",
+                      "store_postcode": "",
+                      "store_state": "",
+                      "show_relevant_product_in_single_page": "no",
+                      "show_relevant_product_in_modal": "no",
+                      "order_mode": "live",
+                      "variation_view": "both",
+                      "variation_columns": "masonry",
+                      "enable_early_payment_for_installment": "yes",
+                      "subscription_management_mode": "gateway_managed",
+                      "subscription_system_charge": "no",
+                      "modules_settings": [],
+                      "min_receipt_number": "1000"
+                    },
+                    "tax_settings": {
+                      "enable_tax": "no",
+                      "tax_inclusion": "excluded",
+                      "eu_method": "oss",
+                      "vat_number": ""
                     }
                   }
                 },
                 "example": {
                   "pages": [
                     {
-                      "id": 10,
-                      "title": "Shop",
-                      "link": "https://example.com/shop/"
+                      "label": "Shop( 10 )",
+                      "value": "10"
                     },
                     {
-                      "id": 12,
-                      "title": "Checkout",
-                      "link": "https://example.com/checkout/"
+                      "label": "Checkout( 12 )",
+                      "value": "12"
                     }
                   ],
-                  "currencies": {
-                    "USD": "United States Dollar ($)",
-                    "EUR": "Euro (EUR)",
-                    "GBP": "British Pound (GBP)"
-                  },
+                  "currencies": [
+                    {
+                      "label": "United States Dollar",
+                      "value": "USD"
+                    },
+                    {
+                      "label": "Euro",
+                      "value": "EUR"
+                    },
+                    {
+                      "label": "British Pound",
+                      "value": "GBP"
+                    }
+                  ],
                   "default_settings": {
+                    "reminders_enabled": "no",
+                    "yearly_renewal_reminders_enabled": "yes",
+                    "yearly_renewal_reminder_days": "30",
+                    "trial_end_reminders_enabled": "yes",
+                    "trial_end_reminder_days": "3",
+                    "monthly_renewal_reminders_enabled": "no",
+                    "monthly_renewal_reminder_days": "7",
+                    "quarterly_renewal_reminders_enabled": "no",
+                    "quarterly_renewal_reminder_days": "14",
+                    "half_yearly_renewal_reminders_enabled": "no",
+                    "half_yearly_renewal_reminder_days": "21",
+                    "renewal_reminders_enabled": "no",
+                    "renewal_reminder_overdue_days": "1,3,7",
                     "store_name": "My Store",
-                    "store_logo": "",
+                    "company_name": "",
+                    "legal_registration_id": "",
+                    "seller_vat_id": "",
+                    "seller_tax_id": "",
+                    "note_for_user_account_creation": "An user account will be created",
+                    "checkout_button_text": "Checkout",
+                    "view_cart_button_text": "View Cart",
+                    "cart_button_text": "Add To Cart",
+                    "popup_button_text": "View Product",
+                    "out_of_stock_button_text": "Out of stock",
+                    "currency_position": "before",
+                    "decimal_separator": "dot",
+                    "checkout_method_style": "logo",
+                    "enable_modal_checkout": "no",
+                    "require_logged_in": "no",
+                    "show_cart_icon_in_nav": "no",
+                    "show_cart_icon_in_body": "yes",
+                    "additional_address_field": "yes",
+                    "hide_coupon_field": "yes",
+                    "user_account_creation_mode": "all",
+                    "checkout_page_id": 12,
+                    "custom_payment_page_id": "",
+                    "registration_page_id": "",
+                    "login_page_id": "",
+                    "cart_page_id": 13,
+                    "receipt_page_id": 14,
+                    "shop_page_id": 10,
+                    "customer_profile_page_id": 15,
+                    "customer_profile_page_slug": "account",
                     "currency": "USD",
-                    "shop_page_id": "10",
-                    "checkout_page_id": "12",
-                    "customer_profile_page_id": ""
+                    "store_address1": "",
+                    "store_address2": "",
+                    "store_city": "",
+                    "store_country": "US",
+                    "store_postcode": "",
+                    "store_state": "",
+                    "show_relevant_product_in_single_page": "no",
+                    "show_relevant_product_in_modal": "no",
+                    "order_mode": "live",
+                    "variation_view": "both",
+                    "variation_columns": "masonry",
+                    "enable_early_payment_for_installment": "yes",
+                    "subscription_management_mode": "gateway_managed",
+                    "subscription_system_charge": "no",
+                    "modules_settings": [],
+                    "min_receipt_number": "1000"
+                  },
+                  "tax_settings": {
+                    "enable_tax": "no",
+                    "tax_inclusion": "excluded",
+                    "eu_method": "oss",
+                    "vat_number": ""
                   }
                 },
                 "examples": {
@@ -122,30 +260,125 @@
                     "value": {
                       "pages": [
                         {
-                          "id": 10,
-                          "title": "Shop",
-                          "link": "https://example.com/shop/"
+                          "label": "Shop( 10 )",
+                          "value": "10"
                         },
                         {
-                          "id": 12,
-                          "title": "Checkout",
-                          "link": "https://example.com/checkout/"
+                          "label": "Checkout( 12 )",
+                          "value": "12"
                         }
                       ],
-                      "currencies": {
-                        "USD": "United States Dollar ($)",
-                        "EUR": "Euro (EUR)",
-                        "GBP": "British Pound (GBP)"
-                      },
+                      "currencies": [
+                        {
+                          "label": "United States Dollar",
+                          "value": "USD"
+                        },
+                        {
+                          "label": "Euro",
+                          "value": "EUR"
+                        },
+                        {
+                          "label": "British Pound",
+                          "value": "GBP"
+                        }
+                      ],
                       "default_settings": {
+                        "reminders_enabled": "no",
+                        "yearly_renewal_reminders_enabled": "yes",
+                        "yearly_renewal_reminder_days": "30",
+                        "trial_end_reminders_enabled": "yes",
+                        "trial_end_reminder_days": "3",
+                        "monthly_renewal_reminders_enabled": "no",
+                        "monthly_renewal_reminder_days": "7",
+                        "quarterly_renewal_reminders_enabled": "no",
+                        "quarterly_renewal_reminder_days": "14",
+                        "half_yearly_renewal_reminders_enabled": "no",
+                        "half_yearly_renewal_reminder_days": "21",
+                        "renewal_reminders_enabled": "no",
+                        "renewal_reminder_overdue_days": "1,3,7",
                         "store_name": "My Store",
-                        "store_logo": "",
+                        "company_name": "",
+                        "legal_registration_id": "",
+                        "seller_vat_id": "",
+                        "seller_tax_id": "",
+                        "note_for_user_account_creation": "An user account will be created",
+                        "checkout_button_text": "Checkout",
+                        "view_cart_button_text": "View Cart",
+                        "cart_button_text": "Add To Cart",
+                        "popup_button_text": "View Product",
+                        "out_of_stock_button_text": "Out of stock",
+                        "currency_position": "before",
+                        "decimal_separator": "dot",
+                        "checkout_method_style": "logo",
+                        "enable_modal_checkout": "no",
+                        "require_logged_in": "no",
+                        "show_cart_icon_in_nav": "no",
+                        "show_cart_icon_in_body": "yes",
+                        "additional_address_field": "yes",
+                        "hide_coupon_field": "yes",
+                        "user_account_creation_mode": "all",
+                        "checkout_page_id": 12,
+                        "custom_payment_page_id": "",
+                        "registration_page_id": "",
+                        "login_page_id": "",
+                        "cart_page_id": 13,
+                        "receipt_page_id": 14,
+                        "shop_page_id": 10,
+                        "customer_profile_page_id": 15,
+                        "customer_profile_page_slug": "account",
                         "currency": "USD",
-                        "shop_page_id": "10",
-                        "checkout_page_id": "12",
-                        "customer_profile_page_id": ""
+                        "store_address1": "",
+                        "store_address2": "",
+                        "store_city": "",
+                        "store_country": "US",
+                        "store_postcode": "",
+                        "store_state": "",
+                        "show_relevant_product_in_single_page": "no",
+                        "show_relevant_product_in_modal": "no",
+                        "order_mode": "live",
+                        "variation_view": "both",
+                        "variation_columns": "masonry",
+                        "enable_early_payment_for_installment": "yes",
+                        "subscription_management_mode": "gateway_managed",
+                        "subscription_system_charge": "no",
+                        "modules_settings": [],
+                        "min_receipt_number": "1000"
+                      },
+                      "tax_settings": {
+                        "enable_tax": "no",
+                        "tax_inclusion": "excluded",
+                        "eu_method": "oss",
+                        "vat_number": ""
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -159,36 +392,47 @@
     "schemas": {
       "PageOption": {
         "type": "object",
+        "description": "A published WordPress page, formatted as a label/value option for the onboarding wizard's page pickers.",
         "properties": {
-          "id": {
-            "type": "integer",
+          "label": {
+            "type": "string",
+            "description": "Page title with its ID appended",
+            "example": "Shop( 10 )"
+          },
+          "value": {
+            "type": "string",
             "description": "WordPress page ID",
-            "example": 10
-          },
-          "title": {
+            "example": "10"
+          }
+        }
+      },
+      "CurrencyOption": {
+        "type": "object",
+        "description": "An available store currency, formatted as a label/value option.",
+        "properties": {
+          "label": {
             "type": "string",
-            "description": "Page title",
-            "example": "Shop"
+            "description": "Currency display name",
+            "example": "United States Dollar"
           },
-          "link": {
+          "value": {
             "type": "string",
-            "format": "uri",
-            "description": "Page permalink",
-            "example": "https://example.com/shop/"
+            "description": "Currency code (ISO 4217)",
+            "example": "USD"
           }
         }
       },
       "OnboardingDefaults": {
         "type": "object",
+        "description": "The store's current settings (fluentcart_settings), used to pre-fill the onboarding wizard. This is the full store settings object, not an onboarding-specific subset.",
         "properties": {
           "store_name": {
             "type": "string",
             "description": "Store name",
             "example": "My Store"
           },
-          "store_logo": {
+          "company_name": {
             "type": "string",
-            "description": "Store logo URL",
             "example": ""
           },
           "currency": {
@@ -196,19 +440,268 @@
             "description": "Store currency code",
             "example": "USD"
           },
-          "shop_page_id": {
+          "currency_position": {
             "type": "string",
-            "description": "Shop page ID",
-            "example": "10"
+            "example": "before"
+          },
+          "decimal_separator": {
+            "type": "string",
+            "example": "dot"
+          },
+          "checkout_button_text": {
+            "type": "string",
+            "example": "Checkout"
+          },
+          "view_cart_button_text": {
+            "type": "string",
+            "example": "View Cart"
+          },
+          "cart_button_text": {
+            "type": "string",
+            "example": "Add To Cart"
+          },
+          "popup_button_text": {
+            "type": "string",
+            "example": "View Product"
+          },
+          "out_of_stock_button_text": {
+            "type": "string",
+            "example": "Out of stock"
+          },
+          "checkout_method_style": {
+            "type": "string",
+            "example": "logo"
+          },
+          "enable_modal_checkout": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "require_logged_in": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "show_cart_icon_in_nav": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "show_cart_icon_in_body": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "yes"
+          },
+          "additional_address_field": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "yes"
+          },
+          "hide_coupon_field": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "yes"
+          },
+          "user_account_creation_mode": {
+            "type": "string",
+            "example": "all"
+          },
+          "shop_page_id": {
+            "type": "integer",
+            "description": "Shop page ID. Defaults to a newly generated page's ID when not yet configured.",
+            "example": 10
           },
           "checkout_page_id": {
-            "type": "string",
+            "type": "integer",
             "description": "Checkout page ID",
-            "example": "12"
+            "example": 12
+          },
+          "custom_payment_page_id": {
+            "type": "string",
+            "example": ""
+          },
+          "registration_page_id": {
+            "type": "string",
+            "example": ""
+          },
+          "login_page_id": {
+            "type": "string",
+            "example": ""
+          },
+          "cart_page_id": {
+            "type": "integer",
+            "example": 13
+          },
+          "receipt_page_id": {
+            "type": "integer",
+            "example": 14
           },
           "customer_profile_page_id": {
-            "type": "string",
+            "type": "integer",
             "description": "Customer profile page ID",
+            "example": 15
+          },
+          "customer_profile_page_slug": {
+            "type": "string",
+            "example": "account"
+          },
+          "store_address1": {
+            "type": "string",
+            "example": ""
+          },
+          "store_address2": {
+            "type": "string",
+            "example": ""
+          },
+          "store_city": {
+            "type": "string",
+            "example": ""
+          },
+          "store_country": {
+            "type": "string",
+            "example": "US"
+          },
+          "store_postcode": {
+            "type": "string",
+            "example": ""
+          },
+          "store_state": {
+            "type": "string",
+            "example": ""
+          },
+          "show_relevant_product_in_single_page": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "show_relevant_product_in_modal": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "order_mode": {
+            "type": "string",
+            "enum": [
+              "live",
+              "test"
+            ],
+            "example": "live"
+          },
+          "variation_view": {
+            "type": "string",
+            "example": "both"
+          },
+          "variation_columns": {
+            "type": "string",
+            "example": "masonry"
+          },
+          "enable_early_payment_for_installment": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "yes"
+          },
+          "subscription_management_mode": {
+            "type": "string",
+            "example": "gateway_managed"
+          },
+          "subscription_system_charge": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "modules_settings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "min_receipt_number": {
+            "type": "string",
+            "example": "1000"
+          },
+          "reminders_enabled": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "renewal_reminders_enabled": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "example": "no"
+          },
+          "renewal_reminder_overdue_days": {
+            "type": "string",
+            "description": "Comma-separated list of days before/after due date to send overdue reminders",
+            "example": "1,3,7"
+          }
+        }
+      },
+      "OnboardingTaxSettings": {
+        "type": "object",
+        "description": "A summary of the store's tax configuration used by the onboarding wizard.",
+        "properties": {
+          "enable_tax": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "description": "Whether tax collection is enabled store-wide",
+            "example": "no"
+          },
+          "tax_inclusion": {
+            "type": "string",
+            "enum": [
+              "included",
+              "excluded"
+            ],
+            "description": "Whether displayed prices include tax",
+            "example": "excluded"
+          },
+          "eu_method": {
+            "type": "string",
+            "description": "EU VAT collection method (e.g. oss, home)",
+            "example": "oss"
+          },
+          "vat_number": {
+            "type": "string",
+            "description": "The store's VAT/tax ID for its configured country, resolved from the EU OSS/home VAT setting or from the non-EU country's tax ID meta",
             "example": ""
           }
         }

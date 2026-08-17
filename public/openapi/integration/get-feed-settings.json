@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getFeedSettings",
         "summary": "GET Feed Settings",
-        "description": "Retrieve the settings form schema, saved values, and available shortcodes for a specific integration feed. Used to populate the feed editor when creating or editing a global feed.",
+        "description": "Retrieve the settings form schema, saved values, and available shortcodes for a specific integration feed. Used to populate the feed editor when creating or editing a global feed.\n\n**Required permission:** `integrations/view`",
         "tags": [
           "Integrations"
         ],
@@ -84,245 +84,255 @@
                     },
                     "shortcodes": {
                       "type": "object",
-                      "description": "Available shortcodes for dynamic field mapping"
+                      "description": "Available shortcodes for dynamic field mapping, grouped by category.",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ShortcodeGroup"
+                          }
+                        }
+                      }
                     },
                     "inputs": {
                       "type": "object",
-                      "description": "Checkout input fields available for mapping"
+                      "description": "Checkout input fields available for mapping, keyed by shortcode. Serializes as an empty array `[]` when no checkout fields are configured."
                     },
                     "merge_fields": {
-                      "description": "Merge fields for the selected list (if applicable)"
+                      "type": "boolean",
+                      "description": "`false` by default. When the selected integration list has custom merge fields, this becomes an object mapping merge field keys to labels."
                     }
                   },
                   "example": {
                     "settings": {
-                      "conditionals": {
-                        "conditions": [
-                          {
-                            "field": "payment_status",
-                            "operator": "is",
-                            "value": "paid"
-                          }
-                        ],
-                        "status": false,
-                        "type": "all"
-                      },
                       "enabled": "yes",
-                      "list_id": "",
                       "list_name": "",
                       "name": "",
-                      "merge_fields": {
-                        "first_name": "{customer.first_name}",
-                        "last_name": "{customer.last_name}",
-                        "email": "{customer.email}"
-                      }
+                      "list_ids": [],
+                      "tag_ids": [],
+                      "tag_ids_selection_type": "simple",
+                      "double_opt_in": "yes",
+                      "note": ""
                     },
                     "settings_fields": {
                       "fields": [
                         {
                           "key": "name",
-                          "label": "Feed Name",
-                          "type": "text",
-                          "required": true
+                          "label": "Feed Title",
+                          "required": true,
+                          "placeholder": "Name",
+                          "component": "text",
+                          "inline_tip": "Name of this feed, it will be used to identify this feed in the list of feeds"
                         },
                         {
-                          "key": "list_id",
-                          "label": "Contact List",
-                          "type": "select",
-                          "required": true,
-                          "options": [
-                            {
-                              "id": "1",
-                              "label": "Newsletter Subscribers"
-                            },
-                            {
-                              "id": "2",
-                              "label": "Customers"
-                            },
-                            {
-                              "id": "3",
-                              "label": "VIP Customers"
-                            }
-                          ]
+                          "key": "list_ids",
+                          "label": "Add to Lists",
+                          "placeholder": "Select FluentCRM Lists",
+                          "inline_tip": "Select the FluentCRM Lists you would like to add your contact to.",
+                          "component": "select",
+                          "is_multiple": true,
+                          "required": false,
+                          "options": {
+                            "1": "Newsletter Subscribers",
+                            "2": "Customers",
+                            "3": "VIP Customers"
+                          }
+                        }
+                      ],
+                      "button_require_list": false,
+                      "integration_title": "FluentCRM"
+                    },
+                    "shortcodes": {
+                      "data": [
+                        {
+                          "key": "customer",
+                          "title": "Customer",
+                          "shortcodes": {
+                            "{{order.billing.full_name}}": "Full Name",
+                            "{{order.billing.email}}": "Email",
+                            "{{order.billing.city}}": "City",
+                            "{{order.billing.country}}": "Country"
+                          }
+                        },
+                        {
+                          "key": "order",
+                          "title": "Order",
+                          "shortcodes": {
+                            "{{order.id}}": "Order ID",
+                            "{{order.invoice_no}}": "Order Number",
+                            "{{order.total_amount}}": "Order Total Amount",
+                            "{{order.currency}}": "Order Currency"
+                          }
                         }
                       ]
                     },
-                    "shortcodes": {
-                      "customer": {
-                        "title": "Customer",
-                        "shortcodes": {
-                          "{customer.first_name}": "First Name",
-                          "{customer.last_name}": "Last Name",
-                          "{customer.email}": "Email"
-                        }
-                      }
-                    },
-                    "inputs": {
-                      "billing_first_name": "Billing First Name",
-                      "billing_last_name": "Billing Last Name",
-                      "billing_email": "Billing Email",
-                      "billing_phone": "Billing Phone"
-                    },
-                    "merge_fields": {
-                      "first_name": "{customer.first_name}",
-                      "last_name": "{customer.last_name}",
-                      "email": "{customer.email}"
-                    }
+                    "inputs": [],
+                    "merge_fields": false
                   }
                 },
                 "example": {
                   "settings": {
-                    "conditionals": {
-                      "conditions": [
-                        {
-                          "field": "payment_status",
-                          "operator": "is",
-                          "value": "paid"
-                        }
-                      ],
-                      "status": false,
-                      "type": "all"
-                    },
                     "enabled": "yes",
-                    "list_id": "",
                     "list_name": "",
                     "name": "",
-                    "merge_fields": {
-                      "first_name": "{customer.first_name}",
-                      "last_name": "{customer.last_name}",
-                      "email": "{customer.email}"
-                    }
+                    "list_ids": [],
+                    "tag_ids": [],
+                    "tag_ids_selection_type": "simple",
+                    "double_opt_in": "yes",
+                    "note": ""
                   },
                   "settings_fields": {
                     "fields": [
                       {
                         "key": "name",
-                        "label": "Feed Name",
-                        "type": "text",
-                        "required": true
+                        "label": "Feed Title",
+                        "required": true,
+                        "placeholder": "Name",
+                        "component": "text",
+                        "inline_tip": "Name of this feed, it will be used to identify this feed in the list of feeds"
                       },
                       {
-                        "key": "list_id",
-                        "label": "Contact List",
-                        "type": "select",
-                        "required": true,
-                        "options": [
-                          {
-                            "id": "1",
-                            "label": "Newsletter Subscribers"
-                          },
-                          {
-                            "id": "2",
-                            "label": "Customers"
-                          },
-                          {
-                            "id": "3",
-                            "label": "VIP Customers"
-                          }
-                        ]
+                        "key": "list_ids",
+                        "label": "Add to Lists",
+                        "placeholder": "Select FluentCRM Lists",
+                        "inline_tip": "Select the FluentCRM Lists you would like to add your contact to.",
+                        "component": "select",
+                        "is_multiple": true,
+                        "required": false,
+                        "options": {
+                          "1": "Newsletter Subscribers",
+                          "2": "Customers",
+                          "3": "VIP Customers"
+                        }
+                      }
+                    ],
+                    "button_require_list": false,
+                    "integration_title": "FluentCRM"
+                  },
+                  "shortcodes": {
+                    "data": [
+                      {
+                        "key": "customer",
+                        "title": "Customer",
+                        "shortcodes": {
+                          "{{order.billing.full_name}}": "Full Name",
+                          "{{order.billing.email}}": "Email",
+                          "{{order.billing.city}}": "City",
+                          "{{order.billing.country}}": "Country"
+                        }
+                      },
+                      {
+                        "key": "order",
+                        "title": "Order",
+                        "shortcodes": {
+                          "{{order.id}}": "Order ID",
+                          "{{order.invoice_no}}": "Order Number",
+                          "{{order.total_amount}}": "Order Total Amount",
+                          "{{order.currency}}": "Order Currency"
+                        }
                       }
                     ]
                   },
-                  "shortcodes": {
-                    "customer": {
-                      "title": "Customer",
-                      "shortcodes": {
-                        "{customer.first_name}": "First Name",
-                        "{customer.last_name}": "Last Name",
-                        "{customer.email}": "Email"
-                      }
-                    }
-                  },
-                  "inputs": {
-                    "billing_first_name": "Billing First Name",
-                    "billing_last_name": "Billing Last Name",
-                    "billing_email": "Billing Email",
-                    "billing_phone": "Billing Phone"
-                  },
-                  "merge_fields": {
-                    "first_name": "{customer.first_name}",
-                    "last_name": "{customer.last_name}",
-                    "email": "{customer.email}"
-                  }
+                  "inputs": [],
+                  "merge_fields": false
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
                       "settings": {
-                        "conditionals": {
-                          "conditions": [
-                            {
-                              "field": "payment_status",
-                              "operator": "is",
-                              "value": "paid"
-                            }
-                          ],
-                          "status": false,
-                          "type": "all"
-                        },
                         "enabled": "yes",
-                        "list_id": "",
                         "list_name": "",
                         "name": "",
-                        "merge_fields": {
-                          "first_name": "{customer.first_name}",
-                          "last_name": "{customer.last_name}",
-                          "email": "{customer.email}"
-                        }
+                        "list_ids": [],
+                        "tag_ids": [],
+                        "tag_ids_selection_type": "simple",
+                        "double_opt_in": "yes",
+                        "note": ""
                       },
                       "settings_fields": {
                         "fields": [
                           {
                             "key": "name",
-                            "label": "Feed Name",
-                            "type": "text",
-                            "required": true
+                            "label": "Feed Title",
+                            "required": true,
+                            "placeholder": "Name",
+                            "component": "text",
+                            "inline_tip": "Name of this feed, it will be used to identify this feed in the list of feeds"
                           },
                           {
-                            "key": "list_id",
-                            "label": "Contact List",
-                            "type": "select",
-                            "required": true,
-                            "options": [
-                              {
-                                "id": "1",
-                                "label": "Newsletter Subscribers"
-                              },
-                              {
-                                "id": "2",
-                                "label": "Customers"
-                              },
-                              {
-                                "id": "3",
-                                "label": "VIP Customers"
-                              }
-                            ]
+                            "key": "list_ids",
+                            "label": "Add to Lists",
+                            "placeholder": "Select FluentCRM Lists",
+                            "inline_tip": "Select the FluentCRM Lists you would like to add your contact to.",
+                            "component": "select",
+                            "is_multiple": true,
+                            "required": false,
+                            "options": {
+                              "1": "Newsletter Subscribers",
+                              "2": "Customers",
+                              "3": "VIP Customers"
+                            }
+                          }
+                        ],
+                        "button_require_list": false,
+                        "integration_title": "FluentCRM"
+                      },
+                      "shortcodes": {
+                        "data": [
+                          {
+                            "key": "customer",
+                            "title": "Customer",
+                            "shortcodes": {
+                              "{{order.billing.full_name}}": "Full Name",
+                              "{{order.billing.email}}": "Email",
+                              "{{order.billing.city}}": "City",
+                              "{{order.billing.country}}": "Country"
+                            }
+                          },
+                          {
+                            "key": "order",
+                            "title": "Order",
+                            "shortcodes": {
+                              "{{order.id}}": "Order ID",
+                              "{{order.invoice_no}}": "Order Number",
+                              "{{order.total_amount}}": "Order Total Amount",
+                              "{{order.currency}}": "Order Currency"
+                            }
                           }
                         ]
                       },
-                      "shortcodes": {
-                        "customer": {
-                          "title": "Customer",
-                          "shortcodes": {
-                            "{customer.first_name}": "First Name",
-                            "{customer.last_name}": "Last Name",
-                            "{customer.email}": "Email"
-                          }
-                        }
-                      },
-                      "inputs": {
-                        "billing_first_name": "Billing First Name",
-                        "billing_last_name": "Billing Last Name",
-                        "billing_email": "Billing Email",
-                        "billing_phone": "Billing Phone"
-                      },
-                      "merge_fields": {
-                        "first_name": "{customer.first_name}",
-                        "last_name": "{customer.last_name}",
-                        "email": "{customer.email}"
-                      }
+                      "inputs": [],
+                      "merge_fields": false
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`integrations/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -336,6 +346,7 @@
     "schemas": {
       "FeedSettingsField": {
         "type": "object",
+        "description": "Field definition. Exact shape is integration-specific (built by that provider's own settings-fields filter), so field names beyond the common ones below can vary per integration.",
         "properties": {
           "key": {
             "type": "string",
@@ -345,19 +356,53 @@
             "type": "string",
             "description": "Display label"
           },
-          "type": {
+          "component": {
             "type": "string",
-            "description": "Field type (e.g., text, select, password)"
+            "description": "Field UI component (e.g., text, select, password)"
           },
           "required": {
             "type": "boolean",
             "description": "Whether the field is required"
           },
+          "placeholder": {
+            "type": "string",
+            "description": "Placeholder text for the input"
+          },
+          "inline_tip": {
+            "type": "string",
+            "description": "Helper text shown below the field"
+          },
+          "is_multiple": {
+            "type": "boolean",
+            "description": "Whether a select field allows multiple selections"
+          },
           "options": {
-            "type": "array",
-            "description": "Available options for select fields",
-            "items": {
-              "type": "object"
+            "type": "object",
+            "description": "Available options for select fields, as a map of option value to label",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ShortcodeGroup": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Shortcode group identifier",
+            "example": "customer"
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable group title",
+            "example": "Customer"
+          },
+          "shortcodes": {
+            "type": "object",
+            "description": "Map of shortcode to its human-readable label",
+            "additionalProperties": {
+              "type": "string"
             }
           }
         }

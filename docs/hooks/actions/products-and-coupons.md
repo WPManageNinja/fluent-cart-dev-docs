@@ -579,6 +579,353 @@ add_action('fluent_cart/product/group/after_price_block', function($data) {
 
 ---
 
+## Product Card & Single-Page Render Hooks
+
+Positional markers wrapping the card and single-product-page blocks (title, excerpt, purchase actions), plus a data hook that fires after a batch of variants is saved. Unlike the `$data`-array hooks above, these pass a `$gateContext` array built by `RenderGate::context()` / `RenderContext::decorate()` -- at minimum `'product'` (the current [Product](/database/models/product) model) and `'scope'` (a `RenderGate::SCOPE_*` constant, `'card'` or `'single'`). All rendering hooks here use **output buffering** -- your callback should `echo` HTML directly rather than return a value.
+
+### <code> product/group/before_card </code>
+<details>
+<summary><code>fluent_cart/product/group/before_card</code> &mdash; Before a product card's opening <code>&lt;article&gt;</code> tag</summary>
+
+**When it runs:**
+Fires on archive/group/shop listings immediately before the `<article data-fct-product-card>` wrapper for a single product card is opened.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for this card. Built here via `RenderContext::decorate(['product' => $this->product, 'scope' => RenderGate::SCOPE_CARD])`.
+    ```php
+    $gateContext = [
+        'product' => $product,               // \FluentCart\App\Models\Product
+        'scope'   => RenderGate::SCOPE_CARD,  // 'card'
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:75`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/group/before_card', function ($gateContext) {
+    // Wrap featured products in a highlight container
+    if (get_post_meta($gateContext['product']->ID, '_is_featured', true)) {
+        echo '<div class="fct-featured-card-wrap">';
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> product/group/after_card </code>
+<details>
+<summary><code>fluent_cart/product/group/after_card</code> &mdash; After a product card's closing <code>&lt;/article&gt;</code> tag</summary>
+
+**When it runs:**
+Fires on archive/group/shop listings immediately after a product card's `</article>` tag closes, once the buy button has already been rendered.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for this card.
+    ```php
+    $gateContext = [
+        'product' => $product,               // \FluentCart\App\Models\Product
+        'scope'   => RenderGate::SCOPE_CARD,  // 'card'
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:95`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/group/after_card', function ($gateContext) {
+    // Close the featured-product wrapper opened in before_card
+    if (get_post_meta($gateContext['product']->ID, '_is_featured', true)) {
+        echo '</div>';
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> product/group/before_title_block </code>
+<details>
+<summary><code>fluent_cart/product/group/before_title_block</code> &mdash; Before the product card title</summary>
+
+**When it runs:**
+Fires inside `renderTitle()` on a product card, immediately before the title link/text is echoed.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for this card (at minimum `'product'` and `'scope' => RenderGate::SCOPE_CARD`).
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:171`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/group/before_title_block', function ($gateContext) {
+    // Show a category eyebrow above the card title
+    $term = get_the_terms($gateContext['product']->ID, 'product-category');
+    if ($term && !is_wp_error($term)) {
+        echo '<span class="fct-card-eyebrow">' . esc_html($term[0]->name) . '</span>';
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> product/group/after_title_block </code>
+<details>
+<summary><code>fluent_cart/product/group/after_title_block</code> &mdash; After the product card title</summary>
+
+**When it runs:**
+Fires inside `renderTitle()` on a product card, immediately after the title markup is echoed.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for this card (at minimum `'product'` and `'scope' => RenderGate::SCOPE_CARD`).
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:205`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/group/after_title_block', function ($gateContext) {
+    // Show a star rating summary right under the card title
+    echo do_shortcode('[my_reviews_stars id="' . esc_attr($gateContext['product']->ID) . '"]');
+}, 10, 1);
+```
+</details>
+
+### <code> product/group/before_excerpt_block </code>
+<details>
+<summary><code>fluent_cart/product/group/before_excerpt_block</code> &mdash; Before the product card excerpt</summary>
+
+**When it runs:**
+Fires inside `renderExcerpt()`/similar on a product card, immediately before the `<p class="fct-product-card-excerpt">` is echoed.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for this card (at minimum `'product'` and `'scope' => RenderGate::SCOPE_CARD`).
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:150`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/group/before_excerpt_block', function ($gateContext) {
+    echo '<span class="fct-card-highlight">Best Seller</span>';
+}, 10, 1);
+```
+</details>
+
+### <code> product/group/after_excerpt_block </code>
+<details>
+<summary><code>fluent_cart/product/group/after_excerpt_block</code> &mdash; After the product card excerpt</summary>
+
+**When it runs:**
+Fires on a product card immediately after the excerpt `<p>` markup is echoed.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for this card (at minimum `'product'` and `'scope' => RenderGate::SCOPE_CARD`).
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:160`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/group/after_excerpt_block', function ($gateContext) {
+    echo '<a class="fct-card-readmore" href="' . esc_url(get_permalink($gateContext['product']->ID)) . '">Read more</a>';
+}, 10, 1);
+```
+</details>
+
+### <code> product/group/before_actions_block </code>
+<details>
+<summary><code>fluent_cart/product/group/before_actions_block</code> &mdash; Before the buy button row on a product card</summary>
+
+**When it runs:**
+Fires on a product card immediately before `renderBuyButtonMarkup()` renders the add-to-cart/buy-now buttons.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for this card (at minimum `'product'` and `'scope' => RenderGate::SCOPE_CARD`).
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:362`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/group/before_actions_block', function ($gateContext) {
+    // Wishlist icon before the buy button
+    echo '<button class="fct-wishlist-btn" data-product-id="' . esc_attr($gateContext['product']->ID) . '">&hearts;</button>';
+}, 10, 1);
+```
+</details>
+
+### <code> product/group/after_actions_block </code>
+<details>
+<summary><code>fluent_cart/product/group/after_actions_block</code> &mdash; After the buy button row on a product card</summary>
+
+**When it runs:**
+Fires on a product card immediately after `renderBuyButtonMarkup()` has rendered the add-to-cart/buy-now buttons.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for this card (at minimum `'product'` and `'scope' => RenderGate::SCOPE_CARD`).
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:366`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/group/after_actions_block', function ($gateContext) {
+    // Social share icons below the buy button
+    echo '<div class="fct-card-share">' . do_shortcode('[addtoany]') . '</div>';
+}, 10, 1);
+```
+</details>
+
+### <code> product/single/before_title_block </code>
+<details>
+<summary><code>fluent_cart/product/single/before_title_block</code> &mdash; Before the <code>&lt;h1&gt;</code> title on a single product page</summary>
+
+**When it runs:**
+Fires on a single product page immediately before the `<div class="fct-product-title">` / `<h1>` wrapper is rendered.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for the single product page, typically carrying at least `'product'` (this [Product](/database/models/product) model) and `'scope' => RenderGate::SCOPE_SINGLE`.
+
+**Source:** `app/Services/Renderer/ProductRenderer.php:725`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/single/before_title_block', function ($gateContext) {
+    // Breadcrumb above the product title
+    echo '<nav class="fct-breadcrumb">' . get_the_term_list($gateContext['product']->ID, 'product-category', '', ', ') . '</nav>';
+}, 10, 1);
+```
+</details>
+
+### <code> product/single/after_title_block </code>
+<details>
+<summary><code>fluent_cart/product/single/after_title_block</code> &mdash; After the <code>&lt;h1&gt;</code> title on a single product page</summary>
+
+**When it runs:**
+Fires on a single product page immediately after the product title `<h1>` and its wrapper `<div>` close.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for the single product page, typically carrying at least `'product'` and `'scope' => RenderGate::SCOPE_SINGLE`.
+
+**Source:** `app/Services/Renderer/ProductRenderer.php:731`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/single/after_title_block', function ($gateContext) {
+    echo do_shortcode('[my_reviews_stars id="' . esc_attr($gateContext['product']->ID) . '" show_count="1"]');
+}, 10, 1);
+```
+</details>
+
+### <code> product/single/before_excerpt_block </code>
+<details>
+<summary><code>fluent_cart/product/single/before_excerpt_block</code> &mdash; Before the excerpt on a single product page</summary>
+
+**When it runs:**
+Fires on a single product page immediately before the `<div class="fct-product-excerpt">` wrapper is rendered (only when the product has an excerpt).
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for the single product page, typically carrying at least `'product'` and `'scope' => RenderGate::SCOPE_SINGLE`.
+
+**Source:** `app/Services/Renderer/ProductRenderer.php:942`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/single/before_excerpt_block', function ($gateContext) {
+    echo '<span class="fct-single-highlight">Limited stock</span>';
+}, 10, 1);
+```
+</details>
+
+### <code> product/single/after_excerpt_block </code>
+<details>
+<summary><code>fluent_cart/product/single/after_excerpt_block</code> &mdash; After the excerpt on a single product page</summary>
+
+**When it runs:**
+Fires on a single product page immediately after the product excerpt `</div>` wrapper closes.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for the single product page, typically carrying at least `'product'` and `'scope' => RenderGate::SCOPE_SINGLE`.
+
+**Source:** `app/Services/Renderer/ProductRenderer.php:948`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/single/after_excerpt_block', function ($gateContext) {
+    // Trust badges below the excerpt
+    echo '<div class="fct-trust-badges"><span>30-day guarantee</span><span>Secure checkout</span></div>';
+}, 10, 1);
+```
+</details>
+
+### <code> product/single/before_actions_block </code>
+<details>
+<summary><code>fluent_cart/product/single/before_actions_block</code> &mdash; Before the buy-now / add-to-cart buttons on a single product page</summary>
+
+**When it runs:**
+Fires on a single product page immediately before `renderBuyNowButton()` and `renderAddToCartButton()` render the purchase buttons.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for the single product page, typically carrying at least `'product'` and `'scope' => RenderGate::SCOPE_SINGLE`.
+
+**Source:** `app/Services/Renderer/ProductRenderer.php:1424`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/single/before_actions_block', function ($gateContext) {
+    // Urgency message above the purchase buttons
+    if ($gateContext['product']->getStockQuantity() < 5) {
+        echo '<p class="fct-urgency">Only a few left in stock!</p>';
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> product/single/after_actions_block </code>
+<details>
+<summary><code>fluent_cart/product/single/after_actions_block</code> &mdash; After the buy-now / add-to-cart buttons on a single product page</summary>
+
+**When it runs:**
+Fires on a single product page immediately after `renderBuyNowButton()` and `renderAddToCartButton()` have rendered the purchase buttons.
+
+**Parameters:**
+- `$gateContext` (array): The render gate context for the single product page, typically carrying at least `'product'` and `'scope' => RenderGate::SCOPE_SINGLE`.
+
+**Source:** `app/Services/Renderer/ProductRenderer.php:1430`
+
+**Usage:**
+```php
+add_action('fluent_cart/product/single/after_actions_block', function ($gateContext) {
+    // Accepted payment icons below the purchase buttons
+    echo '<div class="fct-payment-icons"><img src="' . esc_url(FLUENTCART_PLUGIN_URL . 'assets/images/payment-icons.svg') . '" alt="" /></div>';
+}, 10, 1);
+```
+</details>
+
+### <code> product/variants_updated </code>
+<details>
+<summary><code>fluent_cart/product/variants_updated</code> &mdash; Fired after a batch of product variants is saved</summary>
+
+**When it runs:**
+Fires after a product's variants have been persisted, whether through the bulk variant-update endpoint, a single-variant field update, or (in Pro) the advanced-variation save path. Listen here once instead of duplicating logic across every variant-save entry point.
+
+**Parameters:**
+- `$data` (array): Updated variant batch
+    ```php
+    $data = [
+        'post_id'  => 456,          // (int) The product's WordPress post ID
+        'variants' => $batchData,   // (array) The variant records that were just written
+    ];
+    ```
+
+**Source:**
+- `app/Http/Controllers/ProductVariationController.php:387` (bulk variant update)
+- `app/Http/Controllers/ProductVariationController.php:649` (single-variant field update)
+- `app/Services/AdvancedVariationService.php:280` (Pro's advanced-variation save path)
+
+**Usage:**
+```php
+add_action('fluent_cart/product/variants_updated', function ($data) {
+    // Push the new variant stock/prices to an external inventory system
+    do_action('my_plugin/sync_variants', $data['post_id'], $data['variants']);
+}, 10, 1);
+```
+</details>
+
+---
+
 ## Coupons
 
 Hooks that fire during [Coupon](/database/models/coupon) create and update operations in the admin.

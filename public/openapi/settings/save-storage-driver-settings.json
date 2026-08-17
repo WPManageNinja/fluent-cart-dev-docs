@@ -27,7 +27,7 @@
       "post": {
         "operationId": "saveStorageDriverSettings",
         "summary": "POST Save Storage Driver Settings",
-        "description": "Create or update settings for a specific file storage driver.",
+        "description": "Create or update settings for a specific file storage driver.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -123,10 +123,10 @@
                     "data": {
                       "access_key": "AKIAIOSFODNN7EXAMPLE",
                       "secret_key": "****",
-                      "bucket": "techstore-downloads",
+                      "bucket": "example-store-downloads",
                       "region": "us-east-1",
                       "is_active": true,
-                      "base_url": "https://techstore-downloads.s3.amazonaws.com"
+                      "base_url": "https://example-store-downloads.s3.amazonaws.com"
                     }
                   }
                 },
@@ -135,10 +135,10 @@
                   "data": {
                     "access_key": "AKIAIOSFODNN7EXAMPLE",
                     "secret_key": "****",
-                    "bucket": "techstore-downloads",
+                    "bucket": "example-store-downloads",
                     "region": "us-east-1",
                     "is_active": true,
-                    "base_url": "https://techstore-downloads.s3.amazonaws.com"
+                    "base_url": "https://example-store-downloads.s3.amazonaws.com"
                   }
                 },
                 "examples": {
@@ -149,12 +149,55 @@
                       "data": {
                         "access_key": "AKIAIOSFODNN7EXAMPLE",
                         "secret_key": "****",
-                        "bucket": "techstore-downloads",
+                        "bucket": "example-store-downloads",
                         "region": "us-east-1",
                         "is_active": true,
-                        "base_url": "https://techstore-downloads.s3.amazonaws.com"
+                        "base_url": "https://example-store-downloads.s3.amazonaws.com"
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

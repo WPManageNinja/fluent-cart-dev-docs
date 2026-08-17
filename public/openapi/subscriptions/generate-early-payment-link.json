@@ -27,7 +27,7 @@
       "post": {
         "operationId": "generateEarlyPaymentLink",
         "summary": "POST Generate Early Payment Link",
-        "description": "Generate a URL that allows early payment of remaining installments on an installment-based subscription. Requires early payment feature to be enabled, the subscription must belong to the specified order, have finite installments, be active or trialing, and have remaining installments.",
+        "description": "Generate a URL that allows early payment of remaining installments on an installment-based subscription. Requires early payment feature to be enabled, the subscription must belong to the specified order, have finite installments, be active or trialing, and have remaining installments.\n\n**Required permission:** `subscriptions/manage`",
         "tags": [
           "Subscriptions"
         ],
@@ -143,6 +143,49 @@
                   "success": false,
                   "data": {
                     "message": "Invalid request. Please check your input and try again."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`subscriptions/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

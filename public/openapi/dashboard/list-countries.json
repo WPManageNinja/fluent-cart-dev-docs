@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listCountries",
         "summary": "GET List Countries",
-        "description": "Retrieve a list of all available countries formatted as select options.",
+        "description": "Retrieve a list of all available countries formatted as select options.\n\n**Access policy:** `UserPolicy`",
         "tags": [
           "Dashboard"
         ],
@@ -54,16 +54,16 @@
                   "example": {
                     "data": [
                       {
-                        "label": "United States",
-                        "value": "US"
+                        "value": "US",
+                        "name": "United States"
                       },
                       {
-                        "label": "United Kingdom",
-                        "value": "GB"
+                        "value": "GB",
+                        "name": "United Kingdom"
                       },
                       {
-                        "label": "Canada",
-                        "value": "CA"
+                        "value": "CA",
+                        "name": "Canada"
                       }
                     ]
                   }
@@ -71,16 +71,16 @@
                 "example": {
                   "data": [
                     {
-                      "label": "United States",
-                      "value": "US"
+                      "value": "US",
+                      "name": "United States"
                     },
                     {
-                      "label": "United Kingdom",
-                      "value": "GB"
+                      "value": "GB",
+                      "name": "United Kingdom"
                     },
                     {
-                      "label": "Canada",
-                      "value": "CA"
+                      "value": "CA",
+                      "name": "Canada"
                     }
                   ]
                 },
@@ -90,19 +90,47 @@
                     "value": {
                       "data": [
                         {
-                          "label": "United States",
-                          "value": "US"
+                          "value": "US",
+                          "name": "United States"
                         },
                         {
-                          "label": "United Kingdom",
-                          "value": "GB"
+                          "value": "GB",
+                          "name": "United Kingdom"
                         },
                         {
-                          "label": "Canada",
-                          "value": "CA"
+                          "value": "CA",
+                          "name": "Canada"
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -117,15 +145,15 @@
       "CountryOption": {
         "type": "object",
         "properties": {
-          "label": {
-            "type": "string",
-            "description": "Country display name",
-            "example": "United States"
-          },
           "value": {
             "type": "string",
             "description": "Two-letter ISO country code",
             "example": "US"
+          },
+          "name": {
+            "type": "string",
+            "description": "Country display name",
+            "example": "United States"
           }
         }
       }

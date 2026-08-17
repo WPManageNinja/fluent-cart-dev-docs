@@ -27,7 +27,7 @@
       "delete": {
         "operationId": "deleteFile",
         "summary": "DELETE Delete File",
-        "description": "Delete a file from the specified storage driver. For the local driver, this requires the `manage_options` WordPress capability.",
+        "description": "Delete a file from the specified storage driver. For the local driver, this requires the `manage_options` WordPress capability.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Files"
         ],
@@ -171,6 +171,20 @@
                     "value": {
                       "message": "File not found"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
                   }
                 }
               }

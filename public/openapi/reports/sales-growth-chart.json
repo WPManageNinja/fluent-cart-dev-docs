@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSalesGrowthChart",
         "summary": "GET Get Sales Growth Chart",
-        "description": "Retrieve time-series chart data for sales growth on the dashboard, showing order counts and net revenue grouped by the specified interval.",
+        "description": "Retrieve time-series chart data for sales growth on the dashboard, showing order counts and net revenue grouped by the specified interval.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -343,6 +343,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

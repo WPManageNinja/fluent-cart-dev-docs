@@ -27,7 +27,7 @@
       "post": {
         "operationId": "savePermissions",
         "summary": "POST Save Permissions",
-        "description": "Update the role-to-capability permission mappings for FluentCart.",
+        "description": "Update the role-to-capability permission mappings for FluentCart.\n\n**Also used by the roles & permissions UI.** Update which WordPress roles have access to FluentCart.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -152,6 +152,83 @@
                     "value": {
                       "message": "Permissions saved successfully"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User doesn't have manage_options capability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Sorry, You can not update permissions. Only administrators can update permissions"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "success": false,
+                    "data": {
+                      "message": "Sorry, You can not update permissions. Only administrators can update permissions"
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "data": {
+                    "message": "Sorry, You can not update permissions. Only administrators can update permissions"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "success": false,
+                      "data": {
+                        "message": "Sorry, You can not update permissions. Only administrators can update permissions"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

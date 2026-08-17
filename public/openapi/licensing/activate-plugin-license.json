@@ -27,7 +27,7 @@
       "post": {
         "operationId": "activatePluginLicense",
         "summary": "POST Activate Plugin License",
-        "description": "Activate a FluentCart Pro license key on this WordPress site.",
+        "description": "Activate a FluentCart Pro license key on this WordPress site.\n\n**Policy:** `AdminPolicy`",
         "tags": [
           "Licensing"
         ],
@@ -190,7 +190,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

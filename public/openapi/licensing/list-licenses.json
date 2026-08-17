@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listLicenses",
         "summary": "GET List Licenses",
-        "description": "Retrieve a paginated list of all licenses with optional filtering, sorting, and search.",
+        "description": "Retrieve a paginated list of all licenses with optional filtering, sorting, and search.\n\n**Permission:** `licenses/view` · **Policy:** `LicensePolicy`",
         "tags": [
           "Licensing"
         ],
@@ -259,6 +259,21 @@
                               },
                               "updated_at": {
                                 "type": "string"
+                              },
+                              "config": {
+                                "type": "object",
+                                "nullable": true,
+                                "description": "Arbitrary per-license configuration payload."
+                              },
+                              "last_reminder_sent": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Timestamp of the last renewal reminder sent for this license."
+                              },
+                              "last_reminder_type": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Which reminder template was last sent."
                               }
                             }
                           }
@@ -271,6 +286,50 @@
                         },
                         "last_page": {
                           "type": "integer"
+                        },
+                        "first_page_url": {
+                          "type": "string"
+                        },
+                        "from": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "last_page_url": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "active": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "description": "Rendered pagination links, including the `&laquo; Previous` / `Next &raquo;` entries."
+                        },
+                        "next_page_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "prev_page_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "to": {
+                          "type": "integer",
+                          "nullable": true
                         }
                       }
                     }
@@ -293,12 +352,34 @@
                           "expiration_date": "2026-01-15 00:00:00",
                           "subscription_id": 3,
                           "created_at": "2025-01-15 10:30:00",
-                          "updated_at": "2025-06-15 10:35:00"
+                          "updated_at": "2025-06-15 10:35:00",
+                          "config": null,
+                          "last_reminder_sent": null,
+                          "last_reminder_type": null
                         }
                       ],
                       "per_page": 10,
                       "total": 50,
-                      "last_page": 5
+                      "last_page": 5,
+                      "first_page_url": "https://example.com/wp-json/fluent-cart/v2/licensing/licenses?page=1",
+                      "from": 1,
+                      "last_page_url": "https://example.com/wp-json/fluent-cart/v2/licensing/licenses?page=5",
+                      "links": [
+                        {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "active": false
+                        },
+                        {
+                          "url": "https://example.com/wp-json/fluent-cart/v2/licensing/licenses?page=1",
+                          "label": "1",
+                          "active": true
+                        }
+                      ],
+                      "next_page_url": "https://example.com/wp-json/fluent-cart/v2/licensing/licenses?page=2",
+                      "path": "https://example.com/wp-json/fluent-cart/v2/licensing/licenses",
+                      "prev_page_url": null,
+                      "to": 10
                     }
                   }
                 },
@@ -373,7 +454,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

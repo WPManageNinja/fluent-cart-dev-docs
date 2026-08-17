@@ -1,0 +1,214 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/inventory/adjustment-history": {
+      "get": {
+        "operationId": "getInventoryAdjustmentHistory",
+        "summary": "GET Get Adjustment History",
+        "description": "Return the stock-adjustment audit trail for a single variant, newest first, capped at the **100** most recent entries.\n\n**Permission:** `products/view` · **Policy:** `ProductPolicy`",
+        "tags": [
+          "Advanced Inventory"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "variant_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the product variant. **Required** — the endpoint returns `400` without it."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "adjustments": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "variant_id": {
+                            "type": "integer"
+                          },
+                          "post_id": {
+                            "type": "integer"
+                          },
+                          "old_stock": {
+                            "type": "integer"
+                          },
+                          "new_stock": {
+                            "type": "integer"
+                          },
+                          "change": {
+                            "type": "integer",
+                            "description": "`new_stock - old_stock`; negative for a decrease."
+                          },
+                          "reason": {
+                            "type": "string",
+                            "enum": [
+                              "received",
+                              "damage",
+                              "return",
+                              "correction",
+                              "transfer",
+                              "other"
+                            ]
+                          },
+                          "reason_label": {
+                            "type": "string",
+                            "description": "Human-readable label for `reason`."
+                          },
+                          "custom_reason": {
+                            "type": "string",
+                            "description": "Free text, only set when `reason` is `other`."
+                          },
+                          "user_id": {
+                            "type": "integer"
+                          },
+                          "user_name": {
+                            "type": "string",
+                            "description": "Display name of the user who made the adjustment, or `System`."
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    },
+                    "variant_id": {
+                      "type": "integer"
+                    }
+                  },
+                  "example": {
+                    "adjustments": [
+                      {
+                        "id": 18,
+                        "variant_id": 22,
+                        "post_id": 31562,
+                        "old_stock": 8,
+                        "new_stock": 12,
+                        "change": 4,
+                        "reason": "received",
+                        "reason_label": "Received Stock",
+                        "custom_reason": "",
+                        "user_id": 1,
+                        "user_name": "Alex Morgan",
+                        "created_at": "2026-08-14 09:31:02",
+                        "updated_at": "2026-08-14 09:31:02"
+                      }
+                    ],
+                    "variant_id": 22
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`variant_id` was not supplied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "Variant ID is required"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the authenticated user lacks the required permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

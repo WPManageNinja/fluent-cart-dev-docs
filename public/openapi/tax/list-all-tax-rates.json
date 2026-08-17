@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listAllTaxRates",
         "summary": "GET List All Tax Rates",
-        "description": "Retrieve all tax rates from the database, grouped by continent/region and country.",
+        "description": "Retrieve all tax rates from the database, grouped by continent/region and country.\n\n**Required permission:** `store/settings`",
         "tags": [
           "Tax"
         ],
@@ -48,6 +48,13 @@
                       "type": "array",
                       "items": {
                         "$ref": "#/components/schemas/TaxRateGroup"
+                      }
+                    },
+                    "country_enabled_map": {
+                      "type": "object",
+                      "description": "Map of country code (plus \"EU\") to whether tax is enabled for that country. Defaults to true for any country without an explicit override.",
+                      "additionalProperties": {
+                        "type": "boolean"
                       }
                     }
                   },
@@ -74,7 +81,8 @@
                                 "for_shipping": null
                               }
                             ],
-                            "total_rates": 2
+                            "total_rates": 2,
+                            "enabled": true
                           }
                         ],
                         "total_countries": 1
@@ -94,12 +102,18 @@
                                 "for_shipping": null
                               }
                             ],
-                            "total_rates": 1
+                            "total_rates": 1,
+                            "enabled": true
                           }
                         ],
                         "total_countries": 1
                       }
-                    ]
+                    ],
+                    "country_enabled_map": {
+                      "EU": true,
+                      "DE": true,
+                      "US": true
+                    }
                   }
                 },
                 "example": {
@@ -125,7 +139,8 @@
                               "for_shipping": null
                             }
                           ],
-                          "total_rates": 2
+                          "total_rates": 2,
+                          "enabled": true
                         }
                       ],
                       "total_countries": 1
@@ -145,12 +160,18 @@
                               "for_shipping": null
                             }
                           ],
-                          "total_rates": 1
+                          "total_rates": 1,
+                          "enabled": true
                         }
                       ],
                       "total_countries": 1
                     }
-                  ]
+                  ],
+                  "country_enabled_map": {
+                    "EU": true,
+                    "DE": true,
+                    "US": true
+                  }
                 },
                 "examples": {
                   "default": {
@@ -178,7 +199,8 @@
                                   "for_shipping": null
                                 }
                               ],
-                              "total_rates": 2
+                              "total_rates": 2,
+                              "enabled": true
                             }
                           ],
                           "total_countries": 1
@@ -198,13 +220,47 @@
                                   "for_shipping": null
                                 }
                               ],
-                              "total_rates": 1
+                              "total_rates": 1,
+                              "enabled": true
                             }
                           ],
                           "total_countries": 1
                         }
-                      ]
+                      ],
+                      "country_enabled_map": {
+                        "EU": true,
+                        "DE": true,
+                        "US": true
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`store/settings`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -270,6 +326,11 @@
                 "total_rates": {
                   "type": "integer",
                   "example": 2
+                },
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Whether tax collection is enabled for this country, resolved from country_enabled_map. Defaults to true when no explicit override exists.",
+                  "example": true
                 }
               }
             }

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listCouponCodes",
         "summary": "GET List Coupon Codes",
-        "description": "Retrieve a simple array of active coupon codes. This lightweight endpoint is designed for use in order creation forms and quick coupon lookups.",
+        "description": "Retrieve a simple array of active coupon codes. This lightweight endpoint is designed for use in order creation forms and quick coupon lookups.\n\n**Required permissions:** all of `orders/create`, `orders/manage`, `coupons/view`",
         "tags": [
           "Coupons"
         ],
@@ -81,6 +81,34 @@
                         "FREESHIP"
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/create, orders/manage, coupons/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

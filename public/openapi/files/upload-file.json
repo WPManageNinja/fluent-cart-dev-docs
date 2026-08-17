@@ -27,7 +27,7 @@
       "post": {
         "operationId": "uploadFile",
         "summary": "POST Upload File",
-        "description": "Upload a downloadable file to the specified storage driver. The file is stored with a unique name appended with a timestamp to prevent collisions.",
+        "description": "Upload a downloadable file to the specified storage driver. The file is stored with a unique name appended with a timestamp to prevent collisions.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Files"
         ],
@@ -142,6 +142,49 @@
                       "message": "Failed To Upload File",
                       "additional": "File is empty"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

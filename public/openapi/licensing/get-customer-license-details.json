@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getCustomerLicenseDetails",
         "summary": "GET Get Customer License Details",
-        "description": "Retrieve full details of a specific license for the currently logged-in customer.",
+        "description": "Retrieve full details of a specific license for the currently logged-in customer.\n\n**Policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Licensing"
         ],
@@ -55,9 +55,6 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": {
-                      "type": "string"
-                    },
                     "license": {
                       "type": "object",
                       "properties": {
@@ -128,7 +125,6 @@
                     }
                   },
                   "example": {
-                    "message": "Success",
                     "license": {
                       "license_key": "DTPRO-A1B2-C3D4-E5F6",
                       "status": "active",
@@ -215,7 +211,7 @@
             }
           },
           "422": {
-            "description": "License or customer not found",
+            "description": "License not found for this customer, or no customer could be resolved for the current user. Both causes return 422 — the controller's `sendError()` calls use the framework default status.",
             "content": {
               "application/json": {
                 "schema": {
@@ -254,7 +250,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

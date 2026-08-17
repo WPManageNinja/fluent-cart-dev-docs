@@ -1,0 +1,270 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/variants/{variantId}/tax-exempt": {
+      "post": {
+        "operationId": "updateTaxSettings",
+        "summary": "POST Update Variant Tax Settings",
+        "description": "Set the tax-exempt flag and tax class for a single product variant. If `tax_class` is omitted, the variant's existing tax class (or `standard` if none is set) is kept. The supplied tax class must already exist.\n\n**Required permission:** `products/edit`",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "variantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Product variation ID"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tax_exempt": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "description": "Whether the variant is exempt from tax. Defaults to 'no'."
+                  },
+                  "tax_class": {
+                    "type": "string",
+                    "description": "Slug of an existing tax class. Defaults to the variant's current tax class, or 'standard'."
+                  }
+                },
+                "example": {
+                  "tax_exempt": "yes",
+                  "tax_class": "standard"
+                }
+              },
+              "example": {
+                "tax_exempt": "yes",
+                "tax_class": "standard"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "tax_exempt": "yes",
+                    "tax_class": "standard"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Variant tax settings updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "tax_exempt": {
+                      "type": "string"
+                    },
+                    "tax_class": {
+                      "type": "string"
+                    },
+                    "tax_class_slug": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Variation is now tax exempt",
+                    "tax_exempt": "yes",
+                    "tax_class": "standard",
+                    "tax_class_slug": "standard"
+                  }
+                },
+                "example": {
+                  "message": "Variation is now tax exempt",
+                  "tax_exempt": "yes",
+                  "tax_class": "standard",
+                  "tax_class_slug": "standard"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Variation is now tax exempt",
+                      "tax_exempt": "yes",
+                      "tax_class": "standard",
+                      "tax_class_slug": "standard"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Variant not found.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Variant not found"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Variant not found"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Variant not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user lacks the products/edit permission.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The supplied tax_class does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid tax class"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Invalid tax class"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Invalid tax class"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getStoreSettings",
         "summary": "GET Get Store Settings",
-        "description": "Retrieve all store configuration settings along with the field schema for a given settings tab.",
+        "description": "Retrieve all store configuration settings along with the field schema for a given settings tab.\n\n**Required permission:** `store/settings`",
         "tags": [
           "Settings"
         ],
@@ -379,6 +379,34 @@
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`store/settings`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getUpgradeSettings",
         "summary": "GET Get Upgrade Settings",
-        "description": "Retrieve all upgrade path configurations for a product.",
+        "description": "Retrieve all upgrade path configurations for a product.\n\n**Required permission:** `products/view`",
         "tags": [
           "Products"
         ],
@@ -55,69 +55,127 @@
                 "example": {
                   "data": [
                     {
-                      "id": 5,
-                      "product_id": 123,
-                      "from_variant": 456,
-                      "to_variants": [
-                        457,
-                        458
-                      ],
-                      "title": "Upgrade to Business License",
-                      "description": "Upgrade from Personal to Business for team access and priority support.",
-                      "slug": "upgrade-to-business",
-                      "discount_amount": 500,
-                      "from_variation": {
-                        "id": 456,
-                        "variation_title": "Personal License",
-                        "item_price": 4900
+                      "id": 13,
+                      "object_type": "variant_upgrade",
+                      "object_id": "456",
+                      "meta_key": "variant_upgrade_path",
+                      "meta_value": {
+                        "to_variants": [
+                          "457",
+                          "458"
+                        ],
+                        "is_prorate": "1",
+                        "discount_amount": "500"
                       },
-                      "to_variations": [
-                        {
-                          "id": 457,
-                          "variation_title": "Business License - Annual",
-                          "item_price": 9900
-                        },
-                        {
-                          "id": 458,
-                          "variation_title": "Enterprise License",
-                          "item_price": 19900
-                        }
-                      ]
+                      "created_at": "2025-10-14T22:20:09+00:00",
+                      "updated_at": "2025-10-14T22:20:09+00:00"
+                    },
+                    {
+                      "id": 14,
+                      "object_type": "variant_upgrade",
+                      "object_id": "457",
+                      "meta_key": "variant_upgrade_path",
+                      "meta_value": {
+                        "to_variants": [
+                          "458"
+                        ],
+                        "is_prorate": "1",
+                        "discount_amount": "0"
+                      },
+                      "created_at": "2025-10-14T22:20:31+00:00",
+                      "updated_at": "2025-10-14T22:20:31+00:00"
                     }
                   ]
                 },
                 "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "List of upgrade path meta records defined for the product's variants.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Meta record ID."
+                          },
+                          "object_type": {
+                            "type": "string",
+                            "description": "Always `variant_upgrade` for upgrade path records."
+                          },
+                          "object_id": {
+                            "type": "string",
+                            "description": "The source variant ID this upgrade path is attached to."
+                          },
+                          "meta_key": {
+                            "type": "string",
+                            "description": "Always `variant_upgrade_path`."
+                          },
+                          "meta_value": {
+                            "type": "object",
+                            "properties": {
+                              "to_variants": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "description": "Variant IDs the source variant can upgrade to."
+                              },
+                              "is_prorate": {
+                                "type": "string",
+                                "description": "Whether the upgrade is prorated (`\"1\"` or `\"0\"`)."
+                              },
+                              "discount_amount": {
+                                "type": "string",
+                                "description": "Discount amount applied on upgrade, in cents (as a numeric string)."
+                              }
+                            }
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "description": "Creation timestamp (ISO 8601)."
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "description": "Last update timestamp (ISO 8601)."
+                          }
+                        }
+                      }
+                    }
+                  },
                   "example": {
                     "data": [
                       {
-                        "id": 5,
-                        "product_id": 123,
-                        "from_variant": 456,
-                        "to_variants": [
-                          457,
-                          458
-                        ],
-                        "title": "Upgrade to Business License",
-                        "description": "Upgrade from Personal to Business for team access and priority support.",
-                        "slug": "upgrade-to-business",
-                        "discount_amount": 500,
-                        "from_variation": {
-                          "id": 456,
-                          "variation_title": "Personal License",
-                          "item_price": 4900
+                        "id": 13,
+                        "object_type": "variant_upgrade",
+                        "object_id": "456",
+                        "meta_key": "variant_upgrade_path",
+                        "meta_value": {
+                          "to_variants": [
+                            "457",
+                            "458"
+                          ],
+                          "is_prorate": "1",
+                          "discount_amount": "500"
                         },
-                        "to_variations": [
-                          {
-                            "id": 457,
-                            "variation_title": "Business License - Annual",
-                            "item_price": 9900
-                          },
-                          {
-                            "id": 458,
-                            "variation_title": "Enterprise License",
-                            "item_price": 19900
-                          }
-                        ]
+                        "created_at": "2025-10-14T22:20:09+00:00",
+                        "updated_at": "2025-10-14T22:20:09+00:00"
+                      },
+                      {
+                        "id": 14,
+                        "object_type": "variant_upgrade",
+                        "object_id": "457",
+                        "meta_key": "variant_upgrade_path",
+                        "meta_value": {
+                          "to_variants": [
+                            "458"
+                          ],
+                          "is_prorate": "1",
+                          "discount_amount": "0"
+                        },
+                        "created_at": "2025-10-14T22:20:31+00:00",
+                        "updated_at": "2025-10-14T22:20:31+00:00"
                       }
                     ]
                   }
@@ -128,37 +186,81 @@
                     "value": {
                       "data": [
                         {
-                          "id": 5,
-                          "product_id": 123,
-                          "from_variant": 456,
-                          "to_variants": [
-                            457,
-                            458
-                          ],
-                          "title": "Upgrade to Business License",
-                          "description": "Upgrade from Personal to Business for team access and priority support.",
-                          "slug": "upgrade-to-business",
-                          "discount_amount": 500,
-                          "from_variation": {
-                            "id": 456,
-                            "variation_title": "Personal License",
-                            "item_price": 4900
+                          "id": 13,
+                          "object_type": "variant_upgrade",
+                          "object_id": "456",
+                          "meta_key": "variant_upgrade_path",
+                          "meta_value": {
+                            "to_variants": [
+                              "457",
+                              "458"
+                            ],
+                            "is_prorate": "1",
+                            "discount_amount": "500"
                           },
-                          "to_variations": [
-                            {
-                              "id": 457,
-                              "variation_title": "Business License - Annual",
-                              "item_price": 9900
-                            },
-                            {
-                              "id": 458,
-                              "variation_title": "Enterprise License",
-                              "item_price": 19900
-                            }
-                          ]
+                          "created_at": "2025-10-14T22:20:09+00:00",
+                          "updated_at": "2025-10-14T22:20:09+00:00"
+                        },
+                        {
+                          "id": 14,
+                          "object_type": "variant_upgrade",
+                          "object_id": "457",
+                          "meta_key": "variant_upgrade_path",
+                          "meta_value": {
+                            "to_variants": [
+                              "458"
+                            ],
+                            "is_prorate": "1",
+                            "discount_amount": "0"
+                          },
+                          "created_at": "2025-10-14T22:20:31+00:00",
+                          "updated_at": "2025-10-14T22:20:31+00:00"
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getWidgets",
         "summary": "GET Get Widgets",
-        "description": "Retrieve dynamic widget data for a specific context. Widgets are loaded via WordPress filters, allowing modules and extensions to register custom widgets.",
+        "description": "Retrieve dynamic widget data for a specific context. Widgets are loaded via WordPress filters, allowing modules and extensions to register custom widgets.\n\n**Required permissions:** any one of `customers/view`, `orders/view`",
         "tags": [
           "Dashboard"
         ],
@@ -131,6 +131,34 @@
                     "value": {
                       "message": "Order not found"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`customers/view, orders/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

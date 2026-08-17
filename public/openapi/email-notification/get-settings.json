@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getEmailSettings",
         "summary": "GET Get Global Email Settings",
-        "description": "Retrieve the global email configuration settings used across all notification emails (sender name, email addresses, footer, etc.).",
+        "description": "Retrieve the global email configuration settings used across all notification emails (sender name, email addresses, footer, etc.).\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Email Notifications"
         ],
@@ -246,6 +246,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

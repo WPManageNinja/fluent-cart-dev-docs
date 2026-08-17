@@ -315,7 +315,7 @@ $item = [
     "other_info"       => [
         "payment_type" => "onetime"
     ],
-    "view_url"         => "https://www.abelandcole.co.uk/turkey-breast-joint-high-welfare-kellybronze?cid=9427"
+    "view_url"         => "https://www.example.com/turkey-breast-joint-high-welfare-kellybronze?cid=9427"
 ];
 ```
 
@@ -344,7 +344,7 @@ $item = [
         "manage_setup_fee" => "yes",
          "signup_fee"       => 500
     ],
-    "view_url"         => "https://www.abelandcole.co.uk/weekly-protein-pack?cid=9428"
+    "view_url"         => "https://www.example.com/weekly-protein-pack?cid=9428"
 ];
 ```
 

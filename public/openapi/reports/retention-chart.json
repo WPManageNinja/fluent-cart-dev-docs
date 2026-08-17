@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getRetentionChart",
         "summary": "GET Get Retention Chart",
-        "description": "Retrieve subscription retention data as chart data, showing how many subscribers remain active over time.",
+        "description": "Retrieve subscription retention data as chart data, showing how many subscribers remain active over time.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -156,77 +156,30 @@
                   "type": "object",
                   "properties": {
                     "chartData": {
-                      "type": "object",
-                      "description": "Retention chart data"
+                      "$ref": "#/components/schemas/RetentionChartData"
                     }
                   },
                   "example": {
                     "chartData": {
-                      "labels": [
-                        "Month 1",
-                        "Month 2",
-                        "Month 3",
-                        "Month 4",
-                        "Month 5",
-                        "Month 6",
-                        "Month 7",
-                        "Month 8",
-                        "Month 9",
-                        "Month 10",
-                        "Month 11",
-                        "Month 12"
-                      ],
-                      "data": [
-                        100,
-                        92,
-                        87,
-                        83,
-                        80,
-                        78,
-                        76,
-                        74,
-                        73,
-                        72,
-                        71,
-                        70
-                      ],
-                      "total_initial_subscribers": 183,
-                      "current_active": 128
+                      "day_7": 12,
+                      "day_15": 9,
+                      "day_30": 24,
+                      "day_90": 41,
+                      "day_180": 33,
+                      "day_365": 28,
+                      "more_than_year": 36
                     }
                   }
                 },
                 "example": {
                   "chartData": {
-                    "labels": [
-                      "Month 1",
-                      "Month 2",
-                      "Month 3",
-                      "Month 4",
-                      "Month 5",
-                      "Month 6",
-                      "Month 7",
-                      "Month 8",
-                      "Month 9",
-                      "Month 10",
-                      "Month 11",
-                      "Month 12"
-                    ],
-                    "data": [
-                      100,
-                      92,
-                      87,
-                      83,
-                      80,
-                      78,
-                      76,
-                      74,
-                      73,
-                      72,
-                      71,
-                      70
-                    ],
-                    "total_initial_subscribers": 183,
-                    "current_active": 128
+                    "day_7": 12,
+                    "day_15": 9,
+                    "day_30": 24,
+                    "day_90": 41,
+                    "day_180": 33,
+                    "day_365": 28,
+                    "more_than_year": 36
                   }
                 },
                 "examples": {
@@ -234,38 +187,43 @@
                     "summary": "Successful response",
                     "value": {
                       "chartData": {
-                        "labels": [
-                          "Month 1",
-                          "Month 2",
-                          "Month 3",
-                          "Month 4",
-                          "Month 5",
-                          "Month 6",
-                          "Month 7",
-                          "Month 8",
-                          "Month 9",
-                          "Month 10",
-                          "Month 11",
-                          "Month 12"
-                        ],
-                        "data": [
-                          100,
-                          92,
-                          87,
-                          83,
-                          80,
-                          78,
-                          76,
-                          74,
-                          73,
-                          72,
-                          71,
-                          70
-                        ],
-                        "total_initial_subscribers": 183,
-                        "current_active": 128
+                        "day_7": 12,
+                        "day_15": 9,
+                        "day_30": 24,
+                        "day_90": 41,
+                        "day_180": 33,
+                        "day_365": 28,
+                        "more_than_year": 36
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -276,7 +234,56 @@
     }
   },
   "components": {
-    "schemas": {},
+    "schemas": {
+      "RetentionChartData": {
+        "type": "object",
+        "description": "Count of subscriptions falling into each lifespan bucket (measured in days from creation to cancellation, or to now if still active). When `params[customDays]` is supplied, the response instead contains a single dynamic key `day_{customDays}` with the count for that custom window, in place of the fixed buckets below.",
+        "properties": {
+          "day_7": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Subscriptions with a lifespan of 0-7 days. Null when there is no matching data for the selected range.",
+            "example": 12
+          },
+          "day_15": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Subscriptions with a lifespan of 8-15 days",
+            "example": 9
+          },
+          "day_30": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Subscriptions with a lifespan of 16-30 days",
+            "example": 24
+          },
+          "day_90": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Subscriptions with a lifespan of 31-90 days",
+            "example": 41
+          },
+          "day_180": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Subscriptions with a lifespan of 91-180 days",
+            "example": 33
+          },
+          "day_365": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Subscriptions with a lifespan of 181-365 days",
+            "example": 28
+          },
+          "more_than_year": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Subscriptions with a lifespan greater than 365 days",
+            "example": 36
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",

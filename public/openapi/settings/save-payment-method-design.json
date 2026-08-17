@@ -27,7 +27,7 @@
       "post": {
         "operationId": "savePaymentMethodDesign",
         "summary": "POST Save Payment Method Design",
-        "description": "Customize the checkout appearance for a specific payment method, including its label, logo, and instructions.",
+        "description": "Customize the checkout appearance for a specific payment method, including its label, logo, and instructions.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -154,6 +154,49 @@
                         "thank_you_page_instructions": "<p>Your payment was processed successfully. A receipt has been sent to your email.</p>"
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

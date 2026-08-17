@@ -27,7 +27,7 @@
       "post": {
         "operationId": "updateLicenseActivationLimit",
         "summary": "POST Update License Activation Limit",
-        "description": "Change the maximum number of site activations allowed for a license.",
+        "description": "Change the maximum number of site activations allowed for a license.\n\n**Permission:** `licenses/manage` · **Policy:** `LicensePolicy`",
         "tags": [
           "Licensing"
         ],
@@ -151,7 +151,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

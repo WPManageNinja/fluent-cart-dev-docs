@@ -14,3 +14,5 @@ Filter hooks allow you to modify data, settings, and behavior in FluentCart. The
 4. [Cart & Checkout](./filters/cart-and-checkout) - Shopping flow from cart to checkout
 5. [Customers & Subscriptions](./filters/customers-and-subscriptions) - Customer management and recurring revenue
 6. [Integrations & Advanced](./filters/integrations-and-advanced) - External integrations and advanced features
+7. [Modules](./filters/modules) - MCP server and advanced product variations
+8. [Pro Modules](./filters/pro-modules) <Badge type="warning" text="Pro" /> - Advanced inventory, saved views, signed releases, Paddle, e-invoicing

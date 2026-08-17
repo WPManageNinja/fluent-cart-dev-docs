@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getOrderValueDistribution",
         "summary": "GET Get Order Value Distribution",
-        "description": "Retrieve the distribution of orders by their total value, showing how orders are spread across different price ranges.",
+        "description": "Retrieve the distribution of orders by their total value, showing how orders are spread across different price ranges.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -170,119 +170,133 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "Order value distribution data"
+                      "type": "object",
+                      "description": "Order counts bucketed by fixed $100-wide order-value ranges (order total_amount, in dollars).",
+                      "properties": {
+                        "0-100": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $0\u2013$100."
+                        },
+                        "100-200": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $100\u2013$200."
+                        },
+                        "200-300": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $200\u2013$300."
+                        },
+                        "300-400": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $300\u2013$400."
+                        },
+                        "400-500": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $400\u2013$500."
+                        },
+                        "500-600": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $500\u2013$600."
+                        },
+                        "600-700": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $600\u2013$700."
+                        },
+                        "700-800": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $700\u2013$800."
+                        },
+                        "800-900": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $800\u2013$900."
+                        },
+                        "900-1000": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling $900\u2013$1000."
+                        },
+                        "1000+": {
+                          "type": "integer",
+                          "description": "Order count for orders totaling more than $1000."
+                        }
+                      }
                     }
                   },
                   "example": {
-                    "data": [
-                      {
-                        "label": "$0-$25",
-                        "count": 28,
-                        "percentage": 8.2
-                      },
-                      {
-                        "label": "$25-$50",
-                        "count": 82,
-                        "percentage": 24
-                      },
-                      {
-                        "label": "$50-$100",
-                        "count": 120,
-                        "percentage": 35.1
-                      },
-                      {
-                        "label": "$100-$200",
-                        "count": 78,
-                        "percentage": 22.8
-                      },
-                      {
-                        "label": "$200-$500",
-                        "count": 28,
-                        "percentage": 8.2
-                      },
-                      {
-                        "label": "$500+",
-                        "count": 6,
-                        "percentage": 1.7
-                      }
-                    ]
+                    "data": {
+                      "0-100": 28,
+                      "100-200": 82,
+                      "200-300": 45,
+                      "300-400": 30,
+                      "400-500": 22,
+                      "500-600": 15,
+                      "600-700": 10,
+                      "700-800": 6,
+                      "800-900": 4,
+                      "900-1000": 3,
+                      "1000+": 6
+                    }
                   }
                 },
                 "example": {
-                  "data": [
-                    {
-                      "label": "$0-$25",
-                      "count": 28,
-                      "percentage": 8.2
-                    },
-                    {
-                      "label": "$25-$50",
-                      "count": 82,
-                      "percentage": 24
-                    },
-                    {
-                      "label": "$50-$100",
-                      "count": 120,
-                      "percentage": 35.1
-                    },
-                    {
-                      "label": "$100-$200",
-                      "count": 78,
-                      "percentage": 22.8
-                    },
-                    {
-                      "label": "$200-$500",
-                      "count": 28,
-                      "percentage": 8.2
-                    },
-                    {
-                      "label": "$500+",
-                      "count": 6,
-                      "percentage": 1.7
-                    }
-                  ]
+                  "data": {
+                    "0-100": 28,
+                    "100-200": 82,
+                    "200-300": 45,
+                    "300-400": 30,
+                    "400-500": 22,
+                    "500-600": 15,
+                    "600-700": 10,
+                    "700-800": 6,
+                    "800-900": 4,
+                    "900-1000": 3,
+                    "1000+": 6
+                  }
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "data": [
-                        {
-                          "label": "$0-$25",
-                          "count": 28,
-                          "percentage": 8.2
-                        },
-                        {
-                          "label": "$25-$50",
-                          "count": 82,
-                          "percentage": 24
-                        },
-                        {
-                          "label": "$50-$100",
-                          "count": 120,
-                          "percentage": 35.1
-                        },
-                        {
-                          "label": "$100-$200",
-                          "count": 78,
-                          "percentage": 22.8
-                        },
-                        {
-                          "label": "$200-$500",
-                          "count": 28,
-                          "percentage": 8.2
-                        },
-                        {
-                          "label": "$500+",
-                          "count": 6,
-                          "percentage": 1.7
-                        }
-                      ]
+                      "data": {
+                        "0-100": 28,
+                        "100-200": 82,
+                        "200-300": 45,
+                        "300-400": 30,
+                        "400-500": 22,
+                        "500-600": 15,
+                        "600-700": 10,
+                        "700-800": 6,
+                        "800-900": 4,
+                        "900-1000": 3,
+                        "1000+": 6
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

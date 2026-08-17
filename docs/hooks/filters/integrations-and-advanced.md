@@ -219,7 +219,7 @@ This filter is applied to the webhook payload body after it is constructed but b
 **Returns:**
 - `$payloadBody` (array): The modified payload body
 
-**Source:** `fluent-cart-pro/.../WebhookConnect.php:251`
+**Source:** `fluent-cart-pro/app/Modules/Integrations/WebhookConnect.php:251`
 
 **Usage:**
 ```php
@@ -842,6 +842,138 @@ add_filter('fluent_cart/storage/storage_settings_before_update_s3', function ($s
 ```
 </details>
 
+### <code> storage/s3_prevent_overwrite </code>
+<details>
+<summary><code>fluent_cart/storage/s3_prevent_overwrite</code> &mdash; Filter whether an S3 upload may overwrite an existing object</summary>
+
+**When it runs:**
+Applied in `S3FileUploader`'s constructor, before the S3 request signature is generated, while preparing to upload a file to the S3-compatible storage driver. It is resolved once per upload and the result is baked into the signed request, so a listener cannot change it after signing.
+
+**Parameters:**
+
+- `$preventOverwrite` (bool): Whether to refuse the upload instead of overwriting an existing object at the same key. Default `false`.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'bucket'       => $this->bucket,        // string — the target S3 bucket
+        's3_file_path' => $this->s3FilePath,    // string — the destination object key
+    ];
+    ```
+
+**Returns:** `bool` — whether the upload should refuse to overwrite an existing object
+
+**Source:** `app/Services/FileSystem/Drivers/S3/S3FileUploader.php:64`
+
+**Usage:**
+```php
+add_filter('fluent_cart/storage/s3_prevent_overwrite', function ($preventOverwrite, $context) {
+    // Never allow overwriting objects already stored under "licenses/"
+    if (strpos($context['s3_file_path'], 'licenses/') === 0) {
+        return true;
+    }
+    return $preventOverwrite;
+}, 10, 2);
+```
+</details>
+
+### <code> storage/settings_response </code>
+<details>
+<summary><code>fluent_cart/storage/settings_response</code> &mdash; Filter a storage driver's settings-screen response</summary>
+
+**When it runs:**
+Applied in `BaseStorageDriver::getSettingsResponse()` after the driver's raw settings (and, if applicable, the settings-template payload) have been assembled for the admin Storage settings screen. Runs for every storage driver before the driver-specific `fluent_cart/storage/settings_response_{$slug}` filter gets the same, already-filtered value.
+
+**Parameters:**
+
+- `$response` (array): The settings response payload sent to the admin UI
+- `$driver` ([BaseStorageDriver](/database/models/order)): The storage driver instance (e.g. the S3 or local driver)
+
+**Returns:** `array` — the modified settings response
+
+**Source:** `app/Modules/StorageDrivers/BaseStorageDriver.php:184`
+
+**Usage:**
+```php
+add_filter('fluent_cart/storage/settings_response', function ($response, $driver) {
+    // Flag drivers that still need a connection test
+    if (empty($response['verified'])) {
+        $response['needs_verification'] = true;
+    }
+    return $response;
+}, 10, 2);
+```
+</details>
+
+### <code> storage/settings_response_{slug} </code>
+<details>
+<summary><code>fluent_cart/storage/settings_response_{$slug}</code> &mdash; Filter one storage driver's settings-screen response (DYNAMIC)</summary>
+
+**When it runs:**
+Fires immediately after `fluent_cart/storage/settings_response` above, in the same `BaseStorageDriver::getSettingsResponse()` call, receiving the value that generic filter already returned. The `{$slug}` portion is replaced with the driver's own slug (e.g. `s3`, `local`), so a listener can target one specific driver without checking `$driver->slug` itself.
+
+**Parameters:**
+
+- `$response` (array): The settings response payload, already passed through `fluent_cart/storage/settings_response`
+- `$driver` ([BaseStorageDriver](/database/models/order)): The storage driver instance
+
+**Returns:** `array` — the modified settings response
+
+**Source:** `app/Modules/StorageDrivers/BaseStorageDriver.php:186`
+
+**Usage:**
+```php
+add_filter('fluent_cart/storage/settings_response_s3', function ($response, $driver) {
+    // Surface the configured region directly at the top level for the S3 driver
+    $response['region_label'] = $response['settings']['region'] ?? 'us-east-1';
+    return $response;
+}, 10, 2);
+```
+</details>
+
+---
+
+## Data Backfills & Migrations
+
+### <code> data_backfills/chunk_budget </code>
+<details>
+<summary><code>fluent_cart/data_backfills/chunk_budget</code> &mdash; Filter the chunk size and per-run budget for a data backfill task</summary>
+
+**When it runs:**
+Applied at the start of a chunked data-backfill task (e.g. the `completed_next_billing_date` backfill that repairs subscription billing-date rows), before it selects its first batch of rows. Controls how many rows are processed per chunk and how many chunks may run in a single request, so it is mainly useful for shrinking the batch size in tests against a small table — production leaves the defaults as-is.
+
+**Parameters:**
+
+- `$budget` (array): The chunk/run budget, keyed by:
+    ```php
+    $budget = [
+        'chunk_size'         => 500, // int — rows processed per chunk
+        'max_chunks_per_run' => 10,  // int — maximum chunks processed in one request
+    ];
+    ```
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'slug' => 'completed_next_billing_date', // string — identifies which backfill task is running
+    ];
+    ```
+
+**Returns:** `array` — the modified budget, same shape as `$budget`
+
+**Source:** `database/DataBackfills.php:535`
+
+**Usage:**
+```php
+add_filter('fluent_cart/data_backfills/chunk_budget', function ($budget, $context) {
+    // Use a much smaller chunk size in a test environment
+    if ($context['slug'] === 'completed_next_billing_date' && wp_get_environment_type() !== 'production') {
+        $budget['chunk_size'] = 5;
+        $budget['max_chunks_per_run'] = 2;
+    }
+    return $budget;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Localization & Address
@@ -935,6 +1067,10 @@ add_filter('fluent_cart/address/postcode/is_valid', function ($valid, $postcode,
 <details>
 <summary><code>fluent-cart/util/countries</code> &mdash; Filter the country list</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/util/countries` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/util/countries`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter is applied when retrieving the full list of countries.
 
@@ -1067,6 +1203,10 @@ add_filter('fluent_cart/template_path', function ($path) {
 <details>
 <summary><code>fluent_cart_template_part_content</code> &mdash; Filter template part content</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_template_part_content` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/template_part_content`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter is applied to template part content before it is rendered, allowing you to modify the HTML content.
 
@@ -1097,6 +1237,10 @@ add_filter('fluent_cart_template_part_content', function ($content, $slug, $args
 <details>
 <summary><code>fluent_cart_template_part_content_{$slug}</code> &mdash; Filter template part content by slug (DYNAMIC)</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_template_part_content_{var}` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/template_part_content_{var}`** instead — it receives the same value.
+:::
 **When it runs:**
 This dynamic filter is applied to a specific template part's content. The `{$slug}` is replaced with the template part slug.
 
@@ -1124,6 +1268,10 @@ add_filter('fluent_cart_template_part_content_product-card', function ($content,
 <details>
 <summary><code>fluent_cart_template_part_output</code> &mdash; Filter template part output</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_template_part_output` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/template_part_output`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter is applied to the final rendered output of a template part.
 
@@ -1149,6 +1297,10 @@ add_filter('fluent_cart_template_part_output', function ($output) {
 <details>
 <summary><code>fluent_cart_template_part_output_{$slug}</code> &mdash; Filter template part output by slug (DYNAMIC)</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_template_part_output_{var}` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/template_part_output_{var}`** instead — it receives the same value.
+:::
 **When it runs:**
 This dynamic filter is applied to the final rendered output of a specific template part. The `{$slug}` is replaced with the template part slug.
 
@@ -1170,6 +1322,110 @@ add_filter('fluent_cart_template_part_output_product-modal', function ($output) 
 ```
 </details>
 
+### <code> template_part_content </code>
+<details>
+<summary><code>fluent_cart/template_part_content</code> &mdash; Filter template part content (canonical)</summary>
+
+**When it runs:**
+Applied when a template part (e.g. the product-modal template part) renders, right after the deprecated `fluent_cart_template_part_content` alias runs on the same value and before the driver-specific `fluent_cart/template_part_content_{$slug}` filter and `do_blocks()` parsing. This is the namespaced replacement for `fluent_cart_template_part_content` — prefer it for new code.
+
+**Parameters:**
+
+- `$content` (string): The raw template part block markup, before block parsing
+- `$slug` (string): The template part's registered slug (e.g. `product_modal`)
+- `$args` (array): Arguments passed to the template part renderer
+
+**Returns:** `string` — the modified template part content
+
+**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:247`
+
+**Usage:**
+```php
+add_filter('fluent_cart/template_part_content', function ($content, $slug, $args) {
+    if ($slug === 'product_modal') {
+        $content = '<div class="custom-wrapper">' . $content . '</div>';
+    }
+    return $content;
+}, 10, 3);
+```
+</details>
+
+### <code> template_part_content_{slug} </code>
+<details>
+<summary><code>fluent_cart/template_part_content_{$slug}</code> &mdash; Filter one template part's content by slug (canonical, DYNAMIC)</summary>
+
+**When it runs:**
+Fires immediately after `fluent_cart/template_part_content` above, in the same render call, receiving the value that generic filter already returned. The `{$slug}` portion is replaced with the template part's own slug, so a listener can target one specific template part without checking `$slug` itself.
+
+**Parameters:**
+
+- `$content` (string): The template part content, already passed through `fluent_cart/template_part_content`
+- `$args` (array): Arguments passed to the template part renderer
+
+**Returns:** `string` — the modified content
+
+**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:248`
+
+**Usage:**
+```php
+add_filter('fluent_cart/template_part_content_product_modal', function ($content, $args) {
+    // Append a badge just to the product-modal template part
+    $content .= '<span class="badge">New</span>';
+    return $content;
+}, 10, 2);
+```
+</details>
+
+### <code> template_part_output </code>
+<details>
+<summary><code>fluent_cart/template_part_output</code> &mdash; Filter template part rendered output (canonical)</summary>
+
+**When it runs:**
+Applied after a template part's block markup has been parsed with `do_blocks()`, right after the deprecated `fluent_cart_template_part_output` alias runs on the same value and before the slug-specific `fluent_cart/template_part_output_{$slug}` filter. This is the namespaced replacement for `fluent_cart_template_part_output`.
+
+**Parameters:**
+
+- `$output` (string): The rendered HTML output of the template part
+- `$slug` (string): The template part's registered slug
+- `$args` (array): Arguments passed to the template part renderer
+
+**Returns:** `string` — the modified output
+
+**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:256`
+
+**Usage:**
+```php
+add_filter('fluent_cart/template_part_output', function ($output, $slug, $args) {
+    // Minify whitespace in every template part's output
+    return preg_replace('/\s+/', ' ', $output);
+}, 10, 3);
+```
+</details>
+
+### <code> template_part_output_{slug} </code>
+<details>
+<summary><code>fluent_cart/template_part_output_{$slug}</code> &mdash; Filter one template part's rendered output by slug (canonical, DYNAMIC)</summary>
+
+**When it runs:**
+Fires immediately after `fluent_cart/template_part_output` above, in the same render call, receiving the already-filtered output. The `{$slug}` portion is replaced with the template part's own slug.
+
+**Parameters:**
+
+- `$output` (string): The rendered output, already passed through `fluent_cart/template_part_output`
+- `$args` (array): Arguments passed to the template part renderer
+
+**Returns:** `string` — the modified output
+
+**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:257`
+
+**Usage:**
+```php
+add_filter('fluent_cart/template_part_output_product_modal', function ($output, $args) {
+    return str_replace('<div class="fct-modal"', '<div class="fct-modal" data-tracking="true"', $output);
+}, 10, 2);
+```
+</details>
+
 ### <code> buttons/enable_floating_cart_button </code>
 <details>
 <summary><code>fluent_cart/buttons/enable_floating_cart_button</code> &mdash; Filter floating cart button visibility</summary>
@@ -1184,7 +1440,7 @@ This filter controls whether the floating cart button is displayed on the fronte
 **Returns:**
 - `$enabled` (bool): The modified value
 
-**Source:** `app/Hooks/Cart/CartLoader.php:41`
+**Source:** `app/Hooks/Cart/CartLoader.php:49`
 
 **Usage:**
 ```php
@@ -1425,6 +1681,99 @@ add_filter('fluent_cart/advanced_filter_options_payment_methods', function ($opt
         'label' => 'Custom Gateway',
     ];
     return $options;
+});
+```
+</details>
+
+### <code> {filter}_allowed_scopes </code>
+<details>
+<summary><code>fluent_cart/{$filterName}_allowed_scopes</code> &mdash; Filter the query scopes a list filter is allowed to apply (DYNAMIC)</summary>
+
+**When it runs:**
+Applied inside `BaseFilter` when resolving the `scopes` requested on an admin list-filter query (orders, customers, subscriptions, etc.), before any of the requested scopes are applied to the underlying Eloquent query. The `{$filterName}` portion is replaced with the filter class's own registered name (e.g. `order_filter`), so a listener can add or remove scopes for one specific list without affecting the others.
+
+**Parameters:**
+
+- `$scopeMap` (array): The map of scope name => callable/definition allowed for this filter, as returned by the filter's own `allowedScopes()` method
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'filter' => $this, // BaseFilter — the filter instance handling the request
+    ];
+    ```
+
+**Returns:** `array` — the modified scope map
+
+**Source:** `app/Services/Filter/BaseFilter.php:743`
+
+**Usage:**
+```php
+add_filter('fluent_cart/order_filter_allowed_scopes', function ($scopeMap, $context) {
+    // Expose a custom "high_value" scope on the orders list filter
+    $scopeMap['high_value'] = function ($query) {
+        return $query->where('total', '>=', 50000); // cents
+    };
+    return $scopeMap;
+}, 10, 2);
+```
+</details>
+
+### <code> {filter}_allowed_withs </code>
+<details>
+<summary><code>fluent_cart/{$filterName}_allowed_withs</code> &mdash; Filter the relationships a list filter is allowed to eager-load (DYNAMIC)</summary>
+
+**When it runs:**
+Applied inside `BaseFilter` when resolving the `with` relationships requested on an admin list-filter query, before any requested relationship is passed to the query's `with()` call. Any requested key that isn't present in the returned map is silently dropped, so this is also the gate that decides what a filter request is allowed to eager-load. The `{$filterName}` portion is replaced with the filter class's own registered name.
+
+**Parameters:**
+
+- `$withMap` (array): The map of relationship key => Eloquent relationship path allowed for this filter, as returned by the filter's own `allowedWiths()` method
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'filter' => $this, // BaseFilter — the filter instance handling the request
+    ];
+    ```
+
+**Returns:** `array` — the modified relationship map
+
+**Source:** `app/Services/Filter/BaseFilter.php:724`
+
+**Usage:**
+```php
+add_filter('fluent_cart/order_filter_allowed_withs', function ($withMap, $context) {
+    // Let the orders list filter eager-load a custom relation
+    $withMap['loyalty_points'] = 'customer.loyaltyPoints';
+    return $withMap;
+}, 10, 2);
+```
+</details>
+
+---
+
+## Tracking & Attribution
+
+### <code> utm/internal_domains </code>
+<details>
+<summary><code>fluent_cart/utm/internal_domains</code> &mdash; Filter the domains treated as "internal" for UTM/referrer attribution</summary>
+
+**When it runs:**
+Applied in `UtmHelper::getInternalDomains()` whenever the internal-domain list is resolved for attribution tracking. Domains on this list are excluded when FluentCart decides whether a visit's referrer counts as an external traffic source, so multisite/multi-domain stores can avoid attributing sales to their own other domains.
+
+**Parameters:**
+
+- `$domains` (array): Extra internal domain names to add (default `[]`)
+
+**Returns:** `array` — the domain list to treat as internal (non-string entries are dropped)
+
+**Source:** `app/Helpers/UtmHelper.php:45`
+
+**Usage:**
+```php
+add_filter('fluent_cart/utm/internal_domains', function ($domains) {
+    // Don't attribute sales to traffic arriving from our own docs subdomain
+    $domains[] = 'docs.example.com';
+    return $domains;
 });
 ```
 </details>
@@ -1741,6 +2090,10 @@ add_filter('fluent_cart/license/get_version_response', function ($changeLogData)
 <details>
 <summary><code>fluent_cart/license/santized_url</code> <Badge type="warning" text="Pro" /> &mdash; Filter sanitized URL for license validation</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart/license/santized_url` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/license/sanitized_url`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter is applied when sanitizing a site URL during license activation or validation.
 
@@ -1788,7 +2141,7 @@ This filter is applied when determining if the current site is a local or stagin
 **Returns:**
 - `$isLocal` (bool): The modified detection result
 
-**Source:** `fluent-cart-pro/.../LicenseSite.php:69`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Models/LicenseSite.php:69`
 
 **Usage:**
 ```php
@@ -2173,6 +2526,10 @@ add_filter('fluent_cart_sl/generate_license_key', function ($key, $context) {
 <details>
 <summary><code>fluent_cart_sl_encoded_package_url</code> <Badge type="warning" text="Pro" /> &mdash; Filter encoded download package URL</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_sl_encoded_package_url` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart_sl/encoded_package_url`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter is applied to the encoded package download URL returned during update checks.
 
@@ -2226,6 +2583,10 @@ add_filter('fluent_cart_sl/issue_license_data', function ($data) {
 <details>
 <summary><code>fluentcart/sanitize_user_meta</code> <Badge type="warning" text="Pro" /> &mdash; Filter user metadata sanitization</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluentcart/sanitize_user_meta` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/sanitize_user_meta`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter controls whether a specific user meta field should be sanitized during processing.
 

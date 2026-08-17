@@ -27,7 +27,7 @@
       "post": {
         "operationId": "saveEmailSettings",
         "summary": "POST Save Global Email Settings",
-        "description": "Update the global email configuration settings for all notification emails.",
+        "description": "Update the global email configuration settings for all notification emails.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Email Notifications"
         ],
@@ -85,7 +85,7 @@
                   "admin_email": {
                     "type": "string",
                     "description": "Admin notification recipient email(s). Supports shortcodes like {{wp.admin_email}}",
-                    "example": "admin@techstore.com"
+                    "example": "admin@example.com"
                   },
                   "show_email_footer": {
                     "type": "string",
@@ -104,7 +104,7 @@
                   "reply_to_name": "TechStore Support",
                   "reply_to_email": "support@example.com",
                   "email_footer": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p>",
-                  "admin_email": "admin@techstore.com",
+                  "admin_email": "admin@example.com",
                   "show_email_footer": "yes"
                 }
               },
@@ -114,7 +114,7 @@
                 "reply_to_name": "TechStore Support",
                 "reply_to_email": "support@example.com",
                 "email_footer": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p>",
-                "admin_email": "admin@techstore.com",
+                "admin_email": "admin@example.com",
                 "show_email_footer": "yes"
               },
               "examples": {
@@ -126,7 +126,7 @@
                     "reply_to_name": "TechStore Support",
                     "reply_to_email": "support@example.com",
                     "email_footer": "<p>&copy; 2025 TechStore Inc. All rights reserved.</p>",
-                    "admin_email": "admin@techstore.com",
+                    "admin_email": "admin@example.com",
                     "show_email_footer": "yes"
                   }
                 }
@@ -190,6 +190,49 @@
                     "value": {
                       "message": "Failed to save email settings"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

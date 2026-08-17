@@ -27,7 +27,7 @@
       "put": {
         "operationId": "updateOrderStatuses",
         "summary": "PUT Update Statuses",
-        "description": "Update the order status or shipping status for an order.",
+        "description": "Update the order status or shipping status for an order.\n\n**Required permission:** `orders/manage_statuses`",
         "tags": [
           "Orders"
         ],
@@ -192,6 +192,49 @@
                     "value": {
                       "message": "Order already has the same status"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/manage_statuses`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

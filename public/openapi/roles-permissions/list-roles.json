@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listRoles",
         "summary": "GET List Roles",
-        "description": "Retrieve all available FluentCart roles with their titles and descriptions. This returns the role definitions (not user assignments).",
+        "description": "Retrieve all available FluentCart roles with their titles and descriptions. This returns the role definitions (not user assignments).\n\n**Policy:** `AdminPolicy`",
         "tags": [
           "Roles"
         ],
@@ -147,7 +147,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

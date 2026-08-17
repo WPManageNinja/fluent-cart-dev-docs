@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getPrintTemplates",
         "summary": "GET Get Print Templates",
-        "description": "Retrieve all available print templates. Returns saved custom templates or falls back to default templates.",
+        "description": "Retrieve all available print templates. Returns saved custom templates or falls back to default templates.\n\n**Access policy:** `AdminPolicy` \u2014 requires the `is_super_admin` FluentCart capability.",
         "tags": [
           "Dashboard"
         ],
@@ -142,6 +142,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

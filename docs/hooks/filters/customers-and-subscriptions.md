@@ -32,7 +32,7 @@ This filter is applied when preparing a single customer's data for display in th
 **Returns:**
 - `$customer` ([Customer](/database/models/customer)): The modified customer data
 
-**Source:** `app/Http/Controllers/CustomerController.php:74`
+**Source:** `app/Http/Controllers/CustomerController.php:83`
 
 **Usage:**
 ```php
@@ -59,7 +59,7 @@ This filter is applied when loading widget data for a single customer's admin vi
 **Returns:**
 - `$widgets` (array): The modified widgets array
 
-**Source:** `app/Http/Controllers/CustomerController.php:177`
+**Source:** `app/Http/Controllers/CustomerController.php:426`
 
 **Usage:**
 ```php
@@ -155,7 +155,7 @@ This filter is applied when building the customer portal sidebar navigation menu
 **Returns:**
 - `$menuItems` (array): The modified menu items array
 
-**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:266`
+**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:299`
 
 **Usage:**
 ```php
@@ -173,6 +173,35 @@ add_filter('fluent_cart/global_customer_menu_items', function($menuItems, $conte
 ```
 </details>
 
+### <code> fct_allowed_svg_tags </code>
+<details>
+<summary><code>fct_allowed_svg_tags</code> &mdash; Allow-list the SVG tags/attributes for a customer nav menu icon</summary>
+
+**When it runs:**
+This filter is applied when rendering a customer-portal navigation menu item that has an inline `icon_svg` value. The returned value is passed straight to `wp_kses()` as the allowed-HTML list, so a menu item's inline SVG icon is only rendered if this filter allow-lists the SVG tags/attributes it uses — the default is an empty array, which strips all markup.
+
+> **Note:** This hook has no `fluent_cart/` or `fluent_cart_` prefix — it predates that naming convention. Register it exactly as `fct_allowed_svg_tags`.
+
+**Source:** `app/Views/frontend/customer_menu.php:60`
+
+**Parameters:**
+
+- `$allowedTags` (array): The `wp_kses()`-style allowed tags/attributes array. Empty by default.
+
+**Returns:**
+- `array` — The allowed tags/attributes array, in the format `wp_kses()` expects
+
+**Usage:**
+```php
+add_filter('fct_allowed_svg_tags', function ($allowedTags) {
+    // Allow a basic inline <svg><path> icon
+    $allowedTags['svg'] = ['class' => true, 'viewbox' => true, 'width' => true, 'height' => true, 'fill' => true];
+    $allowedTags['path'] = ['d' => true, 'fill' => true];
+    return $allowedTags;
+});
+```
+</details>
+
 ### <code> customer_portal/active_tab </code>
 <details>
 <summary><code>fluent_cart/customer_portal/active_tab</code> &mdash; Filter the active tab in customer portal</summary>
@@ -187,7 +216,7 @@ This filter is applied when rendering the customer portal to determine which tab
 **Returns:**
 - `$activeTab` (string): The modified active tab slug
 
-**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:117`
+**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:150`
 
 **Usage:**
 ```php
@@ -220,7 +249,7 @@ This filter is applied when routing customer portal requests to check for regist
 **Returns:**
 - `$endpoints` (array): The modified endpoints array
 
-**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:141`
+**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:174`
 
 **Usage:**
 ```php
@@ -237,6 +266,41 @@ add_filter('fluent_cart/customer_portal/custom_endpoints', function($endpoints) 
 ::: tip
 Consider using the `FluentCartGeneralApi::addCustomerPortalEndpoint()` helper method instead, which registers both the menu item and the endpoint in one call.
 :::
+</details>
+
+### <code> customer_portal/{filter} </code>
+<details>
+<summary><code>fluent_cart/customer_portal/{$filter}</code> &mdash; Provide sections for a custom customer-portal endpoint (dynamic)</summary>
+
+**When it runs:**
+This **dynamic** filter is applied by the customer-portal sections REST endpoint. `{$filter}` is replaced with the requested section/tab slug from the request, so an add-on that registers a portal endpoint (see `customer_portal/custom_endpoints` above) can supply that endpoint's section content by listening on its own slug.
+
+**Source:** `app/Http/Controllers/FrontendControllers/CustomerProfileController.php:228`
+
+**Parameters:**
+
+- `$sections` (array): The sections to return for this endpoint. Empty by default.
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'customer' => $customer,  // Customer model instance
+    ];
+    ```
+
+**Returns:**
+- `array` — The sections for this portal endpoint, formatted for the frontend
+
+**Usage:**
+```php
+// Supply sections for a portal endpoint registered under the "warranty" slug
+add_filter('fluent_cart/customer_portal/warranty', function ($sections, $data) {
+    $sections[] = [
+        'title'   => __('Warranty', 'fluent-cart'),
+        'content' => __('Your products are covered by our standard 12-month warranty.', 'fluent-cart'),
+    ];
+    return $sections;
+}, 10, 2);
+```
 </details>
 
 ### <code> customer_portal/subscription_data </code>
@@ -260,7 +324,7 @@ This filter is applied when preparing a single subscription's data for display i
 **Returns:**
 - `$formattedData` (array): The modified subscription data
 
-**Source:** `app/Http/Controllers/FrontendControllers/CustomerSubscriptionController.php:157`
+**Source:** `app/Http/Controllers/FrontendControllers/CustomerSubscriptionController.php:175`
 
 **Usage:**
 ```php
@@ -272,6 +336,49 @@ add_filter('fluent_cart/customer_portal/subscription_data', function($formattedD
         'date' => $subscription->expiration_at
     ];
     return $formattedData;
+}, 10, 2);
+```
+</details>
+
+### <code> customer/subscription_details_section_parts </code>
+<details>
+<summary><code>fluent_cart/customer/subscription_details_section_parts</code> &mdash; Filter subscription details section parts in customer portal</summary>
+
+**When it runs:**
+This filter is applied when rendering a subscription details page in the customer portal, letting you inject custom HTML into specific sections of the view. Every returned value is passed through `wp_kses_post()` before output. This is the free-plugin counterpart to Pro's `customer/license_details_section_parts`.
+
+**Source:** `app/Http/Controllers/FrontendControllers/CustomerSubscriptionController.php:180`
+
+**Parameters:**
+
+- `$sectionParts` (array): Associative array of injectable HTML sections
+    ```php
+    $sectionParts = [
+        'end_of_subscription' => '',
+    ];
+    ```
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'subscription'  => $subscription,   // Subscription model
+        'formattedData' => $formattedData,  // Formatted subscription data for display
+    ];
+    ```
+
+**Returns:**
+- `array` — The modified section parts. Each value is sanitized with `wp_kses_post()`.
+
+**Usage:**
+```php
+add_filter('fluent_cart/customer/subscription_details_section_parts', function ($parts, $context) {
+    $subscription = $context['subscription'];
+
+    $parts['end_of_subscription'] = sprintf(
+        '<p>%s</p>',
+        sprintf(__('Need help? Contact us about subscription #%d.', 'fluent-cart'), $subscription->id)
+    );
+
+    return $parts;
 }, 10, 2);
 ```
 </details>
@@ -290,7 +397,7 @@ This filter is applied when localizing JavaScript data for the customer portal, 
 **Returns:**
 - `$pubKey` (string): The modified Stripe public key
 
-**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:356`
+**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:389`
 
 **Usage:**
 ```php
@@ -319,7 +426,7 @@ This filter is applied when localizing JavaScript data for the customer portal, 
 **Returns:**
 - `$clientId` (string): The modified PayPal client ID
 
-**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:357`
+**Source:** `app/Hooks/Handlers/ShortCodes/CustomerProfileHandler.php:390`
 
 **Usage:**
 ```php
@@ -338,6 +445,10 @@ add_filter('fluent_cart/payment_methods/paypal_client_id', function($clientId, $
 <details>
 <summary><code>fluent-cart/editable_customer_statuses</code> &mdash; Filter editable customer statuses</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/editable_customer_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/editable_customer_statuses`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter is applied when retrieving the list of customer statuses that can be set in the admin panel.
 
@@ -355,7 +466,7 @@ This filter is applied when retrieving the list of customer statuses that can be
 **Returns:**
 - `$statuses` (array): The modified statuses array
 
-**Source:** `app/Helpers/Helper.php:162`, `app/Helpers/Status.php:350`
+**Source:** `app/Helpers/Helper.php:312`, `app/Helpers/Status.php:350`
 
 **Usage:**
 ```php
@@ -369,6 +480,38 @@ add_filter('fluent-cart/editable_customer_statuses', function($statuses, $contex
 ::: warning Note
 This hook uses a hyphen separator (`fluent-cart/`) instead of the usual underscore separator (`fluent_cart/`).
 :::
+</details>
+
+### <code> editable_customer_statuses (current) </code>
+<details>
+<summary><code>fluent_cart/editable_customer_statuses</code> &mdash; Filter editable customer statuses (current hook)</summary>
+
+**When it runs:**
+The direct successor to the deprecated `fluent-cart/editable_customer_statuses` above — same call site, same value, underscore-separated `fluent_cart/` prefix.
+
+**Source:** `app/Helpers/Status.php:383`
+
+**Parameters:**
+
+- `$statuses` (array): Associative array of status key => label
+    ```php
+    $statuses = [
+        'active'   => __('Active', 'fluent-cart'),
+        'inactive' => __('Inactive', 'fluent-cart'),
+    ];
+    ```
+- `$context` (array): Additional context data (empty array)
+
+**Returns:**
+- `array` — The modified statuses array
+
+**Usage:**
+```php
+add_filter('fluent_cart/editable_customer_statuses', function ($statuses, $context) {
+    $statuses['suspended'] = __('Suspended', 'my-plugin');
+    return $statuses;
+}, 10, 2);
+```
 </details>
 
 ### <code> user/after_register/skip_hooks </code>
@@ -432,7 +575,7 @@ This filter is applied when retrieving the list of all available subscription st
 **Returns:**
 - `$statuses` (array): The modified subscription statuses array
 
-**Source:** `app/Helpers/Status.php:253`
+**Source:** `app/Helpers/Status.php:271`
 
 **Usage:**
 ```php
@@ -462,7 +605,7 @@ This filter is applied when determining which subscription statuses should be co
 **Returns:**
 - `$statuses` (array): The modified list of valid statuses
 
-**Source:** `app/Helpers/Status.php:271`
+**Source:** `app/Helpers/Status.php:289`
 
 **Usage:**
 ```php
@@ -489,7 +632,7 @@ This filter is applied when preparing a single subscription's data for display i
 **Returns:**
 - `$subscription` (array): The modified subscription data
 
-**Source:** `app/Modules/Subscriptions/Http/Controllers/SubscriptionController.php:63`
+**Source:** `app/Modules/Subscriptions/Http/Controllers/SubscriptionController.php:83`
 
 **Usage:**
 ```php
@@ -523,7 +666,7 @@ This filter is applied when generating the external vendor dashboard URL for a s
 **Returns:**
 - `$url` (string): The modified vendor dashboard URL
 
-**Source:** `app/Models/Subscription.php:158`
+**Source:** `app/Models/Subscription.php:284`
 
 **Usage:**
 ```php
@@ -559,7 +702,7 @@ This filter is applied when checking if a canceled, failing, expired, paused, ex
 **Returns:**
 - `$canReactivate` (bool): The modified reactivation eligibility
 
-**Source:** `app/Models/Subscription.php:427`
+**Source:** `app/Models/Subscription.php:983`
 
 **Usage:**
 ```php
@@ -636,7 +779,7 @@ This filter is applied when retrieving the list of available subscription billin
 **Returns:**
 - `$intervals` (array): The modified intervals array
 
-**Source:** `app/Helpers/Helper.php:1531`
+**Source:** `app/Helpers/Helper.php:1772`
 
 **Usage:**
 ```php
@@ -676,7 +819,7 @@ This filter is applied when converting a subscription interval to its day count.
 **Returns:**
 - `$days` (int): The number of days in this interval
 
-**Source:** `app/Helpers/Helper.php:1592`, `app/Services/Payments/PaymentHelper.php:236`
+**Source:** `app/Helpers/Helper.php:1833`, `app/Services/Payments/PaymentHelper.php:236`
 
 **Usage:**
 ```php
@@ -718,7 +861,7 @@ This filter is applied when calculating adjusted trial days for a subscription i
 **Returns:**
 - `$maxDays` (int): The modified maximum trial days
 
-**Source:** `app/Helpers/Helper.php:1566`
+**Source:** `app/Helpers/Helper.php:1807`
 
 **Usage:**
 ```php
@@ -756,7 +899,7 @@ This filter is applied when generating the human-readable trial information text
 **Returns:**
 - `$trialInfo` (string): The modified trial info text
 
-**Source:** `app/Helpers/Helper.php:1133`
+**Source:** `app/Helpers/Helper.php:1370`
 
 **Usage:**
 ```php
@@ -853,7 +996,7 @@ This filter is applied when retrieving the grace period (number of extra days af
 **Returns:**
 - `$gracePeriods` (array): The modified grace period days
 
-**Source:** `app/Services/Payments/SubscriptionHelper.php:159`
+**Source:** `app/Services/Payments/SubscriptionHelper.php:188`
 
 **Usage:**
 ```php
@@ -887,7 +1030,7 @@ This filter is applied when the automated reminder system scans for subscription
 **Returns:**
 - `$batchSize` (int): The modified batch size
 
-**Source:** `app/Services/Reminders/ReminderService.php:75`
+**Source:** `app/Services/Reminders/ReminderService.php:355`
 
 **Usage:**
 ```php
@@ -963,7 +1106,7 @@ This filter is applied when mapping a subscription's billing interval to a billi
 **Returns:**
 - `$cycle` (string): The modified billing cycle name
 
-**Source:** `app/Services/Reminders/SubscriptionReminderService.php:502`
+**Source:** `app/Services/Reminders/SubscriptionReminderService.php:508`
 
 **Usage:**
 ```php
@@ -991,7 +1134,7 @@ This filter is applied when determining at which day intervals before a yearly s
 **Returns:**
 - `$days` (array): The modified array of reminder day intervals
 
-**Source:** `app/Services/Reminders/SubscriptionReminderService.php:534`
+**Source:** `app/Services/Reminders/SubscriptionReminderService.php:540`
 
 **Usage:**
 ```php
@@ -1016,7 +1159,7 @@ This filter is applied when determining at which day intervals before a monthly 
 **Returns:**
 - `$days` (array): The modified array of reminder day intervals
 
-**Source:** `app/Services/Reminders/SubscriptionReminderService.php:546`
+**Source:** `app/Services/Reminders/SubscriptionReminderService.php:552`
 
 **Usage:**
 ```php
@@ -1041,7 +1184,7 @@ This filter is applied when determining at which day intervals before a quarterl
 **Returns:**
 - `$days` (array): The modified array of reminder day intervals
 
-**Source:** `app/Services/Reminders/SubscriptionReminderService.php:558`
+**Source:** `app/Services/Reminders/SubscriptionReminderService.php:564`
 
 **Usage:**
 ```php
@@ -1066,7 +1209,7 @@ This filter is applied when determining at which day intervals before a half-yea
 **Returns:**
 - `$days` (array): The modified array of reminder day intervals
 
-**Source:** `app/Services/Reminders/SubscriptionReminderService.php:570`
+**Source:** `app/Services/Reminders/SubscriptionReminderService.php:576`
 
 **Usage:**
 ```php
@@ -1091,7 +1234,7 @@ This filter is applied when determining at which day intervals before a trial pe
 **Returns:**
 - `$days` (array): The modified array of reminder day intervals
 
-**Source:** `app/Services/Reminders/SubscriptionReminderService.php:582`
+**Source:** `app/Services/Reminders/SubscriptionReminderService.php:588`
 
 **Usage:**
 ```php
@@ -1122,7 +1265,7 @@ This filter is applied when resolving the store's subscription management mode �
 **Returns:**
 - `$mode` (string): The (possibly overridden) mode
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionManagementMode.php:58`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionManagementMode.php:36`
 
 **Usage:**
 ```php
@@ -1146,7 +1289,7 @@ This **dynamic** filter is applied at checkout after the collection method (`aut
 **Returns:**
 - `$collectionMethod` (string): The (possibly overridden) collection method
 
-**Source:** `app/Helpers/CheckoutProcessor.php:953`
+**Source:** `app/Helpers/CheckoutProcessor.php:963`
 
 **Usage:**
 ```php
@@ -1172,7 +1315,7 @@ This filter is applied when validating an edit to a store-managed subscription's
 **Returns:**
 - `$intervals` (array): The (possibly modified) allowed intervals
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:916`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:966`
 
 **Usage:**
 ```php
@@ -1197,7 +1340,7 @@ This filter is applied by the renewal engine when deciding how far in advance of
 **Returns:**
 - `$map` (array): The (possibly modified) advance-days map
 
-**Source:** `app/Modules/StoreManagedRenewal/Services/RenewalService.php:914`
+**Source:** `app/Modules/StoreManagedRenewal/Services/RenewalService.php:911`
 
 **Usage:**
 ```php
@@ -1273,7 +1416,7 @@ This filter is applied before sending the "an automatic charge is coming up" not
 **Returns:**
 - `$send` (bool): Whether to send
 
-**Source:** `app/Services/Email/EmailNotificationMailer.php:80`
+**Source:** `app/Services/Email/EmailNotificationMailer.php:95`
 
 **Usage:**
 ```php
@@ -1321,7 +1464,7 @@ This filter gates whether a new subscription is allowed to be created with the `
 **Returns:**
 - `$enabled` (bool): Whether to allow the `system` collection method
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionManagementMode.php:82`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionManagementMode.php:55`
 
 **Usage:**
 ```php
@@ -1421,7 +1564,7 @@ This filter is applied when a customer reactivates a canceled or expired subscri
 **Returns:**
 - `$daysLimit` (int): The modified days limit
 
-**Source:** `fluent-cart-pro/.../SubscriptionRenewalHandler.php:234`
+**Source:** `fluent-cart-pro/app/Hooks/Handlers/SubscriptionRenewalHandler.php:288`
 
 **Usage:**
 ```php
@@ -1471,7 +1614,7 @@ This filter is applied when rendering a license details page in the customer por
 **Returns:**
 - `$sectionParts` (array): The modified section parts
 
-**Source:** `fluent-cart-pro/.../CustomerProfileController.php:97`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Http/Controllers/CustomerProfileController.php:97`
 
 **Usage:**
 ```php

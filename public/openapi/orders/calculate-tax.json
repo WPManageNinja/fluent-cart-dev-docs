@@ -1,0 +1,307 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/calculate-tax": {
+      "post": {
+        "operationId": "calculateTax",
+        "summary": "POST Calculate Order Tax",
+        "description": "Calculate tax for an admin-created order given a destination address and a list of line items. This is a pure calculation helper \u2014 no database writes occur and no order is created or modified. Up to 100 items are processed per request; any beyond that are silently dropped. If tax calculation isn't available for the given address, all totals are returned as zero.\n\n**Required permissions:** any one of `orders/create`, `orders/manage`",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "country": {
+                    "type": "string",
+                    "description": "Destination country code (e.g. US)."
+                  },
+                  "state": {
+                    "type": "string",
+                    "description": "Destination state/province code."
+                  },
+                  "city": {
+                    "type": "string",
+                    "description": "Destination city."
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Destination postal/zip code."
+                  },
+                  "items": {
+                    "type": "array",
+                    "description": "Line items to calculate tax for. Capped at 100 items per request.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "post_id": {
+                          "type": "integer",
+                          "description": "Product post ID."
+                        },
+                        "object_id": {
+                          "type": "integer",
+                          "description": "Variation/object ID."
+                        },
+                        "subtotal": {
+                          "type": "integer",
+                          "description": "Line subtotal in cents."
+                        },
+                        "discount_total": {
+                          "type": "integer",
+                          "description": "Discount applied to the line, in cents."
+                        },
+                        "shipping_charge": {
+                          "type": "integer",
+                          "description": "Shipping charge attributed to the line, in cents."
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "Line quantity. Minimum 1."
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "country": "US",
+                  "state": "CA",
+                  "city": "Springfield",
+                  "postcode": "62704",
+                  "items": [
+                    {
+                      "post_id": 123,
+                      "object_id": 456,
+                      "subtotal": 9900,
+                      "discount_total": 0,
+                      "shipping_charge": 0,
+                      "quantity": 1
+                    }
+                  ]
+                }
+              },
+              "example": {
+                "country": "US",
+                "state": "CA",
+                "city": "Springfield",
+                "postcode": "62704",
+                "items": [
+                  {
+                    "post_id": 123,
+                    "object_id": 456,
+                    "subtotal": 9900,
+                    "discount_total": 0,
+                    "shipping_charge": 0,
+                    "quantity": 1
+                  }
+                ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "country": "US",
+                    "state": "CA",
+                    "city": "Springfield",
+                    "postcode": "62704",
+                    "items": [
+                      {
+                        "post_id": 123,
+                        "object_id": 456,
+                        "subtotal": 9900,
+                        "discount_total": 0,
+                        "shipping_charge": 0,
+                        "quantity": 1
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns calculated tax totals.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tax_total": {
+                      "type": "integer",
+                      "description": "Total tax across all items, in cents."
+                    },
+                    "shipping_tax": {
+                      "type": "integer",
+                      "description": "Tax on shipping, in cents."
+                    },
+                    "tax_behavior": {
+                      "type": "integer",
+                      "description": "0 for tax-exclusive, 1 for tax-inclusive pricing."
+                    },
+                    "tax_country": {
+                      "type": "string"
+                    },
+                    "tax_lines": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "label": {
+                            "type": "string"
+                          },
+                          "rate_percent": {
+                            "type": "number"
+                          },
+                          "tax_amount": {
+                            "type": "integer",
+                            "description": "Tax amount for this line, in cents."
+                          },
+                          "inclusive": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "tax_total": 792,
+                    "shipping_tax": 0,
+                    "tax_behavior": 0,
+                    "tax_country": "US",
+                    "tax_lines": [
+                      {
+                        "label": "CA State Tax",
+                        "rate_percent": 8.0,
+                        "tax_amount": 792,
+                        "inclusive": false
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "tax_total": 792,
+                  "shipping_tax": 0,
+                  "tax_behavior": 0,
+                  "tax_country": "US",
+                  "tax_lines": [
+                    {
+                      "label": "CA State Tax",
+                      "rate_percent": 8.0,
+                      "tax_amount": 792,
+                      "inclusive": false
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "tax_total": 792,
+                      "shipping_tax": 0,
+                      "tax_behavior": 0,
+                      "tax_country": "US",
+                      "tax_lines": [
+                        {
+                          "label": "CA State Tax",
+                          "rate_percent": 8.0,
+                          "tax_amount": 792,
+                          "inclusive": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

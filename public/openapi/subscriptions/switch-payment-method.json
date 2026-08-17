@@ -27,7 +27,7 @@
       "post": {
         "operationId": "switchPaymentMethod",
         "summary": "POST Switch Payment Method",
-        "description": "Switch a subscription's payment method from one gateway to another (e.g., from Stripe to PayPal). This initiates the switch process, which may require a confirmation step depending on the target gateway.",
+        "description": "Switch a subscription's payment method from one gateway to another (e.g., from Stripe to PayPal). This initiates the switch process, which may require a confirmation step depending on the target gateway.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Subscriptions"
         ],
@@ -154,6 +154,34 @@
                     "value": {
                       "message": "Could not switch payment method"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

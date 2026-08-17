@@ -27,7 +27,7 @@
       "post": {
         "operationId": "storeCouponSettings",
         "summary": "POST Store Coupon Settings",
-        "description": "Update the global coupon settings. Currently controls whether the coupon input field is displayed on the checkout page.",
+        "description": "Update the global coupon settings. Currently controls whether the coupon input field is displayed on the checkout page.\n\n**Required permission:** `coupons/manage`",
         "tags": [
           "Coupons"
         ],
@@ -138,6 +138,49 @@
                     "auto_apply_coupons": false,
                     "max_coupons_per_order": 3,
                     "allow_stackable_coupons": false
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`coupons/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getPluginLicenseStatus",
         "summary": "GET Get Plugin License Status",
-        "description": "Retrieve the current activation status of the FluentCart Pro plugin license on this site.",
+        "description": "Retrieve the current activation status of the FluentCart Pro plugin license on this site.\n\n**Policy:** `AdminPolicy`",
         "tags": [
           "Licensing"
         ],
@@ -56,12 +56,30 @@
                     "expires": {
                       "type": "string",
                       "description": "License expiration date"
+                    },
+                    "activation_hash": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Opaque hash identifying this site's activation record."
+                    },
+                    "variation_id": {
+                      "type": "integer",
+                      "nullable": true,
+                      "description": "ID of the purchased product variation."
+                    },
+                    "variation_title": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Human-readable variation title, e.g. `5 Sites - Yearly`."
                     }
                   },
                   "example": {
                     "status": "valid",
                     "license_key": "DTPRO-A1B2-C3D4-E5F6",
-                    "expires": "2026-01-15"
+                    "expires": "2026-01-15",
+                    "activation_hash": "a1b2c3d4e5f60718293a4b5c6d7e8f90",
+                    "variation_id": 15,
+                    "variation_title": "5 Sites - Yearly"
                   }
                 },
                 "example": {
@@ -93,7 +111,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

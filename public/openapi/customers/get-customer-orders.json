@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getCustomerOrders",
         "summary": "GET Get Customer Orders",
-        "description": "Retrieve a paginated list of orders belonging to a specific customer. Supports the same filtering and sorting parameters as the main Orders list.",
+        "description": "Retrieve a paginated list of orders belonging to a specific customer. Supports the same filtering and sorting parameters as the main Orders list.\n\n**Also used by the customer portal UI.** Retrieve a paginated list of orders for the specified customer. The customerId must match the logged-in user.\n\n**Required permission:** `customers/view`",
         "tags": [
           "Customers"
         ],
@@ -301,6 +301,49 @@
                         ]
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`customers/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getPaymentMethodConnectionInfo",
         "summary": "GET Get Payment Method Connection Info",
-        "description": "Retrieve connection information (OAuth URLs, account status) for a connectable payment gateway.",
+        "description": "Retrieve connection information (OAuth URLs, account status) for a connectable payment gateway.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -103,7 +103,7 @@
                     },
                     "live_account": {
                       "merchant_id": "LIVEMERCHANT456",
-                      "email": "payments@techstore.com",
+                      "email": "payments@example.com",
                       "connected": true,
                       "webhook_id": "WH-LIVE-0987654321"
                     },
@@ -129,7 +129,7 @@
                   },
                   "live_account": {
                     "merchant_id": "LIVEMERCHANT456",
-                    "email": "payments@techstore.com",
+                    "email": "payments@example.com",
                     "connected": true,
                     "webhook_id": "WH-LIVE-0987654321"
                   },
@@ -157,7 +157,7 @@
                       },
                       "live_account": {
                         "merchant_id": "LIVEMERCHANT456",
-                        "email": "payments@techstore.com",
+                        "email": "payments@example.com",
                         "connected": true,
                         "webhook_id": "WH-LIVE-0987654321"
                       },
@@ -168,6 +168,34 @@
                         "checkout_logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/paypal.svg"
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

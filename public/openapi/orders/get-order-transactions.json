@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getOrderTransactions",
         "summary": "GET Get Order Transactions",
-        "description": "Retrieve all transactions for an order. Returns the full order details (same as Get Order Details), which includes the transactions relation.",
+        "description": "Retrieve all transactions for an order. Returns the full order details (same as Get Order Details), which includes the transactions relation.\n\n**Required permission:** `orders/view`",
         "tags": [
           "Orders"
         ],
@@ -82,6 +82,15 @@
                       "type": "integer",
                       "nullable": true,
                       "description": "Tax ID if applicable"
+                    },
+                    "checkout_shipping": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Shipping option selected at checkout, if any"
+                    },
+                    "can_send_payment_reminder": {
+                      "type": "boolean",
+                      "description": "Whether a payment reminder can currently be sent for this order"
                     }
                   },
                   "example": {
@@ -156,7 +165,9 @@
                     "selected_labels": [
                       1
                     ],
-                    "tax_id": null
+                    "tax_id": null,
+                    "checkout_shipping": null,
+                    "can_send_payment_reminder": false
                   }
                 },
                 "example": {
@@ -231,7 +242,9 @@
                   "selected_labels": [
                     1
                   ],
-                  "tax_id": null
+                  "tax_id": null,
+                  "checkout_shipping": null,
+                  "can_send_payment_reminder": false
                 },
                 "examples": {
                   "default": {
@@ -308,8 +321,53 @@
                       "selected_labels": [
                         1
                       ],
-                      "tax_id": null
+                      "tax_id": null,
+                      "checkout_shipping": null,
+                      "can_send_payment_reminder": false
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

@@ -1,0 +1,404 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/pdf-templates/saved": {
+      "get": {
+        "operationId": "getSavedPdfTemplates",
+        "summary": "GET Get Saved Templates",
+        "description": "Retrieve the currently saved templates, falling back to the defaults where nothing has been saved. Legacy templates are migrated on read.\n\nThis returns the same `templates` map as `GET /settings/pdf-templates/receipt` but without the PDF engine status fields.\n\n**Permission:** `is_super_admin` (`manage_options`) · **Policy:** `StoreSensitivePolicy`",
+        "tags": [
+          "PDF Templates"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "templates": {
+                      "type": "object",
+                      "properties": {
+                        "order_receipt": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "Template slug; matches the key in the `templates` map."
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "is_default": {
+                              "type": "boolean",
+                              "description": "Built-in templates are `true` and cannot be deleted."
+                            },
+                            "pdf_settings": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "active": {
+                                    "type": "string",
+                                    "description": "`yes` or `no`."
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "preview_image": {
+                                    "type": "string"
+                                  },
+                                  "pdf_structure": {
+                                    "type": "object",
+                                    "properties": {
+                                      "content": {
+                                        "type": "string",
+                                        "description": "Gutenberg block markup using `wp:fluent-cart/receipt-*` blocks, with `{{order.*}}` merge tags."
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "renewal_receipt": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "Template slug; matches the key in the `templates` map."
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "is_default": {
+                              "type": "boolean",
+                              "description": "Built-in templates are `true` and cannot be deleted."
+                            },
+                            "pdf_settings": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "active": {
+                                    "type": "string",
+                                    "description": "`yes` or `no`."
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "preview_image": {
+                                    "type": "string"
+                                  },
+                                  "pdf_structure": {
+                                    "type": "object",
+                                    "properties": {
+                                      "content": {
+                                        "type": "string",
+                                        "description": "Gutenberg block markup using `wp:fluent-cart/receipt-*` blocks, with `{{order.*}}` merge tags."
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "refund_notice": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "Template slug; matches the key in the `templates` map."
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "is_default": {
+                              "type": "boolean",
+                              "description": "Built-in templates are `true` and cannot be deleted."
+                            },
+                            "pdf_settings": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "active": {
+                                    "type": "string",
+                                    "description": "`yes` or `no`."
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "preview_image": {
+                                    "type": "string"
+                                  },
+                                  "pdf_structure": {
+                                    "type": "object",
+                                    "properties": {
+                                      "content": {
+                                        "type": "string",
+                                        "description": "Gutenberg block markup using `wp:fluent-cart/receipt-*` blocks, with `{{order.*}}` merge tags."
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "proforma_invoice": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string",
+                              "description": "Template slug; matches the key in the `templates` map."
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "is_default": {
+                              "type": "boolean",
+                              "description": "Built-in templates are `true` and cannot be deleted."
+                            },
+                            "pdf_settings": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "active": {
+                                    "type": "string",
+                                    "description": "`yes` or `no`."
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "preview_image": {
+                                    "type": "string"
+                                  },
+                                  "pdf_structure": {
+                                    "type": "object",
+                                    "properties": {
+                                      "content": {
+                                        "type": "string",
+                                        "description": "Gutenberg block markup using `wp:fluent-cart/receipt-*` blocks, with `{{order.*}}` merge tags."
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "description": "Map keyed by template slug. The four built-ins are `order_receipt`, `renewal_receipt`, `refund_notice` and `proforma_invoice`; custom templates appear alongside them.",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Template slug; matches the key in the `templates` map."
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "is_default": {
+                            "type": "boolean",
+                            "description": "Built-in templates are `true` and cannot be deleted."
+                          },
+                          "pdf_settings": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "active": {
+                                  "type": "string",
+                                  "description": "`yes` or `no`."
+                                },
+                                "title": {
+                                  "type": "string"
+                                },
+                                "preview_image": {
+                                  "type": "string"
+                                },
+                                "pdf_structure": {
+                                  "type": "object",
+                                  "properties": {
+                                    "content": {
+                                      "type": "string",
+                                      "description": "Gutenberg block markup using `wp:fluent-cart/receipt-*` blocks, with `{{order.*}}` merge tags."
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "templates": {
+                      "order_receipt": {
+                        "name": "order_receipt",
+                        "title": "Order Receipt",
+                        "description": "Default receipt template for paid orders",
+                        "is_default": true,
+                        "pdf_settings": [
+                          {
+                            "active": "yes",
+                            "title": "Order Receipt",
+                            "preview_image": "",
+                            "pdf_structure": {
+                              "content": "<!-- wp:fluent-cart/receipt-header {\"title\":\"RECEIPT\"} /-->\n\n<!-- wp:fluent-cart/receipt-addresses {\"billingLabel\":\"BILL TO\"} /-->\n\n<!-- wp:fluent-cart/receipt-meta {\"rows\":[{\"label\":\"Order Number\",\"value\":\"{{order.invoice_no}}\"},{\"label\":\"Order Date\",\"value\":\"{{order.created_at}}\"}]} /-->"
+                            }
+                          }
+                        ]
+                      },
+                      "renewal_receipt": {
+                        "name": "renewal_receipt",
+                        "title": "Renewal Receipt",
+                        "description": "Receipt sent for subscription renewals",
+                        "is_default": true,
+                        "pdf_settings": [
+                          {
+                            "active": "yes",
+                            "title": "Order Receipt",
+                            "preview_image": "",
+                            "pdf_structure": {
+                              "content": "<!-- wp:fluent-cart/receipt-header {\"title\":\"RECEIPT\"} /-->\n\n<!-- wp:fluent-cart/receipt-addresses {\"billingLabel\":\"BILL TO\"} /-->\n\n<!-- wp:fluent-cart/receipt-meta {\"rows\":[{\"label\":\"Order Number\",\"value\":\"{{order.invoice_no}}\"},{\"label\":\"Order Date\",\"value\":\"{{order.created_at}}\"}]} /-->"
+                            }
+                          }
+                        ]
+                      },
+                      "refund_notice": {
+                        "name": "refund_notice",
+                        "title": "Refund Notice",
+                        "description": "Notice sent when an order is refunded",
+                        "is_default": true,
+                        "pdf_settings": [
+                          {
+                            "active": "yes",
+                            "title": "Order Receipt",
+                            "preview_image": "",
+                            "pdf_structure": {
+                              "content": "<!-- wp:fluent-cart/receipt-header {\"title\":\"RECEIPT\"} /-->\n\n<!-- wp:fluent-cart/receipt-addresses {\"billingLabel\":\"BILL TO\"} /-->\n\n<!-- wp:fluent-cart/receipt-meta {\"rows\":[{\"label\":\"Order Number\",\"value\":\"{{order.invoice_no}}\"},{\"label\":\"Order Date\",\"value\":\"{{order.created_at}}\"}]} /-->"
+                            }
+                          }
+                        ]
+                      },
+                      "proforma_invoice": {
+                        "name": "proforma_invoice",
+                        "title": "Proforma Invoice",
+                        "description": "Proforma invoice issued before payment",
+                        "is_default": true,
+                        "pdf_settings": [
+                          {
+                            "active": "yes",
+                            "title": "Order Receipt",
+                            "preview_image": "",
+                            "pdf_structure": {
+                              "content": "<!-- wp:fluent-cart/receipt-header {\"title\":\"RECEIPT\"} /-->\n\n<!-- wp:fluent-cart/receipt-addresses {\"billingLabel\":\"BILL TO\"} /-->\n\n<!-- wp:fluent-cart/receipt-meta {\"rows\":[{\"label\":\"Order Number\",\"value\":\"{{order.invoice_no}}\"},{\"label\":\"Order Date\",\"value\":\"{{order.created_at}}\"}]} /-->"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user is not a super admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

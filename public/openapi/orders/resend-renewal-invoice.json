@@ -1,0 +1,226 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/renewals/{order}/resend": {
+      "post": {
+        "operationId": "resend",
+        "summary": "POST Resend Renewal Invoice Email",
+        "description": "Resend the pay-now email notification for a pending renewal invoice. Only allowed for renewal orders with `payment_status = pending`. If the invoice belongs to a system (store-managed) subscription that is still mid-retry, the resend is blocked until the automatic retry ladder is exhausted, so it never overlaps the dunning emails.\n\n**Required permission:** `orders/manage`",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Renewal order ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Renewal invoice email resent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Renewal order email has been resent"
+                  }
+                },
+                "example": {
+                  "message": "Renewal order email has been resent"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Renewal order email has been resent"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Order is not a renewal, is not pending, or its automatic retries have not yet exhausted.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Only pending renewal orders can be resent"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Only pending renewal orders can be resent"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Only pending renewal orders can be resent"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user lacks the orders/manage permission.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No order matches the given ID. Thrown by the framework's route-model-binding (`Order::firstOrFail()`), not an explicit controller check, so the message is generic.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No query results for model [FluentCart\\App\\Models\\Order]."
+                },
+                "schema": {
+                  "example": {
+                    "message": "No query results for model [FluentCart\\App\\Models\\Order]."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No query results for model [FluentCart\\App\\Models\\Order]."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

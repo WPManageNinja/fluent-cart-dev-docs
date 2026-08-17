@@ -1,0 +1,215 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/storage-drivers/create-bucket": {
+      "post": {
+        "operationId": "createBucket",
+        "summary": "POST Create Storage Bucket",
+        "description": "Create a new bucket on a storage driver using the supplied credentials. Used by the settings UI when a store wants to provision a bucket instead of using an existing one.\n\n**Required permission:** `is_super_admin`",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "driver",
+                  "settings"
+                ],
+                "properties": {
+                  "driver": {
+                    "type": "string",
+                    "description": "The storage driver key (e.g., `s3`, `bunny`).",
+                    "example": "s3"
+                  },
+                  "settings": {
+                    "type": "object",
+                    "description": "Driver-specific credentials and the new bucket name/configuration. Fields vary by driver.",
+                    "additionalProperties": true,
+                    "example": {
+                      "access_key": "AKIAEXAMPLE1234",
+                      "secret_key": "your-secret-key-here",
+                      "region": "us-east-1",
+                      "bucket": "my-store-files"
+                    }
+                  }
+                },
+                "example": {
+                  "driver": "s3",
+                  "settings": {
+                    "access_key": "AKIAEXAMPLE1234",
+                    "secret_key": "your-secret-key-here",
+                    "region": "us-east-1",
+                    "bucket": "my-store-files"
+                  }
+                }
+              },
+              "example": {
+                "driver": "s3",
+                "settings": {
+                  "access_key": "AKIAEXAMPLE1234",
+                  "secret_key": "your-secret-key-here",
+                  "region": "us-east-1",
+                  "bucket": "my-store-files"
+                }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "driver": "s3",
+                    "settings": {
+                      "access_key": "AKIAEXAMPLE1234",
+                      "secret_key": "your-secret-key-here",
+                      "region": "us-east-1",
+                      "bucket": "my-store-files"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. The bucket was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Driver-specific result of the create-bucket call."
+                    }
+                  },
+                  "example": {
+                    "message": "Bucket created successfully",
+                    "data": {
+                      "bucket": "my-store-files"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Bucket created successfully",
+                  "data": {
+                    "bucket": "my-store-files"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Bucket created successfully",
+                      "data": {
+                        "bucket": "my-store-files"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The driver could not be resolved, or bucket creation was rejected by the storage provider.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "A bucket with that name already exists.",
+                  "error_data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

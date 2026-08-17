@@ -1,0 +1,180 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/pdf-templates/seller-details": {
+      "get": {
+        "operationId": "getSellerDetails",
+        "summary": "GET Get Seller Details",
+        "description": "Retrieve the E-Invoice (ZUGFeRD/Factur-X) seller details, plus whether the store country — a mandatory EN 16931 field (BT-40) that lives in Store Settings, not here — has been set.\n\n**Permission:** `is_super_admin` (`manage_options`) · **Policy:** `StoreSensitivePolicy`",
+        "tags": [
+          "PDF Templates"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "seller_details": {
+                      "type": "object",
+                      "properties": {
+                        "zugferd_enabled": {
+                          "type": "string",
+                          "description": "`\"1\"` enables ZUGFeRD/Factur-X e-invoice embedding, `\"0\"` disables it."
+                        },
+                        "zugferd_profile": {
+                          "type": "string",
+                          "description": "ZUGFeRD conformance profile, e.g. `en16931`."
+                        },
+                        "seller_legal_registration_scheme": {
+                          "type": "string",
+                          "description": "ISO 6523 ICD code identifying the registration scheme. Validated against a fixed list."
+                        },
+                        "seller_contact_name": {
+                          "type": "string"
+                        },
+                        "seller_contact_email": {
+                          "type": "string",
+                          "description": "Validated with `is_email()` when non-empty."
+                        },
+                        "seller_contact_phone": {
+                          "type": "string"
+                        },
+                        "seller_bank_iban": {
+                          "type": "string",
+                          "description": "Validated as 2 letters + 2 digits + 4–30 alphanumerics, ignoring whitespace."
+                        },
+                        "seller_bank_bic": {
+                          "type": "string"
+                        },
+                        "seller_bank_account_name": {
+                          "type": "string"
+                        },
+                        "seller_electronic_address": {
+                          "type": "string"
+                        },
+                        "seller_vat_id": {
+                          "type": "string"
+                        },
+                        "seller_tax_id": {
+                          "type": "string"
+                        },
+                        "seller_legal_name": {
+                          "type": "string"
+                        },
+                        "seller_legal_registration_id": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "store_country_set": {
+                      "type": "boolean",
+                      "description": "`false` blocks enabling ZUGFeRD."
+                    },
+                    "store_settings_url": {
+                      "type": "string",
+                      "description": "Deep link to the Store Settings business-details section."
+                    }
+                  },
+                  "example": {
+                    "seller_details": {
+                      "zugferd_enabled": "1",
+                      "zugferd_profile": "en16931",
+                      "seller_legal_registration_scheme": "0198",
+                      "seller_contact_name": "Alex Morgan",
+                      "seller_contact_email": "alex.morgan@example.com",
+                      "seller_contact_phone": "+1 555 0100",
+                      "seller_bank_iban": "DE89370400440532013000",
+                      "seller_bank_bic": "COBADEFFXXX",
+                      "seller_bank_account_name": "Example Retail Co.",
+                      "seller_electronic_address": "billing@example.com",
+                      "seller_vat_id": "DE123456789",
+                      "seller_tax_id": "12/345/67890",
+                      "seller_legal_name": "Example Retail Co.",
+                      "seller_legal_registration_id": "HRB 12345"
+                    },
+                    "store_country_set": true,
+                    "store_settings_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/settings/store-settings#business_details"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user is not a super admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

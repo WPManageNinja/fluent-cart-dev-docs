@@ -27,7 +27,7 @@
       "post": {
         "operationId": "createSinglePage",
         "summary": "POST Create Single Page",
-        "description": "Create a single store page (e.g., shop, checkout, customer profile) and optionally save the page ID to store settings.",
+        "description": "Create a single store page (e.g., shop, checkout, customer profile) and optionally save the page ID to store settings.\n\n**Access policy:** `AdminPolicy` \u2014 requires the `is_super_admin` FluentCart capability.",
         "tags": [
           "Dashboard"
         ],
@@ -155,6 +155,34 @@
                     "value": {
                       "message": "Unable to create page"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

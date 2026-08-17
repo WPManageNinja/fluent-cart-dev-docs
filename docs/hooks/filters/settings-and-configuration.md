@@ -65,7 +65,7 @@ This filter is applied when retrieving the default store settings, before mergin
 
 **Returns:** `array` — The modified default settings array
 
-**Source:** `api/StoreSettings.php:89`
+**Source:** `api/StoreSettings.php:115`
 
 **Usage:**
 ```php
@@ -112,7 +112,7 @@ This filter is applied when rendering the store settings form in the admin inter
 
 **Returns:** `array` — The modified fields array
 
-**Source:** `api/StoreSettings.php:1141`
+**Source:** `api/StoreSettings.php:1380`
 
 **Usage:**
 ```php
@@ -130,6 +130,30 @@ add_filter('fluent_cart/store_settings/fields', function ($fields, $data) {
     ];
     return $fields;
 }, 10, 2);
+```
+</details>
+
+### <code> store_setting_fields </code>
+<details>
+<summary><code>fluent_cart/store_setting_fields</code> &mdash; Filter the store settings fields payload (legacy hook name)</summary>
+
+**When it runs:**
+This filter is applied inside `StoreSettings::fields()`, the endpoint the admin settings UI calls to build its field schema. It is distinct from [`store_settings/fields`](#store-settings-fields) above — that one filters the tab/field definitions returned by a different code path, while this older, singular-named hook filters the array built by `fields()` itself (which also resolves preview links such as `shop_page_id` and `customer_profile_page_id`).
+
+**Parameters:**
+
+- `$fields` (array): The store settings fields array assembled by `fields()`
+
+**Returns:** `array` — The modified fields array
+
+**Source:** `api/StoreSettings.php:122`
+
+**Usage:**
+```php
+add_filter('fluent_cart/store_setting_fields', function ($fields) {
+    // Inspect or adjust the fields payload built by StoreSettings::fields()
+    return $fields;
+});
 ```
 </details>
 
@@ -152,7 +176,7 @@ This filter is applied when validating store settings form submissions. Use it t
 
 **Returns:** `array` — The modified validation rules array
 
-**Source:** `app/Http/Requests/FluentMetaRequest.php:34`
+**Source:** `app/Http/Requests/FluentMetaRequest.php:37`
 
 **Usage:**
 ```php
@@ -189,7 +213,7 @@ This filter is applied when sanitizing store settings input before saving. Each 
 
 **Returns:** `array` — The modified sanitizer array
 
-**Source:** `app/Http/Requests/FluentMetaRequest.php:136`
+**Source:** `app/Http/Requests/FluentMetaRequest.php:174`
 
 **Usage:**
 ```php
@@ -346,7 +370,7 @@ This filter is applied when listing available plugin add-ons in the module setti
 
 **Returns:** `array` — The modified add-ons array
 
-**Source:** `app/Http/Controllers/ModuleSettingsController.php:199`
+**Source:** `app/Http/Controllers/ModuleSettingsController.php:328`
 
 **Usage:**
 ```php
@@ -423,6 +447,10 @@ add_filter('fluent_cart/global_currency_setting', function ($settings, $data) {
 <details>
 <summary><code>fluent-cart/available_currencies</code> &mdash; Filter available currencies for the store</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/available_currencies` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/available_currencies`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter is applied when retrieving the list of available currencies for the currency selector in store settings. Note the hyphenated hook prefix (`fluent-cart/` instead of `fluent_cart/`).
 
@@ -452,11 +480,41 @@ This filter is applied when retrieving the list of available currencies for the 
 
 **Returns:** `array` — The modified currencies array
 
-**Source:** `app/Helpers/Helper.php:467`
+**Source:** `app/Helpers/Helper.php:670`
 
 **Usage:**
 ```php
 add_filter('fluent-cart/available_currencies', function ($currencies, $data) {
+    // Add a custom currency option
+    $currencies['BTC'] = [
+        'label'  => 'Bitcoin',
+        'value'  => 'BTC',
+        'symbol' => '₿',
+    ];
+    return $currencies;
+}, 10, 2);
+```
+</details>
+
+### <code> available_currencies (current) </code>
+<details>
+<summary><code>fluent_cart/available_currencies</code> &mdash; Filter available currencies for the store (current hook)</summary>
+
+**When it runs:**
+This is the current, non-hyphenated replacement for the deprecated `fluent-cart/available_currencies` hook documented above — the deprecated hook forwards its value straight into this one via `apply_filters_deprecated()`, so a listener on either hook sees the same currency list.
+
+**Parameters:**
+
+- `$currencies` (array): Array of currency definitions keyed by currency code (same shape as the deprecated hook — `label`, `value`, `symbol`)
+- `$data` (array): Additional context data (empty array)
+
+**Returns:** `array` — The modified currencies array
+
+**Source:** `app/Helpers/Helper.php:690`
+
+**Usage:**
+```php
+add_filter('fluent_cart/available_currencies', function ($currencies, $data) {
     // Add a custom currency option
     $currencies['BTC'] = [
         'label'  => 'Bitcoin',
@@ -608,7 +666,7 @@ This filter is applied during price formatting. When true, prices like `$10.00` 
 
 **Returns:** `bool` — Whether to hide unnecessary trailing zeros
 
-**Source:** `app/Helpers/Helper.php:343`
+**Source:** `app/Helpers/Helper.php:513`
 
 **Usage:**
 ```php
@@ -637,7 +695,7 @@ This filter is applied when registering the WordPress admin menu, allowing you t
 
 **Returns:** `string` — The modified menu title
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php:164`
+**Source:** `app/Hooks/Handlers/MenuHandler.php:226`
 
 **Usage:**
 ```php
@@ -660,7 +718,7 @@ This filter is applied when registering the admin menu, controlling its position
 
 **Returns:** `int` — The modified menu position
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php:173`
+**Source:** `app/Hooks/Handlers/MenuHandler.php:235`
 
 **Usage:**
 ```php
@@ -694,7 +752,7 @@ This filter is applied when loading admin filter options for orders, customers, 
 
 **Returns:** `array` — The modified filter options array
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php:380`
+**Source:** `app/Hooks/Handlers/MenuHandler.php:476`
 
 **Usage:**
 ```php
@@ -743,7 +801,7 @@ This filter is applied when loading the admin SPA, providing the full configurat
 
 **Returns:** `array` — The modified admin app data
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php:398`
+**Source:** `app/Hooks/Handlers/MenuHandler.php:514`
 
 **Usage:**
 ```php
@@ -772,7 +830,7 @@ This filter is applied when loading the admin interface, allowing plugins to inj
 
 **Returns:** `array` — The modified notices array
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php:449`
+**Source:** `app/Hooks/Handlers/MenuHandler.php:571`
 
 **Usage:**
 ```php
@@ -847,7 +905,7 @@ This filter is applied when rendering the product action menu in the admin produ
 
 **Returns:** `array` — The modified menu items array
 
-**Source:** `app/Helpers/AdminHelper.php:24`
+**Source:** `app/Helpers/AdminHelper.php:30`
 
 **Usage:**
 ```php
@@ -900,7 +958,7 @@ This filter is applied when rendering the global admin navigation bar at the top
 
 **Returns:** `array` — The modified menu items array
 
-**Source:** `app/Helpers/AdminHelper.php:80`
+**Source:** `app/Helpers/AdminHelper.php:127`
 
 **Usage:**
 ```php
@@ -913,6 +971,50 @@ add_filter('fluent_cart/global_admin_menu_items', function ($menuItems) {
     ];
     return $menuItems;
 });
+```
+</details>
+
+### <code> global_admin_menu_more_items </code>
+<details>
+<summary><code>fluent_cart/global_admin_menu_more_items</code> &mdash; Filter the "More" overflow items in the global admin navigation</summary>
+
+**When it runs:**
+This filter is applied alongside [`global_admin_menu_items`](#global-admin-menu-items) when building the top admin navigation bar, but for the secondary "More" dropdown rather than the primary nav row. Free ships an `integrations` entry here; Pro conditionally adds entries like `order_bump` when their module is active.
+
+**Parameters:**
+
+- `$moreItems` (array): Array of overflow navigation items, each with `label`, `link`, and `permission`
+    ```php
+    $moreItems = [
+        'integrations' => [
+            'label'      => 'Integrations',
+            'link'       => $baseUrl . 'integrations',
+            'permission' => ['is_super_admin'],
+        ],
+        // Pro may add 'order_bump' and other module-gated entries here
+    ];
+    ```
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'base_url' => 'admin.php?page=fluent-cart#/',
+    ];
+    ```
+
+**Returns:** `array` — The modified overflow items array
+
+**Source:** `app/Helpers/AdminHelper.php:155`
+
+**Usage:**
+```php
+add_filter('fluent_cart/global_admin_menu_more_items', function ($moreItems, $data) {
+    $moreItems['custom_tool'] = [
+        'label'      => 'Custom Tool',
+        'link'       => $data['base_url'] . 'custom-tool',
+        'permission' => ['is_super_admin'],
+    ];
+    return $moreItems;
+}, 10, 2);
 ```
 </details>
 
@@ -929,7 +1031,7 @@ This filter is applied when loading the admin app data. It provides dummy produc
 
 **Returns:** `array` — The modified dummy product info
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php:435`
+**Source:** `app/Hooks/Handlers/MenuHandler.php:556`
 
 **Usage:**
 ```php
@@ -939,6 +1041,83 @@ add_filter('fluent_cart/dummy_product_info', function ($dummyProduct) {
         'price' => 2999, // in cents
         'type'  => 'digital',
     ];
+});
+```
+</details>
+
+### <code> generatable_pages </code>
+<details>
+<summary><code>fluent_cart/generatable_pages</code> &mdash; Filter the pages FluentCart can auto-generate</summary>
+
+**When it runs:**
+This filter is applied when building the list of `key => [title, content]` pages (Shop, Checkout, Customer Profile, etc.) that the Pages Setup screen's "+" create button and the onboarding wizard can create for the store. Add-ons that need their own dedicated page (e.g. a custom portal page) register it here.
+
+**Parameters:**
+
+- `$pages` (array): Array of generatable pages keyed by page slug, each with a title and default content
+
+**Returns:** `array` — The modified generatable pages array
+
+**Source:** `app/CPT/Pages.php:42`
+
+**Usage:**
+```php
+add_filter('fluent_cart/generatable_pages', function ($pages) {
+    $pages['loyalty_dashboard'] = [
+        'title'   => 'Loyalty Dashboard',
+        'content' => '[fluent_cart_loyalty_dashboard]',
+    ];
+    return $pages;
+});
+```
+</details>
+
+### <code> pro_upgrade_base_url </code>
+<details>
+<summary><code>fluent_cart/pro_upgrade_base_url</code> &mdash; Filter the base URL used for "Upgrade to Pro" links</summary>
+
+**When it runs:**
+This filter is applied inside `Helper::getUpgradeUrl()`, which builds every "Upgrade to Pro" link shown across the Free plugin's admin (upsell banners, locked settings, feature gates). It runs before UTM query args are appended.
+
+**Parameters:**
+
+- `$baseUrl` (string): The default upgrade URL (`'https://fluentcart.com/discount-deal/'`)
+
+**Returns:** `string` — The modified base URL
+
+**Source:** `app/Helpers/Helper.php:88`
+
+**Usage:**
+```php
+add_filter('fluent_cart/pro_upgrade_base_url', function ($baseUrl) {
+    // Route upgrade links through an affiliate link instead
+    return 'https://fluentcart.com/discount-deal/?ref=my-agency';
+});
+```
+</details>
+
+### <code> show_admin_top_bar </code>
+<details>
+<summary><code>fluent_cart/show_admin_top_bar</code> &mdash; Filter whether the FluentCart admin top bar is rendered</summary>
+
+**When it runs:**
+This filter gates rendering of the FluentCart admin top bar in two places that must agree: the menu handler that decides whether to call `AdminHelper::getAdminMenu()` at all, and the `admin_app.php` view template that adds a `fct-no-top-bar` class to the app wrapper when the bar is hidden. Both call sites pass the same default (`true`), so a single listener should return the same value for both.
+
+**Parameters:**
+
+- `$show` (bool): Whether to show the top bar (default: `true`)
+
+**Returns:** `bool` — Whether the admin top bar should render
+
+**Source:**
+- `app/Hooks/Handlers/MenuHandler.php:418`
+- `app/Views/admin/admin_app.php:2`
+
+**Usage:**
+```php
+add_filter('fluent_cart/show_admin_top_bar', function ($show) {
+    // Hide FluentCart's top bar when embedding the admin app in a custom shell
+    return !defined('MY_CUSTOM_ADMIN_SHELL');
 });
 ```
 </details>
@@ -957,7 +1136,7 @@ This filter is applied when loading the admin app, allowing storage driver plugi
 
 **Returns:** `array` — The modified routes array
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php:367`
+**Source:** `app/Hooks/Handlers/MenuHandler.php:461`
 
 **Usage:**
 ```php
@@ -968,6 +1147,111 @@ add_filter('fluent_cart/storage/storage_driver_settings_routes', function ($rout
         'route' => 'settings/storage/s3',
     ];
     return $routes;
+}, 10, 2);
+```
+</details>
+
+### <code> admin_table_saved_views </code>
+<details>
+<summary><code>fluent_cart/admin_table_saved_views</code> &mdash; Filter the saved-views config injected into admin list tables</summary>
+
+**When it runs:**
+This filter is applied when building the admin app's localized config, letting Pro (or any add-on) attach a per-table "saved views" definition — e.g. `source_report` gets its `filters` seeded from `order_filter_options`. A second call site in `BaseFilter.php` exists purely for backward compatibility with older Pro releases that only injected the config blob this way; new code should rely on the primary call.
+
+**Parameters:**
+
+- `$tableConfig` (array): Saved-view configuration keyed by table name
+    ```php
+    $tableConfig = [
+        'source_report' => ['filters' => $orderFilterOptions],
+    ];
+    ```
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'filterOptions' => $filterOptions,
+    ];
+    ```
+
+**Returns:** `array` — The modified table config array
+
+**Source:** `app/Hooks/Handlers/MenuHandler.php:493`
+
+**Usage:**
+```php
+add_filter('fluent_cart/admin_table_saved_views', function ($tableConfig, $data) {
+    $tableConfig['orders'] = [
+        'saved_views' => [
+            ['slug' => 'high_value', 'label' => 'High Value Orders'],
+        ],
+    ];
+    return $tableConfig;
+}, 10, 2);
+```
+</details>
+
+### <code> filter/supported_operators </code>
+<details>
+<summary><code>fluent_cart/filter/supported_operators</code> &mdash; Filter the comparison operators an admin-table filter supports</summary>
+
+**When it runs:**
+This filter is applied inside `BaseFilter::getSupportedOperators()`, the shared class every admin list-table filter (orders, customers, products, etc.) extends. A listener must declare `add_filter(..., 10, 2)` to receive the `filter_name` context, since the same hook name fires for every filter class.
+
+**Parameters:**
+
+- `$operators` (array): The supported operator definitions
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'filter_name' => 'order_filter', // static::getFilterName() of the calling filter class
+    ];
+    ```
+
+**Returns:** `array` — The modified operators array
+
+**Source:** `app/Services/Filter/BaseFilter.php:1134`
+
+**Usage:**
+```php
+add_filter('fluent_cart/filter/supported_operators', function ($operators, $context) {
+    if ($context['filter_name'] === 'order_filter') {
+        $operators['between'] = 'Between';
+    }
+    return $operators;
+}, 10, 2);
+```
+</details>
+
+### <code> filter_resolve_saved_view </code>
+<details>
+<summary><code>fluent_cart/filter_resolve_saved_view</code> &mdash; Filter used to resolve a saved-view slug for an admin-table filter</summary>
+
+**When it runs:**
+This filter is applied when an admin list-table filter is loaded with an active saved-view slug. Free has no saved-views storage of its own, so this is effectively a request to Pro (or any add-on) to resolve the slug into a view definition; if the returned value is an array or object it becomes the active saved view.
+
+**Parameters:**
+
+- `$resolvedView` (null): The resolved view (`null` by default — nothing resolves it in Free)
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'slug'        => 'high_value',    // The requested saved-view slug
+        'filter_name' => 'order_filter',  // static::getFilterName() of the calling filter class
+        'user_id'     => 42,              // Current WP user ID
+    ];
+    ```
+
+**Returns:** `array|object|null` — The resolved saved-view definition, or `null` if none matched
+
+**Source:** `app/Services/Filter/BaseFilter.php:348`
+
+**Usage:**
+```php
+add_filter('fluent_cart/filter_resolve_saved_view', function ($resolvedView, $context) {
+    if ($context['slug'] === 'high_value' && $context['filter_name'] === 'order_filter') {
+        return ['slug' => 'high_value', 'operator' => '>=', 'value' => 50000];
+    }
+    return $resolvedView;
 }, 10, 2);
 ```
 </details>
@@ -1033,7 +1317,7 @@ This filter is applied when retrieving all available permission roles. FluentCar
 
 **Returns:** `array` — The modified roles array
 
-**Source:** `app/Services/Permission/PermissionManager.php:92`
+**Source:** `app/Services/Permission/PermissionManager.php:98`
 
 **Usage:**
 ```php
@@ -1049,6 +1333,31 @@ add_filter('fluent_cart/permission/all_roles', function ($allRoles, $data) {
         ],
     ];
     return $allRoles;
+}, 10, 2);
+```
+</details>
+
+### <code> advanced_filter_options_permission_{data_key} </code>
+<details>
+<summary><code>fluent_cart/advanced_filter_options_permission_{$dataKey}</code> &mdash; Filter whether the current user can access a specific advanced-filter option</summary>
+
+**When it runs:**
+This filter is applied by the advanced filter options endpoint after its own permission check, once per requested `$dataKey` (e.g. a column or field slug being resolved for the admin table filter UI). The `{$dataKey}` portion of the hook name is replaced with the actual key being checked, so you can gate individual filter options per key.
+
+**Parameters:**
+
+- `$hasPermission` (bool): Whether the current user already has permission, per the built-in check
+- `$dataKey` (string): The filter option's data key (matches the dynamic hook suffix)
+
+**Returns:** `bool` — Whether the current user may access this filter option
+
+**Source:** `app/Http/Controllers/AdvanceFilter/AdvanceFilterController.php:116`
+
+**Usage:**
+```php
+add_filter('fluent_cart/advanced_filter_options_permission_customer_ltv', function ($hasPermission, $dataKey) {
+    // Restrict the "customer_ltv" filter option to super admins only
+    return current_user_can('manage_options');
 }, 10, 2);
 ```
 </details>
@@ -1149,7 +1458,7 @@ This filter is applied when loading translation strings for the checkout page fr
 
 **Returns:** `array` — The modified translations array
 
-**Source:** `app/Services/Translations/TransStrings.php:101`
+**Source:** `app/Services/Translations/TransStrings.php:105`
 
 **Usage:**
 ```php
@@ -1175,7 +1484,7 @@ This filter is applied when loading translation strings for payment-related UI e
 
 **Returns:** `array` — The modified translations array
 
-**Source:** `app/Services/Translations/TransStrings.php:107`
+**Source:** `app/Services/Translations/TransStrings.php:111`
 
 **Usage:**
 ```php
@@ -1268,6 +1577,159 @@ add_filter('fluent_cart/email_notifications', function ($settings) {
 ```
 </details>
 
+### <code> admin_email/notification_recipient </code>
+<details>
+<summary><code>fluent_cart/admin_email/notification_recipient</code> &mdash; Filter the resolved admin recipient address for a notification email</summary>
+
+**When it runs:**
+This filter is applied only when a notification's `recipient` setting is `'admin'`, after the recipient address has already gone through shortcode resolution — so listeners see the final address the notification resolved to, not a raw shortcode. Deliberately not filterable for customer-recipient notifications.
+
+**Parameters:**
+
+- `$to` (string): The resolved admin recipient email address
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'event'        => 'order_completed',      // The notification event key
+        'mail_name'    => 'Order Completed',        // The notification's configured name
+        'notification' => $notification,            // Full notification config array
+        'data'         => $data,                     // Template data used to render the email
+    ];
+    ```
+
+**Returns:** `string` — The modified admin recipient email address
+
+**Source:** `app/Services/Email/EmailNotificationMailer.php:362`
+
+**Usage:**
+```php
+add_filter('fluent_cart/admin_email/notification_recipient', function ($to, $context) {
+    // Route high-value order notifications to a dedicated inbox
+    if ($context['event'] === 'order_completed') {
+        return 'orders-vip@example.com';
+    }
+    return $to;
+}, 10, 2);
+```
+</details>
+
+### <code> email_notification_data </code>
+<details>
+<summary><code>fluent_cart/email_notification_data</code> &mdash; Filter the notification payload shown in the email settings editor</summary>
+
+**When it runs:**
+This filter is applied when the admin loads a single notification's editor payload. It lets add-ons inject their own custom field data (stored outside `settings.extra`, in their own storage) into the payload, since core does not persist arbitrary custom fields for a notification.
+
+**Parameters:**
+
+- `$notification` (array): The notification's settings array
+- `$name` (string): The notification's key (e.g. `'order_completed'`)
+
+**Returns:** `array` — The modified notification array
+
+**Source:** `app/Http/Controllers/EmailNotificationController.php:61`
+
+**Usage:**
+```php
+add_filter('fluent_cart/email_notification_data', function ($notification, $name) {
+    if ($name === 'order_completed') {
+        $notification['my_addon_field'] = get_option('my_addon_' . $name, '');
+    }
+    return $notification;
+}, 10, 2);
+```
+</details>
+
+### <code> prepare_email_template_data </code>
+<details>
+<summary><code>fluent_cart/prepare_email_template_data</code> &mdash; Filter a notification's settings before saving, with the template body stripped</summary>
+
+**When it runs:**
+This filter is applied when an admin saves changes to a notification's email settings, just before the update is persisted. It receives the settings with `email_body` removed (and `is_default_body` forced to `'yes'`) as the value to modify, alongside the full original settings as context — the returned value is what gets saved.
+
+**Parameters:**
+
+- `$settingsWithoutTemplate` (array): The settings array with `email_body` removed and `is_default_body` set to `'yes'`
+- `$settings` (array): The full original settings array (including `email_body`), for context
+
+**Returns:** `array` — The settings array that will be persisted
+
+**Source:** `app/Http/Controllers/EmailNotificationController.php:89`
+
+**Usage:**
+```php
+add_filter('fluent_cart/prepare_email_template_data', function ($settingsWithoutTemplate, $settings) {
+    // Stamp who last edited this notification
+    $settingsWithoutTemplate['last_edited_by'] = get_current_user_id();
+    return $settingsWithoutTemplate;
+}, 10, 2);
+```
+</details>
+
+### <code> email/template_view_path </code>
+<details>
+<summary><code>fluent_cart/email/template_view_path</code> &mdash; Filter the view path used to render an email template</summary>
+
+**When it runs:**
+This filter is applied when resolving which view file renders a given email template name. Add-ons that ship templates outside the core `emails.*` namespace (where the `emails.` prefix can't reach) match on the `template_path` they registered and return a path `View::make()` can resolve — an absolute file path is safest. Core template paths pass through unmodified.
+
+**Parameters:**
+
+- `$viewPath` (string): The default view path (`'emails.' . $name`)
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'template_path' => $name,     // The requested template name
+        'view_data'     => $viewData, // Data that will be passed to the view
+    ];
+    ```
+
+**Returns:** `string` — The resolved view path
+
+**Source:** `app/Services/TemplateService.php:25`
+
+**Usage:**
+```php
+add_filter('fluent_cart/email/template_view_path', function ($viewPath, $context) {
+    if ($context['template_path'] === 'my-addon-receipt') {
+        return '/path/to/my-addon/views/emails/receipt.php';
+    }
+    return $viewPath;
+}, 10, 2);
+```
+</details>
+
+### <code> parse_email_block_content </code>
+<details>
+<summary><code>fluent_cart/parse_email_block_content</code> &mdash; Filter used to parse block-editor markup into rendered email HTML</summary>
+
+**When it runs:**
+This filter exists purely as a Pro integration point: Free always passes an empty string as the starting value and has no listener of its own, so the filter returns `''` unless FluentCart Pro's block parser is active. It fires from two places — a WP-CLI debug command and the notification mailer — both of which fall back to legacy (non-block) email rendering when the result is empty.
+
+**Parameters:**
+
+- `$rendered` (string): The starting value (always `''` in Free)
+- `$blockMarkup` (string): The raw block-editor markup / email body to parse
+- `$data` (array): Template data available to the parser (order, customer, etc.)
+
+**Returns:** `string` — The rendered HTML, or `''` if nothing parsed it (Pro not active)
+
+**Source:**
+- `app/Hooks/CLI/Commands.php:1343`
+- `app/Services/Email/EmailNotificationMailer.php:310`
+
+**Usage:**
+```php
+add_filter('fluent_cart/parse_email_block_content', function ($rendered, $blockMarkup, $data) {
+    // Only handle markup your own block parser recognizes
+    if (strpos($blockMarkup, '<!-- wp:my-addon/block') === false) {
+        return $rendered;
+    }
+    return my_addon_parse_blocks($blockMarkup, $data);
+}, 10, 3);
+```
+</details>
+
 ### <code> keep_email_body_draft </code>
 <details>
 <summary><code>fluent_cart/keep_email_body_draft</code> &mdash; Filter whether to prevent email body reset</summary>
@@ -1287,7 +1749,7 @@ This filter is applied when a notification is switched back to its default body.
 
 **Returns:** `bool` — Whether to preserve the custom email body
 
-**Source:** `app/Services/Email/EmailNotifications.php:520`
+**Source:** `app/Services/Email/EmailNotifications.php:741`
 
 **Usage:**
 ```php
@@ -1458,7 +1920,7 @@ This filter is applied when retrieving available shortcodes for the order confir
 
 **Returns:** `array` — The modified shortcode groups array
 
-**Source:** `app/Helpers/EditorShortCodeHelper.php:201`
+**Source:** `app/Helpers/EditorShortCodeHelper.php:205`
 
 **Usage:**
 ```php
@@ -1499,7 +1961,7 @@ This filter is applied when retrieving available shortcodes for the email notifi
 
 **Returns:** `array` — The modified shortcodes array
 
-**Source:** `app/Helpers/EditorShortCodeHelper.php:277`
+**Source:** `app/Helpers/EditorShortCodeHelper.php:297`
 
 **Usage:**
 ```php
@@ -1537,13 +1999,180 @@ This filter is applied when generating admin notification emails. By default, Fl
 
 **Returns:** `bool` — Whether to disable the celebration messages
 
-**Source:** `app/Services/TemplateService.php:114`
+**Source:** `app/Services/TemplateService.php:124`
 
 **Usage:**
 ```php
 add_filter('fluent_cart/disable_email_celebration_messages', function ($disable, $context) {
     // Disable celebrations for all admin emails
     return true;
+}, 10, 2);
+```
+</details>
+
+---
+
+## Store Digest
+
+Hooks for the scheduled "store digest" summary email (sales/refund metrics over a period), sent by `StoreDigestService`. Fire `do_action('fluent_cart/store_digest/send', 'daily')` (or `'weekly'`) to trigger one on demand — see [Admin & Templates](/hooks/actions/admin-and-templates#store-digest-send).
+
+### <code> store_digest/data </code>
+<details>
+<summary><code>fluent_cart/store_digest/data</code> &mdash; Filter the fully-assembled store digest email payload</summary>
+
+**When it runs:**
+This filter is applied after the digest payload (metrics, promo copy, URLs) is fully assembled but before the email is rendered — the last chance for integrations to override the chosen copy or add data before rendering.
+
+**Parameters:**
+
+- `$payload` (array): The digest email payload
+    ```php
+    $payload = [
+        'reports_url'  => 'https://example.com/wp-admin/admin.php?page=fluent-cart#/reports',
+        'settings_url' => 'https://example.com/wp-admin/admin.php?page=fluent-cart#/settings/email_digest_settings',
+        'is_pro'       => false,
+        'pro_url'      => 'https://fluentcart.com/discount-deal/',
+        'is_empty'     => false,
+        'subject'      => '',
+        'metrics'      => [
+            'gross_sale'    => '$4,820.00',  // formatted; underlying values are cents
+            'net_revenue'   => '$4,512.00',
+            'refund_amount' => '$120.00',
+            'refund_count'  => 2,
+            'order_count'   => 38,
+        ],
+        'pro_promo'    => [], // populated only when `is_pro` is false
+    ];
+    ```
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'frequency' => 'daily', // or 'weekly'
+        'startDate' => '2026-08-11 00:00:00', // UTC
+        'endDate'   => '2026-08-18 00:00:00',  // UTC
+    ];
+    ```
+
+**Returns:** `array` — The modified digest payload
+
+**Source:** `app/Services/Email/StoreDigestService.php:347`
+
+**Usage:**
+```php
+add_filter('fluent_cart/store_digest/data', function ($payload, $context) {
+    // Append a custom metric line for weekly digests
+    if ($context['frequency'] === 'weekly') {
+        $payload['metrics']['new_customers'] = get_transient('weekly_new_customers') ?: 0;
+    }
+    return $payload;
+}, 10, 2);
+```
+</details>
+
+### <code> store_digest/recipients </code>
+<details>
+<summary><code>fluent_cart/store_digest/recipients</code> &mdash; Filter who receives the store digest email</summary>
+
+**When it runs:**
+This filter is applied after the default recipient list (deduplicated admin/store emails) has been resolved, letting you add, remove, or replace recipients before the digest is sent.
+
+**Parameters:**
+
+- `$emails` (array): Deduplicated list of recipient email addresses
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'frequency' => 'daily',  // or 'weekly'
+        'settings'  => $config,  // The digest's configured settings
+    ];
+    ```
+
+**Returns:** `array` — The modified recipient email addresses
+
+**Source:** `app/Services/Email/StoreDigestService.php:492`
+
+**Usage:**
+```php
+add_filter('fluent_cart/store_digest/recipients', function ($emails, $context) {
+    $emails[] = 'alex.morgan@example.com';
+    return array_unique($emails);
+}, 10, 2);
+```
+</details>
+
+### <code> store_digest/pro_url </code>
+<details>
+<summary><code>fluent_cart/store_digest/pro_url</code> &mdash; Filter the "Upgrade to Pro" link shown in the free-plugin digest email</summary>
+
+**When it runs:**
+This filter is applied while building the digest payload, resolving the URL used by the Pro promo block that Free-plugin digests include.
+
+**Parameters:**
+
+- `$proUrl` (string): The default upgrade URL (`'https://fluentcart.com/discount-deal/'`)
+
+**Returns:** `string` — The modified upgrade URL
+
+**Source:** `app/Services/Email/StoreDigestService.php:311`
+
+**Usage:**
+```php
+add_filter('fluent_cart/store_digest/pro_url', function ($proUrl) {
+    return 'https://fluentcart.com/discount-deal/?ref=digest-email';
+});
+```
+</details>
+
+---
+
+## Reports
+
+### <code> report/sanitize_params_rules </code>
+<details>
+<summary><code>fluent_cart/report/sanitize_params_rules</code> &mdash; Filter the sanitization rules applied to report request parameters</summary>
+
+**When it runs:**
+This filter is applied inside `ReportHelper` before sanitizing incoming report parameters (date ranges, filters, group-by, etc.), letting you add or adjust rules for custom parameters your integration adds to a report request.
+
+**Parameters:**
+
+- `$rules` (array): Sanitization rules, keyed like `$params`
+- `$params` (array): The raw, unsanitized report request parameters
+
+**Returns:** `array` — The modified sanitization rules
+
+**Source:** `app/Services/Report/ReportHelper.php:202`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/sanitize_params_rules', function ($rules, $params) {
+    $rules['channel'] = 'sanitizeText';
+    return $rules;
+}, 10, 2);
+```
+</details>
+
+### <code> report/sources_query </code>
+<details>
+<summary><code>fluent_cart/report/sources_query</code> &mdash; Filter the query builder behind the UTM/sources report</summary>
+
+**When it runs:**
+This filter is applied after the base query for the sources (UTM) report is built, letting you add extra where clauses or joins. If the returned value is not a query builder instance, the unmodified query is used instead — a misbehaving listener can't fatal the report.
+
+**Parameters:**
+
+- `$query` (`\FluentCart\Framework\Database\Query\Builder`): The report's query builder
+- `$params` (array): Processed report parameters (date range, filters, etc.)
+
+**Returns:** `\FluentCart\Framework\Database\Query\Builder` — The modified query builder (any non-Builder return is ignored)
+
+**Source:** `app/Services/Report/SourceReportService.php:49`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/sources_query', function ($query, $params) {
+    // Exclude a known bot/internal UTM source from the report
+    return $query->where('utm_source', '!=', 'internal-qa');
 }, 10, 2);
 ```
 </details>
@@ -1621,7 +2250,7 @@ This filter is applied when the email block editor loads. FluentCart aggressivel
 
 **Returns:** `bool` — Whether to skip unloading third-party scripts
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:638`
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:717`
 
 **Usage:**
 ```php
@@ -1651,7 +2280,7 @@ This filter is applied when unloading third-party scripts from the email block e
 
 **Returns:** `array` — The modified approved slugs array
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:650`
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:729`
 
 **Usage:**
 ```php
@@ -1677,7 +2306,7 @@ This filter is applied when unloading third-party stylesheets from the email blo
 
 **Returns:** `bool` — Whether to skip unloading third-party styles
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:707`
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:786`
 
 **Usage:**
 ```php
@@ -1709,7 +2338,7 @@ This filter is applied when filtering third-party stylesheets from the email blo
 
 **Returns:** `array` — The modified approved slugs array
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:720`
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:799`
 
 **Usage:**
 ```php
@@ -1736,7 +2365,7 @@ This filter is applied when loading the email block editor. By default, all Word
 
 **Returns:** `bool` — Whether to unregister default block patterns
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:764`
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:843`
 
 **Usage:**
 ```php
@@ -1772,7 +2401,7 @@ This filter is applied when preparing the settings object for the Gutenberg-base
 
 **Returns:** `array` — The modified editor settings
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:1142`
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:1224`
 
 **Usage:**
 ```php
@@ -1801,7 +2430,7 @@ This filter is applied when determining which Gutenberg block types are availabl
 
 **Returns:** `array` — The modified allowed block types array
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:1282`
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php:1385`
 
 **Usage:**
 ```php
@@ -1810,6 +2439,35 @@ add_filter('fluent_cart/editor_allowed_block_types', function ($allowedBlockType
     $allowedBlockTypes[] = 'my-plugin/custom-email-block';
     return $allowedBlockTypes;
 }, 10, 2);
+```
+</details>
+
+---
+
+## PDF Generation
+
+### <code> pdf_templates/mpdf_config </code>
+<details>
+<summary><code>fluent_cart/pdf_templates/mpdf_config</code> &mdash; Filter the mPDF library configuration used to generate PDFs</summary>
+
+**When it runs:**
+This filter is applied right before instantiating the mPDF renderer used for receipts and other PDF templates (requires FluentCart Pro + FluentPDF). It receives the config after defaults have already been merged in with `wp_parse_args()`.
+
+**Parameters:**
+
+- `$mpdfConfig` (array): mPDF constructor configuration (page format, margins, fonts, temp directory, etc.)
+
+**Returns:** `array` — The modified mPDF configuration
+
+**Source:** `app/Services/PDF/PdfGeneratorService.php:61`
+
+**Usage:**
+```php
+add_filter('fluent_cart/pdf_templates/mpdf_config', function ($mpdfConfig) {
+    // Use landscape orientation for all generated PDFs
+    $mpdfConfig['orientation'] = 'L';
+    return $mpdfConfig;
+});
 ```
 </details>
 
@@ -1867,7 +2525,7 @@ This filter is applied when generating a site-specific prefix string derived fro
 
 **Returns:** `string` — The modified site prefix
 
-**Source:** `app/Helpers/Helper.php:1478`
+**Source:** `app/Helpers/Helper.php:1717`
 
 **Usage:**
 ```php
@@ -1905,7 +2563,7 @@ This filter is applied when capturing UTM tracking parameters from the checkout 
 
 **Returns:** `array` — The modified allowed keys array
 
-**Source:** `app/Helpers/UtmHelper.php:26`
+**Source:** `app/Helpers/UtmHelper.php:34`
 
 **Usage:**
 ```php
@@ -1940,6 +2598,70 @@ add_filter('fluent_cart/cleanup/old_carts_days', function ($days) {
     // Keep abandoned carts for 90 days instead of 30
     return 90;
 });
+```
+</details>
+
+### <code> frontend_assets/should_load_global </code>
+<details>
+<summary><code>fluent_cart/frontend_assets/should_load_global</code> &mdash; Filter whether FluentCart's global frontend assets should load on the current page</summary>
+
+**When it runs:**
+This filter is applied when deciding whether to enqueue FluentCart's shared frontend CSS/JS bundle on the current page — independent of whether a specific FluentCart page type (shop, checkout, etc.) is detected. Use it to force assets to load on a page FluentCart wouldn't otherwise recognize (e.g. a custom template embedding a shortcode).
+
+**Parameters:**
+
+- `$shouldLoad` (bool): The default decision (`true`)
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'page_type'             => 'shop', // TemplateService::getCurrentFcPageType()
+        'is_marked'              => false,  // Whether assets were explicitly marked required elsewhere in the request
+        'is_fluentcart_context'  => true,
+        'is_instant_checkout'    => false,
+        'is_modal_checkout'      => false,
+    ];
+    ```
+
+**Returns:** `bool` — Whether the global frontend assets should be enqueued
+
+**Source:** `app/Modules/Templating/AssetLoader.php:44`
+
+**Usage:**
+```php
+add_filter('fluent_cart/frontend_assets/should_load_global', function ($shouldLoad, $context) {
+    // Force-load assets on a custom landing page template that embeds a shortcode
+    if (is_page_template('templates/custom-landing.php')) {
+        return true;
+    }
+    return $shouldLoad;
+}, 10, 2);
+```
+</details>
+
+### <code> util/countries </code>
+<details>
+<summary><code>fluent_cart/util/countries</code> &mdash; Filter the countries list used in address selectors (current hook)</summary>
+
+**When it runs:**
+This is the current, non-hyphenated replacement for the deprecated `fluent-cart/util/countries` hook — the deprecated hook forwards its value into this one via `apply_filters_deprecated()`. It fires when building the country dropdown options shown in checkout, store settings, and address forms.
+
+**Parameters:**
+
+- `$options` (array): Country options (value/label pairs) from the localization service
+- `$data` (array): Additional context data (empty array)
+
+**Returns:** `array` — The modified country options array
+
+**Source:** `app/Helpers/Helper.php:1379`
+
+**Usage:**
+```php
+add_filter('fluent_cart/util/countries', function ($options, $data) {
+    // Remove a country from the address selector
+    return array_filter($options, function ($option) {
+        return $option['value'] !== 'XX';
+    });
+}, 10, 2);
 ```
 </details>
 

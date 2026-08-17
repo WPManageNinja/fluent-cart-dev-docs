@@ -27,7 +27,7 @@
       "post": {
         "operationId": "initiateEarlyPayment",
         "summary": "POST Initiate Early Payment",
-        "description": "Generate a checkout URL for paying remaining installments early on an installment-based subscription. Requires Pro license, early payment feature enabled, finite installments with remaining payments, and active or trialing status.",
+        "description": "Generate a checkout URL for paying remaining installments early on an installment-based subscription. Requires Pro license, early payment feature enabled, finite installments with remaining payments, and active or trialing status.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Subscriptions"
         ],
@@ -140,6 +140,49 @@
                   "success": false,
                   "data": {
                     "message": "The requested resource was not found."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

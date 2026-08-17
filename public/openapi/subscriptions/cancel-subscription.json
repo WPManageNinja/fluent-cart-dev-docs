@@ -27,7 +27,7 @@
       "put": {
         "operationId": "cancelSubscription",
         "summary": "PUT Cancel Subscription",
-        "description": "Cancel a subscription both locally and with the remote payment gateway.",
+        "description": "Cancel a subscription both locally and with the remote payment gateway.\n\n**Required permission:** `subscriptions/manage`",
         "tags": [
           "Subscriptions"
         ],
@@ -154,6 +154,49 @@
                     "value": {
                       "message": "Please select cancel reason!"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`subscriptions/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

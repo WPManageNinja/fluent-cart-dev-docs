@@ -27,7 +27,7 @@
       "get": {
         "operationId": "fetchTaxonomyTerms",
         "summary": "GET Fetch Taxonomy Terms",
-        "description": "Retrieve all registered taxonomies and their terms for product categorization.",
+        "description": "Retrieve all registered taxonomies and their terms for product categorization.\n\n**Required permission:** `products/view`",
         "tags": [
           "Products"
         ],
@@ -42,136 +42,179 @@
             "content": {
               "application/json": {
                 "example": {
-                  "taxonomies": [
-                    {
+                  "taxonomies": {
+                    "product-categories": {
                       "name": "product-categories",
                       "label": "Product Categories",
                       "terms": [
                         {
-                          "value": 10,
+                          "value": "10",
                           "label": "Software",
+                          "parent": "0",
                           "children": [
                             {
-                              "value": 11,
+                              "value": "11",
                               "label": "Developer Tools",
+                              "parent": "10",
                               "children": []
                             },
                             {
-                              "value": 12,
+                              "value": "12",
                               "label": "Plugins",
+                              "parent": "10",
                               "children": []
                             }
                           ]
                         },
                         {
-                          "value": 13,
+                          "value": "13",
                           "label": "Templates",
+                          "parent": "0",
                           "children": []
                         }
                       ]
                     },
-                    {
+                    "product-brands": {
                       "name": "product-brands",
                       "label": "Product Brands",
                       "terms": [
                         {
-                          "value": 20,
+                          "value": "20",
                           "label": "FluentWP",
+                          "parent": "0",
                           "children": []
                         }
                       ]
                     }
-                  ]
+                  }
                 },
                 "schema": {
                   "example": {
-                    "taxonomies": [
-                      {
+                    "taxonomies": {
+                      "product-categories": {
                         "name": "product-categories",
                         "label": "Product Categories",
                         "terms": [
                           {
-                            "value": 10,
+                            "value": "10",
                             "label": "Software",
+                            "parent": "0",
                             "children": [
                               {
-                                "value": 11,
+                                "value": "11",
                                 "label": "Developer Tools",
+                                "parent": "10",
                                 "children": []
                               },
                               {
-                                "value": 12,
+                                "value": "12",
                                 "label": "Plugins",
+                                "parent": "10",
                                 "children": []
                               }
                             ]
                           },
                           {
-                            "value": 13,
+                            "value": "13",
                             "label": "Templates",
+                            "parent": "0",
                             "children": []
                           }
                         ]
                       },
-                      {
+                      "product-brands": {
                         "name": "product-brands",
                         "label": "Product Brands",
                         "terms": [
                           {
-                            "value": 20,
+                            "value": "20",
                             "label": "FluentWP",
+                            "parent": "0",
                             "children": []
                           }
                         ]
                       }
-                    ]
+                    }
                   }
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "taxonomies": [
-                        {
+                      "taxonomies": {
+                        "product-categories": {
                           "name": "product-categories",
                           "label": "Product Categories",
                           "terms": [
                             {
-                              "value": 10,
+                              "value": "10",
                               "label": "Software",
+                              "parent": "0",
                               "children": [
                                 {
-                                  "value": 11,
+                                  "value": "11",
                                   "label": "Developer Tools",
+                                  "parent": "10",
                                   "children": []
                                 },
                                 {
-                                  "value": 12,
+                                  "value": "12",
                                   "label": "Plugins",
+                                  "parent": "10",
                                   "children": []
                                 }
                               ]
                             },
                             {
-                              "value": 13,
+                              "value": "13",
                               "label": "Templates",
+                              "parent": "0",
                               "children": []
                             }
                           ]
                         },
-                        {
+                        "product-brands": {
                           "name": "product-brands",
                           "label": "Product Brands",
                           "terms": [
                             {
-                              "value": 20,
+                              "value": "20",
                               "label": "FluentWP",
+                              "parent": "0",
                               "children": []
                             }
                           ]
                         }
-                      ]
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

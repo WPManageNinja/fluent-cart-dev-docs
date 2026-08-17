@@ -229,6 +229,10 @@ add_action('fluent_cart/register_payment_methods', function ($data) {
 <details>
 <summary><code>fluent-cart/after_render_payment_method_{$route}</code> &mdash; Fires after a payment method UI renders on the checkout page</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/after_render_payment_method_{var}` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/after_render_payment_method_{var}`** instead — it receives the same value.
+:::
 **When it runs:**
 This action fires after a payment method's frontend UI (logo or radio button) has been rendered on the checkout form. The `{$route}` is the gateway's route identifier. Note that this hook uses a **hyphenated** prefix (`fluent-cart/`) rather than the usual underscored prefix.
 
@@ -252,6 +256,29 @@ None.
 add_action('fluent-cart/after_render_payment_method_stripe', function () {
     // Add custom messaging below the Stripe payment option
     echo '<p class="payment-note">Secure payments powered by Stripe.</p>';
+}, 10, 0);
+```
+</details>
+
+### <code> after_render_payment_method_{$route} (current) </code>
+<details>
+<summary><code>fluent_cart/after_render_payment_method_{$route}</code> &mdash; Current (non-deprecated) name for the hook above</summary>
+
+**When it runs:**
+Fires from the exact same call site as `fluent-cart/after_render_payment_method_{$route}` above (`AbstractPaymentGateway::render()`), one line later — this is the underscored, non-deprecated hook name; the hyphenated `fluent-cart/` version is fired first via `do_action_deprecated()` purely for backward compatibility. **Use this hook, not the hyphenated one, in new code.**
+
+**Parameters:**
+
+None.
+
+**Source:** `app/Modules/PaymentMethods/Core/AbstractPaymentGateway.php:552`
+
+**Dynamic variants:** same route slugs as above — `stripe`, `paypal`, `square`, `airwallex`, `offline_payment`, `razorpay`, `paystack`.
+
+**Usage:**
+```php
+add_action('fluent_cart/after_render_payment_method_paypal', function () {
+    echo '<p class="payment-note">You will be redirected to PayPal to complete payment.</p>';
 }, 10, 0);
 ```
 </details>
@@ -549,6 +576,39 @@ add_action('fluent_cart/payments/paypal/webhook_billing_subscription_cancelled',
     fluent_cart_add_log(
         'PayPal Subscription Cancelled',
         'PayPal subscription cancelled: ' . wp_json_encode($subscription),
+        'warning'
+    );
+}, 10, 1);
+```
+</details>
+
+### <code> payments/paypal_vault_rejected </code>
+<details>
+<summary><code>fluent_cart/payments/paypal_vault_rejected</code> &mdash; Fires when PayPal rejects saving a payment method for future use</summary>
+
+**When it runs:**
+This action fires inside the PayPal gateway's order-creation flow when the buyer opted to save their payment method (vaulting), but PayPal's response indicates the payment source cannot be vaulted (e.g. `PAYMENT_SOURCE_NOT_VAULTABLE`, `VAULTING_NOT_ENABLED`). After this fires, FluentCart strips the vaulting attributes and retries the order creation without vaulting, so a temporary vaulting outage doesn't fail the whole checkout.
+
+**Parameters:**
+
+- `$data` (array): Vault rejection context
+    ```php
+    $data = [
+        'order'       => $order,        // \FluentCart\App\Models\Order
+        'transaction' => $transaction,  // \FluentCart\App\Models\OrderTransaction
+        'error'       => $paypalOrder,  // WP_Error — the PayPal API error response
+    ];
+    ```
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:262`
+
+**Usage:**
+```php
+add_action('fluent_cart/payments/paypal_vault_rejected', function ($data) {
+    $order = $data['order'];
+    fluent_cart_add_log(
+        'PayPal Vaulting Rejected',
+        sprintf('Order #%d: PayPal declined to save the payment method.', $order->id),
         'warning'
     );
 }, 10, 1);
@@ -973,6 +1033,34 @@ add_action('fluent_cart/integration/run/my_crm', function ($integrationArray) {
         ]),
     ]);
 }, 10, 1);
+```
+</details>
+
+### <code> integration/integration_notify_{$feedKey} </code>
+<details>
+<summary><code>fluent_cart/integration/integration_notify_{$feedKey}</code> &mdash; Synchronous notify-style integration feed execution</summary>
+
+**When it runs:**
+This dynamic action fires inside `GlobalNotificationHandler` when a notify-style integration feed is run synchronously (as opposed to being scheduled asynchronously via `fluent_cart/integration/schedule_feed`). The `{$feedKey}` is the integration feed's unique key.
+
+**Parameters:**
+
+- `$feed` (array): The feed configuration
+- `$order` ([Order](/database/models/order)): The Order model instance
+- `$customer` ([Customer](/database/models/customer)): The Customer model instance
+
+**Source:** `app/Modules/Integrations/GlobalNotificationHandler.php:109`
+
+**Usage:**
+```php
+add_action('fluent_cart/integration/integration_notify_my_webhook', function ($feed, $order, $customer) {
+    wp_remote_post($feed['webhook_url'], [
+        'body' => wp_json_encode([
+            'order_id'  => $order->id,
+            'email'     => $customer->email,
+        ]),
+    ]);
+}, 10, 3);
 ```
 </details>
 

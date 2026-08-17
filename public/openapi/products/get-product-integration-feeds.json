@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getProductIntegrationFeeds",
         "summary": "GET Get Product Integration Feeds",
-        "description": "Retrieve all integration feeds configured for a product, along with available integrations.",
+        "description": "Retrieve all integration feeds configured for a product, along with available integrations.\n\n**Also used by the integrations UI.** Retrieve all integration feeds configured for a specific product, along with available product-scoped integrations.\n\n**Required permission:** `products/view`",
         "tags": [
           "Products"
         ],
@@ -156,6 +156,49 @@
                       },
                       "all_module_config_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/integrations"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

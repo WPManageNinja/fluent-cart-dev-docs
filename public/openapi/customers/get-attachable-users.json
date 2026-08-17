@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getAttachableUsers",
         "summary": "GET Get Attachable Users",
-        "description": "Retrieve a list of WordPress users that are not yet associated with any FluentCart customer. Useful for linking existing WP users to customer records.",
+        "description": "Retrieve a list of WordPress users that are not yet associated with any FluentCart customer. Useful for linking existing WP users to customer records.\n\n**Required permission:** `customers/manage`",
         "tags": [
           "Customers"
         ],
@@ -71,13 +71,11 @@
                     "users": [
                       {
                         "ID": 8,
-                        "user_login": "mike.chen",
                         "user_email": "mike.chen@example.com",
                         "display_name": "Mike Chen"
                       },
                       {
                         "ID": 14,
-                        "user_login": "lisa.park",
                         "user_email": "lisa.park@example.com",
                         "display_name": "Lisa Park"
                       }
@@ -88,13 +86,11 @@
                   "users": [
                     {
                       "ID": 8,
-                      "user_login": "mike.chen",
                       "user_email": "mike.chen@example.com",
                       "display_name": "Mike Chen"
                     },
                     {
                       "ID": 14,
-                      "user_login": "lisa.park",
                       "user_email": "lisa.park@example.com",
                       "display_name": "Lisa Park"
                     }
@@ -107,18 +103,44 @@
                       "users": [
                         {
                           "ID": 8,
-                          "user_login": "mike.chen",
                           "user_email": "mike.chen@example.com",
                           "display_name": "Mike Chen"
                         },
                         {
                           "ID": 14,
-                          "user_login": "lisa.park",
                           "user_email": "lisa.park@example.com",
                           "display_name": "Lisa Park"
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`customers/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

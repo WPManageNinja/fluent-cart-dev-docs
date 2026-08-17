@@ -27,7 +27,7 @@
       "post": {
         "operationId": "saveProductIntegration",
         "summary": "POST Save Product Integration",
-        "description": "Create or update an integration feed for a product.",
+        "description": "Create or update an integration feed for a product.\n\n**Also used by the integrations UI.** Create a new product-level integration feed or update an existing one. Validates required fields and associates the feed with the specified product.\n\n**Required permission:** `products/edit`",
         "tags": [
           "Products"
         ],
@@ -159,6 +159,107 @@
                         "scope": "product"
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Product not found"
+                  }
+                },
+                "example": {
+                  "message": "Product not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Product not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "Please fill up the required fields:",
+                    "errors": {
+                      "name": "Feed Name is required."
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Please fill up the required fields:",
+                  "errors": {
+                    "name": "Feed Name is required."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Please fill up the required fields:",
+                      "errors": {
+                        "name": "Feed Name is required."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/edit`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

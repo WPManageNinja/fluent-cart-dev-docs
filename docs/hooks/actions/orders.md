@@ -393,7 +393,7 @@ Fires inside `OrderResource::updateOrderItems()` just before custom order items 
 - `$customItems` (\Illuminate\Support\Collection): Collection of [`\FluentCart\App\Models\OrderItem`](/database/models/order-item) models about to be deleted (only items where `is_custom` is true)
 - `$order` ([`\FluentCart\App\Models\Order`](/database/models/order)): The parent order model
 
-**Source:** `api/Resource/OrderResource.php` (line 535)
+**Source:** `api/Resource/OrderResource.php` (line 1624)
 
 **Usage:**
 ```php
@@ -422,7 +422,7 @@ Fires inside `OrderResource::updateOrderItems()` immediately after custom order 
 - `$customItems` (\Illuminate\Support\Collection): Collection of [`\FluentCart\App\Models\OrderItem`](/database/models/order-item) models that were just deleted
 - `$order` ([`\FluentCart\App\Models\Order`](/database/models/order)): The parent order model
 
-**Source:** `api/Resource/OrderResource.php` (line 541)
+**Source:** `api/Resource/OrderResource.php` (line 1630)
 
 **Usage:**
 ```php
@@ -488,7 +488,7 @@ Fires inside `OrderController::changeCustomer()` after the order (and any child 
     ];
     ```
 
-**Source:** `app/Http/Controllers/OrderController.php` (line 427)
+**Source:** `app/Http/Controllers/OrderController.php` (line 536)
 
 **Usage:**
 ```php
@@ -522,7 +522,7 @@ Fires inside `OrderController::generateLicense()` when an admin requests license
     ];
     ```
 
-**Source:** `app/Http/Controllers/OrderController.php` (line 225)
+**Source:** `app/Http/Controllers/OrderController.php` (line 324)
 
 **Usage:**
 ```php
@@ -554,7 +554,7 @@ Fires inside `CodHandler::processPayment()` after the order and its [transaction
     ];
     ```
 
-**Source:** `app/Modules/PaymentMethods/Cod/CodHandler.php` (line 55)
+**Source:** `app/Modules/PaymentMethods/Cod/CodHandler.php` (line 59)
 
 **Usage:**
 ```php
@@ -591,7 +591,7 @@ Fires asynchronously via Action Scheduler after an order's payment is confirmed 
 
     > **Note:** The `subscription` key is only present when the order type is `subscription` or `renewal`.
 
-**Source:** `app/Hooks/actions.php` (line 159)
+**Source:** `app/Hooks/actions.php` (line 170)
 
 **Usage:**
 ```php
@@ -656,7 +656,7 @@ Fires at the end of receipt rendering (both the `ReceiptRenderer` class and the 
     ];
     ```
 
-**Source:** `app/Services/Renderer/Receipt/ReceiptRenderer.php` (line 151), `app/Views/invoice/receipt_slip.php` (line 482)
+**Source:** `app/Services/Renderer/Receipt/ReceiptRenderer.php` (line 162), `app/Views/invoice/receipt_slip.php` (line 482)
 
 **Usage:**
 ```php
@@ -669,6 +669,65 @@ add_action('fluent_cart/order/receipt_viewed', function ($data) {
         'info',
         ['module_name' => 'order', 'module_id' => $order->id]
     );
+}, 10, 1);
+```
+</details>
+
+### <code> order_canceled </code>
+<details>
+<summary><code>fluent_cart/order_canceled</code> &mdash; Fires when a renewal order is canceled/voided</summary>
+
+**When it runs:**
+Fires inside `RenewalController`'s void/cancel flow, immediately after the order's customer stats have been recounted and immediately before the more specific `fluent_cart/renewal_voided` hook (same call site, one line later). Both hooks receive the same payload.
+
+**Parameters:**
+
+- `$data` (array): Canceled order data
+    ```php
+    $data = [
+        'order'    => $order,          // \FluentCart\App\Models\Order
+        'customer' => $order->customer, // \FluentCart\App\Models\Customer
+    ];
+    ```
+
+**Source:** `app/Http/Controllers/RenewalController.php:122`
+
+**Usage:**
+```php
+add_action('fluent_cart/order_canceled', function ($data) {
+    $order = $data['order'];
+    fluent_cart_add_log(
+        'Order Canceled',
+        sprintf('Order #%d was canceled/voided.', $order->id),
+        'info'
+    );
+}, 10, 1);
+```
+</details>
+
+### <code> order_paid_async_private_handle </code>
+<details>
+<summary><code>fluent_cart/order_paid_async_private_handle</code> &mdash; Internal async post-payment hook for non-renewal orders</summary>
+
+**When it runs:**
+Fires inside `IntegrationEventListener` after an order is confirmed paid, but only when the order's `type` is **not** `renewal`. This is a distinctly-named, correctly-spelled sibling of the legacy `fluent_cart/order_paid_ansyc_private_handle` hook documented above (note that one has a typo, `ansyc`) — they are two separate hooks fired from different call sites. **You should generally hook into `fluent_cart/order_paid_done` instead of either of these internal hooks.**
+
+**Parameters:**
+
+- `$data` (array): Order identifier
+    ```php
+    $data = [
+        'order_id' => 123, // int — the order ID
+    ];
+    ```
+
+**Source:** `app/Listeners/IntegrationEventListener.php:380`
+
+**Usage:**
+```php
+// Not recommended for third-party use. Use fluent_cart/order_paid_done instead.
+add_action('fluent_cart/order_paid_async_private_handle', function ($data) {
+    $orderId = $data['order_id'];
 }, 10, 1);
 ```
 </details>

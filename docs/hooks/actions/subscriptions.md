@@ -26,7 +26,7 @@ This action fires whenever a [Subscription](/database/models/subscription)'s sta
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -65,7 +65,7 @@ This action fires when a subscription's status transitions to `active`. This may
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -98,7 +98,7 @@ This action fires when a subscription's status transitions to `canceled`. The `c
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -119,7 +119,7 @@ add_action('fluent_cart/payments/subscription_canceled', function ($data) {
 ```
 </details>
 
-### <code> subscription_paused </code>
+### <code> payments/subscription_paused </code>
 <details>
 <summary><code>fluent_cart/payments/subscription_paused</code> &mdash; Fires when a subscription is paused</summary>
 
@@ -139,7 +139,7 @@ This action fires when a subscription's status transitions to `paused`. The subs
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -172,7 +172,7 @@ This action fires when a subscription's status transitions to `expired`. After t
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -212,7 +212,7 @@ This action fires when a subscription's status transitions to `failing`, indicat
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -250,7 +250,7 @@ This action fires when a subscription's status transitions to `expiring`, indica
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -288,7 +288,7 @@ This action fires when a subscription's status transitions to `completed`. This 
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -326,7 +326,7 @@ This action fires when a subscription's status transitions to `trialing`. The su
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -372,7 +372,7 @@ This action fires when [Subscription](/database/models/subscription) attributes 
     ];
     ```
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:449,1155`
 
 **Usage:**
 ```php
@@ -622,7 +622,7 @@ This action fires whenever the renewal engine creates a renewal [Order](/databas
     ];
     ```
 
-**Source:** `app/Http/Controllers/RenewalController.php:155`, `app/Modules/Subscriptions/Services/SystemChargeService.php:310`, `app/Modules/StoreManagedRenewal/Services/RenewalService.php:237`
+**Source:** `app/Http/Controllers/RenewalController.php:165`, `app/Modules/Subscriptions/Services/SystemChargeService.php:310`, `app/Modules/StoreManagedRenewal/Services/RenewalService.php:237`
 
 **Usage:**
 ```php
@@ -649,7 +649,7 @@ This action fires exactly once when a renewal [Order](/database/models/order) tr
     ];
     ```
 
-**Source:** `app/Helpers/StatusHelper.php:208`
+**Source:** `app/Helpers/StatusHelper.php:225`
 
 **Usage:**
 ```php
@@ -703,7 +703,7 @@ The array-payload variant of the hook above, fired back-to-back with `fluent_car
     ];
     ```
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:477`, `app/Modules/PaymentMethods/StripeGateway/Confirmations.php:486`
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:752`, `app/Modules/PaymentMethods/StripeGateway/Confirmations.php:486`
 
 **Usage:**
 ```php
@@ -791,7 +791,7 @@ This action fires when a subscription's collection method is converted to `autom
     ];
     ```
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/PayPal.php:128`, `app/Modules/PaymentMethods/StripeGateway/Stripe.php:140`
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/PayPal.php:150`, `app/Modules/PaymentMethods/StripeGateway/Stripe.php:140`
 
 **Usage:**
 ```php
@@ -818,7 +818,7 @@ This action fires when a subscription is demoted to the `manual` collection meth
     ];
     ```
 
-**Source:** `app/Modules/PaymentMethods/Core/AbstractPaymentGateway.php:340`
+**Source:** `app/Modules/PaymentMethods/Core/AbstractPaymentGateway.php:343`
 
 **Usage:**
 ```php
@@ -871,7 +871,7 @@ This hook passes the **Subscription model directly**, not an array. Register wit
 
 - `$subscription` ([Subscription](/database/models/subscription)): The reactivated subscription
 
-**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:814`
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:864`
 
 **Usage:**
 ```php
@@ -1222,7 +1222,7 @@ This action fires when a customer completes a plan upgrade, transitioning from o
     ];
     ```
 
-**Source:** `fluent-cart-pro/app/Hooks/Handlers/UpgradeHandler.php:242`
+**Source:** `fluent-cart-pro/app/Hooks/Handlers/UpgradeHandler.php:268`
 
 **Usage:**
 ```php

@@ -1,0 +1,158 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/mcp/toggle": {
+      "post": {
+        "operationId": "toggle",
+        "summary": "POST Toggle MCP",
+        "description": "Flip the master switch that enables or disables the FluentCart MCP server for AI agents. Writes the same option key the server boot guard reads, so a disabled state immediately blocks further MCP requests. The response reports the actually-persisted state rather than the requested value.\n\n**Required permission:** `is_super_admin`",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mcp_enabled": {
+                    "description": "Desired MCP state. Accepts a boolean, or the strings `yes`, `true`, `1`, `on` (case-insensitive) to enable; any other value disables.",
+                    "example": "yes"
+                  }
+                },
+                "example": {
+                  "mcp_enabled": "yes"
+                }
+              },
+              "example": {
+                "mcp_enabled": "yes"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "mcp_enabled": "yes"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the persisted MCP state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mcp_enabled": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "mcp_enabled": true,
+                    "message": "MCP enabled. AI agents with a valid app password can now reach the FluentCart tools."
+                  }
+                },
+                "example": {
+                  "mcp_enabled": true,
+                  "message": "MCP enabled. AI agents with a valid app password can now reach the FluentCart tools."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "mcp_enabled": true,
+                      "message": "MCP enabled. AI agents with a valid app password can now reach the FluentCart tools."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The current user cannot manage_options, so the setting was not changed.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Sorry, you do not have permission to change the MCP setting."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

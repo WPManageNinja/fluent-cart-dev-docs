@@ -32,7 +32,7 @@
         ],
         "operationId": "saveOssCountryRates",
         "summary": "POST Save OSS Country Rates",
-        "description": "Save per-country EU VAT rates. Each entry may provide class_rates keyed by tax class slug ({rate, label}); rates are upserted per country and class in the EU group. When class_rates is omitted, the single rate value is applied to the standard class (backward compatibility). Entries with unknown tax class slugs or without a country are skipped.",
+        "description": "Save per-country EU VAT rates. Each entry may provide class_rates keyed by tax class slug ({rate, label}); rates are upserted per country and class in the EU group. When class_rates is omitted, the single rate value is applied to the standard class (backward compatibility). Entries with unknown tax class slugs or without a country are skipped.\n\n**Required permission:** `store/sensitive`",
         "tags": [
           "Tax"
         ],
@@ -188,7 +188,7 @@
             }
           },
           "422": {
-            "description": "Validation failed — one or more entries reference a non-EU VAT country.",
+            "description": "Validation failed \u2014 one or more entries reference a non-EU VAT country.",
             "content": {
               "application/json": {
                 "schema": {
@@ -230,6 +230,34 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`store/sensitive`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -242,7 +270,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

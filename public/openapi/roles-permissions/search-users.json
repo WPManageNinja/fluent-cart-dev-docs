@@ -27,7 +27,7 @@
       "get": {
         "operationId": "searchUsers",
         "summary": "GET Search Users",
-        "description": "Search for WordPress users who can be assigned a FluentCart role. Returns users matching the search query, excluding those who already have a WordPress administrator role.",
+        "description": "Search for WordPress users who can be assigned a FluentCart role. Returns users matching the search query, excluding those who already have a WordPress administrator role.\n\n**Policy:** `AdminPolicy`",
         "tags": [
           "Roles"
         ],
@@ -88,6 +88,50 @@
                           "items": {
                             "$ref": "#/components/schemas/UserListItem"
                           }
+                        },
+                        "first_page_url": {
+                          "type": "string"
+                        },
+                        "from": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "last_page_url": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "active": {
+                                "type": "boolean"
+                              }
+                            }
+                          },
+                          "description": "Rendered pagination links, including the `&laquo; Previous` / `Next &raquo;` entries."
+                        },
+                        "next_page_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "path": {
+                          "type": "string"
+                        },
+                        "prev_page_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "to": {
+                          "type": "integer",
+                          "nullable": true
                         }
                       }
                     }
@@ -109,7 +153,26 @@
                           "name": "Bob Wilson",
                           "email": "bob@example.com"
                         }
-                      ]
+                      ],
+                      "first_page_url": "https://example.com/wp-json/fluent-cart/v2/roles/user-list?page=1",
+                      "from": 1,
+                      "last_page_url": "https://example.com/wp-json/fluent-cart/v2/roles/user-list?page=2",
+                      "links": [
+                        {
+                          "url": null,
+                          "label": "&laquo; Previous",
+                          "active": false
+                        },
+                        {
+                          "url": "https://example.com/wp-json/fluent-cart/v2/roles/user-list?page=1",
+                          "label": "1",
+                          "active": true
+                        }
+                      ],
+                      "next_page_url": "https://example.com/wp-json/fluent-cart/v2/roles/user-list?page=2",
+                      "path": "https://example.com/wp-json/fluent-cart/v2/roles/user-list",
+                      "prev_page_url": null,
+                      "to": 15
                     }
                   }
                 },
@@ -193,7 +256,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

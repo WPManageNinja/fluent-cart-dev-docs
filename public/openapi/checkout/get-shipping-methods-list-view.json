@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getShippingMethodsListView",
         "summary": "GET Get Shipping Methods List View",
-        "description": "Retrieve a server-rendered HTML view of available shipping methods for the checkout page. This endpoint wraps get-available-shipping-methods and returns a pre-rendered HTML list suitable for direct insertion into the checkout form.",
+        "description": "Retrieve a server-rendered HTML view of available shipping methods for the checkout page. This endpoint wraps get-available-shipping-methods and returns a pre-rendered HTML list suitable for direct insertion into the checkout form.\n\n**Access policy:** `PublicPolicy`\n\n**Access policy:** `PublicPolicy`",
         "tags": [
           "Checkout"
         ],
@@ -148,6 +148,34 @@
                       "enabled": true
                     }
                   ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
                 }
               }
             }

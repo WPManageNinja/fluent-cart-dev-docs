@@ -27,7 +27,7 @@
       "put": {
         "operationId": "updateCustomerAdditionalInfo",
         "summary": "PUT Update Additional Info (Labels)",
-        "description": "Update a customer's labels/tags. Manages the label relationships for a customer by syncing provided label IDs with existing ones.",
+        "description": "Update a customer's labels/tags. Manages the label relationships for a customer by syncing provided label IDs with existing ones.\n\n**Required permission:** `customers/manage`",
         "tags": [
           "Customers"
         ],
@@ -183,6 +183,49 @@
                         ]
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`customers/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listEmailNotifications",
         "summary": "GET List All Notifications",
-        "description": "Retrieve all registered email notification templates with their current configuration. Returns both default and customized notification settings for orders, subscriptions, and scheduler/reminder actions.",
+        "description": "Retrieve all registered email notification templates with their current configuration. Returns both default and customized notification settings for orders, subscriptions, and scheduler/reminder actions.\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Email Notifications"
         ],
@@ -74,7 +74,8 @@
                           "active": "yes",
                           "subject": "New Sales On {{settings.store_name}}",
                           "is_default_body": "yes",
-                          "email_body": ""
+                          "email_body": "",
+                          "attach_pdf_template": ""
                         }
                       },
                       "order_paid_customer": {
@@ -96,7 +97,8 @@
                           "active": "yes",
                           "subject": "Purchase Receipt #{{order.invoice_no}}",
                           "is_default_body": "yes",
-                          "email_body": ""
+                          "email_body": "",
+                          "attach_pdf_template": ""
                         }
                       },
                       "order_refunded_admin": {
@@ -119,7 +121,8 @@
                           "active": "yes",
                           "subject": "Refund Processed for Order #{{order.invoice_no}}",
                           "is_default_body": "yes",
-                          "email_body": ""
+                          "email_body": "",
+                          "attach_pdf_template": ""
                         }
                       },
                       "order_refunded_customer": {
@@ -141,7 +144,8 @@
                           "active": "yes",
                           "subject": "Your Refund for Order #{{order.invoice_no}}",
                           "is_default_body": "yes",
-                          "email_body": ""
+                          "email_body": "",
+                          "attach_pdf_template": ""
                         }
                       },
                       "subscription_renewal_customer": {
@@ -183,6 +187,438 @@
                           "is_default_body": "yes",
                           "email_body": ""
                         }
+                      },
+                      "order_delivered_customer": {
+                        "event": "shipping_status_changed_to_delivered",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Send mail to customer when shipping status changed to delivered.",
+                        "description": "This email will be sent to the customer after an order is marked as delivered",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "order.delivered.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Order has been delivered #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": "",
+                          "attach_pdf_template": ""
+                        },
+                        "name": "order_delivered_customer"
+                      },
+                      "order_placed_admin": {
+                        "event": "order_placed_offline",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Send mail to admin after New Order Placed (Offline Payment)",
+                        "description": "This email will be sent to the admin when an order is placed using offline payment method.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "order.placed.admin",
+                        "is_async": false,
+                        "manage_toggle": "no",
+                        "toggle_label": "Auto-enabled for offline payments",
+                        "pre_header": "You have a new order on your shop placed with offline payment. Please review the order details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
+                        "settings": {
+                          "subject": "New Order on {{settings.store_name}} (Offline Payment)",
+                          "is_default_body": "yes",
+                          "email_body": "",
+                          "attach_pdf_template": ""
+                        },
+                        "name": "order_placed_admin"
+                      },
+                      "order_placed_customer": {
+                        "event": "order_placed_offline",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Order confirmation to customer (Offline Payment)",
+                        "description": "This email will be sent to the customer when an order is placed using offline payment method.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "order.placed.customer",
+                        "is_async": false,
+                        "manage_toggle": "no",
+                        "toggle_label": "Auto-enabled for offline payments",
+                        "settings": {
+                          "subject": "Order Confirmation #{{order.invoice_no}} (Offline Payment)",
+                          "is_default_body": "yes",
+                          "email_body": "",
+                          "attach_pdf_template": ""
+                        },
+                        "name": "order_placed_customer"
+                      },
+                      "order_shipped_customer": {
+                        "event": "shipping_status_changed_to_shipped",
+                        "group": "order",
+                        "group_label": "Order Actions",
+                        "title": "Send mail to customer when shipping status changed to shipped.",
+                        "description": "This email will be sent to the customer after an order is marked as shipped",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "order.shipped.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Order has been shipped #{{order.invoice_no}} \ud83d\udce6",
+                          "is_default_body": "yes",
+                          "email_body": "",
+                          "attach_pdf_template": ""
+                        },
+                        "name": "order_shipped_customer"
+                      },
+                      "renewal_created_admin": {
+                        "event": "renewal_created",
+                        "group": "manual_subscription",
+                        "group_label": "Store-Managed Renewals",
+                        "title": "Notify admin when a renewal order is created",
+                        "description": "This email will be sent to the admin when a renewal order is generated for a store-managed subscription.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "renewal.created.admin",
+                        "pre_header": "A new renewal order has been created for a store-managed subscription. Review it in the FluentCart Dashboard.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "New Renewal Order Created on {{settings.store_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "renewal_created_admin"
+                      },
+                      "renewal_created_customer": {
+                        "event": "renewal_created",
+                        "group": "manual_subscription",
+                        "group_label": "Store-Managed Renewals",
+                        "title": "Send the renewal order to the customer when a renewal order is created",
+                        "description": "This email will be sent to the customer when a renewal order is generated for a store-managed subscription.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "renewal.created.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Your Subscription Renewal #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "renewal_created_customer"
+                      },
+                      "renewal_reminder_due_admin": {
+                        "event": "renewal_reminder_due",
+                        "group": "manual_subscription",
+                        "group_label": "Store-Managed Renewals",
+                        "title": "Renewal due reminder copy to admin",
+                        "description": "This email will be sent to admin when a due reminder is sent to customer.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "order.reminder.due.admin",
+                        "pre_header": "A renewal due reminder was sent to a customer. Review the order details in this email or visit FluentCart Dashboard.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "no",
+                          "subject": "Renewal Reminder Sent #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "renewal_reminder_due_admin"
+                      },
+                      "renewal_reminder_due_customer": {
+                        "event": "renewal_reminder_due",
+                        "group": "manual_subscription",
+                        "group_label": "Store-Managed Renewals",
+                        "title": "Renewal due reminder to customer",
+                        "description": "This email will be sent before/at renewal due date when payment is pending.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "order.reminder.due.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Payment Reminder #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "renewal_reminder_due_customer"
+                      },
+                      "renewal_reminder_overdue_customer": {
+                        "event": "renewal_reminder_overdue",
+                        "group": "scheduler",
+                        "group_label": "Scheduler / Reminder Actions",
+                        "title": "Payment reminder to customer",
+                        "description": "This email will be sent to remind customer about pending payment.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "order.reminder.overdue.customer",
+                        "is_async": false,
+                        "manage_toggle": "no",
+                        "toggle_label": "On demand",
+                        "settings": {
+                          "subject": "Payment Reminder - Order #{{order.id}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "renewal_reminder_overdue_customer"
+                      },
+                      "subscription_canceled_admin": {
+                        "event": "subscription_canceled",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Send mail to admin when a subscription is canceled",
+                        "description": "This email will be sent to the admin when a subscription is canceled.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.canceled.admin",
+                        "pre_header": "A subscription has been canceled. Review the details in this email or visit FluentCart Dashboard to manage the subscription.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Subscription Canceled - {{order.customer.full_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_canceled_admin"
+                      },
+                      "subscription_past_due_admin": {
+                        "event": "subscription_past_due",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Notify admin when a subscription is past due",
+                        "description": "This email will be sent to the admin when a subscription is marked as past due.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.past_due.admin",
+                        "pre_header": "A subscription payment is past due. Review the subscription details in this email or visit FluentCart Dashboard.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "no",
+                          "subject": "Subscription Past Due #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_past_due_admin"
+                      },
+                      "subscription_past_due_customer": {
+                        "event": "subscription_past_due",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Notify customer when subscription is past due",
+                        "description": "This email will be sent to the customer when their subscription is marked as past due.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.past_due.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Your Subscription is Past Due on {{settings.store_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_past_due_customer"
+                      },
+                      "subscription_period_skipped_customer": {
+                        "event": "subscription_period_skipped",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Notify customer when a billing period is skipped",
+                        "description": "This email will be sent to the customer when an admin skips their next billing period. The internal reason and actor are never included. Off by default.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.period_skipped.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "no",
+                          "subject": "Your next payment has been skipped on {{settings.store_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_period_skipped_customer"
+                      },
+                      "subscription_renewal_admin": {
+                        "event": "subscription_renewed",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Send mail to admin after a subscription renewed",
+                        "description": "This email will be sent to the admin after a renewal payment made",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.renewal.admin",
+                        "pre_header": "You got a new Renewal on your shop. Congratulations! Checkout all the details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "New Renewal On {{settings.store_name}}",
+                          "is_default_body": "yes",
+                          "email_body": "",
+                          "attach_pdf_template": ""
+                        },
+                        "name": "subscription_renewal_admin"
+                      },
+                      "subscription_renewal_failed_admin": {
+                        "event": "subscription_renewal_failed",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Notify admin when an automatic renewal charge fails",
+                        "description": "This email will be sent to the admin when a saved payment method could not be charged for a subscription renewal.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.renewal_failed.admin",
+                        "pre_header": "An automatic subscription renewal charge failed. Review the order in the FluentCart Dashboard.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "no",
+                          "subject": "Automatic Charge Failed for Renewal #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_renewal_failed_admin"
+                      },
+                      "subscription_renewal_failed_customer": {
+                        "event": "subscription_renewal_failed",
+                        "group": "subscription",
+                        "group_label": "Subscription Actions",
+                        "title": "Notify customer when an automatic renewal charge fails",
+                        "description": "This email will be sent to the customer when their saved payment method could not be charged for a subscription renewal.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.renewal_failed.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Automatic Payment Failed for Renewal #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_renewal_failed_customer"
+                      },
+                      "subscription_renewal_reminder_admin": {
+                        "event": "subscription_renewal_reminder",
+                        "group": "scheduler",
+                        "group_label": "Scheduler / Reminder Actions",
+                        "title": "Upcoming renewal reminder copy to admin",
+                        "description": "This email will be sent to admin when an upcoming renewal reminder is sent.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.reminder.admin",
+                        "pre_header": "A subscription renewal reminder was sent to a customer. Review subscription details from FluentCart Dashboard.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "no",
+                          "subject": "Renewal Reminder Sent for {{order.customer.full_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_renewal_reminder_admin"
+                      },
+                      "subscription_renewal_reminder_customer": {
+                        "event": "subscription_renewal_reminder",
+                        "group": "scheduler",
+                        "group_label": "Scheduler / Reminder Actions",
+                        "title": "Upcoming renewal reminder to customer",
+                        "description": "This email will be sent before subscription auto-renewal date.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.reminder.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Upcoming Renewal Reminder from {{settings.store_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_renewal_reminder_customer"
+                      },
+                      "subscription_trial_end_reminder_admin": {
+                        "event": "subscription_trial_end_reminder",
+                        "group": "scheduler",
+                        "group_label": "Scheduler / Reminder Actions",
+                        "title": "Trial ending soon reminder copy to admin",
+                        "description": "This email will be sent to admin when a trial ending reminder is sent to a customer.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.trial_end.admin",
+                        "pre_header": "A trial ending soon reminder was sent to a customer. Review subscription details from FluentCart Dashboard.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "no",
+                          "subject": "Trial Ending Soon - {{order.customer.full_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_trial_end_reminder_admin"
+                      },
+                      "subscription_trial_end_reminder_customer": {
+                        "event": "subscription_trial_end_reminder",
+                        "group": "scheduler",
+                        "group_label": "Scheduler / Reminder Actions",
+                        "title": "Trial ending soon reminder to customer",
+                        "description": "This email will be sent before a trial period ends and converts to a paid subscription.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.trial_end.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Your Trial is Ending Soon - {{settings.store_name}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "subscription_trial_end_reminder_customer"
+                      },
+                      "system_charge_failed_admin": {
+                        "event": "system_charge_failed",
+                        "group": "system_subscription",
+                        "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                        "title": "Notify admin when an automatic renewal charge fails",
+                        "description": "This email will be sent to the admin when a saved payment method could not be charged for a renewal order.",
+                        "recipient": "admin",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.charge_failed.admin",
+                        "pre_header": "An automatic subscription renewal charge failed. Review the renewal order in the FluentCart Dashboard.",
+                        "is_async": false,
+                        "settings": {
+                          "active": "no",
+                          "subject": "Automatic Charge Failed for Renewal #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "system_charge_failed_admin"
+                      },
+                      "system_charge_failed_customer": {
+                        "event": "system_charge_failed",
+                        "group": "system_subscription",
+                        "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                        "title": "Notify customer when an automatic renewal charge fails",
+                        "description": "This email will be sent to the customer when the saved payment method could not be charged for a renewal order. It includes the failure reason and a Pay Now link.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.charge_failed.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Automatic Payment Failed for Renewal #{{order.invoice_no}}",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "system_charge_failed_customer"
+                      },
+                      "system_upcoming_charge_customer": {
+                        "event": "system_upcoming_charge",
+                        "group": "system_subscription",
+                        "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                        "title": "Notify customer before an automatic renewal charge",
+                        "description": "This email tells the customer the amount and date of the upcoming automatic charge to their saved payment method, when the renewal order is created ahead of the due date.",
+                        "recipient": "customer",
+                        "smartcode_groups": [],
+                        "template_path": "subscription.upcoming_charge.customer",
+                        "is_async": false,
+                        "settings": {
+                          "active": "yes",
+                          "subject": "Upcoming automatic payment for your subscription",
+                          "is_default_body": "yes",
+                          "email_body": ""
+                        },
+                        "name": "system_upcoming_charge_customer"
                       }
                     }
                   }
@@ -209,7 +645,8 @@
                         "active": "yes",
                         "subject": "New Sales On {{settings.store_name}}",
                         "is_default_body": "yes",
-                        "email_body": ""
+                        "email_body": "",
+                        "attach_pdf_template": ""
                       }
                     },
                     "order_paid_customer": {
@@ -231,7 +668,8 @@
                         "active": "yes",
                         "subject": "Purchase Receipt #{{order.invoice_no}}",
                         "is_default_body": "yes",
-                        "email_body": ""
+                        "email_body": "",
+                        "attach_pdf_template": ""
                       }
                     },
                     "order_refunded_admin": {
@@ -254,7 +692,8 @@
                         "active": "yes",
                         "subject": "Refund Processed for Order #{{order.invoice_no}}",
                         "is_default_body": "yes",
-                        "email_body": ""
+                        "email_body": "",
+                        "attach_pdf_template": ""
                       }
                     },
                     "order_refunded_customer": {
@@ -276,7 +715,8 @@
                         "active": "yes",
                         "subject": "Your Refund for Order #{{order.invoice_no}}",
                         "is_default_body": "yes",
-                        "email_body": ""
+                        "email_body": "",
+                        "attach_pdf_template": ""
                       }
                     },
                     "subscription_renewal_customer": {
@@ -318,6 +758,438 @@
                         "is_default_body": "yes",
                         "email_body": ""
                       }
+                    },
+                    "order_delivered_customer": {
+                      "event": "shipping_status_changed_to_delivered",
+                      "group": "order",
+                      "group_label": "Order Actions",
+                      "title": "Send mail to customer when shipping status changed to delivered.",
+                      "description": "This email will be sent to the customer after an order is marked as delivered",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "order.delivered.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Order has been delivered #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": "",
+                        "attach_pdf_template": ""
+                      },
+                      "name": "order_delivered_customer"
+                    },
+                    "order_placed_admin": {
+                      "event": "order_placed_offline",
+                      "group": "order",
+                      "group_label": "Order Actions",
+                      "title": "Send mail to admin after New Order Placed (Offline Payment)",
+                      "description": "This email will be sent to the admin when an order is placed using offline payment method.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "order.placed.admin",
+                      "is_async": false,
+                      "manage_toggle": "no",
+                      "toggle_label": "Auto-enabled for offline payments",
+                      "pre_header": "You have a new order on your shop placed with offline payment. Please review the order details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
+                      "settings": {
+                        "subject": "New Order on {{settings.store_name}} (Offline Payment)",
+                        "is_default_body": "yes",
+                        "email_body": "",
+                        "attach_pdf_template": ""
+                      },
+                      "name": "order_placed_admin"
+                    },
+                    "order_placed_customer": {
+                      "event": "order_placed_offline",
+                      "group": "order",
+                      "group_label": "Order Actions",
+                      "title": "Order confirmation to customer (Offline Payment)",
+                      "description": "This email will be sent to the customer when an order is placed using offline payment method.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "order.placed.customer",
+                      "is_async": false,
+                      "manage_toggle": "no",
+                      "toggle_label": "Auto-enabled for offline payments",
+                      "settings": {
+                        "subject": "Order Confirmation #{{order.invoice_no}} (Offline Payment)",
+                        "is_default_body": "yes",
+                        "email_body": "",
+                        "attach_pdf_template": ""
+                      },
+                      "name": "order_placed_customer"
+                    },
+                    "order_shipped_customer": {
+                      "event": "shipping_status_changed_to_shipped",
+                      "group": "order",
+                      "group_label": "Order Actions",
+                      "title": "Send mail to customer when shipping status changed to shipped.",
+                      "description": "This email will be sent to the customer after an order is marked as shipped",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "order.shipped.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Order has been shipped #{{order.invoice_no}} \ud83d\udce6",
+                        "is_default_body": "yes",
+                        "email_body": "",
+                        "attach_pdf_template": ""
+                      },
+                      "name": "order_shipped_customer"
+                    },
+                    "renewal_created_admin": {
+                      "event": "renewal_created",
+                      "group": "manual_subscription",
+                      "group_label": "Store-Managed Renewals",
+                      "title": "Notify admin when a renewal order is created",
+                      "description": "This email will be sent to the admin when a renewal order is generated for a store-managed subscription.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "renewal.created.admin",
+                      "pre_header": "A new renewal order has been created for a store-managed subscription. Review it in the FluentCart Dashboard.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "New Renewal Order Created on {{settings.store_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "renewal_created_admin"
+                    },
+                    "renewal_created_customer": {
+                      "event": "renewal_created",
+                      "group": "manual_subscription",
+                      "group_label": "Store-Managed Renewals",
+                      "title": "Send the renewal order to the customer when a renewal order is created",
+                      "description": "This email will be sent to the customer when a renewal order is generated for a store-managed subscription.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "renewal.created.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Your Subscription Renewal #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "renewal_created_customer"
+                    },
+                    "renewal_reminder_due_admin": {
+                      "event": "renewal_reminder_due",
+                      "group": "manual_subscription",
+                      "group_label": "Store-Managed Renewals",
+                      "title": "Renewal due reminder copy to admin",
+                      "description": "This email will be sent to admin when a due reminder is sent to customer.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "order.reminder.due.admin",
+                      "pre_header": "A renewal due reminder was sent to a customer. Review the order details in this email or visit FluentCart Dashboard.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "no",
+                        "subject": "Renewal Reminder Sent #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "renewal_reminder_due_admin"
+                    },
+                    "renewal_reminder_due_customer": {
+                      "event": "renewal_reminder_due",
+                      "group": "manual_subscription",
+                      "group_label": "Store-Managed Renewals",
+                      "title": "Renewal due reminder to customer",
+                      "description": "This email will be sent before/at renewal due date when payment is pending.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "order.reminder.due.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Payment Reminder #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "renewal_reminder_due_customer"
+                    },
+                    "renewal_reminder_overdue_customer": {
+                      "event": "renewal_reminder_overdue",
+                      "group": "scheduler",
+                      "group_label": "Scheduler / Reminder Actions",
+                      "title": "Payment reminder to customer",
+                      "description": "This email will be sent to remind customer about pending payment.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "order.reminder.overdue.customer",
+                      "is_async": false,
+                      "manage_toggle": "no",
+                      "toggle_label": "On demand",
+                      "settings": {
+                        "subject": "Payment Reminder - Order #{{order.id}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "renewal_reminder_overdue_customer"
+                    },
+                    "subscription_canceled_admin": {
+                      "event": "subscription_canceled",
+                      "group": "subscription",
+                      "group_label": "Subscription Actions",
+                      "title": "Send mail to admin when a subscription is canceled",
+                      "description": "This email will be sent to the admin when a subscription is canceled.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.canceled.admin",
+                      "pre_header": "A subscription has been canceled. Review the details in this email or visit FluentCart Dashboard to manage the subscription.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Subscription Canceled - {{order.customer.full_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_canceled_admin"
+                    },
+                    "subscription_past_due_admin": {
+                      "event": "subscription_past_due",
+                      "group": "subscription",
+                      "group_label": "Subscription Actions",
+                      "title": "Notify admin when a subscription is past due",
+                      "description": "This email will be sent to the admin when a subscription is marked as past due.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.past_due.admin",
+                      "pre_header": "A subscription payment is past due. Review the subscription details in this email or visit FluentCart Dashboard.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "no",
+                        "subject": "Subscription Past Due #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_past_due_admin"
+                    },
+                    "subscription_past_due_customer": {
+                      "event": "subscription_past_due",
+                      "group": "subscription",
+                      "group_label": "Subscription Actions",
+                      "title": "Notify customer when subscription is past due",
+                      "description": "This email will be sent to the customer when their subscription is marked as past due.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.past_due.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Your Subscription is Past Due on {{settings.store_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_past_due_customer"
+                    },
+                    "subscription_period_skipped_customer": {
+                      "event": "subscription_period_skipped",
+                      "group": "subscription",
+                      "group_label": "Subscription Actions",
+                      "title": "Notify customer when a billing period is skipped",
+                      "description": "This email will be sent to the customer when an admin skips their next billing period. The internal reason and actor are never included. Off by default.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.period_skipped.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "no",
+                        "subject": "Your next payment has been skipped on {{settings.store_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_period_skipped_customer"
+                    },
+                    "subscription_renewal_admin": {
+                      "event": "subscription_renewed",
+                      "group": "subscription",
+                      "group_label": "Subscription Actions",
+                      "title": "Send mail to admin after a subscription renewed",
+                      "description": "This email will be sent to the admin after a renewal payment made",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.renewal.admin",
+                      "pre_header": "You got a new Renewal on your shop. Congratulations! Checkout all the details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "New Renewal On {{settings.store_name}}",
+                        "is_default_body": "yes",
+                        "email_body": "",
+                        "attach_pdf_template": ""
+                      },
+                      "name": "subscription_renewal_admin"
+                    },
+                    "subscription_renewal_failed_admin": {
+                      "event": "subscription_renewal_failed",
+                      "group": "subscription",
+                      "group_label": "Subscription Actions",
+                      "title": "Notify admin when an automatic renewal charge fails",
+                      "description": "This email will be sent to the admin when a saved payment method could not be charged for a subscription renewal.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.renewal_failed.admin",
+                      "pre_header": "An automatic subscription renewal charge failed. Review the order in the FluentCart Dashboard.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "no",
+                        "subject": "Automatic Charge Failed for Renewal #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_renewal_failed_admin"
+                    },
+                    "subscription_renewal_failed_customer": {
+                      "event": "subscription_renewal_failed",
+                      "group": "subscription",
+                      "group_label": "Subscription Actions",
+                      "title": "Notify customer when an automatic renewal charge fails",
+                      "description": "This email will be sent to the customer when their saved payment method could not be charged for a subscription renewal.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.renewal_failed.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Automatic Payment Failed for Renewal #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_renewal_failed_customer"
+                    },
+                    "subscription_renewal_reminder_admin": {
+                      "event": "subscription_renewal_reminder",
+                      "group": "scheduler",
+                      "group_label": "Scheduler / Reminder Actions",
+                      "title": "Upcoming renewal reminder copy to admin",
+                      "description": "This email will be sent to admin when an upcoming renewal reminder is sent.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.reminder.admin",
+                      "pre_header": "A subscription renewal reminder was sent to a customer. Review subscription details from FluentCart Dashboard.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "no",
+                        "subject": "Renewal Reminder Sent for {{order.customer.full_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_renewal_reminder_admin"
+                    },
+                    "subscription_renewal_reminder_customer": {
+                      "event": "subscription_renewal_reminder",
+                      "group": "scheduler",
+                      "group_label": "Scheduler / Reminder Actions",
+                      "title": "Upcoming renewal reminder to customer",
+                      "description": "This email will be sent before subscription auto-renewal date.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.reminder.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Upcoming Renewal Reminder from {{settings.store_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_renewal_reminder_customer"
+                    },
+                    "subscription_trial_end_reminder_admin": {
+                      "event": "subscription_trial_end_reminder",
+                      "group": "scheduler",
+                      "group_label": "Scheduler / Reminder Actions",
+                      "title": "Trial ending soon reminder copy to admin",
+                      "description": "This email will be sent to admin when a trial ending reminder is sent to a customer.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.trial_end.admin",
+                      "pre_header": "A trial ending soon reminder was sent to a customer. Review subscription details from FluentCart Dashboard.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "no",
+                        "subject": "Trial Ending Soon - {{order.customer.full_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_trial_end_reminder_admin"
+                    },
+                    "subscription_trial_end_reminder_customer": {
+                      "event": "subscription_trial_end_reminder",
+                      "group": "scheduler",
+                      "group_label": "Scheduler / Reminder Actions",
+                      "title": "Trial ending soon reminder to customer",
+                      "description": "This email will be sent before a trial period ends and converts to a paid subscription.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.trial_end.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Your Trial is Ending Soon - {{settings.store_name}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "subscription_trial_end_reminder_customer"
+                    },
+                    "system_charge_failed_admin": {
+                      "event": "system_charge_failed",
+                      "group": "system_subscription",
+                      "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                      "title": "Notify admin when an automatic renewal charge fails",
+                      "description": "This email will be sent to the admin when a saved payment method could not be charged for a renewal order.",
+                      "recipient": "admin",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.charge_failed.admin",
+                      "pre_header": "An automatic subscription renewal charge failed. Review the renewal order in the FluentCart Dashboard.",
+                      "is_async": false,
+                      "settings": {
+                        "active": "no",
+                        "subject": "Automatic Charge Failed for Renewal #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "system_charge_failed_admin"
+                    },
+                    "system_charge_failed_customer": {
+                      "event": "system_charge_failed",
+                      "group": "system_subscription",
+                      "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                      "title": "Notify customer when an automatic renewal charge fails",
+                      "description": "This email will be sent to the customer when the saved payment method could not be charged for a renewal order. It includes the failure reason and a Pay Now link.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.charge_failed.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Automatic Payment Failed for Renewal #{{order.invoice_no}}",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "system_charge_failed_customer"
+                    },
+                    "system_upcoming_charge_customer": {
+                      "event": "system_upcoming_charge",
+                      "group": "system_subscription",
+                      "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                      "title": "Notify customer before an automatic renewal charge",
+                      "description": "This email tells the customer the amount and date of the upcoming automatic charge to their saved payment method, when the renewal order is created ahead of the due date.",
+                      "recipient": "customer",
+                      "smartcode_groups": [],
+                      "template_path": "subscription.upcoming_charge.customer",
+                      "is_async": false,
+                      "settings": {
+                        "active": "yes",
+                        "subject": "Upcoming automatic payment for your subscription",
+                        "is_default_body": "yes",
+                        "email_body": ""
+                      },
+                      "name": "system_upcoming_charge_customer"
                     }
                   }
                 },
@@ -346,7 +1218,8 @@
                             "active": "yes",
                             "subject": "New Sales On {{settings.store_name}}",
                             "is_default_body": "yes",
-                            "email_body": ""
+                            "email_body": "",
+                            "attach_pdf_template": ""
                           }
                         },
                         "order_paid_customer": {
@@ -368,7 +1241,8 @@
                             "active": "yes",
                             "subject": "Purchase Receipt #{{order.invoice_no}}",
                             "is_default_body": "yes",
-                            "email_body": ""
+                            "email_body": "",
+                            "attach_pdf_template": ""
                           }
                         },
                         "order_refunded_admin": {
@@ -391,7 +1265,8 @@
                             "active": "yes",
                             "subject": "Refund Processed for Order #{{order.invoice_no}}",
                             "is_default_body": "yes",
-                            "email_body": ""
+                            "email_body": "",
+                            "attach_pdf_template": ""
                           }
                         },
                         "order_refunded_customer": {
@@ -413,7 +1288,8 @@
                             "active": "yes",
                             "subject": "Your Refund for Order #{{order.invoice_no}}",
                             "is_default_body": "yes",
-                            "email_body": ""
+                            "email_body": "",
+                            "attach_pdf_template": ""
                           }
                         },
                         "subscription_renewal_customer": {
@@ -455,9 +1331,469 @@
                             "is_default_body": "yes",
                             "email_body": ""
                           }
+                        },
+                        "order_delivered_customer": {
+                          "event": "shipping_status_changed_to_delivered",
+                          "group": "order",
+                          "group_label": "Order Actions",
+                          "title": "Send mail to customer when shipping status changed to delivered.",
+                          "description": "This email will be sent to the customer after an order is marked as delivered",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "order.delivered.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Order has been delivered #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": "",
+                            "attach_pdf_template": ""
+                          },
+                          "name": "order_delivered_customer"
+                        },
+                        "order_placed_admin": {
+                          "event": "order_placed_offline",
+                          "group": "order",
+                          "group_label": "Order Actions",
+                          "title": "Send mail to admin after New Order Placed (Offline Payment)",
+                          "description": "This email will be sent to the admin when an order is placed using offline payment method.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "order.placed.admin",
+                          "is_async": false,
+                          "manage_toggle": "no",
+                          "toggle_label": "Auto-enabled for offline payments",
+                          "pre_header": "You have a new order on your shop placed with offline payment. Please review the order details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
+                          "settings": {
+                            "subject": "New Order on {{settings.store_name}} (Offline Payment)",
+                            "is_default_body": "yes",
+                            "email_body": "",
+                            "attach_pdf_template": ""
+                          },
+                          "name": "order_placed_admin"
+                        },
+                        "order_placed_customer": {
+                          "event": "order_placed_offline",
+                          "group": "order",
+                          "group_label": "Order Actions",
+                          "title": "Order confirmation to customer (Offline Payment)",
+                          "description": "This email will be sent to the customer when an order is placed using offline payment method.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "order.placed.customer",
+                          "is_async": false,
+                          "manage_toggle": "no",
+                          "toggle_label": "Auto-enabled for offline payments",
+                          "settings": {
+                            "subject": "Order Confirmation #{{order.invoice_no}} (Offline Payment)",
+                            "is_default_body": "yes",
+                            "email_body": "",
+                            "attach_pdf_template": ""
+                          },
+                          "name": "order_placed_customer"
+                        },
+                        "order_shipped_customer": {
+                          "event": "shipping_status_changed_to_shipped",
+                          "group": "order",
+                          "group_label": "Order Actions",
+                          "title": "Send mail to customer when shipping status changed to shipped.",
+                          "description": "This email will be sent to the customer after an order is marked as shipped",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "order.shipped.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Order has been shipped #{{order.invoice_no}} \ud83d\udce6",
+                            "is_default_body": "yes",
+                            "email_body": "",
+                            "attach_pdf_template": ""
+                          },
+                          "name": "order_shipped_customer"
+                        },
+                        "renewal_created_admin": {
+                          "event": "renewal_created",
+                          "group": "manual_subscription",
+                          "group_label": "Store-Managed Renewals",
+                          "title": "Notify admin when a renewal order is created",
+                          "description": "This email will be sent to the admin when a renewal order is generated for a store-managed subscription.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "renewal.created.admin",
+                          "pre_header": "A new renewal order has been created for a store-managed subscription. Review it in the FluentCart Dashboard.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "New Renewal Order Created on {{settings.store_name}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "renewal_created_admin"
+                        },
+                        "renewal_created_customer": {
+                          "event": "renewal_created",
+                          "group": "manual_subscription",
+                          "group_label": "Store-Managed Renewals",
+                          "title": "Send the renewal order to the customer when a renewal order is created",
+                          "description": "This email will be sent to the customer when a renewal order is generated for a store-managed subscription.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "renewal.created.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Your Subscription Renewal #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "renewal_created_customer"
+                        },
+                        "renewal_reminder_due_admin": {
+                          "event": "renewal_reminder_due",
+                          "group": "manual_subscription",
+                          "group_label": "Store-Managed Renewals",
+                          "title": "Renewal due reminder copy to admin",
+                          "description": "This email will be sent to admin when a due reminder is sent to customer.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "order.reminder.due.admin",
+                          "pre_header": "A renewal due reminder was sent to a customer. Review the order details in this email or visit FluentCart Dashboard.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "no",
+                            "subject": "Renewal Reminder Sent #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "renewal_reminder_due_admin"
+                        },
+                        "renewal_reminder_due_customer": {
+                          "event": "renewal_reminder_due",
+                          "group": "manual_subscription",
+                          "group_label": "Store-Managed Renewals",
+                          "title": "Renewal due reminder to customer",
+                          "description": "This email will be sent before/at renewal due date when payment is pending.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "order.reminder.due.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Payment Reminder #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "renewal_reminder_due_customer"
+                        },
+                        "renewal_reminder_overdue_customer": {
+                          "event": "renewal_reminder_overdue",
+                          "group": "scheduler",
+                          "group_label": "Scheduler / Reminder Actions",
+                          "title": "Payment reminder to customer",
+                          "description": "This email will be sent to remind customer about pending payment.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "order.reminder.overdue.customer",
+                          "is_async": false,
+                          "manage_toggle": "no",
+                          "toggle_label": "On demand",
+                          "settings": {
+                            "subject": "Payment Reminder - Order #{{order.id}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "renewal_reminder_overdue_customer"
+                        },
+                        "subscription_canceled_admin": {
+                          "event": "subscription_canceled",
+                          "group": "subscription",
+                          "group_label": "Subscription Actions",
+                          "title": "Send mail to admin when a subscription is canceled",
+                          "description": "This email will be sent to the admin when a subscription is canceled.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.canceled.admin",
+                          "pre_header": "A subscription has been canceled. Review the details in this email or visit FluentCart Dashboard to manage the subscription.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Subscription Canceled - {{order.customer.full_name}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_canceled_admin"
+                        },
+                        "subscription_past_due_admin": {
+                          "event": "subscription_past_due",
+                          "group": "subscription",
+                          "group_label": "Subscription Actions",
+                          "title": "Notify admin when a subscription is past due",
+                          "description": "This email will be sent to the admin when a subscription is marked as past due.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.past_due.admin",
+                          "pre_header": "A subscription payment is past due. Review the subscription details in this email or visit FluentCart Dashboard.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "no",
+                            "subject": "Subscription Past Due #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_past_due_admin"
+                        },
+                        "subscription_past_due_customer": {
+                          "event": "subscription_past_due",
+                          "group": "subscription",
+                          "group_label": "Subscription Actions",
+                          "title": "Notify customer when subscription is past due",
+                          "description": "This email will be sent to the customer when their subscription is marked as past due.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.past_due.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Your Subscription is Past Due on {{settings.store_name}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_past_due_customer"
+                        },
+                        "subscription_period_skipped_customer": {
+                          "event": "subscription_period_skipped",
+                          "group": "subscription",
+                          "group_label": "Subscription Actions",
+                          "title": "Notify customer when a billing period is skipped",
+                          "description": "This email will be sent to the customer when an admin skips their next billing period. The internal reason and actor are never included. Off by default.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.period_skipped.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "no",
+                            "subject": "Your next payment has been skipped on {{settings.store_name}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_period_skipped_customer"
+                        },
+                        "subscription_renewal_admin": {
+                          "event": "subscription_renewed",
+                          "group": "subscription",
+                          "group_label": "Subscription Actions",
+                          "title": "Send mail to admin after a subscription renewed",
+                          "description": "This email will be sent to the admin after a renewal payment made",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.renewal.admin",
+                          "pre_header": "You got a new Renewal on your shop. Congratulations! Checkout all the details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "New Renewal On {{settings.store_name}}",
+                            "is_default_body": "yes",
+                            "email_body": "",
+                            "attach_pdf_template": ""
+                          },
+                          "name": "subscription_renewal_admin"
+                        },
+                        "subscription_renewal_failed_admin": {
+                          "event": "subscription_renewal_failed",
+                          "group": "subscription",
+                          "group_label": "Subscription Actions",
+                          "title": "Notify admin when an automatic renewal charge fails",
+                          "description": "This email will be sent to the admin when a saved payment method could not be charged for a subscription renewal.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.renewal_failed.admin",
+                          "pre_header": "An automatic subscription renewal charge failed. Review the order in the FluentCart Dashboard.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "no",
+                            "subject": "Automatic Charge Failed for Renewal #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_renewal_failed_admin"
+                        },
+                        "subscription_renewal_failed_customer": {
+                          "event": "subscription_renewal_failed",
+                          "group": "subscription",
+                          "group_label": "Subscription Actions",
+                          "title": "Notify customer when an automatic renewal charge fails",
+                          "description": "This email will be sent to the customer when their saved payment method could not be charged for a subscription renewal.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.renewal_failed.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Automatic Payment Failed for Renewal #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_renewal_failed_customer"
+                        },
+                        "subscription_renewal_reminder_admin": {
+                          "event": "subscription_renewal_reminder",
+                          "group": "scheduler",
+                          "group_label": "Scheduler / Reminder Actions",
+                          "title": "Upcoming renewal reminder copy to admin",
+                          "description": "This email will be sent to admin when an upcoming renewal reminder is sent.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.reminder.admin",
+                          "pre_header": "A subscription renewal reminder was sent to a customer. Review subscription details from FluentCart Dashboard.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "no",
+                            "subject": "Renewal Reminder Sent for {{order.customer.full_name}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_renewal_reminder_admin"
+                        },
+                        "subscription_renewal_reminder_customer": {
+                          "event": "subscription_renewal_reminder",
+                          "group": "scheduler",
+                          "group_label": "Scheduler / Reminder Actions",
+                          "title": "Upcoming renewal reminder to customer",
+                          "description": "This email will be sent before subscription auto-renewal date.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.reminder.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Upcoming Renewal Reminder from {{settings.store_name}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_renewal_reminder_customer"
+                        },
+                        "subscription_trial_end_reminder_admin": {
+                          "event": "subscription_trial_end_reminder",
+                          "group": "scheduler",
+                          "group_label": "Scheduler / Reminder Actions",
+                          "title": "Trial ending soon reminder copy to admin",
+                          "description": "This email will be sent to admin when a trial ending reminder is sent to a customer.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.trial_end.admin",
+                          "pre_header": "A trial ending soon reminder was sent to a customer. Review subscription details from FluentCart Dashboard.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "no",
+                            "subject": "Trial Ending Soon - {{order.customer.full_name}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_trial_end_reminder_admin"
+                        },
+                        "subscription_trial_end_reminder_customer": {
+                          "event": "subscription_trial_end_reminder",
+                          "group": "scheduler",
+                          "group_label": "Scheduler / Reminder Actions",
+                          "title": "Trial ending soon reminder to customer",
+                          "description": "This email will be sent before a trial period ends and converts to a paid subscription.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.trial_end.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Your Trial is Ending Soon - {{settings.store_name}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "subscription_trial_end_reminder_customer"
+                        },
+                        "system_charge_failed_admin": {
+                          "event": "system_charge_failed",
+                          "group": "system_subscription",
+                          "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                          "title": "Notify admin when an automatic renewal charge fails",
+                          "description": "This email will be sent to the admin when a saved payment method could not be charged for a renewal order.",
+                          "recipient": "admin",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.charge_failed.admin",
+                          "pre_header": "An automatic subscription renewal charge failed. Review the renewal order in the FluentCart Dashboard.",
+                          "is_async": false,
+                          "settings": {
+                            "active": "no",
+                            "subject": "Automatic Charge Failed for Renewal #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "system_charge_failed_admin"
+                        },
+                        "system_charge_failed_customer": {
+                          "event": "system_charge_failed",
+                          "group": "system_subscription",
+                          "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                          "title": "Notify customer when an automatic renewal charge fails",
+                          "description": "This email will be sent to the customer when the saved payment method could not be charged for a renewal order. It includes the failure reason and a Pay Now link.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.charge_failed.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Automatic Payment Failed for Renewal #{{order.invoice_no}}",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "system_charge_failed_customer"
+                        },
+                        "system_upcoming_charge_customer": {
+                          "event": "system_upcoming_charge",
+                          "group": "system_subscription",
+                          "group_label": "Store-Managed Renewals \u00b7 Auto-Charge",
+                          "title": "Notify customer before an automatic renewal charge",
+                          "description": "This email tells the customer the amount and date of the upcoming automatic charge to their saved payment method, when the renewal order is created ahead of the due date.",
+                          "recipient": "customer",
+                          "smartcode_groups": [],
+                          "template_path": "subscription.upcoming_charge.customer",
+                          "is_async": false,
+                          "settings": {
+                            "active": "yes",
+                            "subject": "Upcoming automatic payment for your subscription",
+                            "is_default_body": "yes",
+                            "email_body": ""
+                          },
+                          "name": "system_upcoming_charge_customer"
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -535,6 +1871,20 @@
           },
           "settings": {
             "$ref": "#/components/schemas/NotificationSettings"
+          },
+          "manage_toggle": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "nullable": true,
+            "description": "Present only on notifications with a special enable/disable behavior (e.g. auto-enabled for offline payments, or on-demand only). Indicates whether the toggle is user-manageable."
+          },
+          "toggle_label": {
+            "type": "string",
+            "nullable": true,
+            "description": "Human-readable label describing the toggle behavior when manage_toggle is present."
           }
         }
       },
@@ -567,6 +1917,11 @@
           "email_body": {
             "type": "string",
             "description": "Custom email body content (HTML). Empty when using default body",
+            "example": ""
+          },
+          "attach_pdf_template": {
+            "type": "string",
+            "description": "PDF template slug to attach to this email, when the notification supports PDF receipt attachments (order-related notifications only). Empty string when not applicable or not configured.",
             "example": ""
           }
         }

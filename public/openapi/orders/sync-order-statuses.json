@@ -27,7 +27,7 @@
       "put": {
         "operationId": "syncOrderStatuses",
         "summary": "PUT Sync Order Statuses",
-        "description": "Synchronize the order's status and payment status based on the latest transaction data. Useful for resolving status mismatches.",
+        "description": "Synchronize the order's status and payment status based on the latest transaction data. Useful for resolving status mismatches.\n\n**Required permission:** `orders/manage`",
         "tags": [
           "Orders"
         ],
@@ -180,6 +180,49 @@
                     "value": {
                       "message": "No transaction found for this order"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

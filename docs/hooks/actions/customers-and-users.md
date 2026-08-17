@@ -304,4 +304,26 @@ add_action('fluent_cart/customer_app', function () {
 ```
 </details>
 
+### <code> customer_dashboard/enqueue_assets </code>
+<details>
+<summary><code>fluent_cart/customer_dashboard/enqueue_assets</code> &mdash; Customer dashboard assets are about to load</summary>
+
+**When it runs:**
+This action fires once from `AssetLoader` when the customer dashboard's frontend assets are being loaded. It exists so an add-on that registers its own section via `fluent_cart/customer_portal/profile_sections` can enqueue the JS/CSS backing that section. This is a rendering/enqueue hook with no parameters.
+
+**Parameters:**
+
+None.
+
+**Source:** `app/Modules/Templating/AssetLoader.php:360`
+
+**Usage:**
+```php
+add_action('fluent_cart/customer_dashboard/enqueue_assets', function () {
+    wp_enqueue_script('my-custom-portal-section', plugins_url('js/portal-section.js', __FILE__), [], '1.0', true);
+    wp_enqueue_style('my-custom-portal-section', plugins_url('css/portal-section.css', __FILE__));
+}, 10);
+```
+</details>
+
 ---

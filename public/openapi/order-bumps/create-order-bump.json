@@ -27,7 +27,7 @@
       "post": {
         "operationId": "createOrderBump",
         "summary": "POST Create Order Bump",
-        "description": "Create a new order bump promotion. The order bump is created with minimal data (title and source variant) and can be fully configured via the Update endpoint.",
+        "description": "Create a new order bump promotion. The order bump is created with minimal data (title and source variant) and can be fully configured via the Update endpoint.\n\n**Permission:** `store/sensitive` · **Policy:** `OrderBumpPolicy`",
         "tags": [
           "Order Bumps"
         ],
@@ -167,7 +167,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

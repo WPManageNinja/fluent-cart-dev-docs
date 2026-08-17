@@ -1,0 +1,194 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/inventory/export": {
+      "post": {
+        "operationId": "exportInventory",
+        "summary": "POST Export Inventory",
+        "description": "Build a CSV of stock-managed variants and return it **inline as a string** — this endpoint does not return a file download or a URL; the client is expected to turn `csvData` into a file itself.\n\n`inventoryState: \"available\"` emits `ID, SKU, Product Title, Variation Title, Available`. `inventoryState: \"full\"` additionally emits `Total Stock`, `On Hold` and `Delivered`.\n\n**Permission:** `products/view` · **Policy:** `ProductPolicy`",
+        "tags": [
+          "Advanced Inventory"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scope": {
+                    "type": "string",
+                    "enum": [
+                      "all",
+                      "current_page",
+                      "selected"
+                    ],
+                    "description": "`all` exports every stock-managed variant; `current_page` caps the query at 1000 rows; `selected` restricts to the IDs in `items`."
+                  },
+                  "inventoryState": {
+                    "type": "string",
+                    "enum": [
+                      "available",
+                      "full"
+                    ],
+                    "description": "Which columns to emit."
+                  },
+                  "format": {
+                    "type": "string",
+                    "enum": [
+                      "csv_spreadsheet",
+                      "csv"
+                    ],
+                    "default": "csv_spreadsheet",
+                    "description": "`csv_spreadsheet` prefixes the payload with a UTF-8 BOM so Excel opens it correctly. Any other value omits the BOM."
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "description": "Variant IDs, read only when `scope` is `selected`."
+                  }
+                },
+                "required": [
+                  "scope",
+                  "inventoryState"
+                ],
+                "example": {
+                  "scope": "all",
+                  "inventoryState": "full",
+                  "format": "csv_spreadsheet"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "filename": {
+                      "type": "string",
+                      "description": "Suggested filename, stamped with the server date/time."
+                    },
+                    "csvData": {
+                      "type": "string",
+                      "description": "The complete CSV document as a string."
+                    }
+                  },
+                  "example": {
+                    "message": "Inventory exported successfully",
+                    "filename": "inventory-export-2026-08-18-09-12-44.csv",
+                    "csvData": "﻿ID,SKU,Product Title,Variation Title,Total Stock,Available,On Hold,Delivered\n22,TES-RED-XS,Example Tee,Red / XS,12,10,0,2\n"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid `scope` or invalid `inventoryState`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "Invalid scope."
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the authenticated user lacks the required permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

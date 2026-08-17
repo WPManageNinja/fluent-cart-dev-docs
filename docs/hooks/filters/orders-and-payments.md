@@ -27,7 +27,7 @@ Applied when retrieving the list of available order statuses throughout the admi
 
 **Returns:** `array` — The modified order statuses array
 
-**Source:** `app/Helpers/Status.php:159`
+**Source:** `app/Helpers/Status.php:164`
 
 **Usage:**
 ```php
@@ -43,6 +43,10 @@ add_filter('fluent_cart/order_statuses', function ($statuses, $data) {
 <details>
 <summary><code>fluent-cart/order_statuses</code> &mdash; Filter order statuses (legacy hook name)</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/order_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/order_statuses`** instead — it receives the same value.
+:::
 **When it runs:**
 Legacy location of the order statuses filter. Applied in the older Helper class. Prefer `fluent_cart/order_statuses` for new code.
 
@@ -52,7 +56,7 @@ Legacy location of the order statuses filter. Applied in the older Helper class.
 
 **Returns:** `array` — The modified order statuses array
 
-**Source:** `app/Helpers/Helper.php:140`
+**Source:** `app/Helpers/Helper.php:282`
 
 **Usage:**
 ```php
@@ -67,6 +71,10 @@ add_filter('fluent-cart/order_statuses', function ($statuses, $data) {
 <details>
 <summary><code>fluent-cart/editable_order_statuses</code> &mdash; Filter manually settable order statuses</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/editable_order_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. It is reused for more than one list, so a single callback on the legacy name runs against all of them. Use **`fluent_cart/editable_order_statuses`** and **`fluent_cart/editable_shipping_statuses`** instead — each targets only its own list.
+:::
 **When it runs:**
 Applied when building the list of order statuses an admin can manually set on an order. This controls the dropdown options in the order edit screen.
 
@@ -98,6 +106,30 @@ add_filter('fluent-cart/editable_order_statuses', function ($statuses, $data) {
 ```
 </details>
 
+### <code> editable_order_statuses (current) </code>
+<details>
+<summary><code>fluent_cart/editable_order_statuses</code> &mdash; Filter manually settable order statuses (current hook)</summary>
+
+**When it runs:**
+This is the current, non-deprecated counterpart to the `fluent-cart/editable_order_statuses` hook documented above — `Status::getEditableOrderStatuses()` fires the deprecated hyphenated hook first via `apply_filters_deprecated()` for backward compatibility, then applies this one on the same `$statuses` value and returns its result.
+
+**Parameters:**
+- `$statuses` (array): Associative array of editable order statuses (key => translated label) — same default shape as the deprecated hook
+- `$data` (array): Additional context data (empty array)
+
+**Returns:** `array` — The modified editable order statuses array
+
+**Source:** `app/Helpers/Status.php:185`
+
+**Usage:**
+```php
+add_filter('fluent_cart/editable_order_statuses', function ($statuses, $data) {
+    unset($statuses['canceled']);
+    return $statuses;
+}, 10, 2);
+```
+</details>
+
 ### <code> payment_statuses </code>
 <details>
 <summary><code>fluent_cart/payment_statuses</code> &mdash; Filter payment statuses</summary>
@@ -122,7 +154,7 @@ Applied when retrieving the list of available payment statuses used across the o
 
 **Returns:** `array` — The modified payment statuses array
 
-**Source:** `app/Helpers/Status.php:183`
+**Source:** `app/Helpers/Status.php:192`
 
 **Usage:**
 ```php
@@ -155,7 +187,7 @@ Applied when retrieving available transaction statuses for the primary transacti
 
 **Returns:** `array` — The modified transaction statuses array
 
-**Source:** `app/Helpers/Status.php:197`
+**Source:** `app/Helpers/Status.php:207`
 
 **Usage:**
 ```php
@@ -170,6 +202,10 @@ add_filter('fluent_cart/transaction_statuses', function ($statuses, $data) {
 <details>
 <summary><code>fluent-cart/transaction_statuses</code> &mdash; Filter transaction statuses (legacy hook name)</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/transaction_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/transaction_statuses`** instead — it receives the same value.
+:::
 **When it runs:**
 Legacy location of the transaction statuses filter. Applied in the older Helper class. Prefer `fluent_cart/transaction_statuses` for new code.
 
@@ -179,7 +215,7 @@ Legacy location of the transaction statuses filter. Applied in the older Helper 
 
 **Returns:** `array` — The modified transaction statuses array
 
-**Source:** `app/Helpers/Helper.php:215`
+**Source:** `app/Helpers/Helper.php:377`
 
 **Usage:**
 ```php
@@ -193,6 +229,10 @@ add_filter('fluent-cart/transaction_statuses', function ($statuses, $data) {
 <details>
 <summary><code>fluent-cart/editable_transaction_statuses</code> &mdash; Filter manually editable transaction statuses</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/editable_transaction_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/editable_transaction_statuses`** instead — it receives the same value.
+:::
 **When it runs:**
 Applied when building the list of transaction statuses that an admin can manually set.
 
@@ -213,11 +253,35 @@ Applied when building the list of transaction statuses that an admin can manuall
 
 **Returns:** `array` — The modified editable transaction statuses array
 
-**Source:** `app/Helpers/Helper.php:233`, `app/Helpers/Status.php:214`
+**Source:** `app/Helpers/Helper.php:399`, `app/Helpers/Status.php:214`
 
 **Usage:**
 ```php
 add_filter('fluent-cart/editable_transaction_statuses', function ($statuses, $data) {
+    unset($statuses['refunded']);
+    return $statuses;
+}, 10, 2);
+```
+</details>
+
+### <code> editable_transaction_statuses (current) </code>
+<details>
+<summary><code>fluent_cart/editable_transaction_statuses</code> &mdash; Filter manually editable transaction statuses (current hook)</summary>
+
+**When it runs:**
+This is the current, non-deprecated counterpart to the `fluent-cart/editable_transaction_statuses` hook documented above — fires on the value the deprecated hook already returned, when building the list of transaction statuses an admin can manually set.
+
+**Parameters:**
+- `$statuses` (array): Associative array of editable transaction statuses (key => translated label) — same default shape as the deprecated hook
+- `$data` (array): Additional context data (empty array)
+
+**Returns:** `array` — The modified editable transaction statuses array
+
+**Source:** `app/Helpers/Status.php:234`
+
+**Usage:**
+```php
+add_filter('fluent_cart/editable_transaction_statuses', function ($statuses, $data) {
     unset($statuses['refunded']);
     return $statuses;
 }, 10, 2);
@@ -240,7 +304,7 @@ Applied when determining which transaction statuses should be considered "succes
 
 **Returns:** `array` — The modified success statuses array
 
-**Source:** `app/Helpers/Status.php:331`
+**Source:** `app/Helpers/Status.php:357`
 
 **Usage:**
 ```php
@@ -256,6 +320,10 @@ add_filter('fluent_cart/transaction_success_statuses', function ($statuses, $dat
 <details>
 <summary><code>fluent-cart/shipping_statuses</code> &mdash; Filter shipping statuses (legacy hook name)</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/shipping_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/shipping_statuses`** instead — it receives the same value.
+:::
 **When it runs:**
 Legacy location of the shipping statuses filter. Applied in the older Helper class. Prefer `fluent_cart/shipping_statuses` for new code.
 
@@ -265,7 +333,7 @@ Legacy location of the shipping statuses filter. Applied in the older Helper cla
 
 **Returns:** `array` — The modified shipping statuses array
 
-**Source:** `app/Helpers/Helper.php:170`
+**Source:** `app/Helpers/Helper.php:324`
 
 **Usage:**
 ```php
@@ -296,12 +364,36 @@ Applied when retrieving the list of available shipping statuses used for order f
 
 **Returns:** `array` — The modified shipping statuses array
 
-**Source:** `app/Helpers/Status.php:232`
+**Source:** `app/Helpers/Status.php:246`
 
 **Usage:**
 ```php
 add_filter('fluent_cart/shipping_statuses', function ($statuses, $data) {
     $statuses['in_transit'] = __('In Transit', 'my-plugin');
+    return $statuses;
+}, 10, 2);
+```
+</details>
+
+### <code> editable_shipping_statuses </code>
+<details>
+<summary><code>fluent_cart/editable_shipping_statuses</code> &mdash; Filter manually settable shipping statuses</summary>
+
+**When it runs:**
+Applied when building the list of shipping statuses an admin can manually set on an order. This controls the dropdown options in the order edit screen. A deprecated hyphenated predecessor, `fluent-cart/editable_shipping_statuses`, still fires immediately before this one via `apply_filters_deprecated()` for backward compatibility (note its deprecation message incorrectly points to `fluent-cart/editable_order_statuses` — that's a bug in the source string, not a real alias).
+
+**Parameters:**
+- `$statuses` (array): Associative array of editable shipping statuses (key => translated label) — same default shape as `fluent_cart/shipping_statuses` above
+- `$data` (array): Additional context data (empty array)
+
+**Returns:** `array` — The modified editable shipping statuses array
+
+**Source:** `app/Helpers/Status.php:265`
+
+**Usage:**
+```php
+add_filter('fluent_cart/editable_shipping_statuses', function ($statuses, $data) {
+    unset($statuses['unshippable']);
     return $statuses;
 }, 10, 2);
 ```
@@ -323,7 +415,7 @@ Applied after retrieving the paginated orders collection for the admin orders li
 
 **Returns:** `LengthAwarePaginator` — The modified paginated orders collection
 
-**Source:** `app/Http/Controllers/OrderController.php:58`
+**Source:** `app/Http/Controllers/OrderController.php:62`
 
 **Usage:**
 ```php
@@ -350,7 +442,7 @@ Applied when preparing the data for a single order view in the admin panel.
 
 **Returns:** `array` — The modified order data
 
-**Source:** `app/Http/Controllers/OrderController.php:580`
+**Source:** `app/Http/Controllers/OrderController.php:691`
 
 **Usage:**
 ```php
@@ -375,7 +467,7 @@ Applied when loading the stats/widgets section on the single order admin view.
 
 **Returns:** `array` — Array of widget definitions to display
 
-**Source:** `app/Http/Controllers/OrderController.php:1009`
+**Source:** `app/Http/Controllers/OrderController.php:1085`
 
 **Usage:**
 ```php
@@ -407,7 +499,7 @@ Applied when creating a manual order that contains subscription items. By defaul
 
 **Returns:** `bool` — Whether to allow subscription items in manual orders
 
-**Source:** `app/Http/Controllers/OrderController.php:78`
+**Source:** `app/Http/Controllers/OrderController.php:95`
 
 **Usage:**
 ```php
@@ -431,7 +523,7 @@ Applied when determining the order type during manual order creation. The type i
 
 **Returns:** `string` — The order type string
 
-**Source:** `app/Http/Controllers/OrderController.php:91`
+**Source:** `app/Http/Controllers/OrderController.php:108`
 
 **Usage:**
 ```php
@@ -529,7 +621,7 @@ Applied when preparing the downloadable files for a specific order, allowing you
 
 **Returns:** `array` — The modified download data array
 
-**Source:** `app/Models/Order.php:657`
+**Source:** `app/Models/Order.php:1044`
 
 **Usage:**
 ```php
@@ -566,7 +658,7 @@ Applied when checking if an order is eligible for deletion. By default, orders w
 
 **Returns:** `true|WP_Error` — `true` to allow deletion, or `WP_Error` to block it
 
-**Source:** `app/Models/Order.php:812`
+**Source:** `app/Models/Order.php:1250`
 
 **Usage:**
 ```php
@@ -593,7 +685,7 @@ Applied when calculating the next receipt number. If the computed next number is
 
 **Returns:** `int` — The minimum receipt number to enforce
 
-**Source:** `app/Services/OrderService.php:572`
+**Source:** `app/Services/OrderService.php:590`
 
 **Usage:**
 ```php
@@ -616,7 +708,7 @@ Applied when generating the invoice number string for new orders. The invoice nu
 
 **Returns:** `string` — The modified invoice prefix
 
-**Source:** `app/Services/OrderService.php:584`
+**Source:** `app/Services/OrderService.php:602`
 
 **Usage:**
 ```php
@@ -669,6 +761,30 @@ add_filter('fluent_cart/order_refund_manually', function ($manualRefund, $contex
 ```
 </details>
 
+### <code> transaction/max_refundable_amount </code>
+<details>
+<summary><code>fluent_cart/transaction/max_refundable_amount</code> &mdash; Filter the maximum amount that can still be refunded on a transaction</summary>
+
+**When it runs:**
+Applied on the [`OrderTransaction`](/database/models/order-transaction) model when computing how much of a transaction is still refundable. The base amount is the transaction's total minus what has already been refunded. **Note:** the filtered value is clamped by the caller to `[0, $baseAmount]` — a value greater than the base amount you were passed is silently capped back down, so this filter can only shrink the refundable amount, never grow it beyond what's actually left on the transaction.
+
+**Parameters:**
+- `$baseAmount` (int): The unfiltered max refundable amount in cents (`total - refunded_total`)
+- `$transaction` ([OrderTransaction](/database/models/order-transaction)): The transaction instance (`$this`)
+
+**Returns:** `int` — The (possibly reduced) max refundable amount in cents; automatically clamped to `[0, $baseAmount]`
+
+**Source:** `app/Models/OrderTransaction.php:188`
+
+**Usage:**
+```php
+add_filter('fluent_cart/transaction/max_refundable_amount', function ($baseAmount, $transaction) {
+    // Hold back a $1 processing fee from what support can refund
+    return max(0, $baseAmount - 100);
+}, 10, 2);
+```
+</details>
+
 ### <code> order_status/auto_complete_digital_order </code>
 <details>
 <summary><code>fluent_cart/order_status/auto_complete_digital_order</code> &mdash; Control auto-completion of digital orders</summary>
@@ -687,7 +803,7 @@ Applied during payment status reconciliation. When a digital (non-physical) orde
 
 **Returns:** `bool` — Whether to automatically complete the digital order
 
-**Source:** `app/Helpers/StatusHelper.php:193`
+**Source:** `app/Helpers/StatusHelper.php:281`
 
 **Usage:**
 ```php
@@ -720,7 +836,7 @@ Applied when preparing order data for display in the customer-facing order detai
 
 **Returns:** `array` — The modified formatted order data
 
-**Source:** `app/Http/Controllers/FrontendControllers/CustomerOrderController.php:285`
+**Source:** `app/Http/Controllers/FrontendControllers/CustomerOrderController.php:337`
 
 **Usage:**
 ```php
@@ -764,7 +880,7 @@ Applied when building the customer-facing order details page. Allows you to inje
 
 **Returns:** `array` — The modified sections array with HTML content
 
-**Source:** `app/Http/Controllers/FrontendControllers/CustomerOrderController.php:292`
+**Source:** `app/Http/Controllers/FrontendControllers/CustomerOrderController.php:344`
 
 **Usage:**
 ```php
@@ -772,6 +888,82 @@ add_filter('fluent_cart/customer/order_details_section_parts', function ($sectio
     $sections['after_summary'] = '<div class="custom-notice">Thank you for your order!</div>';
     return $sections;
 }, 10, 2);
+```
+</details>
+
+### <code> order/custom_item_changed </code>
+<details>
+<summary><code>fluent_cart/order/custom_item_changed</code> &mdash; Filter a custom order item's data before it's saved from the order edit screen</summary>
+
+**When it runs:**
+Applied in `OrderItemResource` when an admin edits a **custom** (product + variation, non-catalog) line item on the order edit screen. The result is cast to an array and only a fixed set of keys (`id`, `quantity`, `unit_price`, `cost`, `subtotal`, `tax_amount`, `discount_total`, `line_total`, `shipping_charge`) is kept from it — anything else you add is dropped.
+
+**Parameters:**
+- `$oldItem` (array|object): The existing order item row before this edit (matched by `object_id` = variation ID)
+- `$item` (array): The incoming edited item payload from the request
+
+**Returns:** `array` — The item data to persist; only the keys listed above are used. Amounts (`unit_price`, `cost`, `subtotal`, `tax_amount`, `discount_total`, `line_total`, `shipping_charge`) are in cents.
+
+**Source:** `api/Resource/OrderItemResource.php:282`
+
+**Usage:**
+```php
+add_filter('fluent_cart/order/custom_item_changed', function ($oldItem, $item) {
+    // Never let a custom item's unit price go negative
+    $item['unit_price'] = max(0, (int) $item['unit_price']);
+    return $item;
+}, 10, 2);
+```
+</details>
+
+### <code> order/delete_test_orders_batch_size </code>
+<details>
+<summary><code>fluent_cart/order/delete_test_orders_batch_size</code> &mdash; Filter the batch size for the "delete all test orders" bulk action</summary>
+
+**When it runs:**
+Applied at the start of `OrderController::handleDeleteTestOrdersBulkAction()`, before querying which test orders to delete in this batch. The admin UI calls this endpoint repeatedly (paging by `last_order_id`) until all test orders are gone; this filter controls how many are deleted per request.
+
+**Parameters:**
+- `$batchSize` (int): The batch size (default `50`); the filtered result is floored to a minimum of `1`
+
+**Returns:** `int` — The number of test orders to delete per request
+
+**Source:** `app/Http/Controllers/OrderController.php:955`
+
+**Usage:**
+```php
+add_filter('fluent_cart/order/delete_test_orders_batch_size', function ($batchSize) {
+    // Smaller batches on a resource-constrained host
+    return 20;
+}, 10, 1);
+```
+</details>
+
+### <code> order/should_restore_stock_on_delete </code>
+<details>
+<summary><code>fluent_cart/order/should_restore_stock_on_delete</code> &mdash; Filter whether deleting an order restores its reserved/sold stock</summary>
+
+**When it runs:**
+Applied in `OrderDeleting::shouldRestoreStockOnOrderDelete()` when an order is being permanently deleted. By default, stock is only restored automatically when the order being deleted is a **test-mode** order — deleting a live order does not touch stock unless you opt in here.
+
+**Parameters:**
+- `$shouldRestore` (bool): Whether to restore stock; default is `true` only when the order is in test mode
+- `$order` ([Order](/database/models/order)): The order being deleted (`$event->order`)
+- `$eventData` (array): The full `OrderDeletingEvent` payload as an array
+
+**Returns:** `bool` — Whether to restore stock for the items on this order as part of the delete
+
+**Source:** `app/Listeners/Order/OrderDeleting.php:89`
+
+**Usage:**
+```php
+add_filter('fluent_cart/order/should_restore_stock_on_delete', function ($shouldRestore, $order, $eventData) {
+    // Also restore stock when deleting canceled live orders
+    if ($order->status === 'canceled') {
+        return true;
+    }
+    return $shouldRestore;
+}, 10, 3);
 ```
 </details>
 
@@ -783,6 +975,10 @@ add_filter('fluent_cart/customer/order_details_section_parts', function ($sectio
 <details>
 <summary><code>fluent_cart_ipn_url_{$slug}</code> &mdash; Filter IPN/webhook listener URL for a payment gateway</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_ipn_url_{var}` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/ipn_url_{var}`** instead — it receives the same value.
+:::
 **When it runs:**
 Applied when generating the IPN (Instant Payment Notification) or webhook listener URL for a specific payment method. The `{$slug}` is the gateway slug (e.g., `stripe`, `paypal`).
 
@@ -808,33 +1004,89 @@ add_filter('fluent_cart_ipn_url_stripe', function ($urlData) {
 ```
 </details>
 
-### <code> payment/success_url </code>
+### <code> ipn_url_{$slug} (current) </code>
 <details>
-<summary><code>fluentcart/payment/success_url</code> &mdash; Filter the payment success redirect URL</summary>
+<summary><code>fluent_cart/ipn_url_{$slug}</code> &mdash; Filter IPN/webhook listener URL for a payment gateway (current hook)</summary>
 
 **When it runs:**
-Applied when generating the URL the customer is redirected to after a successful payment.
-
-> **Note:** This hook uses a non-standard prefix (`fluentcart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+This is the current, non-deprecated counterpart to the `fluent_cart_ipn_url_{$slug}` hook documented above — fires on the same `$data` value the deprecated hook already returned. `{$slug}` is the gateway slug (e.g. `stripe`, `paypal`).
 
 **Parameters:**
-- `$url` (string): The success redirect URL (receipt page with query args)
+- `$data` (array): Array containing the listener URL — same shape as the deprecated hook
+    ```php
+    $data = [
+        'listener_url' => 'https://yoursite.com/?fct_payment_listener=1&method=stripe'
+    ];
+    ```
+
+**Returns:** `array` — The modified URL data array
+
+**Source:** `app/Services/Payments/PaymentHelper.php:29`
+
+**Usage:**
+```php
+add_filter('fluent_cart/ipn_url_stripe', function ($data) {
+    $data['listener_url'] = home_url('/custom-stripe-webhook/');
+    return $data;
+}, 10, 1);
+```
+</details>
+
+### <code> payment/validate_custom_item </code>
+<details>
+<summary><code>fluent_cart/payment/validate_custom_item</code> &mdash; Filter/validate the product and variation resolved for a custom order item during payment</summary>
+
+**When it runs:**
+Applied in `ProductItemService` while resolving a **custom** (externally-priced) order item's product and variation objects during payment processing. Returning anything other than an object for either the product or the variation causes the item to be rejected — the caller treats it as invalid and stops processing it.
+
+**Parameters:**
+- `$productVariationPair` (array): Two-element array `[$product, $variation]` — `$variation` starts as a synthetic object built from the order item, with `id` set to the item's `object_id`
+- `$data` (array): The raw custom item data being validated
+
+**Returns:** `array` — `[$product, $variation]`; both elements must be objects or the item is treated as invalid
+
+**Source:** `app/Services/ProductItemService.php:53`
+
+**Usage:**
+```php
+add_filter('fluent_cart/payment/validate_custom_item', function ($pair, $data) {
+    [$product, $variation] = $pair;
+    // Reject custom items over $10,000 (stored in cents)
+    if ($variation && $variation->item_price > 1000000) {
+        return [null, null];
+    }
+    return [$product, $variation];
+}, 10, 2);
+```
+</details>
+
+### <code> payment/success_url </code>
+<details>
+<summary><code>fluent_cart/payment/success_url</code> &mdash; Filter the payment success redirect URL</summary>
+
+**When it runs:**
+Applied when generating the URL the customer is redirected to after a successful payment, just before the redirect is issued.
+
+**Parameters:**
+- `$url` (string): The success redirect URL (receipt page with query args already appended)
 - `$context` (array): Context data
     ```php
     $context = [
         'transaction_hash' => 'abc123...',  // Transaction UUID
         'args'             => [],           // Additional arguments
-        'payment_method'   => 'stripe'      // Gateway slug
+        'payment_method'   => 'stripe',     // Gateway slug
+        'transaction'      => $transaction, // \FluentCart\App\Models\OrderTransaction|null
+        'order'            => $order,       // \FluentCart\App\Models\Order|null
     ];
     ```
 
 **Returns:** `string` — The modified success URL
 
-**Source:** `app/Services/Payments/PaymentHelper.php:46`
+**Source:** `app/Services/Payments/PaymentHelper.php:71`
 
 **Usage:**
 ```php
-add_filter('fluentcart/payment/success_url', function ($url, $context) {
+add_filter('fluent_cart/payment/success_url', function ($url, $context) {
     // Redirect to a custom thank-you page
     return add_query_arg('trx_hash', $context['transaction_hash'], home_url('/thank-you/'));
 }, 10, 2);
@@ -854,7 +1106,7 @@ Applied during checkout validation when the order total (including recurring) is
 
 **Returns:** `string` — The payment method slug to use for zero-total orders
 
-**Source:** `app/Services/Payments/PaymentHelper.php:70`
+**Source:** `app/Services/Payments/PaymentHelper.php:92`
 
 **Usage:**
 ```php
@@ -911,7 +1163,7 @@ Applied when generating the URL attribute of an [`OrderTransaction`](/database/m
 
 **Returns:** `string` — The URL to the transaction in the payment provider's dashboard
 
-**Source:** `app/Models/OrderTransaction.php:111`
+**Source:** `app/Models/OrderTransaction.php:129`
 
 **Usage:**
 ```php
@@ -923,14 +1175,19 @@ add_filter('fluent_cart/transaction/url_stripe', function ($url, $context) {
 ```
 </details>
 
-### <code> transaction/receipt_page_url </code>
+### <code> fluent_cart/transaction/receipt_page_url </code>
 <details>
-<summary><code>fluentcart/transaction/receipt_page_url</code> &mdash; Filter the transaction receipt page URL</summary>
+<summary><code>fluent_cart/transaction/receipt_page_url</code> &mdash; Filter the transaction receipt page URL</summary>
 
 **When it runs:**
 Applied when generating the public-facing receipt page URL for a transaction, typically used in email notifications and customer-facing links.
 
-> **Note:** This hook uses a non-standard prefix (`fluentcart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
+::: warning Renamed in 1.3.16
+The old, non-standard name `fluentcart/transaction/receipt_page_url` (no underscore) still fires via
+`apply_filters_deprecated()`, but it is **scheduled for removal in v1.4.3**. Use
+`fluent_cart/transaction/receipt_page_url` instead. Both names run on the same value; the deprecated
+one fires first.
+:::
 
 **Parameters:**
 - `$url` (string): The receipt page URL with `trx_hash` query parameter
@@ -944,13 +1201,68 @@ Applied when generating the public-facing receipt page URL for a transaction, ty
 
 **Returns:** `string` — The modified receipt page URL
 
-**Source:** `app/Models/OrderTransaction.php:183`
+**Source:** `app/Models/OrderTransaction.php:220`
 
 **Usage:**
 ```php
-add_filter('fluentcart/transaction/receipt_page_url', function ($url, $context) {
+add_filter('fluent_cart/transaction/receipt_page_url', function ($url, $context) {
     // Use a custom receipt page
     return add_query_arg('trx_hash', $context['transaction']->uuid, home_url('/my-receipt/'));
+}, 10, 2);
+```
+</details>
+
+### <code> pdf/can_generate_receipt </code>
+<details>
+<summary><code>fluent_cart/pdf/can_generate_receipt</code> &mdash; Filter whether PDF receipt generation is available</summary>
+
+**When it runs:**
+Applied in `OrderService::canGenerateReceiptPdf()`, a capability check used by the UI (e.g. a "Download PDF" button) and by callers before attempting `fluent_cart/pdf/generate_receipt`. The default is `true` only when FluentCart Pro is active **and** the FluentPDF plugin is loaded.
+
+**Parameters:**
+- `$canGenerate` (bool): Whether PDF receipt generation is available, before filtering
+
+**Returns:** `bool` — Whether to advertise/allow PDF receipt generation
+
+**Source:** `app/Services/OrderService.php:688`
+
+**Usage:**
+```php
+add_filter('fluent_cart/pdf/can_generate_receipt', function ($canGenerate) {
+    // Enable PDF receipts via a custom generator, without FluentPDF
+    return true;
+}, 10, 1);
+```
+</details>
+
+### <code> pdf/generate_receipt </code>
+<details>
+<summary><code>fluent_cart/pdf/generate_receipt</code> &mdash; Generate (or return the path to) a PDF receipt for an order</summary>
+
+**When it runs:**
+Applied wherever FluentCart needs an actual PDF file for an order's receipt: when a customer downloads their receipt as a PDF (`ReceiptHandler`), and when an email notification attaches the receipt PDF (`EmailNotificationMailer`). Core passes `null` and relies entirely on a listener (normally FluentCart Pro + FluentPDF) to generate the file and return its local path; see `fluent_cart/pdf/can_generate_receipt` to check availability first.
+
+**Parameters:**
+- `$pdfPath` (string|null): The generated PDF's local file path; `null` until a listener supplies one
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order'       => $order,          // \FluentCart\App\Models\Order
+        'template_id' => 'order_receipt', // string — the PDF template to use (varies by call site)
+    ];
+    ```
+
+**Returns:** `string|null` — The absolute local path to the generated PDF, or `null` if generation isn't available
+
+**Source:**
+- `app/Hooks/Handlers/ShortCodes/ReceiptHandler.php:98` (customer-facing PDF download)
+- `app/Services/Email/EmailNotificationMailer.php:435` (email attachment)
+
+**Usage:**
+```php
+add_filter('fluent_cart/pdf/generate_receipt', function ($pdfPath, $context) {
+    $order = $context['order'];
+    return my_plugin_generate_receipt_pdf($order, $context['template_id']);
 }, 10, 2);
 ```
 </details>
@@ -1014,7 +1326,7 @@ Applied when creating a Stripe subscription, allowing you to add or modify metad
 
 **Returns:** `array` — The modified metadata array (max 50 keys per Stripe limits)
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:90`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:129`
 
 **Usage:**
 ```php
@@ -1094,7 +1406,7 @@ Applied after building the full payment intent data array, just before creating 
 
 **Returns:** `array` — The modified payment intent arguments
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:257`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:664`
 
 **Usage:**
 ```php
@@ -1180,7 +1492,7 @@ Applied when creating a Stripe Checkout session for subscription-based hosted pa
 
 **Returns:** `array` — The modified Checkout session arguments
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:509`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:976`
 
 **Usage:**
 ```php
@@ -1192,10 +1504,44 @@ add_filter('fluent_cart/payments/stripe_subscription_checkout_session_args', fun
 ```
 </details>
 
+### <code> stripe/client_setup_future_usage </code>
+<details>
+<summary><code>fluent_cart/stripe/client_setup_future_usage</code> &mdash; Filter the client-side `setup_future_usage` value for a Stripe PaymentIntent</summary>
+
+**When it runs:**
+Applied when building the **client-side** PaymentIntent update data for Stripe Elements. **Important:** whatever value this filter resolves to must also be matched on the server-side PaymentIntent built by `fluent_cart/payments/stripe_onetime_intent_args` at place-order time — a mismatch causes Stripe to reject the confirmation. A falsy return removes `setup_future_usage` from the intent entirely.
+
+**Parameters:**
+- `$setupFutureUsage` (string|null): The current `setup_future_usage` value (e.g. `'off_session'`, `'on_session'`), read from the intent data
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'data'             => $data,            // array — the raw request data for the intent
+        'has_subscription' => $hasSubscription, // bool — whether the cart contains a subscription item
+    ];
+    ```
+
+**Returns:** `string|null` — The `setup_future_usage` value to use, or a falsy value to omit it
+
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:852`
+
+**Usage:**
+```php
+add_filter('fluent_cart/stripe/client_setup_future_usage', function ($setupFutureUsage, $context) {
+    // Always save the card on file when the cart has a subscription
+    return $context['has_subscription'] ? 'off_session' : $setupFutureUsage;
+}, 10, 2);
+```
+</details>
+
 ### <code> stripe_idempotency_key </code>
 <details>
 <summary><code>fluent_cart_stripe_idempotency_key</code> &mdash; Filter the Stripe idempotency key</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_stripe_idempotency_key` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/stripe_idempotency_key`** instead — it receives the same value.
+:::
 **When it runs:**
 Applied when sending charge requests to the Stripe API. The idempotency key prevents duplicate charges from being created.
 
@@ -1221,10 +1567,42 @@ add_filter('fluent_cart_stripe_idempotency_key', function ($key, $context) {
 ```
 </details>
 
+### <code> stripe_idempotency_key (current) </code>
+<details>
+<summary><code>fluent_cart/stripe_idempotency_key</code> &mdash; Filter the Stripe idempotency key (current hook)</summary>
+
+**When it runs:**
+This is the current, non-deprecated counterpart to the `fluent_cart_stripe_idempotency_key` hook documented above — fires on the same key value the deprecated hook already returned, and its result is used as the `Idempotency-Key` request header.
+
+**Parameters:**
+- `$idempotency_key` (string): The generated idempotency key
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'request' => $request, // array — the Stripe API request body
+    ];
+    ```
+
+**Returns:** `string` — The idempotency key to send in the `Idempotency-Key` header
+
+**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:119`
+
+**Usage:**
+```php
+add_filter('fluent_cart/stripe_idempotency_key', function ($key, $context) {
+    return 'fct_' . md5($key . time());
+}, 10, 2);
+```
+</details>
+
 ### <code> stripe_request_body </code>
 <details>
 <summary><code>fluent_cart_stripe_request_body</code> &mdash; Filter the Stripe API request body</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_stripe_request_body` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/stripe_request_body`** instead — it receives the same value.
+:::
 **When it runs:**
 Applied just before every request is sent to the Stripe API. This is a low-level filter that affects all Stripe API calls.
 
@@ -1239,7 +1617,7 @@ Applied just before every request is sent to the Stripe API. This is a low-level
 
 **Returns:** `array` — The modified request body
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:126`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:129`
 
 **Usage:**
 ```php
@@ -1251,10 +1629,76 @@ add_filter('fluent_cart_stripe_request_body', function ($request, $context) {
 ```
 </details>
 
+### <code> stripe_request_body (current) </code>
+<details>
+<summary><code>fluent_cart/stripe_request_body</code> &mdash; Filter the Stripe API request body (current hook)</summary>
+
+**When it runs:**
+This is the current, non-deprecated counterpart to the `fluent_cart_stripe_request_body` hook documented above — fires on the value the deprecated hook already returned, immediately before every request sent to the Stripe API.
+
+**Parameters:**
+- `$body` (array): The request body data
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'api' => $api, // string — the Stripe API endpoint being called
+    ];
+    ```
+
+**Returns:** `array` — The modified request body
+
+**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:130`
+
+**Usage:**
+```php
+add_filter('fluent_cart/stripe_request_body', function ($body, $context) {
+    error_log('Stripe API call to: ' . $context['api']);
+    return $body;
+}, 10, 2);
+```
+</details>
+
+### <code> stripe_request_headers </code>
+<details>
+<summary><code>fluent_cart_stripe_request_headers</code> &mdash; Filter the HTTP headers sent with every Stripe API request</summary>
+
+**When it runs:**
+Applied each time a request is sent to the Stripe API — the header-level sibling of `fluent_cart/stripe_request_body`. Unlike most Stripe filters in this file, this one was never migrated to the `fluent_cart/` namespace and has no deprecated wrapper — it is the live, current hook name.
+
+**Parameters:**
+- `$headers` (array): The request headers
+    ```php
+    $headers = [
+        'Authorization'              => 'Basic ' . base64_encode($secretKey . ':'),
+        'Stripe-Version'             => '2020-08-27', // Stripe API version pinned by FluentCart
+        'User-Agent'                 => 'FluentCart/1.x (https://fluentcart.com)',
+        'X-Stripe-Client-User-Agent' => '{"name":"FluentCart",...}', // JSON-encoded user agent info
+    ];
+    ```
+- `$data` (array): Additional context data (empty array)
+
+**Returns:** `array` — The modified request headers
+
+**Source:** `app/Modules/PaymentMethods/StripeGateway/API/ApiRequest.php:87`
+
+**Usage:**
+```php
+add_filter('fluent_cart_stripe_request_headers', function ($headers, $data) {
+    // Route Stripe calls through a corporate outbound proxy that needs a custom header
+    $headers['X-Forwarded-Via'] = 'my-proxy';
+    return $headers;
+}, 10, 2);
+```
+</details>
+
 ### <code> form_disable_stripe_connect </code>
 <details>
 <summary><code>fluent_cart_form_disable_stripe_connect</code> &mdash; Disable Stripe Connect provider option</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_form_disable_stripe_connect` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/form_disable_stripe_connect`** instead — it receives the same value.
+:::
 **When it runs:**
 Applied when rendering the Stripe settings form. Return `true` to force the use of manual API keys instead of Stripe Connect.
 
@@ -1264,7 +1708,7 @@ Applied when rendering the Stripe settings form. Return `true` to force the use 
 
 **Returns:** `bool` — `true` to disable Stripe Connect and force API keys mode
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:288`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:583`
 
 **Usage:**
 ```php
@@ -1275,10 +1719,37 @@ add_filter('fluent_cart_form_disable_stripe_connect', function ($disable, $data)
 ```
 </details>
 
+### <code> form_disable_stripe_connect (current) </code>
+<details>
+<summary><code>fluent_cart/form_disable_stripe_connect</code> &mdash; Disable Stripe Connect provider option (current hook)</summary>
+
+**When it runs:**
+This is the current, non-deprecated counterpart to the `fluent_cart_form_disable_stripe_connect` hook documented above — fires on the value the deprecated hook already returned, when rendering the Stripe settings form. Return `true` to force manual API keys instead of Stripe Connect.
+
+**Parameters:**
+- `$disable` (bool): Whether to disable Stripe Connect (default `false`)
+- `$data` (array): Additional context data (empty array)
+
+**Returns:** `bool` — `true` to disable Stripe Connect and force API keys mode
+
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:584`
+
+**Usage:**
+```php
+add_filter('fluent_cart/form_disable_stripe_connect', function ($disable, $data) {
+    return true;
+}, 10, 2);
+```
+</details>
+
 ### <code> stripe_appearance </code>
 <details>
 <summary><code>fluent_cart_stripe_appearance</code> &mdash; Filter Stripe Elements appearance configuration</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_stripe_appearance` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/stripe_appearance`** instead — it receives the same value.
+:::
 **When it runs:**
 Applied when initializing Stripe Elements on the checkout page. Controls the visual theme and styling of the embedded payment form.
 
@@ -1292,7 +1763,7 @@ Applied when initializing Stripe Elements on the checkout page. Controls the vis
 
 **Returns:** `array` — The modified appearance configuration (follows [Stripe Appearance API](https://docs.stripe.com/elements/appearance-api))
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:427`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:795`
 
 **Usage:**
 ```php
@@ -1305,6 +1776,29 @@ add_filter('fluent_cart_stripe_appearance', function ($appearance) {
             'fontFamily'      => 'Inter, system-ui, sans-serif',
         ],
     ];
+}, 10, 1);
+```
+</details>
+
+### <code> stripe_appearance (current) </code>
+<details>
+<summary><code>fluent_cart/stripe_appearance</code> &mdash; Filter Stripe Elements appearance configuration (current hook)</summary>
+
+**When it runs:**
+This is the current, non-deprecated counterpart to the `fluent_cart_stripe_appearance` hook documented above — fires on the value the deprecated hook already returned, when initializing Stripe Elements on the checkout page.
+
+**Parameters:**
+- `$appearance` (array): Stripe Elements appearance configuration — same default shape as the deprecated hook
+
+**Returns:** `array` — The modified appearance configuration (follows the [Stripe Appearance API](https://docs.stripe.com/elements/appearance-api))
+
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:798`
+
+**Usage:**
+```php
+add_filter('fluent_cart/stripe_appearance', function ($appearance) {
+    $appearance['theme'] = 'night';
+    return $appearance;
 }, 10, 1);
 ```
 </details>
@@ -1346,7 +1840,7 @@ Applied during Stripe webhook processing (`charge.refunded` or `charge.succeeded
 
 **Returns:** [OrderTransaction](/database/models/order-transaction)|null — An `OrderTransaction` instance or `null` if not found
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Webhook/Webhook.php:121`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Webhook/Webhook.php:171`
 
 **Usage:**
 ```php
@@ -1413,7 +1907,7 @@ Applied when generating the PayPal JavaScript SDK script URL for the checkout pa
 
 **Returns:** `string` — The modified PayPal SDK URL
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/PayPal.php:518`
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/PayPal.php:1187`
 
 **Usage:**
 ```php
@@ -1437,7 +1931,7 @@ Applied at the start of PayPal webhook verification. Return `'yes'` to skip sign
 
 **Returns:** `string` — `'yes'` to skip verification, `'no'` to verify normally
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/IPN.php:179`
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/IPN.php:358`
 
 **Usage:**
 ```php
@@ -1471,7 +1965,7 @@ Applied before the actual PayPal webhook signature verification step in the main
 
 **Returns:** `bool` — Whether to proceed with webhook verification
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/IPN.php:302`
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/IPN.php:481`
 
 **Usage:**
 ```php
@@ -1507,13 +2001,80 @@ This filter is applied during a **`system` (auto-charged, store-billed) subscrip
 **Returns:**
 - `$defaults` (array): The (possibly modified) vault attributes
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:154`
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:226`
 
 **Usage:**
 ```php
 add_filter('fluent_cart/paypal/vault_attributes', function($attributes, $context) {
     return $attributes;
 }, 10, 2);
+```
+</details>
+
+### <code> payments/paypal_vault_one_time </code>
+<details>
+<summary><code>fluent_cart/payments/paypal_vault_one_time</code> &mdash; Filter whether a one-time PayPal order should vault the buyer's payment method</summary>
+
+**When it runs:**
+Applied when building a one-time (non-subscription) PayPal order, wherever `vault_on_success` would otherwise be decided. Letting this vault is what allows the saved-payment-methods module to offer the buyer's PayPal account for future purchases. The default simply preserves whatever `vault_on_success` was already resolved to, so with no listener attached, behavior is unchanged.
+
+**Parameters:**
+- `$vaultOnSuccess` (bool): Whether to vault on success (default: `!empty($args['vault_on_success'])`)
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order'        => $order,        // \FluentCart\App\Models\Order
+        'transaction'  => $transaction,  // \FluentCart\App\Models\OrderTransaction
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription|null
+    ];
+    ```
+
+**Returns:** `bool` — Whether PayPal should vault the buyer's payment method on this one-time order
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:214`
+
+**Usage:**
+```php
+add_filter('fluent_cart/payments/paypal_vault_one_time', function ($vaultOnSuccess, $context) {
+    // Never vault for guest (no-account) checkouts
+    if (!$context['order']->customer_id) {
+        return false;
+    }
+    return $vaultOnSuccess;
+}, 10, 2);
+```
+</details>
+
+### <code> payments/paypal_vault_rejection_issues </code>
+<details>
+<summary><code>fluent_cart/payments/paypal_vault_rejection_issues</code> &mdash; Filter which PayPal error codes are treated as a vaulting rejection</summary>
+
+**When it runs:**
+Applied when inspecting a failed PayPal order-creation response to decide whether the failure was caused specifically by a vaulting/save-on-success problem (as opposed to some other error). If the response's error `details` contain one of these issue codes, FluentCart retries the request without the vault attributes instead of failing the checkout outright — see the `fluent_cart/payments/paypal_vault_rejected` action, fired right before that retry.
+
+**Parameters:**
+- `$vaultIssues` (array): PayPal issue codes that indicate a vaulting rejection
+    ```php
+    $vaultIssues = [
+        'PAYMENT_SOURCE_CANNOT_BE_USED',
+        'PAYMENT_SOURCE_NOT_VAULTABLE',
+        'VAULTING_NOT_ENABLED',
+        'MERCHANT_NOT_ENABLED_FOR_VAULTING',
+        'VAULT_ID_NOT_SUPPORTED',
+    ];
+    ```
+
+**Returns:** `array` — The issue codes to treat as a vaulting rejection
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/Processor.php:50`
+
+**Usage:**
+```php
+add_filter('fluent_cart/payments/paypal_vault_rejection_issues', function ($vaultIssues) {
+    // Also retry-without-vault on this less common PayPal issue code
+    $vaultIssues[] = 'CUSTOMER_ALREADY_HAS_A_SIMILAR_PAYMENT_SOURCE_SAVED';
+    return $vaultIssues;
+}, 10, 1);
 ```
 </details>
 
@@ -1637,7 +2198,7 @@ Applied when building the payment data array before sending to the Mollie API fo
 
 **Returns:** `array` — The modified payment data
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/MollieGateway/MollieProcessor.php:142`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/MollieGateway/MollieProcessor.php:169`
 
 **Usage:**
 ```php
@@ -1662,7 +2223,7 @@ Applied before building the Mollie payment request. Return `true` to include ind
 
 **Returns:** `bool` — Whether to pass line item details to Mollie
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/MollieGateway/MollieProcessor.php:128`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/MollieGateway/MollieProcessor.php:155`
 
 **Usage:**
 ```php
@@ -1685,7 +2246,7 @@ Applied when generating the webhook notification URL sent to Mollie during payme
 
 **Returns:** `string` — The modified webhook URL
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/MollieGateway/MollieProcessor.php:301`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/MollieGateway/MollieProcessor.php:341`
 
 **Usage:**
 ```php
@@ -1751,7 +2312,7 @@ Applied when FluentCart creates the corresponding product on Paddle, to determin
 
 **Returns:** `string` — The Paddle tax category (e.g., `'standard'`, `'digital-goods'`, `'saas'`)
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Product.php (line 44)`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Product.php (line 53)`
 
 **Usage:**
 ```php
@@ -2092,7 +2653,7 @@ Applied when building the order metadata (invoice number and description) for an
 
 **Returns:** `string` — The order description (truncated to 255 chars)
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetHelper.php:222`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetHelper.php:234`
 
 **Usage:**
 ```php

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getNewVsReturningCustomer",
         "summary": "GET Get New vs Returning Customers",
-        "description": "Compare the ratio of orders from new customers versus returning customers over the given period.",
+        "description": "Compare orders from new customers versus returning customers over the given period.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -170,83 +170,111 @@
                   "type": "object",
                   "properties": {
                     "newVsReturning": {
-                      "type": "object",
-                      "description": "Comparison data for new vs returning customers"
+                      "type": "array",
+                      "description": "Two rows: one for new customers, one for returning customers.",
+                      "items": {
+                        "$ref": "#/components/schemas/NewVsReturningRow"
+                      }
                     }
                   },
                   "example": {
-                    "newVsReturning": {
-                      "new_customers": 32,
-                      "returning_customers": 183,
-                      "new_orders": 38,
-                      "returning_orders": 304,
-                      "new_revenue": 285000,
-                      "returning_revenue": 965000,
-                      "new_vs_returning_ratio": 0.175,
-                      "chart": [
-                        {
-                          "label": "New Customers",
-                          "value": 32,
-                          "percentage": 14.9
-                        },
-                        {
-                          "label": "Returning Customers",
-                          "value": 183,
-                          "percentage": 85.1
-                        }
-                      ]
-                    }
-                  }
-                },
-                "example": {
-                  "newVsReturning": {
-                    "new_customers": 32,
-                    "returning_customers": 183,
-                    "new_orders": 38,
-                    "returning_orders": 304,
-                    "new_revenue": 285000,
-                    "returning_revenue": 965000,
-                    "new_vs_returning_ratio": 0.175,
-                    "chart": [
+                    "newVsReturning": [
                       {
-                        "label": "New Customers",
-                        "value": 32,
-                        "percentage": 14.9
+                        "customer_type": "new",
+                        "customer_count": 32,
+                        "order_count": 38,
+                        "net_sales": 261500,
+                        "average_net": 6882,
+                        "gross_sales": 285000,
+                        "average_gross": 7500
                       },
                       {
-                        "label": "Returning Customers",
-                        "value": 183,
-                        "percentage": 85.1
+                        "customer_type": "returning",
+                        "customer_count": 183,
+                        "order_count": 304,
+                        "net_sales": 889000,
+                        "average_net": 2924,
+                        "gross_sales": 965000,
+                        "average_gross": 3174
                       }
                     ]
                   }
+                },
+                "example": {
+                  "newVsReturning": [
+                    {
+                      "customer_type": "new",
+                      "customer_count": 32,
+                      "order_count": 38,
+                      "net_sales": 261500,
+                      "average_net": 6882,
+                      "gross_sales": 285000,
+                      "average_gross": 7500
+                    },
+                    {
+                      "customer_type": "returning",
+                      "customer_count": 183,
+                      "order_count": 304,
+                      "net_sales": 889000,
+                      "average_net": 2924,
+                      "gross_sales": 965000,
+                      "average_gross": 3174
+                    }
+                  ]
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "newVsReturning": {
-                        "new_customers": 32,
-                        "returning_customers": 183,
-                        "new_orders": 38,
-                        "returning_orders": 304,
-                        "new_revenue": 285000,
-                        "returning_revenue": 965000,
-                        "new_vs_returning_ratio": 0.175,
-                        "chart": [
-                          {
-                            "label": "New Customers",
-                            "value": 32,
-                            "percentage": 14.9
-                          },
-                          {
-                            "label": "Returning Customers",
-                            "value": 183,
-                            "percentage": 85.1
-                          }
-                        ]
-                      }
+                      "newVsReturning": [
+                        {
+                          "customer_type": "new",
+                          "customer_count": 32,
+                          "order_count": 38,
+                          "net_sales": 261500,
+                          "average_net": 6882,
+                          "gross_sales": 285000,
+                          "average_gross": 7500
+                        },
+                        {
+                          "customer_type": "returning",
+                          "customer_count": 183,
+                          "order_count": 304,
+                          "net_sales": 889000,
+                          "average_net": 2924,
+                          "gross_sales": 965000,
+                          "average_gross": 3174
+                        }
+                      ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -257,7 +285,52 @@
     }
   },
   "components": {
-    "schemas": {},
+    "schemas": {
+      "NewVsReturningRow": {
+        "type": "object",
+        "properties": {
+          "customer_type": {
+            "type": "string",
+            "enum": [
+              "new",
+              "returning"
+            ],
+            "description": "Which segment this row describes",
+            "example": "new"
+          },
+          "customer_count": {
+            "type": "integer",
+            "description": "Number of distinct customers in this segment for the period",
+            "example": 32
+          },
+          "order_count": {
+            "type": "integer",
+            "description": "Number of orders placed by this segment for the period",
+            "example": 38
+          },
+          "net_sales": {
+            "type": "integer",
+            "description": "Net sales in cents (after discounts/refunds, excluding tax) for this segment",
+            "example": 261500
+          },
+          "average_net": {
+            "type": "integer",
+            "description": "Average net sales per order, in cents",
+            "example": 6882
+          },
+          "gross_sales": {
+            "type": "integer",
+            "description": "Gross sales in cents for this segment",
+            "example": 285000
+          },
+          "average_gross": {
+            "type": "integer",
+            "description": "Average gross sales per order, in cents",
+            "example": 7500
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",

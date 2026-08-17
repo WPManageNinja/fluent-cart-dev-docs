@@ -294,12 +294,12 @@ Operator quick mapping (UI → payload): Doesn't equal=`!=`, Less Than=`<`, Grea
         "post_modified_gmt": "2025-10-11 11:50:31",
         "post_content_filtered": "",
         "post_parent": "0",
-        "guid": "https://cart.junior.ninja/?post_type=fluent-products&#038;p=7529385",
+        "guid": "https://example.com/?post_type=fluent-products&#038;p=7529385",
         "menu_order": "0",
         "post_type": "fluent-products",
         "post_mime_type": "",
         "comment_count": "0",
-        "thumbnail": "https://cart.junior.ninja/wp-content/uploads/2025/06/white-navy-athletic-shoe-2.jpeg",
+        "thumbnail": "https://example.com/wp-content/uploads/2025/06/white-navy-athletic-shoe-2.jpeg",
         "detail": {
             "id": 52,
             "post_id": 7529385,
@@ -324,7 +324,7 @@ Operator quick mapping (UI → payload): Doesn't equal=`!=`, Less Than=`<`, Grea
             "updated_at": "2025-10-11T11:50:31+00:00",
             "featured_media": {
                 "id": 7529266,
-                "url": "https://cart.junior.ninja/wp-content/uploads/2025/06/white-navy-athletic-shoe-2.jpeg",
+                "url": "https://example.com/wp-content/uploads/2025/06/white-navy-athletic-shoe-2.jpeg",
                 "title": "white-navy-athletic-shoe-2"
             },
             "formatted_min_price": "&#36;20.00",
@@ -336,17 +336,17 @@ Operator quick mapping (UI → payload): Doesn't equal=`!=`, Less Than=`<`, Grea
                 "meta_value": [
                     {
                         "id": 7529266,
-                        "url": "https://cart.junior.ninja/wp-content/uploads/2025/06/white-navy-athletic-shoe-2.jpeg",
+                        "url": "https://example.com/wp-content/uploads/2025/06/white-navy-athletic-shoe-2.jpeg",
                         "title": "white-navy-athletic-shoe-2"
                     },
                     {
                         "id": 7529265,
-                        "url": "https://cart.junior.ninja/wp-content/uploads/2025/06/white-navy-athletic-shoe-1.jpeg",
+                        "url": "https://example.com/wp-content/uploads/2025/06/white-navy-athletic-shoe-1.jpeg",
                         "title": "white-navy-athletic-shoe-1"
                     },
                     {
                         "id": 7529260,
-                        "url": "https://cart.junior.ninja/wp-content/uploads/2025/06/unnamed-5.png",
+                        "url": "https://example.com/wp-content/uploads/2025/06/unnamed-5.png",
                         "title": "unnamed (5)"
                     }
                 ]
@@ -414,13 +414,13 @@ Create pricing for the created product.
   "post_modified_gmt": "0000-00-00 00:00:00",
   "post_content_filtered": "",
   "post_parent": 0,
-  "guid": "https://cart.junior.ninja/?post_type=fluent-products&p=7529320",
+  "guid": "https://example.com/?post_type=fluent-products&p=7529320",
   "menu_order": 0,
   "post_type": "fluent-products",
   "post_mime_type": "",
   "comment_count": 0,
-  "view_url": "https://cart.junior.ninja/?post_type=fluent-products&p=7529320",
-  "edit_url": "https://cart.junior.ninja/wp-admin/post.php?post=7529320&action=edit",
+  "view_url": "https://example.com/?post_type=fluent-products&p=7529320",
+  "edit_url": "https://example.com/wp-admin/post.php?post=7529320&action=edit",
   "detail": {
     "id": 42,
     "post_id": 7529320,
@@ -509,7 +509,7 @@ Create pricing for the created product.
 #### Example Request
 
 ```bash
-curl --location 'https://cart.junior.ninja/wp-json/fluent-cart/v2/products/7529320/pricing' \
+curl --location 'https://example.com/wp-json/fluent-cart/v2/products/7529320/pricing' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Basic Zmx1ZW50Y2FydDpqbXZwIHk5TEogV2pPNSBIbWpyIGd4dlUgYnlENQ==' \
 --data '{

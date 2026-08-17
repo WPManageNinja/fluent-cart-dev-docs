@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listProducts",
         "summary": "GET List Products",
-        "description": "Retrieve a paginated list of published products with optional filtering by taxonomy terms, price range, product type, and more. Only products with publish status are returned.",
+        "description": "Retrieve a paginated list of published products with optional filtering by taxonomy terms, price range, product type, and more. Only products with publish status are returned.\n\n**Access policy:** `PublicPolicy`\n\n**Access policy:** `PublicPolicy`",
         "tags": [
           "Public Shop"
         ],
@@ -345,6 +345,34 @@
                         "total": 24
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

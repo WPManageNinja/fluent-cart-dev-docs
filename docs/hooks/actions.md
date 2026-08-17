@@ -16,3 +16,5 @@ Action hooks allow you to execute custom code at specific points in FluentCart's
 6. [Products & Coupons](./actions/products-and-coupons) - Catalog management
 7. [Payments & Integrations](./actions/payments-and-integrations) - Payment gateways and third-party integrations
 8. [Admin & Templates](./actions/admin-and-templates) - Frontend rendering and administrative functions
+9. [Modules](./actions/modules) - MCP server and advanced product variations
+10. [Pro Modules](./actions/pro-modules) <Badge type="warning" text="Pro" /> - Software releases, Paddle webhooks, saved payment methods, MCP

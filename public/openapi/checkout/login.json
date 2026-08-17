@@ -27,7 +27,7 @@
       "post": {
         "operationId": "userLogin",
         "summary": "POST Login",
-        "description": "Authenticate a user during the checkout process. On success, sets the WordPress authentication cookie and returns a redirect URL to the customer profile page.",
+        "description": "Authenticate a user during the checkout process. On success, sets the WordPress authentication cookie and returns a redirect URL to the customer profile page.\n\n**Access policy:** `PublicPolicy`\n\n**Access policy:** `PublicPolicy`",
         "tags": [
           "Checkout"
         ],
@@ -296,6 +296,21 @@
                       "message": "Invalid security token. Please refresh the page and try again.",
                       "code": "invalid_nonce"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

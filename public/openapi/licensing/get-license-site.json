@@ -1,0 +1,357 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/licensing/sites/{id}": {
+      "get": {
+        "operationId": "getLicenseSite",
+        "summary": "GET Get License Site",
+        "description": "Retrieve one site with its paginated activation history, plus the customers and orders referenced by those activations.\n\nActivations are ordered newest first. Note the response nests a **hand-built** pagination object under `activations` (only `data`, `total`, `per_page`, `current_page`, `last_page`) rather than the full paginator used elsewhere.\n\n**Permission:** `licenses/view` · **Policy:** `LicensePolicy`",
+        "tags": [
+          "Licensing"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the license site."
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 15,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Activations per page. Clamped into the 1–100 range (default: 15)."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Page number of the activation history."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "site": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "site_url": {
+                          "type": "string",
+                          "description": "Host the license was activated against, stored without a scheme."
+                        },
+                        "server_version": {
+                          "type": "string",
+                          "description": "PHP version reported by the remote site."
+                        },
+                        "platform_version": {
+                          "type": "string",
+                          "description": "WordPress version reported by the remote site."
+                        },
+                        "other": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          },
+                          "description": "Additional environment data reported at activation."
+                        },
+                        "created_at": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "activations": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "license_id": {
+                                "type": "string"
+                              },
+                              "license_key": {
+                                "type": "string"
+                              },
+                              "product_id": {
+                                "type": "string"
+                              },
+                              "product_name": {
+                                "type": "string",
+                                "description": "Falls back to `Unknown Product` when the product has been deleted."
+                              },
+                              "variation_title": {
+                                "type": "string"
+                              },
+                              "license_status": {
+                                "type": "string"
+                              },
+                              "activation_status": {
+                                "type": "string"
+                              },
+                              "is_local": {
+                                "type": "string"
+                              },
+                              "last_update_version": {
+                                "type": "string"
+                              },
+                              "last_update_date": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "customer": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "integer"
+                                  },
+                                  "full_name": {
+                                    "type": "string"
+                                  },
+                                  "email": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "order_id": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "expiration_date": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "`null` for lifetime licenses."
+                              },
+                              "activation_limit": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "activation_count": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "created_at": {
+                                "type": "object"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": "integer"
+                        },
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "last_page": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "customers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Full customer records referenced by the activations on this page."
+                    },
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Full order records referenced by the activations on this page, newest first."
+                    }
+                  },
+                  "example": {
+                    "site": {
+                      "id": 2480,
+                      "site_url": "shop.example.org",
+                      "server_version": "8.3.30",
+                      "platform_version": "7.0",
+                      "other": [],
+                      "created_at": "2026-05-29T19:12:38+00:00",
+                      "updated_at": "2026-05-29T19:12:38+00:00"
+                    },
+                    "activations": {
+                      "data": [
+                        {
+                          "id": 2798,
+                          "license_id": "1196",
+                          "license_key": "fct-3f9a1c7e58b24d06af71e2c9b5d84a30",
+                          "product_id": "21480",
+                          "product_name": "FluentCart Pro",
+                          "variation_title": "50 Sites - Lifetime License",
+                          "license_status": "active",
+                          "activation_status": "active",
+                          "is_local": "0",
+                          "last_update_version": "",
+                          "last_update_date": "2026-05-29 13:12:38",
+                          "customer": {
+                            "id": 1219,
+                            "full_name": "Alex Morgan",
+                            "email": "alex.morgan@example.com"
+                          },
+                          "order_id": "1311",
+                          "expiration_date": null,
+                          "activation_limit": "50",
+                          "activation_count": "3",
+                          "created_at": {
+                            "date": "2026-05-29 19:12:38.000000",
+                            "timezone_type": 3,
+                            "timezone": "UTC"
+                          }
+                        }
+                      ],
+                      "total": 1,
+                      "per_page": 15,
+                      "current_page": 1,
+                      "last_page": 1
+                    },
+                    "customers": [
+                      {
+                        "id": 1219,
+                        "first_name": "Alex",
+                        "last_name": "Morgan",
+                        "email": "alex.morgan@example.com",
+                        "status": "active",
+                        "purchase_count": 1
+                      }
+                    ],
+                    "orders": [
+                      {
+                        "id": 1311,
+                        "status": "completed",
+                        "payment_status": "paid",
+                        "currency": "USD",
+                        "total_amount": 24900
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user lacks `licenses/view`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No license site matches that ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "No query results for model [LicenseSite]."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

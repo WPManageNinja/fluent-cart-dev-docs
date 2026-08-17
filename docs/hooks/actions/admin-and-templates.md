@@ -47,7 +47,7 @@ Fires inside the WordPress `init` hook (which itself runs after `plugins_loaded`
 
 - `$app` (\FluentCart\Framework\Foundation\Application): The FluentCart application container instance
 
-**Source:** `boot/app.php` (line 35)
+**Source:** `boot/app.php` (line 40)
 
 **Usage:**
 ```php
@@ -78,7 +78,7 @@ Fires in two places: inside the admin Vue SPA wrapper (`admin_app.php`) and on t
 
 None — this is a rendering hook. Callbacks should echo HTML.
 
-**Source:** `app/CPT/FluentProducts.php` (line 333), `app/Views/admin/admin_app.php` (line 4)
+**Source:** `app/CPT/FluentProducts.php` (line 359), `app/Views/admin/admin_app.php` (line 4)
 
 **Usage:**
 ```php
@@ -116,7 +116,7 @@ Fires at the end of `MenuHandler::addAdminMenu()`, after all default submenu ite
     ];
     ```
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php` (line 283)
+**Source:** `app/Hooks/Handlers/MenuHandler.php` (line 368)
 
 **Usage:**
 ```php
@@ -143,7 +143,7 @@ Fires at the very beginning of `MenuHandler::enqueueAssets()`, before any admin 
 
 - `$app` (\FluentCart\Framework\Foundation\Application): The FluentCart application container instance
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php` (line 355)
+**Source:** `app/Hooks/Handlers/MenuHandler.php` (line 440)
 
 **Usage:**
 ```php
@@ -151,6 +151,28 @@ add_action('fluent_cart/loading_app', function ($app) {
     // Enqueue a custom admin stylesheet before the SPA loads
     wp_enqueue_style('my-fct-admin-style', plugins_url('css/admin.css', __FILE__));
 }, 10, 1);
+```
+</details>
+
+### <code> fluent_cart/after_migrate </code>
+<details>
+<summary><code>fluent_cart/after_migrate</code> &mdash; After pending database migrations have run</summary>
+
+**When it runs:**
+Fires inside `DBMigrator` after all pending schema migrators for the current version have executed. Use this to run one-off follow-up logic (e.g. warming a cache, re-indexing) that depends on the database schema being fully up to date.
+
+**Parameters:**
+
+None.
+
+**Source:** `database/DBMigrator.php:134`
+
+**Usage:**
+```php
+add_action('fluent_cart/after_migrate', function () {
+    // Clear any cached schema-dependent data after migrations run
+    delete_transient('my_plugin_fluentcart_schema_cache');
+}, 10);
 ```
 </details>
 
@@ -165,7 +187,7 @@ Fires at the end of `MenuHandler::enqueueAssets()`, after all admin scripts have
 
 - `$app` (\FluentCart\Framework\Foundation\Application): The FluentCart application container instance
 
-**Source:** `app/Hooks/Handlers/MenuHandler.php` (line 465)
+**Source:** `app/Hooks/Handlers/MenuHandler.php` (line 603)
 
 **Usage:**
 ```php
@@ -211,7 +233,7 @@ Fires inside `ModuleSettingsController::saveSettings()` when a module's `active`
     ];
     ```
 
-**Source:** `app/Http/Controllers/ModuleSettingsController.php` (line 58)
+**Source:** `app/Http/Controllers/ModuleSettingsController.php` (line 55)
 
 **Usage:**
 ```php
@@ -276,7 +298,7 @@ Fires at the end of `FluentCartBlockEditorHandler::enqueueEditorStyles()`, after
 
 None.
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 428)
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 445)
 
 **Usage:**
 ```php
@@ -298,7 +320,7 @@ Fires inside the `<head>` tag of the custom block editor HTML page. WordPress co
 
 None.
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 620)
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 698)
 
 **Usage:**
 ```php
@@ -320,7 +342,7 @@ Fires immediately after `fluent_cart_block_editor/head` inside the `<head>` tag,
 
 None.
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 622)
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 701)
 
 **Usage:**
 ```php
@@ -342,7 +364,7 @@ Fires inside the `<body>` of the custom block editor page, after the editor `<di
 
 None.
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 629)
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 708)
 
 **Usage:**
 ```php
@@ -364,7 +386,7 @@ Fires at the end of `FluentCartBlockEditorHandler::enqueueEmailEditorBlocks()`, 
 
 None.
 
-**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 1232)
+**Source:** `app/Hooks/Handlers/FluentCartBlockEditorHandler.php` (line 1328)
 
 **Usage:**
 ```php
@@ -701,7 +723,7 @@ add_action('fluent_cart/views/checkout_page_login_form', function ($viewData) {
 <summary><code>fluent_cart/views/checkout_order_summary</code> &mdash; Render order summary (email shortcodes)</summary>
 
 **When it runs:**
-Fires inside `ShortcodeParser::getSummary()` when the `{{order_summary}}` shortcode is parsed in email templates. The output is captured via `ob_start()` and inserted into the email body as the order summary block. Receives the [Order](/database/models/order) model instance.
+Fires inside `ShortcodeParser::getSummary()` when the <code v-pre>{{order_summary}}</code> shortcode is parsed in email templates. The output is captured via `ob_start()` and inserted into the email body as the order summary block. Receives the [Order](/database/models/order) model instance.
 
 **Parameters:**
 
@@ -733,7 +755,7 @@ add_action('fluent_cart/views/checkout_order_summary', function ($data) {
 <summary><code>fluent_cart/views/checkout_order_receipt</code> &mdash; Render full order receipt (email shortcodes)</summary>
 
 **When it runs:**
-Fires inside `ShortcodeParser::getReceipt()` when the `{{order_receipt}}` shortcode is parsed in email templates. The output is captured via `ob_start()` and inserted into the email body as the complete [Order](/database/models/order) receipt.
+Fires inside `ShortcodeParser::getReceipt()` when the <code v-pre>{{order_receipt}}</code> shortcode is parsed in email templates. The output is captured via `ob_start()` and inserted into the email body as the complete [Order](/database/models/order) receipt.
 
 **Parameters:**
 
@@ -779,7 +801,7 @@ Fires inside `ShippingFrontendController::getShippingMethodsListView()` to rende
     ];
     ```
 
-**Source:** `app/Modules/Shipping/Http/Controllers/Frontend/ShippingFrontendController.php` (line 75)
+**Source:** `app/Modules/Shipping/Http/Controllers/Frontend/ShippingFrontendController.php` (line 111)
 
 **Usage:**
 ```php
@@ -816,7 +838,7 @@ Fires inside `CustomerController` when rendering the address information card on
     ];
     ```
 
-**Source:** `app/Http/Controllers/FrontendControllers/CustomerController.php` (line 137)
+**Source:** `app/Http/Controllers/FrontendControllers/CustomerController.php` (line 159)
 
 **Usage:**
 ```php
@@ -829,6 +851,125 @@ add_action('fluent_cart/views/checkout_page_form_address_info_wrapper', function
     echo '<br />' . esc_html($data['address']);
     echo '</div>';
 }, 10, 1);
+```
+</details>
+
+---
+
+## Bricks Builder Integration
+
+Hooks for the Bricks page-builder template integration.
+
+### <code> fluent_cart/bricks/rendering_ajax_collection </code>
+<details>
+<summary><code>fluent_cart/bricks/rendering_ajax_collection</code> &mdash; Before a Bricks AJAX product collection loop renders</summary>
+
+**When it runs:**
+Fires inside `BricksLoader` right before the product loop is rendered for a Bricks "load more" / AJAX collection request, before output buffering for the loop begins.
+
+**Parameters:**
+
+None.
+
+**Source:** `app/Modules/Templating/Bricks/BricksLoader.php:187`
+
+**Usage:**
+```php
+add_action('fluent_cart/bricks/rendering_ajax_collection', function () {
+    // Set up state needed before the Bricks product loop renders
+    my_plugin_prime_bricks_loop_context();
+}, 10);
+```
+</details>
+
+---
+
+## Data Backfills
+
+Hooks fired by the one-off data backfill routines that run in the background after a schema/data change ships (see `database/DataBackfills.php`).
+
+### <code> fluent_cart/data_backfills/chunk_selected </code>
+<details>
+<summary><code>fluent_cart/data_backfills/chunk_selected</code> &mdash; A chunk of rows has been selected for a backfill, before the write</summary>
+
+**When it runs:**
+Fires between row selection and the write for the `completed_next_billing_date` backfill, after a chunk of subscription IDs has been selected but before the UPDATE runs. A selected row can legitimately change state in this window (reactivation, gateway resync) — the subsequent UPDATE re-checks status so it never clobbers a row that changed mid-backfill.
+
+**Parameters:**
+
+- `$data` (array): The selected chunk
+    ```php
+    $data = [
+        'slug' => 'completed_next_billing_date', // string — which backfill routine
+        'ids'  => $ids,                          // array<int> — subscription IDs selected for this chunk
+    ];
+    ```
+
+**Source:** `database/DataBackfills.php:569`
+
+**Usage:**
+```php
+add_action('fluent_cart/data_backfills/chunk_selected', function ($data) {
+    fluent_cart_add_log(
+        'Backfill Chunk Selected',
+        sprintf('%s: %d rows selected', $data['slug'], count($data['ids'])),
+        'info'
+    );
+}, 10, 1);
+```
+</details>
+
+---
+
+## Email Notifications & Digest
+
+### <code> fluent_cart/email_notification_updated </code>
+<details>
+<summary><code>fluent_cart/email_notification_updated</code> &mdash; After an email notification's settings are saved</summary>
+
+**When it runs:**
+Fires inside `EmailNotificationController::update()` after a notification's settings have been successfully persisted. Core does not persist custom fields (`settings.extra`) itself — this hook exists so an add-on can store its own custom-field data in its own storage after the core save succeeds.
+
+**Parameters:**
+
+- `$notification` (array): The notification's identifying data (e.g. `event`, `name`)
+- `$settings` (array): The full settings payload that was just saved
+
+**Source:** `app/Http/Controllers/EmailNotificationController.php:95`
+
+**Usage:**
+```php
+add_action('fluent_cart/email_notification_updated', function ($notification, $settings) {
+    // Persist a custom field that core doesn't store
+    if (isset($settings['extra']['my_custom_field'])) {
+        update_option('my_notification_extra_' . $notification['name'], $settings['extra']['my_custom_field']);
+    }
+}, 10, 2);
+```
+</details>
+
+### <code> fluent_cart/store_digest/send </code>
+<details>
+<summary><code>fluent_cart/store_digest/send</code> &mdash; Trigger the store performance digest email to be sent</summary>
+
+**When it runs:**
+This is a **trigger** hook, not just a listener hook — the hourly scheduler calls `do_action('fluent_cart/store_digest/send', $frequency)` when a digest is due, and FluentCart's own listener (registered on this same hook) builds and sends the digest email. You can also call it yourself (e.g. from WP-CLI or a debugging script) to force an on-demand digest send for a given frequency.
+
+**Parameters:**
+
+- `$frequency` (string): The digest frequency/period to send, e.g. `'daily'`
+
+**Source:** `app/Hooks/Scheduler/AutoSchedules/HourlyScheduler.php:18`
+
+**Usage:**
+```php
+// Force-send today's daily digest on demand (e.g. from wp-cli eval-file.php)
+do_action('fluent_cart/store_digest/send', 'daily');
+
+// Or listen alongside the core handler to also notify Slack
+add_action('fluent_cart/store_digest/send', function ($frequency) {
+    my_plugin_notify_slack_digest_sent($frequency);
+}, 20, 1);
 ```
 </details>
 
@@ -929,7 +1070,7 @@ Fires inside `WebRoutes` when the current FluentCart web route `$page` slug matc
     ];
     ```
 
-**Source:** `app/Http/Routes/WebRoutes.php` (line 198)
+**Source:** `app/Http/Routes/WebRoutes.php` (line 234)
 
 **Usage:**
 ```php

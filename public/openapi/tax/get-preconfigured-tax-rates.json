@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getPreconfiguredTaxRates",
         "summary": "GET Get Preconfigured Tax Rates",
-        "description": "Retrieve the full list of preconfigured tax rates from the built-in tax rates data file. These are the default rates organized by continent/region and country.",
+        "description": "Retrieve the full list of preconfigured tax rates from the built-in tax rates data file. These are the default rates organized by continent/region (`EU`, `NA`, `SA`, `AS`, `AF`, `OC`, `REST`) and country.\n\n**Required permission:** `store/settings`",
         "tags": [
           "Tax"
         ],
@@ -46,6 +46,7 @@
                   "properties": {
                     "tax_rates": {
                       "type": "object",
+                      "description": "Keyed by region/continent group code: EU, NA, SA, AS, AF, OC, REST.",
                       "additionalProperties": {
                         "$ref": "#/components/schemas/PreconfiguredTaxRateGroup"
                       }
@@ -58,35 +59,77 @@
                         "group_code": "EU",
                         "countries": [
                           {
-                            "country_code": "DE",
-                            "country_name": "Germany",
+                            "country_code": "AT",
+                            "country_name": "Austria",
                             "total_rates": 3,
-                            "rates": {
-                              "standard": {
-                                "rate": 19,
-                                "name": "DE Standard Tax",
+                            "rates": [
+                              {
+                                "rate": 20,
+                                "compound": false,
                                 "type": "standard",
-                                "compound": false,
-                                "shipping": false
+                                "name": "MwSt"
                               },
-                              "reduced": {
-                                "rate": 7,
-                                "name": "DE Reduced Tax",
-                                "type": "reduced",
+                              {
+                                "rate": 13,
                                 "compound": false,
-                                "shipping": false
+                                "type": "reduced"
                               },
-                              "zero": {
+                              {
                                 "rate": 0,
-                                "name": "DE Zero Tax",
-                                "type": "zero",
                                 "compound": false,
-                                "shipping": false
+                                "type": "zero"
                               }
-                            }
+                            ]
+                          },
+                          {
+                            "country_code": "BE",
+                            "country_name": "Belgium",
+                            "total_rates": 3,
+                            "rates": [
+                              {
+                                "rate": 21,
+                                "compound": false,
+                                "type": "standard",
+                                "name": "BTW/TVA"
+                              },
+                              {
+                                "rate": 6,
+                                "compound": false,
+                                "type": "reduced"
+                              },
+                              {
+                                "rate": 0,
+                                "compound": false,
+                                "type": "zero"
+                              }
+                            ]
                           }
                         ],
                         "total_countries": 27
+                      },
+                      "REST": {
+                        "group_name": "Rest of the World",
+                        "group_code": "REST",
+                        "countries": [
+                          {
+                            "country_code": "GB",
+                            "country_name": "United Kingdom (UK)",
+                            "total_rates": 2,
+                            "rates": [
+                              {
+                                "rate": 20,
+                                "compound": false,
+                                "type": "standard"
+                              },
+                              {
+                                "rate": 5,
+                                "compound": false,
+                                "type": "reduced"
+                              }
+                            ]
+                          }
+                        ],
+                        "total_countries": 28
                       },
                       "NA": {
                         "group_name": "North America",
@@ -94,48 +137,145 @@
                         "countries": [
                           {
                             "country_code": "US",
-                            "country_name": "United States",
+                            "country_name": "United States (US)",
                             "total_rates": 2,
-                            "rates": {
-                              "standard": {
-                                "rate": 10,
-                                "name": "US Standard Tax",
-                                "type": "standard",
+                            "rates": [
+                              {
+                                "rate": 4,
                                 "compound": false,
-                                "shipping": false
+                                "state": "AL",
+                                "name": "Alabama State Tax (Standard)",
+                                "type": "standard"
                               },
-                              "zero": {
-                                "rate": 0,
-                                "name": "US Zero Tax",
-                                "type": "zero",
+                              {
+                                "rate": 2,
                                 "compound": false,
-                                "shipping": false
+                                "state": "AL",
+                                "name": "Alabama Reduced",
+                                "type": "reduced"
                               }
-                            }
+                            ]
                           },
                           {
                             "country_code": "CA",
                             "country_name": "Canada",
                             "total_rates": 2,
-                            "rates": {
-                              "standard": {
+                            "rates": [
+                              {
                                 "rate": 5,
-                                "name": "CA GST",
+                                "compound": false,
                                 "type": "standard",
-                                "compound": false,
-                                "shipping": true
+                                "name": "GST"
                               },
-                              "zero": {
+                              {
                                 "rate": 0,
-                                "name": "CA Zero Tax",
-                                "type": "zero",
                                 "compound": false,
-                                "shipping": false
+                                "type": "zero"
                               }
-                            }
+                            ]
                           }
                         ],
-                        "total_countries": 2
+                        "total_countries": 42
+                      },
+                      "SA": {
+                        "group_name": "South America",
+                        "group_code": "SA",
+                        "countries": [
+                          {
+                            "country_code": "BR",
+                            "country_name": "Brazil",
+                            "total_rates": 2,
+                            "rates": [
+                              {
+                                "rate": 17,
+                                "compound": false,
+                                "type": "standard",
+                                "name": "ICMS"
+                              },
+                              {
+                                "rate": 0,
+                                "compound": false,
+                                "type": "zero"
+                              }
+                            ]
+                          }
+                        ],
+                        "total_countries": 15
+                      },
+                      "AS": {
+                        "group_name": "Asia",
+                        "group_code": "AS",
+                        "countries": [
+                          {
+                            "country_code": "CN",
+                            "country_name": "China",
+                            "total_rates": 2,
+                            "rates": [
+                              {
+                                "rate": 13,
+                                "compound": false,
+                                "type": "standard",
+                                "name": "VAT"
+                              },
+                              {
+                                "rate": 0,
+                                "compound": false,
+                                "type": "zero"
+                              }
+                            ]
+                          }
+                        ],
+                        "total_countries": 50
+                      },
+                      "AF": {
+                        "group_name": "Africa",
+                        "group_code": "AF",
+                        "countries": [
+                          {
+                            "country_code": "BJ",
+                            "country_name": "Benin",
+                            "total_rates": 2,
+                            "rates": [
+                              {
+                                "rate": 18,
+                                "compound": false,
+                                "type": "standard",
+                                "name": "TVA"
+                              },
+                              {
+                                "rate": 0,
+                                "compound": false,
+                                "type": "zero"
+                              }
+                            ]
+                          }
+                        ],
+                        "total_countries": 58
+                      },
+                      "OC": {
+                        "group_name": "Oceania",
+                        "group_code": "OC",
+                        "countries": [
+                          {
+                            "country_code": "AU",
+                            "country_name": "Australia",
+                            "total_rates": 2,
+                            "rates": [
+                              {
+                                "rate": 10,
+                                "compound": false,
+                                "type": "standard",
+                                "name": "GST"
+                              },
+                              {
+                                "rate": 0,
+                                "compound": false,
+                                "type": "zero"
+                              }
+                            ]
+                          }
+                        ],
+                        "total_countries": 30
                       }
                     }
                   }
@@ -147,35 +287,77 @@
                       "group_code": "EU",
                       "countries": [
                         {
-                          "country_code": "DE",
-                          "country_name": "Germany",
+                          "country_code": "AT",
+                          "country_name": "Austria",
                           "total_rates": 3,
-                          "rates": {
-                            "standard": {
-                              "rate": 19,
-                              "name": "DE Standard Tax",
+                          "rates": [
+                            {
+                              "rate": 20,
+                              "compound": false,
                               "type": "standard",
-                              "compound": false,
-                              "shipping": false
+                              "name": "MwSt"
                             },
-                            "reduced": {
-                              "rate": 7,
-                              "name": "DE Reduced Tax",
-                              "type": "reduced",
+                            {
+                              "rate": 13,
                               "compound": false,
-                              "shipping": false
+                              "type": "reduced"
                             },
-                            "zero": {
+                            {
                               "rate": 0,
-                              "name": "DE Zero Tax",
-                              "type": "zero",
                               "compound": false,
-                              "shipping": false
+                              "type": "zero"
                             }
-                          }
+                          ]
+                        },
+                        {
+                          "country_code": "BE",
+                          "country_name": "Belgium",
+                          "total_rates": 3,
+                          "rates": [
+                            {
+                              "rate": 21,
+                              "compound": false,
+                              "type": "standard",
+                              "name": "BTW/TVA"
+                            },
+                            {
+                              "rate": 6,
+                              "compound": false,
+                              "type": "reduced"
+                            },
+                            {
+                              "rate": 0,
+                              "compound": false,
+                              "type": "zero"
+                            }
+                          ]
                         }
                       ],
                       "total_countries": 27
+                    },
+                    "REST": {
+                      "group_name": "Rest of the World",
+                      "group_code": "REST",
+                      "countries": [
+                        {
+                          "country_code": "GB",
+                          "country_name": "United Kingdom (UK)",
+                          "total_rates": 2,
+                          "rates": [
+                            {
+                              "rate": 20,
+                              "compound": false,
+                              "type": "standard"
+                            },
+                            {
+                              "rate": 5,
+                              "compound": false,
+                              "type": "reduced"
+                            }
+                          ]
+                        }
+                      ],
+                      "total_countries": 28
                     },
                     "NA": {
                       "group_name": "North America",
@@ -183,48 +365,145 @@
                       "countries": [
                         {
                           "country_code": "US",
-                          "country_name": "United States",
+                          "country_name": "United States (US)",
                           "total_rates": 2,
-                          "rates": {
-                            "standard": {
-                              "rate": 10,
-                              "name": "US Standard Tax",
-                              "type": "standard",
+                          "rates": [
+                            {
+                              "rate": 4,
                               "compound": false,
-                              "shipping": false
+                              "state": "AL",
+                              "name": "Alabama State Tax (Standard)",
+                              "type": "standard"
                             },
-                            "zero": {
-                              "rate": 0,
-                              "name": "US Zero Tax",
-                              "type": "zero",
+                            {
+                              "rate": 2,
                               "compound": false,
-                              "shipping": false
+                              "state": "AL",
+                              "name": "Alabama Reduced",
+                              "type": "reduced"
                             }
-                          }
+                          ]
                         },
                         {
                           "country_code": "CA",
                           "country_name": "Canada",
                           "total_rates": 2,
-                          "rates": {
-                            "standard": {
+                          "rates": [
+                            {
                               "rate": 5,
-                              "name": "CA GST",
+                              "compound": false,
                               "type": "standard",
-                              "compound": false,
-                              "shipping": true
+                              "name": "GST"
                             },
-                            "zero": {
+                            {
                               "rate": 0,
-                              "name": "CA Zero Tax",
-                              "type": "zero",
                               "compound": false,
-                              "shipping": false
+                              "type": "zero"
                             }
-                          }
+                          ]
                         }
                       ],
-                      "total_countries": 2
+                      "total_countries": 42
+                    },
+                    "SA": {
+                      "group_name": "South America",
+                      "group_code": "SA",
+                      "countries": [
+                        {
+                          "country_code": "BR",
+                          "country_name": "Brazil",
+                          "total_rates": 2,
+                          "rates": [
+                            {
+                              "rate": 17,
+                              "compound": false,
+                              "type": "standard",
+                              "name": "ICMS"
+                            },
+                            {
+                              "rate": 0,
+                              "compound": false,
+                              "type": "zero"
+                            }
+                          ]
+                        }
+                      ],
+                      "total_countries": 15
+                    },
+                    "AS": {
+                      "group_name": "Asia",
+                      "group_code": "AS",
+                      "countries": [
+                        {
+                          "country_code": "CN",
+                          "country_name": "China",
+                          "total_rates": 2,
+                          "rates": [
+                            {
+                              "rate": 13,
+                              "compound": false,
+                              "type": "standard",
+                              "name": "VAT"
+                            },
+                            {
+                              "rate": 0,
+                              "compound": false,
+                              "type": "zero"
+                            }
+                          ]
+                        }
+                      ],
+                      "total_countries": 50
+                    },
+                    "AF": {
+                      "group_name": "Africa",
+                      "group_code": "AF",
+                      "countries": [
+                        {
+                          "country_code": "BJ",
+                          "country_name": "Benin",
+                          "total_rates": 2,
+                          "rates": [
+                            {
+                              "rate": 18,
+                              "compound": false,
+                              "type": "standard",
+                              "name": "TVA"
+                            },
+                            {
+                              "rate": 0,
+                              "compound": false,
+                              "type": "zero"
+                            }
+                          ]
+                        }
+                      ],
+                      "total_countries": 58
+                    },
+                    "OC": {
+                      "group_name": "Oceania",
+                      "group_code": "OC",
+                      "countries": [
+                        {
+                          "country_code": "AU",
+                          "country_name": "Australia",
+                          "total_rates": 2,
+                          "rates": [
+                            {
+                              "rate": 10,
+                              "compound": false,
+                              "type": "standard",
+                              "name": "GST"
+                            },
+                            {
+                              "rate": 0,
+                              "compound": false,
+                              "type": "zero"
+                            }
+                          ]
+                        }
+                      ],
+                      "total_countries": 30
                     }
                   }
                 },
@@ -238,35 +517,77 @@
                           "group_code": "EU",
                           "countries": [
                             {
-                              "country_code": "DE",
-                              "country_name": "Germany",
+                              "country_code": "AT",
+                              "country_name": "Austria",
                               "total_rates": 3,
-                              "rates": {
-                                "standard": {
-                                  "rate": 19,
-                                  "name": "DE Standard Tax",
+                              "rates": [
+                                {
+                                  "rate": 20,
+                                  "compound": false,
                                   "type": "standard",
-                                  "compound": false,
-                                  "shipping": false
+                                  "name": "MwSt"
                                 },
-                                "reduced": {
-                                  "rate": 7,
-                                  "name": "DE Reduced Tax",
-                                  "type": "reduced",
+                                {
+                                  "rate": 13,
                                   "compound": false,
-                                  "shipping": false
+                                  "type": "reduced"
                                 },
-                                "zero": {
+                                {
                                   "rate": 0,
-                                  "name": "DE Zero Tax",
-                                  "type": "zero",
                                   "compound": false,
-                                  "shipping": false
+                                  "type": "zero"
                                 }
-                              }
+                              ]
+                            },
+                            {
+                              "country_code": "BE",
+                              "country_name": "Belgium",
+                              "total_rates": 3,
+                              "rates": [
+                                {
+                                  "rate": 21,
+                                  "compound": false,
+                                  "type": "standard",
+                                  "name": "BTW/TVA"
+                                },
+                                {
+                                  "rate": 6,
+                                  "compound": false,
+                                  "type": "reduced"
+                                },
+                                {
+                                  "rate": 0,
+                                  "compound": false,
+                                  "type": "zero"
+                                }
+                              ]
                             }
                           ],
                           "total_countries": 27
+                        },
+                        "REST": {
+                          "group_name": "Rest of the World",
+                          "group_code": "REST",
+                          "countries": [
+                            {
+                              "country_code": "GB",
+                              "country_name": "United Kingdom (UK)",
+                              "total_rates": 2,
+                              "rates": [
+                                {
+                                  "rate": 20,
+                                  "compound": false,
+                                  "type": "standard"
+                                },
+                                {
+                                  "rate": 5,
+                                  "compound": false,
+                                  "type": "reduced"
+                                }
+                              ]
+                            }
+                          ],
+                          "total_countries": 28
                         },
                         "NA": {
                           "group_name": "North America",
@@ -274,51 +595,176 @@
                           "countries": [
                             {
                               "country_code": "US",
-                              "country_name": "United States",
+                              "country_name": "United States (US)",
                               "total_rates": 2,
-                              "rates": {
-                                "standard": {
-                                  "rate": 10,
-                                  "name": "US Standard Tax",
-                                  "type": "standard",
+                              "rates": [
+                                {
+                                  "rate": 4,
                                   "compound": false,
-                                  "shipping": false
+                                  "state": "AL",
+                                  "name": "Alabama State Tax (Standard)",
+                                  "type": "standard"
                                 },
-                                "zero": {
-                                  "rate": 0,
-                                  "name": "US Zero Tax",
-                                  "type": "zero",
+                                {
+                                  "rate": 2,
                                   "compound": false,
-                                  "shipping": false
+                                  "state": "AL",
+                                  "name": "Alabama Reduced",
+                                  "type": "reduced"
                                 }
-                              }
+                              ]
                             },
                             {
                               "country_code": "CA",
                               "country_name": "Canada",
                               "total_rates": 2,
-                              "rates": {
-                                "standard": {
+                              "rates": [
+                                {
                                   "rate": 5,
-                                  "name": "CA GST",
+                                  "compound": false,
                                   "type": "standard",
-                                  "compound": false,
-                                  "shipping": true
+                                  "name": "GST"
                                 },
-                                "zero": {
+                                {
                                   "rate": 0,
-                                  "name": "CA Zero Tax",
-                                  "type": "zero",
                                   "compound": false,
-                                  "shipping": false
+                                  "type": "zero"
                                 }
-                              }
+                              ]
                             }
                           ],
-                          "total_countries": 2
+                          "total_countries": 42
+                        },
+                        "SA": {
+                          "group_name": "South America",
+                          "group_code": "SA",
+                          "countries": [
+                            {
+                              "country_code": "BR",
+                              "country_name": "Brazil",
+                              "total_rates": 2,
+                              "rates": [
+                                {
+                                  "rate": 17,
+                                  "compound": false,
+                                  "type": "standard",
+                                  "name": "ICMS"
+                                },
+                                {
+                                  "rate": 0,
+                                  "compound": false,
+                                  "type": "zero"
+                                }
+                              ]
+                            }
+                          ],
+                          "total_countries": 15
+                        },
+                        "AS": {
+                          "group_name": "Asia",
+                          "group_code": "AS",
+                          "countries": [
+                            {
+                              "country_code": "CN",
+                              "country_name": "China",
+                              "total_rates": 2,
+                              "rates": [
+                                {
+                                  "rate": 13,
+                                  "compound": false,
+                                  "type": "standard",
+                                  "name": "VAT"
+                                },
+                                {
+                                  "rate": 0,
+                                  "compound": false,
+                                  "type": "zero"
+                                }
+                              ]
+                            }
+                          ],
+                          "total_countries": 50
+                        },
+                        "AF": {
+                          "group_name": "Africa",
+                          "group_code": "AF",
+                          "countries": [
+                            {
+                              "country_code": "BJ",
+                              "country_name": "Benin",
+                              "total_rates": 2,
+                              "rates": [
+                                {
+                                  "rate": 18,
+                                  "compound": false,
+                                  "type": "standard",
+                                  "name": "TVA"
+                                },
+                                {
+                                  "rate": 0,
+                                  "compound": false,
+                                  "type": "zero"
+                                }
+                              ]
+                            }
+                          ],
+                          "total_countries": 58
+                        },
+                        "OC": {
+                          "group_name": "Oceania",
+                          "group_code": "OC",
+                          "countries": [
+                            {
+                              "country_code": "AU",
+                              "country_name": "Australia",
+                              "total_rates": 2,
+                              "rates": [
+                                {
+                                  "rate": 10,
+                                  "compound": false,
+                                  "type": "standard",
+                                  "name": "GST"
+                                },
+                                {
+                                  "rate": 0,
+                                  "compound": false,
+                                  "type": "zero"
+                                }
+                              ]
+                            }
+                          ],
+                          "total_countries": 30
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`store/settings`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -348,40 +794,43 @@
               "properties": {
                 "country_code": {
                   "type": "string",
-                  "example": "DE"
+                  "example": "AT"
                 },
                 "country_name": {
                   "type": "string",
-                  "example": "Germany"
+                  "example": "Austria"
                 },
                 "total_rates": {
                   "type": "integer",
                   "example": 3
                 },
                 "rates": {
-                  "type": "object",
-                  "additionalProperties": {
+                  "type": "array",
+                  "description": "List of tax rate rows for this country.",
+                  "items": {
                     "type": "object",
                     "properties": {
                       "rate": {
                         "type": "number",
-                        "example": 19
-                      },
-                      "name": {
-                        "type": "string",
-                        "example": "DE Standard Tax"
-                      },
-                      "type": {
-                        "type": "string",
-                        "example": "standard"
+                        "example": 20
                       },
                       "compound": {
                         "type": "boolean",
                         "example": false
                       },
-                      "shipping": {
-                        "type": "boolean",
-                        "example": false
+                      "type": {
+                        "type": "string",
+                        "example": "standard"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "Present for some rate rows (e.g. named local tax); omitted for others.",
+                        "example": "MwSt"
+                      },
+                      "state": {
+                        "type": "string",
+                        "description": "Present only on US rate rows, one per state/territory.",
+                        "example": "AL"
                       }
                     }
                   }

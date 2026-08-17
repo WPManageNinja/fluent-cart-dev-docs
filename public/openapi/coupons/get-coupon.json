@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getCoupon",
         "summary": "GET Coupon Details",
-        "description": "Retrieve detailed information about a specific coupon, including its activity log. The coupon status is automatically updated to expired if its end_date has passed.",
+        "description": "Retrieve detailed information about a specific coupon, including its activity log. The coupon status is automatically updated to expired if its end_date has passed.\n\n**Required permission:** `coupons/view`",
         "tags": [
           "Coupons"
         ],
@@ -63,7 +63,6 @@
                   "example": {
                     "coupon": {
                       "id": 3,
-                      "parent": null,
                       "title": "Welcome Discount",
                       "code": "WELCOME20",
                       "status": "active",
@@ -125,7 +124,6 @@
                 "example": {
                   "coupon": {
                     "id": 3,
-                    "parent": null,
                     "title": "Welcome Discount",
                     "code": "WELCOME20",
                     "status": "active",
@@ -189,7 +187,6 @@
                     "value": {
                       "coupon": {
                         "id": 3,
-                        "parent": null,
                         "title": "Welcome Discount",
                         "code": "WELCOME20",
                         "status": "active",
@@ -251,6 +248,49 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`coupons/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -265,11 +305,6 @@
             "type": "integer",
             "description": "Coupon ID",
             "example": 3
-          },
-          "parent": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Parent coupon ID"
           },
           "title": {
             "type": "string",

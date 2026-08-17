@@ -32,7 +32,7 @@
         ],
         "operationId": "saveProductOverride",
         "summary": "POST Save Product Category Tax Override",
-        "description": "Create or update a product category tax override. Pass id to update an existing override. Without id, an existing override matching the same category, location, and tax class is updated in place; otherwise a new override is created. Pass source_type \"shipping\" with source_id to convert an existing shipping tax override into a product override (the shipping override is removed).",
+        "description": "Create or update a product category tax override. Pass id to update an existing override. Without id, an existing override matching the same category, location, and tax class is updated in place; otherwise a new override is created. Pass source_type \"shipping\" with source_id to convert an existing shipping tax override into a product override (the shipping override is removed).\n\n**Required permission:** `store/sensitive`",
         "tags": [
           "Tax"
         ],
@@ -276,7 +276,7 @@
             }
           },
           "422": {
-            "description": "Validation failed — missing country/category, invalid country code, invalid tax class, invalid product category, or a conflicting override already exists for the same category, location, and tax class.",
+            "description": "Validation failed \u2014 missing country/category, invalid country code, invalid tax class, invalid product category, or a conflicting override already exists for the same category, location, and tax class.",
             "content": {
               "application/json": {
                 "schema": {
@@ -305,6 +305,34 @@
                     "value": {
                       "message": "An override already exists for the selected category, location, and tax class"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`store/sensitive`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -427,7 +455,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

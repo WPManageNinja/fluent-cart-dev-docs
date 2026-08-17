@@ -27,7 +27,7 @@
       "post": {
         "operationId": "assignRole",
         "summary": "POST Assign Role",
-        "description": "Assign a FluentCart role to a WordPress user. The user receives the fluent_cart_admin capability and their role is stored as user meta. If the user already has an assigned role, it is replaced.",
+        "description": "Assign a FluentCart role to a WordPress user. The user receives the fluent_cart_admin capability and their role is stored as user meta. If the user already has an assigned role, it is replaced.\n\n**Policy:** `AdminPolicy`",
         "tags": [
           "Roles"
         ],
@@ -174,7 +174,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

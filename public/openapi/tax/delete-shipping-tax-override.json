@@ -27,7 +27,7 @@
       "delete": {
         "operationId": "deleteShippingTaxOverride",
         "summary": "DELETE Delete Shipping Tax Override",
-        "description": "Remove the shipping tax override from a tax rate, resetting for_shipping to null.",
+        "description": "Remove the shipping tax override from a tax rate, resetting for_shipping to null.\n\n**Required permission:** `store/sensitive`",
         "tags": [
           "Tax"
         ],
@@ -74,6 +74,49 @@
                     "value": {
                       "message": "Shipping override has been deleted successfully"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`store/sensitive`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

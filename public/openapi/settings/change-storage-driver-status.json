@@ -1,0 +1,201 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/storage-drivers/change-status": {
+      "post": {
+        "operationId": "changeStatus",
+        "summary": "POST Change Storage Driver Status",
+        "description": "Enable or disable a storage driver that does not manage its own bucket (bucket-backed drivers such as S3 must instead be configured from their own settings page). Only flips the driver's `is_active` flag.\n\n**Required permission:** `is_super_admin`",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "driver",
+                  "status"
+                ],
+                "properties": {
+                  "driver": {
+                    "type": "string",
+                    "description": "The storage driver key (e.g., `local`).",
+                    "example": "local"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ],
+                    "description": "New active status for the driver."
+                  }
+                },
+                "example": {
+                  "driver": "local",
+                  "status": "yes"
+                }
+              },
+              "example": {
+                "driver": "local",
+                "status": "yes"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "driver": "local",
+                    "status": "yes"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the updated driver settings.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "The driver's persisted settings, including the new is_active value."
+                    }
+                  },
+                  "example": {
+                    "message": "Status updated successfully",
+                    "data": {
+                      "is_active": "yes"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Status updated successfully",
+                  "data": {
+                    "is_active": "yes"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Status updated successfully",
+                      "data": {
+                        "is_active": "yes"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The driver manages its own bucket and must be configured from its settings page, or saving the new status failed.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "This storage driver must be managed from its settings page."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The named driver does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid driver"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`status` was not `yes` or `no`.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid status value"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

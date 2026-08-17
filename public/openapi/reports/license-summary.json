@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getLicenseSummary",
         "summary": "GET Get License Summary",
-        "description": "Retrieve summary statistics for licenses (total issued, active, expired, revoked, etc.) within the specified date range.",
+        "description": "Retrieve summary statistics for licenses (total, active, inactive, expired, total activated sites, and licensed product count). Note: the date range parameters are accepted but the current counts are not filtered by them.\n\n**Also used by the licensing UI.** Retrieve a summary of license statistics.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -109,6 +109,28 @@
             },
             "description": "Order type filter.",
             "required": false
+          },
+          {
+            "name": "params",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "object"
+            },
+            "description": "Request parameters object containing filters and date range",
+            "style": "deepObject",
+            "explode": true
+          },
+          {
+            "name": "params[filters]",
+            "in": "query",
+            "schema": {
+              "type": "object"
+            },
+            "description": "Filter criteria",
+            "required": false,
+            "style": "deepObject",
+            "explode": true
           }
         ],
         "responses": {
@@ -118,39 +140,106 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "License summary statistics",
-                  "additionalProperties": true,
+                  "properties": {
+                    "summaryData": {
+                      "type": "object",
+                      "description": "License summary statistics",
+                      "properties": {
+                        "totalLicense": {
+                          "type": "integer",
+                          "description": "Total number of licenses issued",
+                          "example": 245
+                        },
+                        "totalActiveLicense": {
+                          "type": "integer",
+                          "description": "Number of licenses with status 'active'",
+                          "example": 198
+                        },
+                        "totalInactiveLicense": {
+                          "type": "integer",
+                          "description": "Number of licenses with status 'disabled'",
+                          "example": 12
+                        },
+                        "totalExpiredLicense": {
+                          "type": "integer",
+                          "description": "Number of licenses with status 'expired'",
+                          "example": 32
+                        },
+                        "totalActivatedSites": {
+                          "type": "string",
+                          "description": "Sum of activation_count across all licenses (site activations), returned as a numeric string",
+                          "example": "412"
+                        },
+                        "totalLicensedProducts": {
+                          "type": "integer",
+                          "description": "Number of products that have license settings configured",
+                          "example": 3
+                        }
+                      }
+                    }
+                  },
                   "example": {
-                    "total_licenses": 245,
-                    "active_licenses": 198,
-                    "expired_licenses": 32,
-                    "revoked_licenses": 15,
-                    "total_activations": 412,
-                    "average_activations_per_license": 1.68,
-                    "activation_limit_reached": 24
+                    "summaryData": {
+                      "totalLicense": 245,
+                      "totalActiveLicense": 198,
+                      "totalInactiveLicense": 12,
+                      "totalExpiredLicense": 32,
+                      "totalActivatedSites": "412",
+                      "totalLicensedProducts": 3
+                    }
                   }
                 },
                 "example": {
-                  "total_licenses": 245,
-                  "active_licenses": 198,
-                  "expired_licenses": 32,
-                  "revoked_licenses": 15,
-                  "total_activations": 412,
-                  "average_activations_per_license": 1.68,
-                  "activation_limit_reached": 24
+                  "summaryData": {
+                    "totalLicense": 245,
+                    "totalActiveLicense": 198,
+                    "totalInactiveLicense": 12,
+                    "totalExpiredLicense": 32,
+                    "totalActivatedSites": "412",
+                    "totalLicensedProducts": 3
+                  }
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "total_licenses": 245,
-                      "active_licenses": 198,
-                      "expired_licenses": 32,
-                      "revoked_licenses": 15,
-                      "total_activations": 412,
-                      "average_activations_per_license": 1.68,
-                      "activation_limit_reached": 24
+                      "summaryData": {
+                        "totalLicense": 245,
+                        "totalActiveLicense": 198,
+                        "totalInactiveLicense": 12,
+                        "totalExpiredLicense": 32,
+                        "totalActivatedSites": "412",
+                        "totalLicensedProducts": 3
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

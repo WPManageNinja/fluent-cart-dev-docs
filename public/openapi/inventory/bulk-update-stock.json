@@ -1,0 +1,202 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/inventory/bulk-update": {
+      "post": {
+        "operationId": "bulkUpdateInventoryStock",
+        "summary": "POST Bulk Update Stock",
+        "description": "Adjust stock for many variants at once. `mode: \"set\"` writes `value` as the new absolute stock; `mode: \"add\"` adds `value` to each variant's current stock (use a negative `value` to subtract). Results are clamped at 0.\n\nIDs that do not resolve to an existing variant are **skipped silently** — compare `count` against the number of items you sent to detect this. An empty `items` array is a successful no-op.\n\n**Permission:** `products/edit` · **Policy:** `ProductPolicy`",
+        "tags": [
+          "Advanced Inventory"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "add",
+                      "set"
+                    ],
+                    "description": "`set` writes an absolute value; `add` applies a delta."
+                  },
+                  "value": {
+                    "type": "integer",
+                    "description": "The absolute value or the delta, per `mode`."
+                  },
+                  "reason": {
+                    "type": "string",
+                    "enum": [
+                      "received",
+                      "damage",
+                      "return",
+                      "correction",
+                      "transfer",
+                      "other"
+                    ],
+                    "description": "Why the stock changed. One of `received` (Received Stock), `damage` (Damage/Loss), `return` (Return/Refund), `correction` (Count Correction), `transfer` (Inventory Transfer) or `other`. When `other` is used, `customReason` becomes required."
+                  },
+                  "customReason": {
+                    "type": "string",
+                    "description": "Free-text reason. Required when `reason` is `other`."
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Variant ID."
+                        }
+                      }
+                    },
+                    "description": "Variants to update. Only the `id` key is read."
+                  }
+                },
+                "required": [
+                  "mode",
+                  "value",
+                  "reason",
+                  "items"
+                ],
+                "example": {
+                  "mode": "add",
+                  "value": 5,
+                  "reason": "received",
+                  "items": [
+                    {
+                      "id": 22
+                    },
+                    {
+                      "id": 23
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "count": {
+                      "type": "integer",
+                      "description": "Number of variants actually updated."
+                    }
+                  },
+                  "example": {
+                    "message": "Stock updated successfully",
+                    "count": 2
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid `mode` (allowed: `add`, `set`) or invalid `reason`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "Invalid mode. Allowed: add, set"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the authenticated user lacks the required permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

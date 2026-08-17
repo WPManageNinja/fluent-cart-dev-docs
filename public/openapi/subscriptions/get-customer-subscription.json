@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getCustomerSubscription",
         "summary": "GET Get Customer Subscription Details",
-        "description": "Retrieve full details of a specific subscription for the currently logged-in customer, including transactions, upgrade eligibility, and payment method capabilities.",
+        "description": "Retrieve full details of a specific subscription for the currently logged-in customer, including transactions, upgrade eligibility, and payment method capabilities.\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Subscriptions"
         ],
@@ -60,6 +60,16 @@
                     },
                     "subscription": {
                       "$ref": "#/components/schemas/CustomerSubscriptionDetail"
+                    },
+                    "section_parts": {
+                      "type": "object",
+                      "description": "Extra HTML content sections for the subscription details page, keyed by section name (filterable via fluent_cart/customer/subscription_details_section_parts). Values are sanitized HTML strings.",
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "example": {
+                        "end_of_subscription": ""
+                      }
                     }
                   },
                   "example": {
@@ -134,6 +144,9 @@
                           }
                         }
                       ]
+                    },
+                    "section_parts": {
+                      "end_of_subscription": ""
                     }
                   }
                 },
@@ -209,6 +222,9 @@
                         }
                       }
                     ]
+                  },
+                  "section_parts": {
+                    "end_of_subscription": ""
                   }
                 },
                 "examples": {
@@ -286,8 +302,54 @@
                             }
                           }
                         ]
+                      },
+                      "section_parts": {
+                        "end_of_subscription": ""
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

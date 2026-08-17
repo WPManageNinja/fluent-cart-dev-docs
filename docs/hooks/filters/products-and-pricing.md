@@ -21,7 +21,7 @@ This filter is applied after fetching the paginated products collection in the a
 **Returns:**
 - `$products` (LengthAwarePaginator): The modified paginated collection
 
-**Source:** `app/Http/Controllers/ProductController.php:52`
+**Source:** `app/Http/Controllers/ProductController.php:59`
 
 **Usage:**
 ```php
@@ -167,7 +167,7 @@ This filter is applied when rendering the price text for each product variation.
 **Returns:**
 - `$priceText` (string): The modified price text (HTML allowed via `wp_kses_post`)
 
-**Source:** `app/Services/Renderer/ProductRenderer.php:827`
+**Source:** `app/Services/Renderer/ProductRenderer.php:1213`
 
 **Usage:**
 ```php
@@ -250,7 +250,7 @@ This dynamic filter is applied when the shop controller loads products via AJAX 
 **Returns:**
 - `$html` (string): Rendered HTML string, or empty string to fall back to default JSON response
 
-**Source:** `app/Http/Controllers/ShopController.php:103`
+**Source:** `app/Http/Controllers/ShopController.php:133`
 
 **Usage:**
 ```php
@@ -261,6 +261,306 @@ add_filter('fluent_cart/products_views/preload_collection_bricks', function($htm
         echo '<div class="custom-product-card">' . esc_html($product['title']) . '</div>';
     }
     return ob_get_clean();
+}, 10, 2);
+```
+</details>
+
+### <code> product/card_classes </code>
+<details>
+<summary><code>fluent_cart/product/card_classes</code> &mdash; Filter the CSS classes on a product card wrapper</summary>
+
+**When it runs:**
+This filter is applied by `RenderGate::cardClasses()` whenever a product card is rendered (shop listing, related products, carousel, etc.), just before the class list is imploded into the `class` attribute on the card `<article>` element.
+
+**Parameters:**
+
+- `$classes` (array): The CSS class strings for the card wrapper
+- `$context` (array): Render context, decorated by `RenderContext::decorate()`
+    ```php
+    $context = [
+        'product' => $product, // Product model, or null
+        'scope'   => 'card',   // RenderGate::SCOPE_CARD
+        // ...additional keys added by RenderContext::decorate()
+    ];
+    ```
+
+**Returns:**
+- `$classes` (array): The modified array of CSS class strings. A non-array return is treated as an empty class list.
+
+**Source:** `app/Services/Renderer/RenderGate.php:142`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/card_classes', function($classes, $context) {
+    $product = $context['product'] ?? null;
+    if ($product && $product->detail->variation_type === 'advanced_variations') {
+        $classes[] = 'fct-has-advanced-variations';
+    }
+    return $classes;
+}, 10, 2);
+```
+</details>
+
+### <code> product/display_price </code>
+<details>
+<summary><code>fluent_cart/product/display_price</code> &mdash; Filter the price shown on a product card or single product page</summary>
+
+**When it runs:**
+This filter is applied after the renderer resolves the lowest/default variation price to display — on the shop/related product card (`ProductCardRender`) and on the single product page (`ProductRenderer`). Amounts are in cents; the caller casts the filtered result back to `int`.
+
+**Parameters:**
+
+- `$price` (int): The resolved display price, in cents
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'product'   => $product,   // Product model
+        'variation' => $variation, // ProductVariation model (the matched/first variant)
+    ];
+    ```
+
+**Returns:**
+- `$price` (int): The modified price, in cents
+
+**Source:** `app/Services/Renderer/ProductCardRender.php:272`, `app/Services/Renderer/ProductRenderer.php:992`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/display_price', function($price, $data) {
+    // Show a 10% "member price" preview for logged-in customers
+    if (is_user_logged_in()) {
+        return (int) round($price * 0.9);
+    }
+    return $price;
+}, 10, 2);
+```
+</details>
+
+### <code> product/gallery_variation_data </code>
+<details>
+<summary><code>fluent_cart/product/gallery_variation_data</code> &mdash; Filter the variant-to-gallery-image mapping for advanced-variation products</summary>
+
+**When it runs:**
+This filter is applied only for products using the advanced-variation type (`Helper::PRODUCT_TYPE_ADVANCE_VARIATION`), while the product renderer builds its image gallery. It lets an integrator (Pro's advanced-variation module) supply the maps that associate each variant term / variant combination with specific gallery media.
+
+**Parameters:**
+
+- `$data` (array): Default empty maps
+    ```php
+    $data = [
+        'variant_term_map'        => [], // term_id => [media info] or similar mapping
+        'variant_first_media_map' => [], // variation_id => first media item for that variant
+    ];
+    ```
+- `$product` ([Product](/database/models/product)): The product being rendered
+
+**Returns:**
+- `$data` (array): The modified `variant_term_map` / `variant_first_media_map` maps. Read back as `$this->variantTermMap` and `$variantFirstMediaMap` by the renderer.
+
+**Source:** `app/Services/Renderer/ProductRenderer.php:467`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/gallery_variation_data', function($data, $product) {
+    // Populate a custom first-media map built from variant meta
+    foreach ($product->variants as $variant) {
+        if (!empty($variant->other_info['gallery_image_id'])) {
+            $data['variant_first_media_map'][$variant->id] = $variant->other_info['gallery_image_id'];
+        }
+    }
+    return $data;
+}, 10, 2);
+```
+</details>
+
+### <code> product/get_response_data </code>
+<details>
+<summary><code>fluent_cart/product/get_response_data</code> &mdash; Filter the admin product editor's "get product" API response payload</summary>
+
+**When it runs:**
+This filter is applied in the admin product controller right before the single-product edit response is sent to the Vue admin app, after the product model has been converted to an array.
+
+**Parameters:**
+
+- `$payload` (array): The response payload
+    ```php
+    $payload = [
+        'product'    => $productData, // array, from $product->toArray() plus 'featured_image_id'
+        'product_id' => 123,          // int
+        'request'    => $request,     // \FluentCart\Framework\Http\Request\Request instance
+    ];
+    ```
+
+**Returns:**
+- `$payload` (array): The modified payload. Only `$payload['product']` is read back by the caller (via `Arr::get($payload, 'product', $productData)`); other keys are for the listener's own use.
+
+**Source:** `app/Http/Controllers/ProductController.php:799`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/get_response_data', function($payload) {
+    // Attach a computed field the admin UI can render
+    $payload['product']['review_count'] = get_review_count_for_product($payload['product_id']);
+    return $payload;
+}, 10, 1);
+```
+</details>
+
+### <code> product/price_suffix_context </code>
+<details>
+<summary><code>fluent_cart/product/price_suffix_context</code> &mdash; Filter the context passed to the price suffix renderer</summary>
+
+**When it runs:**
+This filter is applied at the start of `RenderHelper::renderPriceSuffix()`, before the context is handed to `fluent_cart/product/price_suffix_atts` (the filter that actually returns the suffix text, e.g. the Tax module's "incl. tax" label).
+
+**Parameters:**
+
+- `$context` (array): The suffix render context
+    ```php
+    $context = [
+        'product' => $product, // Product model
+        'variant' => $variant, // ProductVariant model
+        'scope'   => $scope,   // e.g. 'variant_item'
+    ];
+    ```
+
+**Returns:**
+- `$context` (array): The modified context array, passed straight through to `fluent_cart/product/price_suffix_atts`
+
+**Source:** `app/Services/Renderer/RenderHelper.php:20`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/price_suffix_context', function($context) {
+    // Flag wholesale variants so a listener on price_suffix_atts can react
+    $context['is_wholesale'] = !empty($context['variant']->other_info['wholesale']);
+    return $context;
+}, 10, 1);
+```
+</details>
+
+### <code> product/render_advanced_variation </code>
+<details>
+<summary><code>fluent_cart/product/render_advanced_variation</code> &mdash; Let an add-on render the variation selector for advanced-variation products</summary>
+
+**When it runs:**
+This filter is applied by the single-product renderer, but only when the product's variation type is the advanced-variation type. It is the hand-off point that lets FluentCart Pro's advanced-variation selector replace the core's simple-variation markup entirely.
+
+**Parameters:**
+
+- `$result` (array): Render request/result
+    ```php
+    $result = [
+        'product'        => $this->product, // Product model
+        'selector_style' => 'auto',         // from render atts, default 'auto'
+        'rendered'       => false,          // set true to signal the listener rendered the selector
+    ];
+    ```
+
+**Returns:**
+- `$result` (array): The same shape back. **The core renderer only skips its own simple-variation output when `$result['rendered']` is truthy** — a listener that filters other keys but leaves `rendered` at `false` is a no-op and the default selector still renders.
+
+**Source:** `app/Services/Renderer/ProductRenderer.php:350`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/render_advanced_variation', function($result) {
+    // Echo a custom selector and take over rendering
+    echo '<div class="my-advanced-variation-selector" data-product-id="' . esc_attr($result['product']->ID) . '"></div>';
+    $result['rendered'] = true;
+    return $result;
+}, 10, 1);
+```
+</details>
+
+### <code> product/render_source </code>
+<details>
+<summary><code>fluent_cart/product/render_source</code> &mdash; Filter which render source/provider is currently active</summary>
+
+**When it runs:**
+This filter is applied by `RenderContext` whenever code needs to know which template provider is currently rendering product markup (e.g. the classic PHP renderer vs. a page-builder integration like Bricks). It has no natural default source of truth, so it always starts from an "unknown" fallback and relies entirely on a listener to identify itself.
+
+**Parameters:**
+
+- `$fallback` (array): The default value
+    ```php
+    $fallback = [
+        'source' => 'unknown', // RenderContext::SOURCE_UNKNOWN
+        'name'   => '',
+    ];
+    ```
+
+**Returns:**
+- `array` — Must include a non-empty `'source'` key to be accepted; otherwise the `$fallback` is used. `'name'` is cast to string.
+
+**Source:** `app/Services/Renderer/RenderContext.php:89`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/render_source', function($fallback) {
+    if (defined('BRICKS_VERSION') && bricks_is_builder()) {
+        return ['source' => 'bricks', 'name' => 'Bricks Builder'];
+    }
+    return $fallback;
+}, 10, 1);
+```
+</details>
+
+### <code> product/show_section </code>
+<details>
+<summary><code>fluent_cart/product/show_section</code> &mdash; Generic filter for whether any product render section should be shown</summary>
+
+**When it runs:**
+This filter is applied by `RenderGate::shouldRender()` immediately after the section-specific `fluent_cart/product/show_{$section}` filter (see below) has run, receiving that filter's result. Use this one when you want to gate visibility across *every* section from a single callback instead of hooking each section name individually.
+
+**Parameters:**
+
+- `$show` (bool): The visibility decision from the section-specific filter
+- `$context` (array): Render context (decorated via `RenderContext::decorate()`), includes the product, scope, and the section being gated
+
+**Returns:**
+- `bool` — Whether the section should render
+
+**Source:** `app/Services/Renderer/RenderGate.php:109`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/show_section', function($show, $context) {
+    // Hide every card section for products tagged "coming-soon"
+    $product = $context['product'] ?? null;
+    if ($product && $product->hasTerm('coming-soon', 'product-tag')) {
+        return false;
+    }
+    return $show;
+}, 10, 2);
+```
+</details>
+
+### <code> product/show_{$section} </code>
+<details>
+<summary><code>fluent_cart/product/show_{$section}</code> &mdash; Filter whether a specific product render section should be shown</summary>
+
+**When it runs:**
+This dynamic filter is applied first inside `RenderGate::shouldRender()`, before the generic `fluent_cart/product/show_section` filter above wraps its result. The `{$section}` portion is the section name being gated — confirmed examples elsewhere in the renderer include `'title'` and `'image'`; other card/single-page blocks (excerpt, actions, etc.) follow the same pattern.
+
+**Parameters:**
+
+- `$show` (bool): Whether the section should render. Default: `true`
+- `$context` (array): Render context (decorated via `RenderContext::decorate()`), includes the product and scope
+
+**Returns:**
+- `bool` — Whether this section should render
+
+**Source:** `app/Services/Renderer/RenderGate.php:107`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/show_title', function($show, $context) {
+    // Hide the title block on the card, but keep it on the single page
+    if (($context['scope'] ?? '') === 'card') {
+        return false;
+    }
+    return $show;
 }, 10, 2);
 ```
 </details>
@@ -349,7 +649,7 @@ This filter is applied when rendering the button text for products that are out 
 **Returns:**
 - `$text` (string): The modified out-of-stock text
 
-**Source:** `app/Hooks/Handlers/ShortCodes/SingleProductShortCode.php:83`, `app/Hooks/Handlers/BlockEditors/ShopApp/InnerBlocks/InnerBlocks.php:1027,1106`, `app/Modules/Templating/AssetLoader.php:85`, `app/Hooks/Handlers/BlockEditors/ProductCarousel/InnerBlocks/InnerBlocks.php:495`
+**Source:** `app/Hooks/Handlers/ShortCodes/SingleProductShortCode.php:91`, `app/Hooks/Handlers/BlockEditors/ShopApp/InnerBlocks/InnerBlocks.php:1027,1106`, `app/Modules/Templating/AssetLoader.php:85`, `app/Hooks/Handlers/BlockEditors/ProductCarousel/InnerBlocks/InnerBlocks.php:495`
 
 **Usage:**
 ```php
@@ -374,7 +674,7 @@ This filter is applied in the block editor asset loader when localizing the out-
 **Returns:**
 - `$text` (string): The modified out-of-stock button text
 
-**Source:** `app/Modules/Templating/AssetLoader.php:260`
+**Source:** `app/Modules/Templating/AssetLoader.php:314`
 
 **Usage:**
 ```php
@@ -552,7 +852,7 @@ This filter is applied when registering the `fluent-products` custom post type, 
 **Returns:**
 - `$slug` (string): The modified URL slug
 
-**Source:** `app/CPT/FluentProducts.php:181`
+**Source:** `app/CPT/FluentProducts.php:171`
 
 **Note:** After changing the slug, you must flush rewrite rules (visit Settings > Permalinks in WP admin) for the change to take effect.
 
@@ -585,7 +885,7 @@ This filter is applied when registering the `fluent-products` custom post type, 
 **Returns:**
 - `$withFront` (bool): The modified value
 
-**Source:** `app/CPT/FluentProducts.php:183`
+**Source:** `app/CPT/FluentProducts.php:172`
 
 **Note:** After changing this value, flush rewrite rules by visiting Settings > Permalinks in the WordPress admin.
 
@@ -639,7 +939,7 @@ This filter is applied when rendering the single product page content, after che
 **Returns:**
 - `$show` (bool): The modified boolean value
 
-**Source:** `app/Modules/Templating/TemplateActions.php:240`
+**Source:** `app/Modules/Templating/TemplateActions.php:277`
 
 **Usage:**
 ```php
@@ -749,7 +1049,7 @@ This filter is applied after the coupon has been validated and found in the data
 **Returns:**
 - `$canUse` (bool|WP_Error): `true` to allow, `false` or `WP_Error` to reject. When a `WP_Error` is returned, its message is shown to the customer
 
-**Source:** `app/Services/Coupon/DiscountService.php:257`
+**Source:** `app/Services/Coupon/DiscountService.php:299`
 
 **Usage:**
 ```php
@@ -792,7 +1092,7 @@ This filter is applied for each cart item when filtering applicable items for a 
 **Returns:**
 - `$willSkip` (bool): `true` to exclude the item from the coupon, `false` to include it
 
-**Source:** `app/Services/Coupon/DiscountService.php:279`
+**Source:** `app/Services/Coupon/DiscountService.php:321`
 
 **Usage:**
 ```php
@@ -831,7 +1131,7 @@ This filter is applied when checking if a customer has exceeded the per-customer
 **Returns:**
 - `$usageQuery` (Builder): The modified query builder
 
-**Source:** `app/Services/Coupon/DiscountService.php:592`
+**Source:** `app/Services/Coupon/DiscountService.php:729`
 
 **Usage:**
 ```php
@@ -847,6 +1147,10 @@ add_filter('fluent_cart/coupon/per_customer_usage_query', function($usageQuery, 
 <details>
 <summary><code>fluent-cart/coupon_statuses</code> &mdash; Filter the available coupon statuses</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent-cart/coupon_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/coupon_statuses`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter is applied when retrieving the list of available coupon statuses, used in the admin coupon management interface.
 
@@ -865,7 +1169,7 @@ This filter is applied when retrieving the list of available coupon statuses, us
 **Returns:**
 - `$statuses` (array): The modified coupon statuses array
 
-**Source:** `app/Helpers/Helper.php:823`
+**Source:** `app/Helpers/Helper.php:1037`
 
 **Note:** This hook uses `fluent-cart/` (with a hyphen) instead of the usual `fluent_cart/` (with an underscore) prefix.
 
@@ -875,6 +1179,473 @@ add_filter('fluent-cart/coupon_statuses', function($statuses) {
     // Add a custom coupon status
     $statuses['scheduled'] = __('Scheduled', 'fluent-cart');
     return $statuses;
+}, 10, 1);
+```
+</details>
+
+### <code> coupon/resolve_coupons </code>
+<details>
+<summary><code>fluent_cart/coupon/resolve_coupons</code> &mdash; Filter the coupons resolved for a cart or order</summary>
+
+**When it runs:**
+This filter is applied everywhere FluentCart resolves the [Coupon](/database/models/coupon) records that back a cart's or order's applied discount codes — on `Cart`, in `CheckoutProcessor` (when rebuilding an order from stored `coupon_codes`), and in `DiscountService::apply()`. It receives the coupons already found in the database plus the originally requested codes, and may append additional, unsaved `Coupon` model instances (e.g. representing a dynamic-pricing discount) so they appear in the cart/order's discount summary like any real coupon.
+
+**Parameters:**
+
+- `$coupons` (Collection): The DB-found [Coupon](/database/models/coupon) models
+- `$codes` (array): The originally requested coupon code strings
+- `$context` (array): Context data — the key differs by call site
+    ```php
+    // From Cart::getAppliedCoupons() / DiscountService::apply()
+    $context = ['cart' => $cart];
+
+    // From CheckoutProcessor (rebuilding an order)
+    $context = ['order' => $orderModel];
+    ```
+
+**Returns:**
+- `Collection` — The modified collection of Coupon models (DB-found coupons plus any synthetic ones appended by a listener)
+
+**Source:** `app/Services/Coupon/DiscountService.php:96`, `app/Models/Cart.php:767`, `app/Helpers/CheckoutProcessor.php:572`
+
+**Usage:**
+```php
+add_filter('fluent_cart/coupon/resolve_coupons', function($coupons, $codes, $context) {
+    // Surface a computed loyalty discount as a synthetic, unsaved coupon
+    if (in_array('LOYALTY10', $codes, true)) {
+        $loyaltyCoupon = new \FluentCart\App\Models\Coupon([
+            'code'          => 'LOYALTY10',
+            'discount_type' => 'percent',
+            'amount'        => 10,
+        ]);
+        $coupons->push($loyaltyCoupon);
+    }
+    return $coupons;
+}, 10, 3);
+```
+</details>
+
+### <code> discount/pre_apply </code>
+<details>
+<summary><code>fluent_cart/discount/pre_apply</code> &mdash; Filter the cart items before a coupon discount is applied</summary>
+
+**When it runs:**
+This filter is applied at the start of `DiscountService::apply()`, before checking whether the coupon can be used and before the discount is calculated. It lets you adjust which items (and their data) the coupon will be evaluated and applied against.
+
+**Parameters:**
+
+- `$cartItems` (array): The cart line items
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'coupon' => $coupon, // Coupon model instance being applied
+        'cart'   => $cart,   // Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `$cartItems` (array): The modified cart items array
+
+**Source:** `app/Services/Coupon/DiscountService.php:227`
+
+**Usage:**
+```php
+add_filter('fluent_cart/discount/pre_apply', function($cartItems, $data) {
+    // Exclude gift-card items from ever being eligible for a coupon
+    return array_filter($cartItems, function ($item) {
+        return ($item['product_type'] ?? '') !== 'gift_card';
+    });
+}, 10, 2);
+```
+</details>
+
+### <code> coupon_statuses (current) </code>
+<details>
+<summary><code>fluent_cart/coupon_statuses</code> &mdash; Filter the available coupon statuses (current hook)</summary>
+
+**When it runs:**
+This is the current, non-deprecated counterpart to the `fluent-cart/coupon_statuses` hook documented above — `Helper::getCouponStatuses()` fires the deprecated hyphenated hook first via `apply_filters_deprecated()` for backward compatibility, then applies this one on the same `$statuses` value and returns its result.
+
+**Parameters:**
+
+- `$statuses` (array): Array of coupon statuses (key => label) — same default shape as the deprecated hook
+    ```php
+    $statuses = [
+        'active'   => 'Active',
+        'expired'  => 'Expired',
+        'disabled' => 'Disabled',
+    ];
+    ```
+- `$data` (array): Context data (empty array)
+
+**Returns:**
+- `$statuses` (array): The modified coupon statuses array
+
+**Source:** `app/Helpers/Helper.php:1045`
+
+**Usage:**
+```php
+add_filter('fluent_cart/coupon_statuses', function($statuses) {
+    $statuses['scheduled'] = __('Scheduled', 'fluent-cart');
+    return $statuses;
+}, 10, 1);
+```
+</details>
+
+---
+
+## Variant Options & Attributes
+
+### <code> attribute_groups/max_reorder </code>
+<details>
+<summary><code>fluent_cart/attribute_groups/max_reorder</code> &mdash; Filter the maximum number of attribute groups allowed in one reorder request</summary>
+
+**When it runs:**
+This filter is applied in the attribute groups reorder endpoint, before checking the submitted ID list against the cap. The attribute-group library is a small, admin-managed set, so the cap bounds a `whereIn` ownership lookup rather than reflecting a realistic catalog size.
+
+**Parameters:**
+
+- `$maxGroups` (int): The maximum reorder batch size. Default: `500`
+
+**Returns:**
+- `int` — The modified maximum
+
+**Source:** `app/Http/Controllers/AttributesController.php:205`
+
+**Usage:**
+```php
+add_filter('fluent_cart/attribute_groups/max_reorder', function($maxGroups) {
+    // Raise the cap for a store with an unusually large attribute library
+    return 2000;
+}, 10, 1);
+```
+</details>
+
+### <code> item_attributes </code>
+<details>
+<summary><code>fluent_cart/item_attributes</code> &mdash; Filter the resolved attribute rows for a product variation</summary>
+
+**When it runs:**
+This filter is applied by `AttributeHelper::getProductItemAttributes()` after resolving a variation's system attributes, letting a third-party plugin append its own attribute entries. A batched sibling call resolves attributes for many variations at once with a single query and applies the same filter per variation.
+
+**Parameters:**
+
+- `$atts` (array): The resolved attribute rows, keyed by attribute slug
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'variation_id' => 42,  // int
+        'product_id'   => 10,  // int
+    ];
+    ```
+
+**Returns:**
+- `$atts` (array): The modified attribute rows. Third-party attributes are conventionally appended without FluentCart's `pa_` system-attribute prefix, keyed by the provider's own group slug.
+
+**Source:** `app/Helpers/AttributeHelper.php:138,191`
+
+**Usage:**
+```php
+add_filter('fluent_cart/item_attributes', function($atts, $data) {
+    $atts['warranty'] = [
+        'slug'  => 'warranty',
+        'value' => '2-Year Extended Warranty',
+    ];
+    return $atts;
+}, 10, 2);
+```
+</details>
+
+### <code> item_display_attr </code>
+<details>
+<summary><code>fluent_cart/item_display_attr</code> &mdash; Filter the display-ready attribute rows for a line item</summary>
+
+**When it runs:**
+This filter is applied after building the display rows for an item's attributes (cart line item, order item, etc.), before rows with an empty `display_value` are stripped out.
+
+**Parameters:**
+
+- `$displayAtts` (array): Display attribute rows, each shaped like:
+    ```php
+    $displayAtts = [
+        'color' => [
+            'display_title' => 'Color',
+            'attr_key'      => 'color',
+            'slug'          => 'red',
+            'display_value' => 'Red',
+            'is_system'     => true,
+        ],
+        // ...
+    ];
+    ```
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'item'  => $item,  // the item array being described
+        'scope' => $scope, // where this is being rendered (e.g. cart, order)
+    ];
+    ```
+
+**Returns:**
+- `$displayAtts` (array): The modified rows. A row that resolves to an empty `display_value` is dropped afterward, so a listener can opt an attribute out by clearing that key.
+
+**Source:** `app/Helpers/AttributeHelper.php:346`
+
+**Usage:**
+```php
+add_filter('fluent_cart/item_display_attr', function($displayAtts, $data) {
+    // Suppress an internal-only attribute from customer-facing display
+    unset($displayAtts['internal_sku']);
+    return $displayAtts;
+}, 10, 2);
+```
+</details>
+
+### <code> item_display_attr_string </code>
+<details>
+<summary><code>fluent_cart/item_display_attr_string</code> &mdash; Filter the combined attribute display string for a line item</summary>
+
+**When it runs:**
+This filter is applied after building the default comma/separator-joined attribute string (e.g. `"Color: Red, Size: L"`) for an item, letting an integrator rebuild the combination text in a custom format using the resolved rows it also receives.
+
+**Parameters:**
+
+- `$displayTitleString` (string): The default joined attribute string
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'display_atts' => $displayAtts, // the resolved display rows (see fluent_cart/item_display_attr)
+        'item'         => $item,
+        'scope'        => $scope,
+        'separator'    => $separator,   // the default separator string
+    ];
+    ```
+
+**Returns:**
+- `$displayTitleString` (string): The modified string
+
+**Source:** `app/Helpers/AttributeHelper.php:418`
+
+**Usage:**
+```php
+add_filter('fluent_cart/item_display_attr_string', function($displayTitleString, $data) {
+    // Render each attribute on its own line instead of comma-separated
+    return implode("\n", array_map(function ($attr) {
+        return $attr['display_title'] . ': ' . $attr['display_value'];
+    }, $data['display_atts']));
+}, 10, 2);
+```
+</details>
+
+### <code> item_display_attr_{$key} </code>
+<details>
+<summary><code>fluent_cart/item_display_attr_{$key}</code> &mdash; Filter one third-party attribute's display row</summary>
+
+**When it runs:**
+This dynamic filter is applied once per non-system (third-party) attribute found on an item, right before it's added into the `$displayAtts` array consumed by `fluent_cart/item_display_attr`. The `{$key}` portion is the attribute's array key (its slug), letting a provider shape only the row(s) it owns.
+
+**Parameters:**
+
+- `$row` (array): The default display row for this attribute
+    ```php
+    $row = [
+        'display_title' => $key,                             // defaults to the raw key
+        'attr_key'      => $key,
+        'slug'          => $value['slug'] ?? $key,
+        'display_value' => $value['value'] ?? '',
+        'is_system'     => false,
+    ];
+    ```
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'attr'  => $value, // the raw attribute value array for this key
+        'item'  => $item,
+        'scope' => $scope,
+    ];
+    ```
+
+**Returns:**
+- `$row` (array): The modified display row. Return an empty `display_value` to have the row dropped by `fluent_cart/item_display_attr`.
+
+**Source:** `app/Helpers/AttributeHelper.php:333`
+
+**Usage:**
+```php
+add_filter('fluent_cart/item_display_attr_warranty', function($row, $data) {
+    $row['display_title'] = __('Warranty', 'my-addon');
+    return $row;
+}, 10, 2);
+```
+</details>
+
+### <code> product/variant_option_payload </code>
+<details>
+<summary><code>fluent_cart/product/variant_option_payload</code> &mdash; Filter/pre-process the variant-option sync payload</summary>
+
+**When it runs:**
+This filter is applied at the start of `ProductResource::syncVariantOption()`, before the submitted variant-option data is written. It lets an integrator transform the incoming payload before core processing runs.
+
+**Parameters:**
+
+- `$payload` (array): The sync request
+    ```php
+    $payload = [
+        'product_id' => 10,    // int
+        'data'       => $data, // array, the raw submitted variant-option data
+    ];
+    ```
+
+**Returns:**
+- `$payload` (array): Must include a `'data'` key to be accepted; if the returned value is not an array or has no `'data'` key, the original `$productId`/`$data` are used instead
+
+**Source:** `api/Resource/ProductResource.php:569`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/variant_option_payload', function($payload) {
+    // Normalize option labels to title case before they're synced
+    if (!empty($payload['data']['label'])) {
+        $payload['data']['label'] = ucwords($payload['data']['label']);
+    }
+    return $payload;
+}, 10, 1);
+```
+</details>
+
+### <code> product/variant_option_sync </code>
+<details>
+<summary><code>fluent_cart/product/variant_option_sync</code> &mdash; Let an add-on take over a variant-option sync request</summary>
+
+**When it runs:**
+This filter is applied in `ProductResource::syncVariantOption()`, immediately after `fluent_cart/product/variant_option_payload` has pre-processed the payload. It's a short-circuit hook: if a listener marks the result `handled`, FluentCart's own sync logic never runs and the listener's `response` is returned as-is.
+
+**Parameters:**
+
+- `$result` (array): Sync state
+    ```php
+    $result = [
+        'product_id' => 10,     // int
+        'data'       => $data,  // array, the (possibly pre-processed) payload
+        'handled'    => false,  // set true to short-circuit core handling
+        'response'   => null,   // the value returned to the caller when handled
+    ];
+    ```
+
+**Returns:**
+- `$result` (array): The same shape back
+
+**Source:** `api/Resource/ProductResource.php:578`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/variant_option_sync', function($result) {
+    if (($result['data']['type'] ?? null) === 'my_custom_option_type') {
+        $result['response'] = my_addon_sync_option($result['product_id'], $result['data']);
+        $result['handled'] = true;
+    }
+    return $result;
+}, 10, 1);
+```
+</details>
+
+### <code> product/variant_save_data </code>
+<details>
+<summary><code>fluent_cart/product/variant_save_data</code> &mdash; Filter a single variant's data before a batch save</summary>
+
+**When it runs:**
+This filter is applied once per variant while building the batch-update payload for a product's variants, immediately before the batch write runs inside a transaction.
+
+**Parameters:**
+
+- `$variant` (array): The variant's field data about to be saved
+- `$postId` (int): The product's post ID
+
+**Returns:**
+- `$variant` (array): The modified variant data
+
+**Source:** `api/Resource/ProductResource.php:281`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product/variant_save_data', function($variant, $postId) {
+    // Ensure a minimum price of $1.00 (100 cents) on every variant save
+    if (isset($variant['item_price']) && $variant['item_price'] < 100) {
+        $variant['item_price'] = 100;
+    }
+    return $variant;
+}, 10, 2);
+```
+</details>
+
+---
+
+## Statuses & Types
+
+### <code> product_statuses </code>
+<details>
+<summary><code>fluent_cart/product_statuses</code> &mdash; Filter the available product statuses</summary>
+
+**When it runs:**
+This filter is applied in `Status::getProductStatuses()`. **Note:** in the current source, the `apply_filters()` call is inside a `return` statement that executes before the method's `$withLabel` check, so the filtered, label-keyed array is always returned — the `$withLabel = false` code path below it is currently unreachable.
+
+**Parameters:**
+
+- `$statuses` (array): The product statuses, keyed by status constant
+    ```php
+    $statuses = [
+        'publish' => __('Publish', 'fluent-cart'),   // Status::PRODUCT_PUBLISH
+        'draft'   => __('Draft', 'fluent-cart'),     // Status::PRODUCT_DRAFT
+        'private' => __('Private', 'fluent-cart'),   // Status::PRODUCT_PRIVATE
+        'future'  => __('Scheduled', 'fluent-cart'), // Status::PRODUCT_FUTURE
+        'trash'   => __('Trashed', 'fluent-cart'),   // Status::PRODUCT_TRASH
+    ];
+    ```
+- `$data` (array): Context data (empty array)
+
+**Returns:**
+- `$statuses` (array): The modified statuses array
+
+**Source:** `app/Helpers/Status.php:115`
+
+**Usage:**
+```php
+add_filter('fluent_cart/product_statuses', function($statuses) {
+    // Add a custom "archived" status label
+    $statuses['archived'] = __('Archived', 'fluent-cart');
+    return $statuses;
+}, 10, 1);
+```
+</details>
+
+### <code> variation_types </code>
+<details>
+<summary><code>fluent_cart/variation_types</code> &mdash; Filter the available product variation types</summary>
+
+**When it runs:**
+This filter is applied after the default variation type list is built, and before it's returned (as the full label-keyed array, or as just the keys when `$withLabel` is false).
+
+**Parameters:**
+
+- `$types` (array): The variation types, keyed by type slug. The default list includes at least:
+    ```php
+    $types = [
+        // ...other type entries defined above this call in the source...
+        'advanced_variations' => __('Advanced Variations', 'fluent-cart'),
+    ];
+    ```
+
+**Returns:**
+- `$types` (array): The modified types array
+
+**Source:** `app/Helpers/Helper.php:817`
+
+**Usage:**
+```php
+add_filter('fluent_cart/variation_types', function($types) {
+    // Register a custom variation type for a third-party module
+    $types['my_matrix_variations'] = __('Matrix Variations', 'my-addon');
+    return $types;
 }, 10, 1);
 ```
 </details>

@@ -27,7 +27,7 @@
       "post": {
         "operationId": "deleteProfileAddress",
         "summary": "POST Delete Profile Address",
-        "description": "Delete an address from the customer's profile. The address must belong to the authenticated customer. Primary addresses and the last remaining address cannot be deleted.",
+        "description": "Delete an address from the customer's profile. The address must belong to the authenticated customer. Primary addresses and the last remaining address cannot be deleted.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Customer Profile"
         ],
@@ -140,6 +140,35 @@
                     "value": {
                       "message": "You are not authorized to update this address"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

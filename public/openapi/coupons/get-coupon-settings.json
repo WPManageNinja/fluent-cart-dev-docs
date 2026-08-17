@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getCouponSettings",
         "summary": "GET Coupon Settings",
-        "description": "Retrieve the global coupon settings (currently, whether coupon input is shown on the checkout page).",
+        "description": "Retrieve the global coupon settings (currently, whether coupon input is shown on the checkout page).\n\n**Required permission:** `coupons/view`",
         "tags": [
           "Coupons"
         ],
@@ -52,24 +52,46 @@
                     }
                   },
                   "example": {
-                    "show_on_checkout": 1,
-                    "enable_coupons": true,
-                    "auto_apply_coupons": false
+                    "show_on_checkout": 1
                   }
                 },
                 "example": {
-                  "show_on_checkout": 1,
-                  "enable_coupons": true,
-                  "auto_apply_coupons": false
+                  "show_on_checkout": 1
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "show_on_checkout": 1,
-                      "enable_coupons": true,
-                      "auto_apply_coupons": false
+                      "show_on_checkout": 1
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`coupons/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

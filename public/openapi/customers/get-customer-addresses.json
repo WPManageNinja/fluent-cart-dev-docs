@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getCustomerAddresses",
         "summary": "GET Get Customer Addresses",
-        "description": "Retrieve addresses for a customer, optionally filtered by address type. Results are sorted with the primary address first.",
+        "description": "Retrieve addresses for a customer, optionally filtered by address type. Results are sorted with the primary address first.\n\n**Required permission:** `customers/view`",
         "tags": [
           "Customers"
         ],
@@ -107,11 +107,15 @@
                           "type": "billing",
                           "name": "Sarah Johnson",
                           "company_name": "TechStart Inc.",
+                          "vat_number": "",
+                          "legal_registration_id": "",
                           "label": "Office",
                           "phone": "+1-415-555-0142",
                           "full_address": "TechStart Inc., 456 Market Street, Suite 300, San Francisco, California, United States"
                         },
-                        "company_name": "TechStart Inc."
+                        "company_name": "TechStart Inc.",
+                        "vat_number": "",
+                        "legal_registration_id": ""
                       }
                     ]
                   }
@@ -147,11 +151,15 @@
                         "type": "billing",
                         "name": "Sarah Johnson",
                         "company_name": "TechStart Inc.",
+                        "vat_number": "",
+                        "legal_registration_id": "",
                         "label": "Office",
                         "phone": "+1-415-555-0142",
                         "full_address": "TechStart Inc., 456 Market Street, Suite 300, San Francisco, California, United States"
                       },
-                      "company_name": "TechStart Inc."
+                      "company_name": "TechStart Inc.",
+                      "vat_number": "",
+                      "legal_registration_id": ""
                     }
                   ]
                 },
@@ -189,14 +197,61 @@
                             "type": "billing",
                             "name": "Sarah Johnson",
                             "company_name": "TechStart Inc.",
+                            "vat_number": "",
+                            "legal_registration_id": "",
                             "label": "Office",
                             "phone": "+1-415-555-0142",
                             "full_address": "TechStart Inc., 456 Market Street, Suite 300, San Francisco, California, United States"
                           },
-                          "company_name": "TechStart Inc."
+                          "company_name": "TechStart Inc.",
+                          "vat_number": "",
+                          "legal_registration_id": ""
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`customers/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

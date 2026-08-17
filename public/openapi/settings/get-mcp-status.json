@@ -1,0 +1,214 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/mcp": {
+      "get": {
+        "operationId": "status",
+        "summary": "GET Get MCP Status",
+        "description": "Return the status payload used by the MCP settings card in the admin: whether the MCP endpoint is enabled, whether the FluentHub adapter plugin is installed/available, the endpoint URL, tool count, and helper links (Application Passwords page, plugins page).\n\n**Required permission:** `is_super_admin`",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the current MCP status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mcp_enabled": {
+                      "type": "boolean"
+                    },
+                    "adapter_available": {
+                      "type": "boolean"
+                    },
+                    "toolkit_installed": {
+                      "type": "boolean"
+                    },
+                    "can_auto_install": {
+                      "type": "boolean"
+                    },
+                    "toolkit_download_url": {
+                      "type": "string"
+                    },
+                    "endpoint_url": {
+                      "type": "string"
+                    },
+                    "tools_count": {
+                      "type": "integer"
+                    },
+                    "app_passwords_url": {
+                      "type": "string"
+                    },
+                    "plugins_url": {
+                      "type": "string"
+                    },
+                    "current_user_login": {
+                      "type": "string"
+                    },
+                    "is_local_dev": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": {
+                    "mcp_enabled": true,
+                    "adapter_available": true,
+                    "toolkit_installed": true,
+                    "can_auto_install": true,
+                    "toolkit_download_url": "https://github.com/WPManageNinja/fluent-toolkit",
+                    "endpoint_url": "https://example.com/wp-json/fluent-cart/mcp",
+                    "tools_count": 35,
+                    "app_passwords_url": "https://example.com/wp-admin/profile.php#application-passwords-section",
+                    "plugins_url": "https://example.com/wp-admin/plugins.php",
+                    "current_user_login": "admin",
+                    "is_local_dev": false
+                  }
+                },
+                "example": {
+                  "mcp_enabled": true,
+                  "adapter_available": true,
+                  "toolkit_installed": true,
+                  "can_auto_install": true,
+                  "toolkit_download_url": "https://github.com/WPManageNinja/fluent-toolkit",
+                  "endpoint_url": "https://example.com/wp-json/fluent-cart/mcp",
+                  "tools_count": 35,
+                  "app_passwords_url": "https://example.com/wp-admin/profile.php#application-passwords-section",
+                  "plugins_url": "https://example.com/wp-admin/plugins.php",
+                  "current_user_login": "admin",
+                  "is_local_dev": false
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "mcp_enabled": true,
+                      "adapter_available": true,
+                      "toolkit_installed": true,
+                      "can_auto_install": true,
+                      "toolkit_download_url": "https://github.com/WPManageNinja/fluent-toolkit",
+                      "endpoint_url": "https://example.com/wp-json/fluent-cart/mcp",
+                      "tools_count": 35,
+                      "app_passwords_url": "https://example.com/wp-admin/profile.php#application-passwords-section",
+                      "plugins_url": "https://example.com/wp-admin/plugins.php",
+                      "current_user_login": "admin",
+                      "is_local_dev": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user is not a super admin.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

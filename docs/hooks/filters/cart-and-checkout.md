@@ -55,7 +55,7 @@ add_filter('fluent_cart/cart/item_modify', function ($variation, $data) {
 **When it runs:**
 This filter is applied immediately after the variation is resolved, before the item is added to the cart. It allows you to cap or adjust the quantity a customer can add.
 
-**Source:** `api/Resource/FrontendResource/CartResource.php:54`
+**Source:** `api/Resource/FrontendResource/CartResource.php:79`
 
 **Parameters:**
 
@@ -94,7 +94,7 @@ add_filter('fluent_cart/item_max_quantity', function ($quantity, $data) {
 **When it runs:**
 This filter fires when the quantity of a custom (externally-managed) item already in the cart is changed. It lets you recalculate pricing or validate the new quantity.
 
-**Source:** `api/Resource/FrontendResource/CartResource.php:269`
+**Source:** `api/Resource/FrontendResource/CartResource.php:310`
 
 **Parameters:**
 
@@ -183,7 +183,7 @@ add_filter('fluent_cart/cart/validate_custom_item', function ($variation, $data)
 **When it runs:**
 This filter fires when a product variation cannot be found in the database during cart operations. It serves as a fallback mechanism to supply a variation from an external source.
 
-**Source:** `api/Resource/FrontendResource/CartResource.php:631`
+**Source:** `api/Resource/FrontendResource/CartResource.php:710`
 
 **Parameters:**
 
@@ -214,7 +214,7 @@ add_filter('fluent_cart/cart_item_product_variation', function ($variation, $ite
 **When it runs:**
 This filter fires after the built-in `canPurchase()` check on the variation model, inside `Cart::addItem()`. It allows you to add additional purchase restrictions or override the default validation.
 
-**Source:** `app/Models/Cart.php:333`
+**Source:** `app/Models/Cart.php:451`
 
 **Parameters:**
 
@@ -323,7 +323,7 @@ add_filter('fluent_cart/cart_cookie_minutes', function ($expireTime) {
 **When it runs:**
 This filter fires during the `canPurchase()` check on a [ProductVariation](/database/models/product-variation) when the product is a bundle. It allows external modules (like StockManagement) to validate stock for bundled child items.
 
-**Source:** `app/Models/ProductVariation.php:265`
+**Source:** `app/Models/ProductVariation.php:330`
 
 **Parameters:**
 
@@ -363,6 +363,262 @@ add_filter('fluent_cart/variation/can_purchase_bundle', function ($result, $data
 
 ---
 
+## Cart Totals & Fees
+
+### <code> cart/context_data </code>
+<details>
+<summary><code>fluent_cart/cart/context_data</code> &mdash; Filter the cart's context data snapshot</summary>
+
+**When it runs:**
+This filter is applied at the end of the [Cart](/database/models/cart) model's context-data builder, which assembles a snapshot describing the current cart used by gateways and integrations that need cart context without holding the full model.
+
+**Source:** `app/Models/Cart.php:1297`
+
+**Parameters:**
+
+- `$context` (array): The cart context data
+    ```php
+    $context = [
+        // ...additional cart context keys assembled earlier in the method...
+        'order_type' => 'initial', // from $cart->checkout_data['order_type'], defaults to 'initial'
+    ];
+    ```
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => $cart,  // Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `array` — The modified context data
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/context_data', function ($context, $data) {
+    $context['is_renewal'] = $data['cart']->checkout_data['order_type'] ?? '' === 'renewal';
+    return $context;
+}, 10, 2);
+```
+</details>
+
+### <code> cart/fees </code>
+<details>
+<summary><code>fluent_cart/cart/fees</code> &mdash; Add or modify dynamic (computed) cart fees</summary>
+
+**When it runs:**
+This filter is applied while calculating the cart total, after the cart's stored fees have been loaded. It lets add-ons append computed fees (e.g. a surcharge based on payment method or region) that were never persisted to the cart record.
+
+**Source:** `app/Models/Cart.php:902`
+
+**Parameters:**
+
+- `$storedFees` (array): The fees already stored on the cart
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart'           => $cart,               // Cart model instance
+        'cart_items'     => $cart->cart_data,     // Raw cart line items
+        'cart_subtotal'  => 4999,                 // Items subtotal, in cents
+        'shipping_total' => 500,                  // Shipping total, in cents
+        'customer_id'    => 123,                  // Customer ID (or 0 for guest)
+        'payment_method' => 'stripe',              // Selected payment method route
+        'checkout_data'  => $cart->checkout_data,  // Full checkout session data
+    ];
+    ```
+
+**Returns:**
+- `array` — The modified list of fees to apply to the cart
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/fees', function ($fees, $data) {
+    // Add a $2.00 surcharge for cash-on-delivery
+    if ($data['payment_method'] === 'cod') {
+        $fees[] = [
+            'label'  => __('COD Surcharge', 'fluent-cart'),
+            'amount' => 200, // cents
+        ];
+    }
+    return $fees;
+}, 10, 2);
+```
+</details>
+
+### <code> cart/item_dynamic_discount </code>
+<details>
+<summary><code>fluent_cart/cart/item_dynamic_discount</code> &mdash; Filter cart item data before totals are calculated</summary>
+
+**When it runs:**
+This filter is applied at the start of the cart total calculation, right after `fluent_cart/cart/before_totals_calculation` fires. It lets add-ons (e.g. a dynamic pricing module) rewrite cart line items — for example to inject a computed per-item discount — before the [CheckoutService](/database/models/cart) splits them into subscription and one-time items.
+
+**Source:** `app/Models/Cart.php:1198`
+
+**Parameters:**
+
+- `$cartData` (array): The raw cart line items (`$cart->cart_data`)
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => $cart,  // Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `array` — The (possibly rewritten) cart line items
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/item_dynamic_discount', function ($cartData, $data) {
+    foreach ($cartData as &$item) {
+        // Apply a flat 10% dynamic discount to every line item
+        $item['other_info']['dynamic_discount'] = (int) round($item['unit_price'] * 0.10);
+    }
+    return $cartData;
+}, 10, 2);
+```
+</details>
+
+### <code> cart/item_price </code>
+<details>
+<summary><code>fluent_cart/cart/item_price</code> &mdash; Filter a cart line item's unit price</summary>
+
+**When it runs:**
+This filter is applied when computing a line item's subtotal, right after the variation's base `item_price` is read and before it's multiplied by quantity. The filtered value is clamped to a non-negative integer.
+
+**Source:** `app/Helpers/CartHelper.php:34`
+
+**Parameters:**
+
+- `$itemPrice` (int): The variation's base unit price, in cents
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'variation' => $variation,  // ProductVariation model
+        'quantity'  => 2,           // Requested quantity
+    ];
+    ```
+
+**Returns:**
+- `int` — The (possibly modified) unit price, in cents. Negative values are clamped to `0`.
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/item_price', function ($itemPrice, $data) {
+    // Give a flat $1.00 discount per unit on a specific variation
+    if ($data['variation']->id === 42) {
+        return max(0, $itemPrice - 100);
+    }
+    return $itemPrice;
+}, 10, 2);
+```
+</details>
+
+### <code> cart/items_total </code>
+<details>
+<summary><code>fluent_cart/cart/items_total</code> &mdash; Filter the combined items + shipping total</summary>
+
+**When it runs:**
+This filter is applied in `OrderService::getItemsTotal()` after the items subtotal and shipping total have been summed. The result is clamped to a non-negative integer afterward.
+
+**Source:** `app/Services/OrderService.php:441`
+
+**Parameters:**
+
+- `$total` (int): The combined items + shipping total, in cents
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'items'          => $items,          // The order/cart items array
+        'shipping_total' => 500,             // Shipping total already added in, cents
+    ];
+    ```
+
+**Returns:**
+- `int` — The modified total, in cents. Negative values are clamped to `0`.
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/items_total', function ($total, $data) {
+    // Round up to the nearest dollar
+    return (int) (ceil($total / 100) * 100);
+}, 10, 2);
+```
+</details>
+
+### <code> cart/shipping_total </code>
+<details>
+<summary><code>fluent_cart/cart/shipping_total</code> &mdash; Filter the cart's shipping total</summary>
+
+**When it runs:**
+This filter is applied whenever the cart's shipping charge is read — both from the [Cart](/database/models/cart) model's own getter and again in `CheckoutApi::placeOrder()` right before the final shipping charge is stored on the order (where the TaxModule reduces it to a net amount for tax-inclusive, reverse-charge pricing).
+
+**Source:**
+- `app/Models/Cart.php:857`
+- `api/Checkout/CheckoutApi.php:226`
+
+**Parameters:**
+
+- `$shippingTotal` (int): The shipping charge, in cents
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => $cart,  // Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `int` — The modified shipping total, in cents
+
+**Usage:**
+```php
+add_filter('fluent_cart/cart/shipping_total', function ($shippingTotal, $data) {
+    // Free shipping over $75
+    if ($data['cart']->getItemsSubtotal() >= 7500) {
+        return 0;
+    }
+    return $shippingTotal;
+}, 10, 2);
+```
+</details>
+
+### <code> shipping/auto_select_single_method </code>
+<details>
+<summary><code>fluent_cart/shipping/auto_select_single_method</code> &mdash; Control whether a lone shipping method is auto-selected</summary>
+
+**When it runs:**
+This filter is applied when only one shipping method is available for the cart. By default that single method is auto-selected on the customer's behalf; return `false` to require an explicit selection instead.
+
+**Source:** `app/Helpers/CartHelper.php:905`
+
+**Parameters:**
+
+- `$shouldAutoSelect` (bool): Whether to auto-select the single method. Default `true`.
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart'   => $cart,    // Cart model instance
+        'method' => $method,  // The single available shipping method
+    ];
+    ```
+
+**Returns:**
+- `bool` — `true` to auto-select the method, `false` to leave the selection empty
+
+**Usage:**
+```php
+add_filter('fluent_cart/shipping/auto_select_single_method', function ($shouldAutoSelect, $data) {
+    // Always require an explicit choice for local pickup
+    if ($data['method']->title === 'Local Pickup') {
+        return false;
+    }
+    return $shouldAutoSelect;
+}, 10, 2);
+```
+</details>
+
+---
+
 ## Checkout Validation
 
 ### <code> checkout/validate_before_process </code>
@@ -372,7 +628,7 @@ add_filter('fluent_cart/variation/can_purchase_bundle', function ($result, $data
 **When it runs:**
 This filter fires early in the `placeOrder()` flow, before any field or product validation occurs. It is the first opportunity for modules to reject a checkout attempt (e.g., CAPTCHA verification, rate limiting, or custom business rules).
 
-**Source:** `api/Checkout/CheckoutApi.php:83`
+**Source:** `api/Checkout/CheckoutApi.php:114`
 
 **Parameters:**
 
@@ -409,7 +665,7 @@ add_filter('fluent_cart/checkout/validate_before_process', function ($validation
 **When it runs:**
 This filter fires during order creation in `CheckoutApi::placeOrder()`. It determines the tax behavior value that controls how tax is applied to the order total. The TaxModule hooks into this to read the computed tax behavior from the cart's checkout data.
 
-**Source:** `api/Checkout/CheckoutApi.php:171`
+**Source:** `api/Checkout/CheckoutApi.php:216`
 
 **Parameters:**
 
@@ -447,7 +703,7 @@ add_filter('fluent_cart/cart/tax_behavior', function ($behavior, $data) {
 **When it runs:**
 This filter fires after the core field, shipping, and terms validation has run, but before the order is created. It lets you append custom validation errors or clear existing ones.
 
-**Source:** `api/Checkout/CheckoutApi.php:890`
+**Source:** `api/Checkout/CheckoutApi.php:1042`
 
 **Parameters:**
 
@@ -492,7 +748,7 @@ add_filter('fluent_cart/checkout/validate_data', function ($errors, $data) {
 **When it runs:**
 This filter fires when the checkout page container is being rendered. It lets you add, remove, or modify the CSS classes on the checkout wrapper element.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:144`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:133`
 
 **Parameters:**
 
@@ -529,7 +785,7 @@ add_filter('fluent_cart/checkout_page_css_classes', function ($classes, $data) {
 **When it runs:**
 This filter fires during checkout page rendering, allowing you to inject notice messages that appear at the top of the checkout form.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:170`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:161`
 
 **Parameters:**
 
@@ -562,6 +818,40 @@ add_filter('fluent_cart/checkout_page_notices', function ($notices, $data) {
     }
 
     return $notices;
+}, 10, 2);
+```
+</details>
+
+### <code> checkout/summary_extra_lines </code>
+<details>
+<summary><code>fluent_cart/checkout/summary_extra_lines</code> &mdash; Add extra rendered lines to the checkout order summary</summary>
+
+**When it runs:**
+This filter is applied while rendering the order summary sidebar (`CartSummaryRender`), right after the fee rows are rendered and before the total. It lets add-ons inject additional line items into the summary.
+
+**Source:** `app/Services/Renderer/CartSummaryRender.php:123`
+
+**Parameters:**
+
+- `$extraLines` (array): Extra summary line items. Empty by default.
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => $cart,  // Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `array` — The extra line items to render in the order summary (a non-array return is discarded and treated as empty)
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/summary_extra_lines', function ($extraLines, $data) {
+    $extraLines[] = [
+        'label' => __('Estimated delivery', 'fluent-cart'),
+        'value' => '3-5 business days',
+    ];
+    return $extraLines;
 }, 10, 2);
 ```
 </details>
@@ -611,7 +901,7 @@ add_filter('fluent_cart/checkout_renderer/billing_fields', function ($fields, $d
 **When it runs:**
 This filter fires after shipping address fields have been assembled and validated in the checkout renderer, before they are output as HTML.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:521`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:632`
 
 **Parameters:**
 
@@ -649,7 +939,7 @@ add_filter('fluent_cart/checkout_renderer/shipping_fields', function ($fields, $
 **When it runs:**
 This filter fires when the checkout renderer decides whether to show the order notes textarea. By default, order notes are hidden when the cart contains only digital (non-shippable) products.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:560`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:671`
 
 **Parameters:**
 
@@ -721,7 +1011,7 @@ add_filter('fluent_cart/checkout_active_payment_methods', function ($methods, $d
 **When it runs:**
 This filter fires when the checkout submit button is being rendered, allowing you to change its label.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:705`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:841`
 
 **Parameters:**
 
@@ -742,6 +1032,10 @@ add_filter('fluent_cart/checkout_page_order_button_text', function ($text) {
 <details>
 <summary><code>fluent_cart_payment_method_list_class</code> &mdash; Add CSS classes to a payment method wrapper</summary>
 
+
+::: warning Deprecated since 1.3.16
+`fluent_cart_payment_method_list_class` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/payment_method_list_class`** instead — it receives the same value.
+:::
 **When it runs:**
 This filter fires when rendering each individual payment method option in both the standard and modal checkout. It lets you add custom CSS classes to the payment method container element.
 
@@ -778,6 +1072,43 @@ add_filter('fluent_cart_payment_method_list_class', function ($class, $data) {
 ```
 </details>
 
+### <code> payment_method_list_class (current) </code>
+<details>
+<summary><code>fluent_cart/payment_method_list_class</code> &mdash; Add CSS classes to a payment method wrapper (current hook)</summary>
+
+**When it runs:**
+The direct successor to the deprecated `fluent_cart_payment_method_list_class` above — same call site, same value, `fluent_cart/` prefix. Fires when rendering each individual payment method option in both the standard and modal checkout.
+
+**Source:**
+- `app/Services/Renderer/CheckoutRenderer.php:939`
+- `app/Services/Renderer/ModalCheckoutRenderer.php:806`
+
+**Parameters:**
+
+- `$class` (string): The CSS class string, already possibly modified by the deprecated filter above
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'route'        => 'stripe',   // Payment method route/slug
+        'method_title' => 'Stripe',   // Display title
+        'method_style' => 'logo',     // Display style
+    ];
+    ```
+
+**Returns:**
+- `string` — The modified CSS class string
+
+**Usage:**
+```php
+add_filter('fluent_cart/payment_method_list_class', function ($class, $data) {
+    if ($data['route'] === 'stripe') {
+        return trim($class . ' payment-method-recommended');
+    }
+    return $class;
+}, 10, 2);
+```
+</details>
+
 ### <code> modal_checkout/filter_active_payment_methods </code>
 <details>
 <summary><code>fluent_cart/modal_checkout/filter_active_payment_methods</code> &mdash; Restrict payment methods in modal checkout</summary>
@@ -785,7 +1116,7 @@ add_filter('fluent_cart_payment_method_list_class', function ($class, $data) {
 **When it runs:**
 This filter fires during modal checkout rendering, after the active payment methods have been resolved. If a non-empty array of payment method route slugs is returned, only those methods will be shown in the modal.
 
-**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:455`
+**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:680`
 
 **Parameters:**
 
@@ -803,6 +1134,37 @@ add_filter('fluent_cart/modal_checkout/filter_active_payment_methods', function 
 ```
 </details>
 
+### <code> modal_checkout/before_payment_methods_placement </code>
+<details>
+<summary><code>fluent_cart/modal_checkout/before_payment_methods_placement</code> &mdash; Choose where the pre-payment-methods action fires in modal checkout</summary>
+
+**When it runs:**
+This filter is applied once per modal checkout render to decide where the `fluent_cart/before_payment_methods` action hook fires: alongside the payment method list (`'payment'`, the default) or with the order details block (`'details'`). Any value other than `'details'` falls back to `'payment'`.
+
+**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:216`
+
+**Parameters:**
+
+- `$placement` (string): The placement. Default `'payment'`.
+- `$data` (array): Context data
+    ```php
+    $data = [
+        'cart' => $cart,  // Cart model instance
+    ];
+    ```
+
+**Returns:**
+- `string` — `'payment'` or `'details'`
+
+**Usage:**
+```php
+add_filter('fluent_cart/modal_checkout/before_payment_methods_placement', function ($placement, $data) {
+    // Move the hook next to the order details block instead
+    return 'details';
+}, 10, 2);
+```
+</details>
+
 ### <code> enable_modal_checkout </code>
 <details>
 <summary><code>fluent_cart/enable_modal_checkout</code> &mdash; Enable or disable modal checkout</summary>
@@ -810,7 +1172,7 @@ add_filter('fluent_cart/modal_checkout/filter_active_payment_methods', function 
 **When it runs:**
 This filter fires when checking whether modal (popup) checkout is enabled. By default, modal checkout is disabled.
 
-**Source:** `app/Helpers/Helper.php:1710`
+**Source:** `app/Helpers/Helper.php:1960`
 
 **Parameters:**
 
@@ -887,7 +1249,7 @@ add_filter('fluent_cart/checkout/checkout_data_changed', function ($checkoutData
 **When it runs:**
 This filter fires when the cart has been updated during the checkout session (e.g., items added or removed). It lets you append additional data to the success response.
 
-**Source:** `app/Hooks/Cart/WebCheckoutHandler.php:683`
+**Source:** `app/Hooks/Cart/WebCheckoutHandler.php:750`
 
 **Parameters:**
 
@@ -974,7 +1336,7 @@ add_filter('fluent_cart/checkout/before_patch_checkout_data', function ($fillDat
 **When it runs:**
 This filter fires after the checkout session has been patched and the HTML fragments for the AJAX response have been generated. It allows modules to add or modify the HTML fragments that will be swapped into the checkout page.
 
-**Source:** `app/Hooks/Cart/WebCheckoutHandler.php:901`
+**Source:** `app/Hooks/Cart/WebCheckoutHandler.php:1019`
 
 **Parameters:**
 
@@ -1013,7 +1375,7 @@ add_filter('fluent_cart/checkout/after_patch_checkout_data_fragments', function 
 **When it runs:**
 This filter fires when a customer toggles an order bump on the checkout page. By default it returns a `WP_Error`; modules that implement order bumps must hook in to handle the logic and return success data.
 
-**Source:** `app/Hooks/Cart/WebCheckoutHandler.php:1144`
+**Source:** `app/Hooks/Cart/WebCheckoutHandler.php:1052`
 
 **Parameters:**
 
@@ -1290,7 +1652,7 @@ add_filter('fluent_cart/checkout_coupon_fields', function ($fields) {
 **When it runs:**
 This filter fires when the checkout name fields schema (first name, last name, email, and optionally company) is being built. Modules like FluentCRM hook in to pre-fill name and email from CRM contact data.
 
-**Source:** `app/Services/Renderer/CheckoutFieldsSchema.php:86`
+**Source:** `app/Services/Renderer/CheckoutFieldsSchema.php:113`
 
 **Parameters:**
 
@@ -1329,7 +1691,7 @@ add_filter('fluent_cart/checkout_page_name_fields_schema', function ($fields, $d
 **When it runs:**
 This filter fires when the low-level address field definitions are assembled in `CheckoutFieldsSchema`. These are the raw field configurations (country, state, city, zip, address lines) that form the foundation for both billing and shipping sections.
 
-**Source:** `app/Services/Renderer/CheckoutFieldsSchema.php:320`
+**Source:** `app/Services/Renderer/CheckoutFieldsSchema.php:348`
 
 **Parameters:**
 
@@ -1370,7 +1732,7 @@ add_filter('fluent_cart/fields/address_base_fields', function ($fields, $data) {
 **When it runs:**
 This filter fires when determining the default billing country for the checkout form. By default, it attempts to read the country from the Cloudflare `HTTP_CF_IPCOUNTRY` header for geo-detection.
 
-**Source:** `app/Helpers/AddressHelper.php:639`
+**Source:** `app/Helpers/AddressHelper.php:627`
 
 **Parameters:**
 
@@ -1403,7 +1765,7 @@ add_filter('fluent_cart/default_billing_country_for_checkout', function ($countr
 **When it runs:**
 This filter fires when the checkout page assets are being enqueued. It allows modules to add or modify the data that is passed to the checkout JavaScript via `wp_localize_script()`. Modules like Turnstile hook in to add their client-side configuration.
 
-**Source:** `app/Modules/Templating/AssetLoader.php:497`
+**Source:** `app/Modules/Templating/AssetLoader.php:574`
 
 **Parameters:**
 
@@ -1452,7 +1814,7 @@ add_filter('fluent_cart/checkout/localize_data', function ($data, $cart) {
 **When it runs:**
 This filter fires when building the checkout localized data. Payment gateways that render their own submit button (like PayPal's smart buttons) register themselves here so the default "Place Order" button behavior is adapted accordingly.
 
-**Source:** `app/Modules/Templating/AssetLoader.php:465`
+**Source:** `app/Modules/Templating/AssetLoader.php:542`
 
 **Parameters:**
 
@@ -1478,7 +1840,7 @@ add_filter('fluent_cart/payment_methods_with_custom_checkout_buttons', function 
 **When it runs:**
 This filter fires during the instant checkout (add-to-cart via URL) flow when a `redirect_to` parameter is provided. For security, only URLs whose hosts are in the allowed list will be accepted as redirect targets.
 
-**Source:** `app/Http/Routes/WebRoutes.php:155`
+**Source:** `app/Http/Routes/WebRoutes.php:190`
 
 **Parameters:**
 

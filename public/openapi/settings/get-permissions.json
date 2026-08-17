@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getPermissions",
         "summary": "GET Get Permissions",
-        "description": "Retrieve the current role-to-capability permission mappings for FluentCart.",
+        "description": "Retrieve the current role-to-capability permission mappings for FluentCart.\n\n**Also used by the roles & permissions UI.** Retrieve a list of available WordPress roles and the currently configured capability permissions.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -184,6 +184,34 @@
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

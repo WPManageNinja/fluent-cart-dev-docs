@@ -27,7 +27,7 @@
       "post": {
         "operationId": "updateProfileDetails",
         "summary": "POST Update Profile Details",
-        "description": "Update the authenticated customer's profile name. Also updates the associated WordPress user's first_name, last_name, and display_name.",
+        "description": "Update the authenticated customer's profile name. Also updates the associated WordPress user's first_name, last_name, and display_name.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Customer Profile"
         ],
@@ -145,6 +145,35 @@
                     "value": {
                       "message": "You are not logged in"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

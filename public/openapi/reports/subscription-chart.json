@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSubscriptionChart",
         "summary": "GET Get Subscription Chart",
-        "description": "Retrieve subscription data as time-series chart data, including total subscription counts and future installment projections. Supports comparison against a prior period.",
+        "description": "Retrieve subscription data as time-series chart data, including total subscription counts and future installment projections. Supports comparison against a prior period.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -488,6 +488,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

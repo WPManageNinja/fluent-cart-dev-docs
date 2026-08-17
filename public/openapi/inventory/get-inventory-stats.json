@@ -1,0 +1,119 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/inventory/stats": {
+      "get": {
+        "operationId": "getInventoryStats",
+        "summary": "GET Get Inventory Stats",
+        "description": "Return counts of stock-managed variants bucketed by availability. The low-stock boundary defaults to **10** units and is filterable via `fluent_cart/inventory_low_stock_threshold`.\n\nBuckets are computed on `available` (not `total_stock`): `outOfStock` is `available <= 0`, `lowStock` is `0 < available <= threshold`, and `inStock` is `available > threshold`.\n\n**Permission:** `products/view` · **Policy:** `ProductPolicy`",
+        "tags": [
+          "Advanced Inventory"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalVariants": {
+                      "type": "integer",
+                      "description": "All variants with `manage_stock = 1`."
+                    },
+                    "inStock": {
+                      "type": "integer"
+                    },
+                    "lowStock": {
+                      "type": "integer"
+                    },
+                    "outOfStock": {
+                      "type": "integer"
+                    }
+                  },
+                  "example": {
+                    "totalVariants": 24,
+                    "inStock": 0,
+                    "lowStock": 24,
+                    "outOfStock": 0
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the authenticated user lacks the required permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

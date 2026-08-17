@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listProductVariations",
         "summary": "GET List Product Variations",
-        "description": "Retrieve a list of product variations.",
+        "description": "Retrieve a list of product variations.\n\n**Required permissions:** all of `products/view`, `products/view`",
         "tags": [
           "Products"
         ],
@@ -207,6 +207,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view, products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

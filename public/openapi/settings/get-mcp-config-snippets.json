@@ -1,0 +1,222 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/mcp/config-snippets": {
+      "get": {
+        "operationId": "getConfigSnippets",
+        "summary": "GET Get MCP Config Snippets",
+        "description": "Return ready-to-paste MCP connection snippets for every supported client (Claude Code, Claude Desktop, Cursor, Codex, and a generic HTTP snippet), built server-side in one response. No credentials are ever included — each snippet carries a placeholder for the WordPress username and Application Password that the caller fills in themselves.\n\n**Required permission:** `is_super_admin`",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "local_dev",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Overrides TLS-verification guidance in the Claude Desktop snippet. Truthy values (yes, true, 1, on) are treated as a local/dev environment. When omitted, the server auto-detects."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns connection snippets for every supported MCP client.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "snippets": {
+                      "type": "object",
+                      "description": "Keyed by client id: claude-code, claude-desktop, cursor, codex, generic"
+                    },
+                    "endpoint": {
+                      "type": "string"
+                    },
+                    "app_passwords_url": {
+                      "type": "string"
+                    },
+                    "is_local_dev": {
+                      "type": "boolean"
+                    }
+                  },
+                  "example": {
+                    "snippets": {
+                      "claude-code": {
+                        "client": "claude-code",
+                        "snippet": "claude mcp add \\\n  --transport http \\\n  fluent-cart https://example.com/wp-json/fluent-cart/mcp \\\n  --header \"Authorization: Basic <base64(your-username:application-password)>\"",
+                        "instructions": "Run this in your terminal where Claude Code is installed, with base64 of \"username:application-password\"."
+                      },
+                      "claude-desktop": {
+                        "client": "claude-desktop",
+                        "snippet": "{\n    \"mcpServers\": {\n        \"fluent-cart\": {\n            \"command\": \"npx\",\n            \"args\": [\n                \"-y\",\n                \"@automattic/mcp-wordpress-remote@latest\"\n            ],\n            \"env\": {\n                \"WP_API_URL\": \"https://example.com/wp-json/fluent-cart/mcp\",\n                \"WP_API_USERNAME\": \"<your-username>\",\n                \"WP_API_PASSWORD\": \"<your-application-password>\"\n            }\n        }\n    }\n}",
+                        "instructions": "Add this to your Claude Desktop config (Settings → Developer → Edit Config), fill in your username + application password, then restart Claude Desktop."
+                      },
+                      "cursor": {
+                        "client": "cursor",
+                        "snippet": "{\n    \"mcpServers\": {\n        \"fluent-cart\": {\n            \"url\": \"https://example.com/wp-json/fluent-cart/mcp\",\n            \"type\": \"http\",\n            \"headers\": {\n                \"Authorization\": \"Basic <base64(your-username:application-password)>\"\n            }\n        }\n    }\n}",
+                        "instructions": "Add to Cursor's mcp.json, replacing the placeholder with base64 of \"username:application-password\"."
+                      },
+                      "codex": {
+                        "client": "codex",
+                        "snippet": "Settings → Connect to a custom MCP\n\nName:       fluent-cart\nTransport:  Streamable HTTP\nURL:        https://example.com/wp-json/fluent-cart/mcp\n\nHeader:\n  Key:    Authorization\n  Value:  Basic <base64(your-username:application-password)>",
+                        "instructions": "In Codex, add a custom MCP server with Streamable HTTP transport and the Authorization header above."
+                      },
+                      "generic": {
+                        "client": "generic",
+                        "snippet": "URL:   https://example.com/wp-json/fluent-cart/mcp\nAuth:  Authorization: Basic <base64(your-username:application-password)>\n\n# Quick test (curl base64-encodes for you):\ncurl -s -u '<your-username>:<your-application-password>' \\\n  -X POST https://example.com/wp-json/fluent-cart/mcp \\\n  -H 'Content-Type: application/json'",
+                        "instructions": "Any MCP client that speaks Streamable HTTP can connect using this URL and a Basic auth header."
+                      }
+                    },
+                    "endpoint": "https://example.com/wp-json/fluent-cart/mcp",
+                    "app_passwords_url": "https://example.com/wp-admin/profile.php#application-passwords-section",
+                    "is_local_dev": false
+                  }
+                },
+                "example": {
+                  "snippets": {
+                    "claude-code": {
+                      "client": "claude-code",
+                      "snippet": "claude mcp add --transport http fluent-cart https://example.com/wp-json/fluent-cart/mcp --header \"Authorization: Basic <base64(your-username:application-password)>\"",
+                      "instructions": "Run this in your terminal where Claude Code is installed, with base64 of \"username:application-password\"."
+                    }
+                  },
+                  "endpoint": "https://example.com/wp-json/fluent-cart/mcp",
+                  "app_passwords_url": "https://example.com/wp-admin/profile.php#application-passwords-section",
+                  "is_local_dev": false
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "snippets": {
+                        "claude-code": {
+                          "client": "claude-code",
+                          "snippet": "claude mcp add --transport http fluent-cart https://example.com/wp-json/fluent-cart/mcp --header \"Authorization: Basic <base64(your-username:application-password)>\"",
+                          "instructions": "Run this in your terminal where Claude Code is installed, with base64 of \"username:application-password\"."
+                        }
+                      },
+                      "endpoint": "https://example.com/wp-json/fluent-cart/mcp",
+                      "app_passwords_url": "https://example.com/wp-admin/profile.php#application-passwords-section",
+                      "is_local_dev": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user is not a super admin.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -27,7 +27,8 @@
       "get": {
         "operationId": "getTopProductsSold",
         "summary": "GET Get Top Products Sold",
-        "description": "Retrieve a list of top-selling products based on order item data, using the Resource API layer.",
+        "description": "**Deprecated since v1.4** \u2014 use `GET /reports/fetch-top-sold-products` instead. Retrieve the top 5 products by total quantity sold, using the Resource API layer. The response always includes a `_deprecated` notice alongside the data.\n\n**Access policy:** `ReportPolicy`",
+        "deprecated": true,
         "tags": [
           "Reports"
         ],
@@ -44,90 +45,59 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "_deprecated": {
+                      "type": "string",
+                      "description": "Deprecation notice always included in the response.",
+                      "example": "This endpoint is deprecated since v1.4 and will be removed in a future release. Use GET /fluent-cart/v2/reports/fetch-top-sold-products instead."
+                    },
                     "top_products_sold": {
                       "type": "array",
+                      "description": "Top 5 products by total quantity sold (descending).",
                       "items": {
-                        "type": "object"
-                      },
-                      "description": "List of top-selling products"
+                        "$ref": "#/components/schemas/TopProductSoldRow"
+                      }
                     }
                   },
                   "example": {
+                    "_deprecated": "This endpoint is deprecated since v1.4 and will be removed in a future release. Use GET /fluent-cart/v2/reports/fetch-top-sold-products instead.",
                     "top_products_sold": [
                       {
-                        "product_id": 123,
-                        "title": "Developer Toolkit Pro",
+                        "post_id": 123,
                         "total_sold": 142,
-                        "total_revenue": 680000,
-                        "average_price": 4789
+                        "product": {
+                          "ID": 123,
+                          "post_title": "Developer Toolkit Pro"
+                        }
                       },
                       {
-                        "product_id": 125,
-                        "title": "API Testing Suite",
+                        "post_id": 125,
                         "total_sold": 98,
-                        "total_revenue": 290000,
-                        "average_price": 2959
-                      },
-                      {
-                        "product_id": 130,
-                        "title": "WordPress starter theme",
-                        "total_sold": 76,
-                        "total_revenue": 152000,
-                        "average_price": 2000
-                      },
-                      {
-                        "product_id": 128,
-                        "title": "Cloud Hosting Add-on",
-                        "total_sold": 65,
-                        "total_revenue": 97500,
-                        "average_price": 1500
-                      },
-                      {
-                        "product_id": 135,
-                        "title": "Premium Support Package",
-                        "total_sold": 42,
-                        "total_revenue": 626000,
-                        "average_price": 14905
+                        "product": {
+                          "ID": 125,
+                          "post_title": "API Testing Suite"
+                        }
                       }
                     ]
                   }
                 },
                 "example": {
+                  "_deprecated": "This endpoint is deprecated since v1.4 and will be removed in a future release. Use GET /fluent-cart/v2/reports/fetch-top-sold-products instead.",
                   "top_products_sold": [
                     {
-                      "product_id": 123,
-                      "title": "Developer Toolkit Pro",
+                      "post_id": 123,
                       "total_sold": 142,
-                      "total_revenue": 680000,
-                      "average_price": 4789
+                      "product": {
+                        "ID": 123,
+                        "post_title": "Developer Toolkit Pro"
+                      }
                     },
                     {
-                      "product_id": 125,
-                      "title": "API Testing Suite",
+                      "post_id": 125,
                       "total_sold": 98,
-                      "total_revenue": 290000,
-                      "average_price": 2959
-                    },
-                    {
-                      "product_id": 130,
-                      "title": "WordPress starter theme",
-                      "total_sold": 76,
-                      "total_revenue": 152000,
-                      "average_price": 2000
-                    },
-                    {
-                      "product_id": 128,
-                      "title": "Cloud Hosting Add-on",
-                      "total_sold": 65,
-                      "total_revenue": 97500,
-                      "average_price": 1500
-                    },
-                    {
-                      "product_id": 135,
-                      "title": "Premium Support Package",
-                      "total_sold": 42,
-                      "total_revenue": 626000,
-                      "average_price": 14905
+                      "product": {
+                        "ID": 125,
+                        "post_title": "API Testing Suite"
+                      }
                     }
                   ]
                 },
@@ -135,44 +105,61 @@
                   "default": {
                     "summary": "Successful response",
                     "value": {
+                      "_deprecated": "This endpoint is deprecated since v1.4 and will be removed in a future release. Use GET /fluent-cart/v2/reports/fetch-top-sold-products instead.",
                       "top_products_sold": [
                         {
-                          "product_id": 123,
-                          "title": "Developer Toolkit Pro",
+                          "post_id": 123,
                           "total_sold": 142,
-                          "total_revenue": 680000,
-                          "average_price": 4789
+                          "product": {
+                            "ID": 123,
+                            "post_title": "Developer Toolkit Pro"
+                          }
                         },
                         {
-                          "product_id": 125,
-                          "title": "API Testing Suite",
+                          "post_id": 125,
                           "total_sold": 98,
-                          "total_revenue": 290000,
-                          "average_price": 2959
-                        },
-                        {
-                          "product_id": 130,
-                          "title": "WordPress starter theme",
-                          "total_sold": 76,
-                          "total_revenue": 152000,
-                          "average_price": 2000
-                        },
-                        {
-                          "product_id": 128,
-                          "title": "Cloud Hosting Add-on",
-                          "total_sold": 65,
-                          "total_revenue": 97500,
-                          "average_price": 1500
-                        },
-                        {
-                          "product_id": 135,
-                          "title": "Premium Support Package",
-                          "total_sold": 42,
-                          "total_revenue": 626000,
-                          "average_price": 14905
+                          "product": {
+                            "ID": 125,
+                            "post_title": "API Testing Suite"
+                          }
                         }
                       ]
                     }
+                  },
+                  "empty": {
+                    "summary": "No order items found for the query",
+                    "value": {
+                      "_deprecated": "This endpoint is deprecated since v1.4 and will be removed in a future release. Use GET /fluent-cart/v2/reports/fetch-top-sold-products instead.",
+                      "top_products_sold": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -183,7 +170,37 @@
     }
   },
   "components": {
-    "schemas": {},
+    "schemas": {
+      "TopProductSoldRow": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "description": "Product post ID",
+            "example": 123
+          },
+          "total_sold": {
+            "type": "integer",
+            "description": "Total quantity sold (SUM of order item quantity), grouped by product",
+            "example": 142
+          },
+          "product": {
+            "type": "object",
+            "description": "Eager-loaded product relation (only ID and title are selected)",
+            "properties": {
+              "ID": {
+                "type": "integer",
+                "example": 123
+              },
+              "post_title": {
+                "type": "string",
+                "example": "Developer Toolkit Pro"
+              }
+            }
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",

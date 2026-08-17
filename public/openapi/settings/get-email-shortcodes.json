@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getEmailShortcodes",
         "summary": "GET Get Email Shortcodes",
-        "description": "Retrieve available shortcodes/merge tags that can be used in email notification templates and confirmation messages.",
+        "description": "Retrieve available shortcodes/merge tags that can be used in email notification templates and confirmation messages.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -46,7 +46,7 @@
                   "properties": {
                     "data": {
                       "type": "object",
-                      "description": "Shortcode categories with available merge tags",
+                      "description": "Shortcode categories with available merge tags, keyed by group name.",
                       "properties": {
                         "order": {
                           "type": "object",
@@ -55,8 +55,33 @@
                               "type": "string",
                               "example": "Order"
                             },
+                            "key": {
+                              "type": "string",
+                              "description": "Internal group key used to namespace the shortcodes."
+                            },
                             "shortcodes": {
                               "type": "object",
+                              "description": "Map of shortcode tag to human-readable label.",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "general": {
+                          "type": "object",
+                          "properties": {
+                            "title": {
+                              "type": "string",
+                              "example": "General"
+                            },
+                            "key": {
+                              "type": "string",
+                              "description": "Internal group key used to namespace the shortcodes."
+                            },
+                            "shortcodes": {
+                              "type": "object",
+                              "description": "Map of shortcode tag to human-readable label.",
                               "additionalProperties": {
                                 "type": "string"
                               }
@@ -70,23 +95,72 @@
                               "type": "string",
                               "example": "Customer"
                             },
+                            "key": {
+                              "type": "string",
+                              "description": "Internal group key used to namespace the shortcodes."
+                            },
                             "shortcodes": {
                               "type": "object",
+                              "description": "Map of shortcode tag to human-readable label.",
                               "additionalProperties": {
                                 "type": "string"
                               }
                             }
                           }
                         },
-                        "store": {
+                        "transaction": {
                           "type": "object",
                           "properties": {
                             "title": {
                               "type": "string",
-                              "example": "Store"
+                              "example": "transaction"
+                            },
+                            "key": {
+                              "type": "string",
+                              "description": "Internal group key used to namespace the shortcodes."
                             },
                             "shortcodes": {
                               "type": "object",
+                              "description": "Map of shortcode tag to human-readable label.",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "settings": {
+                          "type": "object",
+                          "properties": {
+                            "title": {
+                              "type": "string",
+                              "example": "Settings"
+                            },
+                            "key": {
+                              "type": "string",
+                              "description": "Internal group key used to namespace the shortcodes."
+                            },
+                            "shortcodes": {
+                              "type": "object",
+                              "description": "Map of shortcode tag to human-readable label.",
+                              "additionalProperties": {
+                                "type": "string"
+                              }
+                            },
+                            "group": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "license": {
+                          "type": "object",
+                          "properties": {
+                            "title": {
+                              "type": "string",
+                              "example": "License"
+                            },
+                            "shortcodes": {
+                              "type": "object",
+                              "description": "Map of shortcode tag to human-readable label.",
                               "additionalProperties": {
                                 "type": "string"
                               }
@@ -100,33 +174,93 @@
                     "data": {
                       "order": {
                         "title": "Order",
+                        "key": "order",
                         "shortcodes": {
                           "{{order.id}}": "Order ID",
-                          "{{order.invoice_no}}": "Invoice Number",
-                          "{{order.total_amount_formatted}}": "Total Amount (Formatted)",
+                          "{{order.customer_dashboard_link}}": "Customer Dashboard Link",
+                          "{{order.payment_link}}": "Order Payment Link",
                           "{{order.status}}": "Order Status",
-                          "{{order.payment_method_title}}": "Payment Method",
-                          "{{order.receipt_url}}": "Receipt URL",
-                          "{{order.created_at}}": "Order Date",
-                          "{{order.customer_dashboard_link}}": "Customer Dashboard Link"
+                          "{{order.invoice_no}}": "Order Number",
+                          "{{order.total_amount_formatted}}": "Order Total Amount (Formatted)",
+                          "{{order.payment_method_title}}": "Order Payment Method Title",
+                          "{{order.created_at}}": "Order Create Date",
+                          "{{order.downloads}}": "Order Downloads",
+                          "{{order.item_count}}": "Order Item Count"
+                        }
+                      },
+                      "general": {
+                        "title": "General",
+                        "key": "wp",
+                        "shortcodes": {
+                          "{{wp.admin_email}}": "Admin Email",
+                          "{{wp.site_url}}": "Site URL",
+                          "{{wp.site_title}}": "Site Title",
+                          "{{user.ID}}": "User ID",
+                          "{{user.display_name}}": "User Display Name",
+                          "{{user.first_name}}": "User First Name",
+                          "{{user.last_name}}": "User Last Name",
+                          "{{user.user_email}}": "User Email",
+                          "{{user.user_login}}": "User Username"
                         }
                       },
                       "customer": {
+                        "key": "customer",
                         "title": "Customer",
                         "shortcodes": {
-                          "{{customer.first_name}}": "First Name",
-                          "{{customer.last_name}}": "Last Name",
-                          "{{customer.email}}": "Email",
-                          "{{customer.full_name}}": "Full Name"
+                          "{{order.billing.full_name}}": "Full Name",
+                          "{{order.billing.email}}": "Email",
+                          "{{order.billing.city}}": "City",
+                          "{{order.billing.state}}": "State",
+                          "{{order.billing.postcode}}": "Postcode",
+                          "{{order.billing.country}}": "Country",
+                          "{{order.billing.address_1}}": "Address Line 1",
+                          "{{order.billing.address_2}}": "Address Line 2",
+                          "{{order.shipping.city}}": "City",
+                          "{{order.shipping.state}}": "State",
+                          "{{order.shipping.postcode}}": "Postcode",
+                          "{{order.shipping.country}}": "Country",
+                          "{{order.shipping.address_1}}": "Address Line 1",
+                          "{{order.shipping.address_2}}": "Address Line 2"
                         }
                       },
-                      "store": {
-                        "title": "Store",
+                      "transaction": {
+                        "title": "transaction",
+                        "key": "settings",
                         "shortcodes": {
-                          "{{store.name}}": "Store Name",
-                          "{{store.logo}}": "Store Logo",
-                          "{{store.address}}": "Store Address",
-                          "{{store.url}}": "Store URL"
+                          "{{transaction.total}}": "Total Amount",
+                          "{{transaction.total_formatted}}": "Total Amount (Formatted)",
+                          "{{transaction.refund_amount}}": "Refund Amount",
+                          "{{transaction.refund_amount_formatted}}": "Refund Amount (Formatted)",
+                          "{{transaction.payment_method}}": "Payment Method",
+                          "{{transaction.card_last_4}}": "Card Last 4",
+                          "{{transaction.card_brand}}": "Card Brand",
+                          "{{transaction.status}}": "Status",
+                          "{{transaction.currency}}": "Currency"
+                        }
+                      },
+                      "settings": {
+                        "title": "Settings",
+                        "key": "settings",
+                        "shortcodes": {
+                          "{{settings.store_name}}": "Store Name",
+                          "{{settings.store_logo}}": "Store Logo",
+                          "{{settings.store_address}}": "Store Address Line 1",
+                          "{{settings.store_address2}}": "Store Address Line 2",
+                          "{{settings.store_country}}": "Store Country",
+                          "{{settings.store_state}}": "Store State",
+                          "{{settings.store_city}}": "Store City",
+                          "{{settings.store_postcode}}": "Store Postcode",
+                          "{{settings.company_name}}": "Company Name",
+                          "{{settings.legal_registration_id}}": "Legal Registration ID",
+                          "{{settings.seller_vat_id}}": "Seller VAT ID",
+                          "{{settings.seller_tax_id}}": "Seller Tax ID"
+                        },
+                        "group": "settings"
+                      },
+                      "license": {
+                        "title": "License",
+                        "shortcodes": {
+                          "{{order.licenses}}": "Order Licenses"
                         }
                       }
                     }
@@ -136,33 +270,93 @@
                   "data": {
                     "order": {
                       "title": "Order",
+                      "key": "order",
                       "shortcodes": {
                         "{{order.id}}": "Order ID",
-                        "{{order.invoice_no}}": "Invoice Number",
-                        "{{order.total_amount_formatted}}": "Total Amount (Formatted)",
+                        "{{order.customer_dashboard_link}}": "Customer Dashboard Link",
+                        "{{order.payment_link}}": "Order Payment Link",
                         "{{order.status}}": "Order Status",
-                        "{{order.payment_method_title}}": "Payment Method",
-                        "{{order.receipt_url}}": "Receipt URL",
-                        "{{order.created_at}}": "Order Date",
-                        "{{order.customer_dashboard_link}}": "Customer Dashboard Link"
+                        "{{order.invoice_no}}": "Order Number",
+                        "{{order.total_amount_formatted}}": "Order Total Amount (Formatted)",
+                        "{{order.payment_method_title}}": "Order Payment Method Title",
+                        "{{order.created_at}}": "Order Create Date",
+                        "{{order.downloads}}": "Order Downloads",
+                        "{{order.item_count}}": "Order Item Count"
+                      }
+                    },
+                    "general": {
+                      "title": "General",
+                      "key": "wp",
+                      "shortcodes": {
+                        "{{wp.admin_email}}": "Admin Email",
+                        "{{wp.site_url}}": "Site URL",
+                        "{{wp.site_title}}": "Site Title",
+                        "{{user.ID}}": "User ID",
+                        "{{user.display_name}}": "User Display Name",
+                        "{{user.first_name}}": "User First Name",
+                        "{{user.last_name}}": "User Last Name",
+                        "{{user.user_email}}": "User Email",
+                        "{{user.user_login}}": "User Username"
                       }
                     },
                     "customer": {
+                      "key": "customer",
                       "title": "Customer",
                       "shortcodes": {
-                        "{{customer.first_name}}": "First Name",
-                        "{{customer.last_name}}": "Last Name",
-                        "{{customer.email}}": "Email",
-                        "{{customer.full_name}}": "Full Name"
+                        "{{order.billing.full_name}}": "Full Name",
+                        "{{order.billing.email}}": "Email",
+                        "{{order.billing.city}}": "City",
+                        "{{order.billing.state}}": "State",
+                        "{{order.billing.postcode}}": "Postcode",
+                        "{{order.billing.country}}": "Country",
+                        "{{order.billing.address_1}}": "Address Line 1",
+                        "{{order.billing.address_2}}": "Address Line 2",
+                        "{{order.shipping.city}}": "City",
+                        "{{order.shipping.state}}": "State",
+                        "{{order.shipping.postcode}}": "Postcode",
+                        "{{order.shipping.country}}": "Country",
+                        "{{order.shipping.address_1}}": "Address Line 1",
+                        "{{order.shipping.address_2}}": "Address Line 2"
                       }
                     },
-                    "store": {
-                      "title": "Store",
+                    "transaction": {
+                      "title": "transaction",
+                      "key": "settings",
                       "shortcodes": {
-                        "{{store.name}}": "Store Name",
-                        "{{store.logo}}": "Store Logo",
-                        "{{store.address}}": "Store Address",
-                        "{{store.url}}": "Store URL"
+                        "{{transaction.total}}": "Total Amount",
+                        "{{transaction.total_formatted}}": "Total Amount (Formatted)",
+                        "{{transaction.refund_amount}}": "Refund Amount",
+                        "{{transaction.refund_amount_formatted}}": "Refund Amount (Formatted)",
+                        "{{transaction.payment_method}}": "Payment Method",
+                        "{{transaction.card_last_4}}": "Card Last 4",
+                        "{{transaction.card_brand}}": "Card Brand",
+                        "{{transaction.status}}": "Status",
+                        "{{transaction.currency}}": "Currency"
+                      }
+                    },
+                    "settings": {
+                      "title": "Settings",
+                      "key": "settings",
+                      "shortcodes": {
+                        "{{settings.store_name}}": "Store Name",
+                        "{{settings.store_logo}}": "Store Logo",
+                        "{{settings.store_address}}": "Store Address Line 1",
+                        "{{settings.store_address2}}": "Store Address Line 2",
+                        "{{settings.store_country}}": "Store Country",
+                        "{{settings.store_state}}": "Store State",
+                        "{{settings.store_city}}": "Store City",
+                        "{{settings.store_postcode}}": "Store Postcode",
+                        "{{settings.company_name}}": "Company Name",
+                        "{{settings.legal_registration_id}}": "Legal Registration ID",
+                        "{{settings.seller_vat_id}}": "Seller VAT ID",
+                        "{{settings.seller_tax_id}}": "Seller Tax ID"
+                      },
+                      "group": "settings"
+                    },
+                    "license": {
+                      "title": "License",
+                      "shortcodes": {
+                        "{{order.licenses}}": "Order Licenses"
                       }
                     }
                   }
@@ -174,37 +368,125 @@
                       "data": {
                         "order": {
                           "title": "Order",
+                          "key": "order",
                           "shortcodes": {
                             "{{order.id}}": "Order ID",
-                            "{{order.invoice_no}}": "Invoice Number",
-                            "{{order.total_amount_formatted}}": "Total Amount (Formatted)",
+                            "{{order.customer_dashboard_link}}": "Customer Dashboard Link",
+                            "{{order.payment_link}}": "Order Payment Link",
                             "{{order.status}}": "Order Status",
-                            "{{order.payment_method_title}}": "Payment Method",
-                            "{{order.receipt_url}}": "Receipt URL",
-                            "{{order.created_at}}": "Order Date",
-                            "{{order.customer_dashboard_link}}": "Customer Dashboard Link"
+                            "{{order.invoice_no}}": "Order Number",
+                            "{{order.total_amount_formatted}}": "Order Total Amount (Formatted)",
+                            "{{order.payment_method_title}}": "Order Payment Method Title",
+                            "{{order.created_at}}": "Order Create Date",
+                            "{{order.downloads}}": "Order Downloads",
+                            "{{order.item_count}}": "Order Item Count"
+                          }
+                        },
+                        "general": {
+                          "title": "General",
+                          "key": "wp",
+                          "shortcodes": {
+                            "{{wp.admin_email}}": "Admin Email",
+                            "{{wp.site_url}}": "Site URL",
+                            "{{wp.site_title}}": "Site Title",
+                            "{{user.ID}}": "User ID",
+                            "{{user.display_name}}": "User Display Name",
+                            "{{user.first_name}}": "User First Name",
+                            "{{user.last_name}}": "User Last Name",
+                            "{{user.user_email}}": "User Email",
+                            "{{user.user_login}}": "User Username"
                           }
                         },
                         "customer": {
+                          "key": "customer",
                           "title": "Customer",
                           "shortcodes": {
-                            "{{customer.first_name}}": "First Name",
-                            "{{customer.last_name}}": "Last Name",
-                            "{{customer.email}}": "Email",
-                            "{{customer.full_name}}": "Full Name"
+                            "{{order.billing.full_name}}": "Full Name",
+                            "{{order.billing.email}}": "Email",
+                            "{{order.billing.city}}": "City",
+                            "{{order.billing.state}}": "State",
+                            "{{order.billing.postcode}}": "Postcode",
+                            "{{order.billing.country}}": "Country",
+                            "{{order.billing.address_1}}": "Address Line 1",
+                            "{{order.billing.address_2}}": "Address Line 2",
+                            "{{order.shipping.city}}": "City",
+                            "{{order.shipping.state}}": "State",
+                            "{{order.shipping.postcode}}": "Postcode",
+                            "{{order.shipping.country}}": "Country",
+                            "{{order.shipping.address_1}}": "Address Line 1",
+                            "{{order.shipping.address_2}}": "Address Line 2"
                           }
                         },
-                        "store": {
-                          "title": "Store",
+                        "transaction": {
+                          "title": "transaction",
+                          "key": "settings",
                           "shortcodes": {
-                            "{{store.name}}": "Store Name",
-                            "{{store.logo}}": "Store Logo",
-                            "{{store.address}}": "Store Address",
-                            "{{store.url}}": "Store URL"
+                            "{{transaction.total}}": "Total Amount",
+                            "{{transaction.total_formatted}}": "Total Amount (Formatted)",
+                            "{{transaction.refund_amount}}": "Refund Amount",
+                            "{{transaction.refund_amount_formatted}}": "Refund Amount (Formatted)",
+                            "{{transaction.payment_method}}": "Payment Method",
+                            "{{transaction.card_last_4}}": "Card Last 4",
+                            "{{transaction.card_brand}}": "Card Brand",
+                            "{{transaction.status}}": "Status",
+                            "{{transaction.currency}}": "Currency"
+                          }
+                        },
+                        "settings": {
+                          "title": "Settings",
+                          "key": "settings",
+                          "shortcodes": {
+                            "{{settings.store_name}}": "Store Name",
+                            "{{settings.store_logo}}": "Store Logo",
+                            "{{settings.store_address}}": "Store Address Line 1",
+                            "{{settings.store_address2}}": "Store Address Line 2",
+                            "{{settings.store_country}}": "Store Country",
+                            "{{settings.store_state}}": "Store State",
+                            "{{settings.store_city}}": "Store City",
+                            "{{settings.store_postcode}}": "Store Postcode",
+                            "{{settings.company_name}}": "Company Name",
+                            "{{settings.legal_registration_id}}": "Legal Registration ID",
+                            "{{settings.seller_vat_id}}": "Seller VAT ID",
+                            "{{settings.seller_tax_id}}": "Seller Tax ID"
+                          },
+                          "group": "settings"
+                        },
+                        "license": {
+                          "title": "License",
+                          "shortcodes": {
+                            "{{order.licenses}}": "Order Licenses"
                           }
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

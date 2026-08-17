@@ -27,7 +27,7 @@
       "post": {
         "operationId": "saveConfirmationSettings",
         "summary": "POST Save Confirmation Settings",
-        "description": "Update the order confirmation/receipt page settings, including the confirmation type, message content, and the receipt page assignment.",
+        "description": "Update the order confirmation/receipt page settings, including the confirmation type, message content, and the receipt page assignment.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -135,6 +135,49 @@
                       "confirmation_type": "same_page",
                       "message_to_show": "<p>Thank you for your order!</p>"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

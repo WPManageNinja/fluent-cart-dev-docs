@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getFutureRenewals",
         "summary": "GET Get Future Renewals",
-        "description": "Retrieve projected future subscription renewal data.",
+        "description": "Retrieve projected future subscription renewal data.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -65,120 +65,158 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Future renewal projection data",
-                  "additionalProperties": true,
+                  "description": "Future renewal projection data for active/trialing subscriptions over the next quarter, grouped by month. Note: the `params[startDate]`/`params[endDate]` query parameters are currently read but not applied \u2014 the window is always \"today\" through \"+3 months\".",
+                  "properties": {
+                    "totalProjected": {
+                      "type": "integer",
+                      "description": "Sum of all projected renewal amounts across the period, in cents"
+                    },
+                    "totalRenewals": {
+                      "type": "integer",
+                      "description": "Total count of projected renewals across the period"
+                    },
+                    "projections": {
+                      "type": "array",
+                      "description": "Renewals and projected revenue grouped by month",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "group": {
+                            "type": "string",
+                            "description": "Month bucket, formatted Y-m"
+                          },
+                          "renewals_count": {
+                            "type": "integer"
+                          },
+                          "projected_amount": {
+                            "type": "integer",
+                            "description": "Projected renewal amount for this month, in cents"
+                          }
+                        }
+                      }
+                    },
+                    "period": {
+                      "type": "array",
+                      "description": "[start, end] datetime strings of the report window",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "groupBy": {
+                      "type": "string",
+                      "description": "Grouping granularity (currently always \"monthly\")"
+                    }
+                  },
                   "example": {
-                    "futureRenewals": [
+                    "totalProjected": 148500,
+                    "totalRenewals": 15,
+                    "projections": [
                       {
-                        "date": "2025-10-01",
-                        "count": 15,
-                        "expected_revenue": 148500
+                        "group": "2026-08",
+                        "renewals_count": 5,
+                        "projected_amount": 49500
                       },
                       {
-                        "date": "2025-11-01",
-                        "count": 22,
-                        "expected_revenue": 217800
+                        "group": "2026-09",
+                        "renewals_count": 6,
+                        "projected_amount": 59400
                       },
                       {
-                        "date": "2025-12-01",
-                        "count": 18,
-                        "expected_revenue": 178200
-                      },
-                      {
-                        "date": "2026-01-01",
-                        "count": 28,
-                        "expected_revenue": 277200
-                      },
-                      {
-                        "date": "2026-02-01",
-                        "count": 12,
-                        "expected_revenue": 118800
-                      },
-                      {
-                        "date": "2026-03-01",
-                        "count": 20,
-                        "expected_revenue": 198000
+                        "group": "2026-10",
+                        "renewals_count": 4,
+                        "projected_amount": 39600
                       }
                     ],
-                    "total_expected_revenue": 1138500,
-                    "total_renewals": 115
+                    "period": [
+                      "2026-08-17 00:00:00",
+                      "2026-11-17 23:59:59"
+                    ],
+                    "groupBy": "monthly"
                   }
                 },
                 "example": {
-                  "futureRenewals": [
+                  "totalProjected": 148500,
+                  "totalRenewals": 15,
+                  "projections": [
                     {
-                      "date": "2025-10-01",
-                      "count": 15,
-                      "expected_revenue": 148500
+                      "group": "2026-08",
+                      "renewals_count": 5,
+                      "projected_amount": 49500
                     },
                     {
-                      "date": "2025-11-01",
-                      "count": 22,
-                      "expected_revenue": 217800
+                      "group": "2026-09",
+                      "renewals_count": 6,
+                      "projected_amount": 59400
                     },
                     {
-                      "date": "2025-12-01",
-                      "count": 18,
-                      "expected_revenue": 178200
-                    },
-                    {
-                      "date": "2026-01-01",
-                      "count": 28,
-                      "expected_revenue": 277200
-                    },
-                    {
-                      "date": "2026-02-01",
-                      "count": 12,
-                      "expected_revenue": 118800
-                    },
-                    {
-                      "date": "2026-03-01",
-                      "count": 20,
-                      "expected_revenue": 198000
+                      "group": "2026-10",
+                      "renewals_count": 4,
+                      "projected_amount": 39600
                     }
                   ],
-                  "total_expected_revenue": 1138500,
-                  "total_renewals": 115
+                  "period": [
+                    "2026-08-17 00:00:00",
+                    "2026-11-17 23:59:59"
+                  ],
+                  "groupBy": "monthly"
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "futureRenewals": [
+                      "totalProjected": 148500,
+                      "totalRenewals": 15,
+                      "projections": [
                         {
-                          "date": "2025-10-01",
-                          "count": 15,
-                          "expected_revenue": 148500
+                          "group": "2026-08",
+                          "renewals_count": 5,
+                          "projected_amount": 49500
                         },
                         {
-                          "date": "2025-11-01",
-                          "count": 22,
-                          "expected_revenue": 217800
+                          "group": "2026-09",
+                          "renewals_count": 6,
+                          "projected_amount": 59400
                         },
                         {
-                          "date": "2025-12-01",
-                          "count": 18,
-                          "expected_revenue": 178200
-                        },
-                        {
-                          "date": "2026-01-01",
-                          "count": 28,
-                          "expected_revenue": 277200
-                        },
-                        {
-                          "date": "2026-02-01",
-                          "count": 12,
-                          "expected_revenue": 118800
-                        },
-                        {
-                          "date": "2026-03-01",
-                          "count": 20,
-                          "expected_revenue": 198000
+                          "group": "2026-10",
+                          "renewals_count": 4,
+                          "projected_amount": 39600
                         }
                       ],
-                      "total_expected_revenue": 1138500,
-                      "total_renewals": 115
+                      "period": [
+                        "2026-08-17 00:00:00",
+                        "2026-11-17 23:59:59"
+                      ],
+                      "groupBy": "monthly"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

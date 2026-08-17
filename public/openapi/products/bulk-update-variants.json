@@ -1,0 +1,260 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/products/variants/bulk-update": {
+      "post": {
+        "operationId": "bulkUpdate",
+        "summary": "POST Bulk Update Product Variants",
+        "description": "Update price and status fields on multiple product variants in one request. All targeted variants must belong to the same product. Rows in the payload that target the same variant ID are merged (last field wins), the batch is applied inside a single locked transaction, and the `item_price` / `compare_price` relationship is enforced in both directions — raising `item_price` above an existing `compare_price` clears `compare_price`, and a `compare_price` below `item_price` is rejected back to 0. Up to 500 update rows are processed per request; additional rows are silently dropped. Note `item_price` and `compare_price` are submitted as decimal amounts (e.g. `29.99`), not cents — they are converted to cents internally.\n\n**Required permission:** `products/edit`",
+        "tags": [
+          "Products"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "updates"
+                ],
+                "properties": {
+                  "updates": {
+                    "type": "array",
+                    "description": "Variant updates. Each row must include id plus at least one of item_price, compare_price, or item_status.",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Product variation ID."
+                        },
+                        "item_price": {
+                          "type": "number",
+                          "description": "New price as a decimal amount (e.g. 29.99), not cents."
+                        },
+                        "compare_price": {
+                          "type": "number",
+                          "description": "New compare-at price as a decimal amount, not cents. Must be 0 or >= item_price."
+                        },
+                        "item_status": {
+                          "type": "string",
+                          "enum": [
+                            "active",
+                            "inactive"
+                          ],
+                          "description": "New variant status."
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "updates": [
+                    {
+                      "id": 501,
+                      "item_price": 29.99,
+                      "compare_price": 39.99,
+                      "item_status": "active"
+                    },
+                    {
+                      "id": 502,
+                      "item_price": 24.99
+                    }
+                  ]
+                }
+              },
+              "example": {
+                "updates": [
+                  {
+                    "id": 501,
+                    "item_price": 29.99,
+                    "compare_price": 39.99,
+                    "item_status": "active"
+                  },
+                  {
+                    "id": 502,
+                    "item_price": 24.99
+                  }
+                ]
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "updates": [
+                      {
+                        "id": 501,
+                        "item_price": 29.99,
+                        "compare_price": 39.99,
+                        "item_status": "active"
+                      },
+                      {
+                        "id": 502,
+                        "item_price": 24.99
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Variants updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "updated": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Variants updated successfully.",
+                  "updated": 2
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Variants updated successfully.",
+                      "updated": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "One or more variant IDs do not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "One or more variant IDs do not exist."
+                },
+                "schema": {
+                  "example": {
+                    "message": "One or more variant IDs do not exist."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "One or more variant IDs do not exist."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "No updates provided, or the updates target variants across more than one product.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "All updates must target variants on the same product."
+                  }
+                },
+                "example": {
+                  "message": "All updates must target variants on the same product."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "All updates must target variants on the same product."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

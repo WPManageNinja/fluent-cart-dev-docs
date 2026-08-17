@@ -27,7 +27,7 @@
       "delete": {
         "operationId": "deleteCustomerAddress",
         "summary": "DELETE Delete Address",
-        "description": "Delete a customer address. Primary addresses and the last remaining address cannot be deleted.",
+        "description": "Delete a customer address. Primary addresses and the last remaining address cannot be deleted.\n\n**Also used by the customer portal UI.** Delete an existing address for the authenticated customer. The address ID is passed in the request body.\n\n**Required permission:** `customers/delete`",
         "tags": [
           "Customers"
         ],
@@ -123,6 +123,82 @@
                     "success": false,
                     "data": {
                       "message": "You do not have permission to perform this action."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "address"
+                ],
+                "properties": {
+                  "address": {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "The address record ID to delete"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "address": {
+                    "id": 5
+                  }
+                }
+              },
+              "example": {
+                "address": {
+                  "id": 5
+                }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "address": {
+                      "id": 5
                     }
                   }
                 }

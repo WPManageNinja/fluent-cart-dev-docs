@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getUpgradePaths",
         "summary": "GET Get Upgrade Paths",
-        "description": "Retrieve available upgrade/downgrade paths for a specific product variation within an order. Used to show plan switching options in the customer portal.",
+        "description": "Retrieve available upgrade/downgrade paths for a specific product variation within an order. Used to show plan switching options in the customer portal.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Customer Profile"
         ],
@@ -201,6 +201,35 @@
                     "value": {
                       "message": "Order not found or you do not have permission to view it."
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

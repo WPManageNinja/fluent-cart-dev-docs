@@ -27,7 +27,7 @@
       "post": {
         "operationId": "createAndChangeCustomer",
         "summary": "POST Create and Change Customer",
-        "description": "Create a new customer and immediately assign them to the order. Combines customer creation with order reassignment.",
+        "description": "Create a new customer and immediately assign them to the order. Combines customer creation with order reassignment.\n\n**Required permission:** `orders/manage`",
         "tags": [
           "Orders"
         ],
@@ -182,6 +182,34 @@
                     "value": {
                       "message": "Email is required"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

@@ -23,11 +23,11 @@
     }
   ],
   "paths": {
-    "/customer-profile/": {
+    "/customer-profile": {
       "get": {
         "operationId": "dashboardOverview",
         "summary": "GET Dashboard Overview",
-        "description": "Retrieve the customer's dashboard overview including the 5 most recent orders. This is the landing page data for the customer portal.",
+        "description": "Retrieve the customer's dashboard overview including the 5 most recent orders. This is the landing page data for the customer portal.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Customer Profile"
         ],
@@ -171,6 +171,34 @@
                         "after_orders_table": ""
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

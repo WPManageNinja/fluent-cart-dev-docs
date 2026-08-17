@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listCustomerSubscriptions",
         "summary": "GET List Customer Subscriptions",
-        "description": "Retrieve a paginated list of subscriptions belonging to the currently logged-in customer. Subscriptions with pending or intended status are excluded.",
+        "description": "Retrieve a paginated list of subscriptions belonging to the currently logged-in customer. Subscriptions with pending or intended status are excluded.\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Subscriptions"
         ],
@@ -81,23 +81,77 @@
                       "data": [
                         {
                           "uuid": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                          "vendor_subscription_id": "sub_1QxR3nH8k5m2Np9",
                           "status": "active",
-                          "item_name": "Developer Toolkit Pro - Business Annual",
-                          "billing_interval": "yearly",
-                          "recurring_amount": 9900,
+                          "overridden_status": "active",
                           "next_billing_date": "2026-09-20 14:25:00",
-                          "bill_times": 0,
-                          "bill_count": 1
+                          "billing_info": {
+                            "method": "stripe",
+                            "vendor_method_id": "pm_1QxR3nH8k5m2Np9",
+                            "payment_type": "card",
+                            "details": {
+                              "brand": "visa",
+                              "last_4": "4242",
+                              "exp_month": 11,
+                              "exp_year": 2028,
+                              "country": "US",
+                              "postal_code": "94102",
+                              "name": "Alex Morgan"
+                            }
+                          },
+                          "current_payment_method": "stripe",
+                          "payment_method": null,
+                          "payment_info": "&#36;99.00 per year, for 1 year",
+                          "bill_times": "0",
+                          "bill_count": "1",
+                          "config": {
+                            "is_trial_days_simulated": "no",
+                            "currency": "USD"
+                          },
+                          "reactivate_url": "https://yoursite.com/?fluent-cart=reactivate-subscription&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                          "can_upgrade": true,
+                          "can_switch_payment_method": true,
+                          "can_update_payment_method": true,
+                          "collection_method": "automatic",
+                          "is_auto_charged": true,
+                          "item_name": "Developer Toolkit Pro - Business Annual"
                         },
                         {
                           "uuid": "c5f9e3d4-1a6f-6c0d-d7e8-f9a0b1234567",
+                          "vendor_subscription_id": "sub_2RyS4oI9l6n3Oq0",
                           "status": "active",
-                          "item_name": "CloudSync Starter - Monthly",
-                          "billing_interval": "monthly",
-                          "recurring_amount": 1900,
+                          "overridden_status": "active",
                           "next_billing_date": "2026-04-15 09:00:00",
-                          "bill_times": 12,
-                          "bill_count": 3
+                          "billing_info": {
+                            "method": "stripe",
+                            "vendor_method_id": "pm_2RyS4oI9l6n3Oq0",
+                            "payment_type": "card",
+                            "details": {
+                              "brand": "mastercard",
+                              "last_4": "4444",
+                              "exp_month": 6,
+                              "exp_year": 2029,
+                              "country": "US",
+                              "postal_code": "10001",
+                              "name": "Jordan Lee"
+                            }
+                          },
+                          "current_payment_method": "stripe",
+                          "payment_method": null,
+                          "payment_info": "&#36;19.00 per month, for 12 month",
+                          "bill_times": "12",
+                          "bill_count": "3",
+                          "config": {
+                            "is_trial_days_simulated": "no",
+                            "currency": "USD"
+                          },
+                          "reactivate_url": "https://yoursite.com/?fluent-cart=reactivate-subscription&subscription_hash=c5f9e3d4-1a6f-6c0d-d7e8-f9a0b1234567",
+                          "can_upgrade": false,
+                          "can_switch_payment_method": true,
+                          "can_update_payment_method": true,
+                          "collection_method": "automatic",
+                          "is_auto_charged": true,
+                          "item_name": "CloudSync Starter - Monthly"
                         }
                       ],
                       "total": 2,
@@ -113,23 +167,77 @@
                     "data": [
                       {
                         "uuid": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                        "vendor_subscription_id": "sub_1QxR3nH8k5m2Np9",
                         "status": "active",
-                        "item_name": "Developer Toolkit Pro - Business Annual",
-                        "billing_interval": "yearly",
-                        "recurring_amount": 9900,
+                        "overridden_status": "active",
                         "next_billing_date": "2026-09-20 14:25:00",
-                        "bill_times": 0,
-                        "bill_count": 1
+                        "billing_info": {
+                          "method": "stripe",
+                          "vendor_method_id": "pm_1QxR3nH8k5m2Np9",
+                          "payment_type": "card",
+                          "details": {
+                            "brand": "visa",
+                            "last_4": "4242",
+                            "exp_month": 11,
+                            "exp_year": 2028,
+                            "country": "US",
+                            "postal_code": "94102",
+                            "name": "Alex Morgan"
+                          }
+                        },
+                        "current_payment_method": "stripe",
+                        "payment_method": null,
+                        "payment_info": "&#36;99.00 per year, for 1 year",
+                        "bill_times": "0",
+                        "bill_count": "1",
+                        "config": {
+                          "is_trial_days_simulated": "no",
+                          "currency": "USD"
+                        },
+                        "reactivate_url": "https://yoursite.com/?fluent-cart=reactivate-subscription&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                        "can_upgrade": true,
+                        "can_switch_payment_method": true,
+                        "can_update_payment_method": true,
+                        "collection_method": "automatic",
+                        "is_auto_charged": true,
+                        "item_name": "Developer Toolkit Pro - Business Annual"
                       },
                       {
                         "uuid": "c5f9e3d4-1a6f-6c0d-d7e8-f9a0b1234567",
+                        "vendor_subscription_id": "sub_2RyS4oI9l6n3Oq0",
                         "status": "active",
-                        "item_name": "CloudSync Starter - Monthly",
-                        "billing_interval": "monthly",
-                        "recurring_amount": 1900,
+                        "overridden_status": "active",
                         "next_billing_date": "2026-04-15 09:00:00",
-                        "bill_times": 12,
-                        "bill_count": 3
+                        "billing_info": {
+                          "method": "stripe",
+                          "vendor_method_id": "pm_2RyS4oI9l6n3Oq0",
+                          "payment_type": "card",
+                          "details": {
+                            "brand": "mastercard",
+                            "last_4": "4444",
+                            "exp_month": 6,
+                            "exp_year": 2029,
+                            "country": "US",
+                            "postal_code": "10001",
+                            "name": "Jordan Lee"
+                          }
+                        },
+                        "current_payment_method": "stripe",
+                        "payment_method": null,
+                        "payment_info": "&#36;19.00 per month, for 12 month",
+                        "bill_times": "12",
+                        "bill_count": "3",
+                        "config": {
+                          "is_trial_days_simulated": "no",
+                          "currency": "USD"
+                        },
+                        "reactivate_url": "https://yoursite.com/?fluent-cart=reactivate-subscription&subscription_hash=c5f9e3d4-1a6f-6c0d-d7e8-f9a0b1234567",
+                        "can_upgrade": false,
+                        "can_switch_payment_method": true,
+                        "can_update_payment_method": true,
+                        "collection_method": "automatic",
+                        "is_auto_charged": true,
+                        "item_name": "CloudSync Starter - Monthly"
                       }
                     ],
                     "total": 2,
@@ -147,23 +255,77 @@
                         "data": [
                           {
                             "uuid": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                            "vendor_subscription_id": "sub_1QxR3nH8k5m2Np9",
                             "status": "active",
-                            "item_name": "Developer Toolkit Pro - Business Annual",
-                            "billing_interval": "yearly",
-                            "recurring_amount": 9900,
+                            "overridden_status": "active",
                             "next_billing_date": "2026-09-20 14:25:00",
-                            "bill_times": 0,
-                            "bill_count": 1
+                            "billing_info": {
+                              "method": "stripe",
+                              "vendor_method_id": "pm_1QxR3nH8k5m2Np9",
+                              "payment_type": "card",
+                              "details": {
+                                "brand": "visa",
+                                "last_4": "4242",
+                                "exp_month": 11,
+                                "exp_year": 2028,
+                                "country": "US",
+                                "postal_code": "94102",
+                                "name": "Alex Morgan"
+                              }
+                            },
+                            "current_payment_method": "stripe",
+                            "payment_method": null,
+                            "payment_info": "&#36;99.00 per year, for 1 year",
+                            "bill_times": "0",
+                            "bill_count": "1",
+                            "config": {
+                              "is_trial_days_simulated": "no",
+                              "currency": "USD"
+                            },
+                            "reactivate_url": "https://yoursite.com/?fluent-cart=reactivate-subscription&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345",
+                            "can_upgrade": true,
+                            "can_switch_payment_method": true,
+                            "can_update_payment_method": true,
+                            "collection_method": "automatic",
+                            "is_auto_charged": true,
+                            "item_name": "Developer Toolkit Pro - Business Annual"
                           },
                           {
                             "uuid": "c5f9e3d4-1a6f-6c0d-d7e8-f9a0b1234567",
+                            "vendor_subscription_id": "sub_2RyS4oI9l6n3Oq0",
                             "status": "active",
-                            "item_name": "CloudSync Starter - Monthly",
-                            "billing_interval": "monthly",
-                            "recurring_amount": 1900,
+                            "overridden_status": "active",
                             "next_billing_date": "2026-04-15 09:00:00",
-                            "bill_times": 12,
-                            "bill_count": 3
+                            "billing_info": {
+                              "method": "stripe",
+                              "vendor_method_id": "pm_2RyS4oI9l6n3Oq0",
+                              "payment_type": "card",
+                              "details": {
+                                "brand": "mastercard",
+                                "last_4": "4444",
+                                "exp_month": 6,
+                                "exp_year": 2029,
+                                "country": "US",
+                                "postal_code": "10001",
+                                "name": "Jordan Lee"
+                              }
+                            },
+                            "current_payment_method": "stripe",
+                            "payment_method": null,
+                            "payment_info": "&#36;19.00 per month, for 12 month",
+                            "bill_times": "12",
+                            "bill_count": "3",
+                            "config": {
+                              "is_trial_days_simulated": "no",
+                              "currency": "USD"
+                            },
+                            "reactivate_url": "https://yoursite.com/?fluent-cart=reactivate-subscription&subscription_hash=c5f9e3d4-1a6f-6c0d-d7e8-f9a0b1234567",
+                            "can_upgrade": false,
+                            "can_switch_payment_method": true,
+                            "can_update_payment_method": true,
+                            "collection_method": "automatic",
+                            "is_auto_charged": true,
+                            "item_name": "CloudSync Starter - Monthly"
                           }
                         ],
                         "total": 2,
@@ -172,6 +334,34 @@
                         "last_page": 1
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -191,41 +381,158 @@
             "description": "Subscription UUID",
             "example": "a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
           },
+          "vendor_subscription_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Subscription ID at the payment gateway",
+            "example": "sub_1QxR3nH8k5m2Np9"
+          },
           "status": {
             "type": "string",
             "description": "Subscription status",
             "example": "active"
           },
+          "overridden_status": {
+            "type": "string",
+            "description": "Effective display status, accounting for expiry/overrides",
+            "example": "active"
+          },
+          "next_billing_date": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "Next billing date in GMT, or null if there is none",
+            "example": "2026-09-20 14:25:00"
+          },
+          "billing_info": {
+            "type": "object",
+            "nullable": true,
+            "description": "Active payment method details used for this subscription",
+            "properties": {
+              "method": {
+                "type": "string",
+                "example": "stripe"
+              },
+              "vendor_method_id": {
+                "type": "string",
+                "example": "pm_1QxR3nH8k5m2Np9"
+              },
+              "payment_type": {
+                "type": "string",
+                "example": "card"
+              },
+              "details": {
+                "type": "object",
+                "properties": {
+                  "brand": {
+                    "type": "string",
+                    "example": "visa"
+                  },
+                  "last_4": {
+                    "type": "string",
+                    "example": "4242"
+                  },
+                  "exp_month": {
+                    "type": "integer",
+                    "example": 11
+                  },
+                  "exp_year": {
+                    "type": "integer",
+                    "example": 2028
+                  },
+                  "country": {
+                    "type": "string",
+                    "example": "US"
+                  },
+                  "postal_code": {
+                    "type": "string",
+                    "example": "94102"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Alex Morgan"
+                  }
+                }
+              }
+            }
+          },
+          "current_payment_method": {
+            "type": "string",
+            "description": "Current payment gateway slug",
+            "example": "stripe"
+          },
+          "payment_method": {
+            "type": "string",
+            "nullable": true,
+            "description": "Deprecated/legacy payment method field; typically null"
+          },
+          "payment_info": {
+            "type": "string",
+            "description": "HTML-escaped, human-readable billing summary (amount, interval, and total occurrences)",
+            "example": "&#36;99.00 per year, for 1 year"
+          },
+          "bill_times": {
+            "type": "string",
+            "description": "Number of times to bill, as a string (\"0\" = unlimited)",
+            "example": "0"
+          },
+          "bill_count": {
+            "type": "string",
+            "description": "Number of completed billing cycles, as a string",
+            "example": "1"
+          },
+          "config": {
+            "type": "object",
+            "description": "Subscription configuration flags",
+            "properties": {
+              "is_trial_days_simulated": {
+                "type": "string",
+                "enum": [
+                  "yes",
+                  "no"
+                ],
+                "example": "no"
+              },
+              "currency": {
+                "type": "string",
+                "example": "USD"
+              }
+            }
+          },
+          "reactivate_url": {
+            "type": "string",
+            "description": "Frontend URL the customer can use to reactivate a canceled/expired subscription",
+            "example": "https://yoursite.com/?fluent-cart=reactivate-subscription&subscription_hash=a3f7c1b2-9e4d-4a8b-b5c6-d7e8f9012345"
+          },
+          "can_upgrade": {
+            "type": "boolean",
+            "description": "Whether the customer can upgrade this subscription's plan"
+          },
+          "can_switch_payment_method": {
+            "type": "boolean",
+            "description": "Whether the customer can switch to a different saved payment method"
+          },
+          "can_update_payment_method": {
+            "type": "boolean",
+            "description": "Whether the customer can update the current payment method's details"
+          },
+          "collection_method": {
+            "type": "string",
+            "description": "How renewals are collected",
+            "enum": [
+              "automatic",
+              "manual"
+            ],
+            "example": "automatic"
+          },
+          "is_auto_charged": {
+            "type": "boolean",
+            "description": "Whether the store automatically charges the customer on renewal"
+          },
           "item_name": {
             "type": "string",
             "description": "Item name",
             "example": "Developer Toolkit Pro - Business Annual"
-          },
-          "billing_interval": {
-            "type": "string",
-            "description": "Billing interval",
-            "example": "yearly"
-          },
-          "recurring_amount": {
-            "type": "integer",
-            "description": "Recurring amount in cents",
-            "example": 9900
-          },
-          "next_billing_date": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Next billing date in GMT",
-            "example": "2026-09-20 14:25:00"
-          },
-          "bill_times": {
-            "type": "integer",
-            "description": "Number of times to bill (0 = unlimited)",
-            "example": 0
-          },
-          "bill_count": {
-            "type": "integer",
-            "description": "Number of completed billing cycles",
-            "example": 1
           }
         }
       },

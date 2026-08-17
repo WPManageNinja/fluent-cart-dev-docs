@@ -1,0 +1,344 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/email-notification/digest-settings": {
+      "post": {
+        "operationId": "saveDigestSettings",
+        "summary": "POST Save Store Digest Settings",
+        "description": "Save the store's digest email settings. The `enabled` master flag is derived server-side \u2014 it is set to \"yes\" automatically whenever any of the daily, weekly, or monthly cadences are enabled, and cannot be set directly.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
+        "tags": [
+          "Email Notifications"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recipients": {
+                    "type": "string",
+                    "description": "Comma-separated recipient list, or a template like {{wp.admin_email}}. Defaults to {{wp.admin_email}} if omitted."
+                  },
+                  "send_when_empty": {
+                    "type": "string",
+                    "description": "\"yes\" to send a digest even when there's no activity to report; anything else is treated as \"no\"."
+                  },
+                  "daily": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "string",
+                        "description": "\"yes\" to enable the daily digest; anything else is treated as \"no\"."
+                      },
+                      "send_hour": {
+                        "type": "integer",
+                        "description": "Hour of day to send, clamped to 0-23."
+                      }
+                    }
+                  },
+                  "weekly": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "string"
+                      },
+                      "send_hour": {
+                        "type": "integer",
+                        "description": "Hour of day to send, clamped to 0-23."
+                      },
+                      "send_dow": {
+                        "type": "integer",
+                        "description": "Day of week to send, 0-6."
+                      }
+                    }
+                  },
+                  "monthly": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "string"
+                      },
+                      "send_hour": {
+                        "type": "integer",
+                        "description": "Hour of day to send, clamped to 0-23."
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "recipients": "alex.morgan@example.com",
+                  "send_when_empty": "no",
+                  "daily": {
+                    "enabled": "no",
+                    "send_hour": 8
+                  },
+                  "weekly": {
+                    "enabled": "yes",
+                    "send_hour": 8,
+                    "send_dow": 1
+                  },
+                  "monthly": {
+                    "enabled": "no",
+                    "send_hour": 8
+                  }
+                }
+              },
+              "example": {
+                "recipients": "alex.morgan@example.com",
+                "send_when_empty": "no",
+                "daily": {
+                  "enabled": "no",
+                  "send_hour": 8
+                },
+                "weekly": {
+                  "enabled": "yes",
+                  "send_hour": 8,
+                  "send_dow": 1
+                },
+                "monthly": {
+                  "enabled": "no",
+                  "send_hour": 8
+                }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "recipients": "alex.morgan@example.com",
+                    "send_when_empty": "no",
+                    "daily": {
+                      "enabled": "no",
+                      "send_hour": 8
+                    },
+                    "weekly": {
+                      "enabled": "yes",
+                      "send_hour": 8,
+                      "send_dow": 1
+                    },
+                    "monthly": {
+                      "enabled": "no",
+                      "send_hour": 8
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Digest settings saved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "description": "The stored digest settings, including the server-derived enabled flag."
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "data": {
+                      "enabled": "yes",
+                      "recipients": "alex.morgan@example.com",
+                      "send_when_empty": "no",
+                      "daily": {
+                        "enabled": "no",
+                        "send_hour": 8
+                      },
+                      "weekly": {
+                        "enabled": "yes",
+                        "send_hour": 8,
+                        "send_dow": 1
+                      },
+                      "monthly": {
+                        "enabled": "no",
+                        "send_hour": 8
+                      }
+                    },
+                    "message": "Store digest settings saved successfully"
+                  }
+                },
+                "example": {
+                  "data": {
+                    "enabled": "yes",
+                    "recipients": "alex.morgan@example.com",
+                    "send_when_empty": "no",
+                    "daily": {
+                      "enabled": "no",
+                      "send_hour": 8
+                    },
+                    "weekly": {
+                      "enabled": "yes",
+                      "send_hour": 8,
+                      "send_dow": 1
+                    },
+                    "monthly": {
+                      "enabled": "no",
+                      "send_hour": 8
+                    }
+                  },
+                  "message": "Store digest settings saved successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "enabled": "yes",
+                        "recipients": "alex.morgan@example.com",
+                        "send_when_empty": "no",
+                        "daily": {
+                          "enabled": "no",
+                          "send_hour": 8
+                        },
+                        "weekly": {
+                          "enabled": "yes",
+                          "send_hour": 8,
+                          "send_dow": 1
+                        },
+                        "monthly": {
+                          "enabled": "no",
+                          "send_hour": 8
+                        }
+                      },
+                      "message": "Store digest settings saved successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The authenticated user lacks store-sensitive access.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

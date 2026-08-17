@@ -27,7 +27,7 @@
       "post": {
         "operationId": "verifyVendorIds",
         "summary": "POST Verify Vendor IDs",
-        "description": "Read-only lookup of a candidate vendor subscription ID at the payment gateway, used before saving a correction. Writes nothing locally and nothing at the gateway. Requires the `fluent_cart/subscription/vendor_id_editing_enabled` filter and a gateway declaring the `verify_vendor_ids` capability (Stripe and PayPal); other gateways return an error. A successful lookup proves the ID exists in the merchant account whose credentials this store holds — it is not proof of ownership, since one merchant account can back several stores.",
+        "description": "Read-only lookup of a candidate vendor subscription ID at the payment gateway, used before saving a correction. Writes nothing locally and nothing at the gateway. Requires the `fluent_cart/subscription/vendor_id_editing_enabled` filter and a gateway declaring the `verify_vendor_ids` capability (Stripe and PayPal); other gateways return an error. A successful lookup proves the ID exists in the merchant account whose credentials this store holds \u2014 it is not proof of ownership, since one merchant account can back several stores.\n\n**Required permission:** `subscriptions/manage`",
         "tags": [
           "Subscriptions"
         ],
@@ -156,6 +156,60 @@
                       "message": "No such subscription: 'sub_1P9xyzABCdef'"
                     }
                   }
+                },
+                "example": {
+                  "message": "Subscription found at the payment gateway.",
+                  "verification": {
+                    "id": "sub_1PxaBcDeFgHiJkLmNoPqRsTu",
+                    "status": "active",
+                    "customer_id": "cus_QrStUvWxYz012345",
+                    "amount": 9900,
+                    "currency": "USD",
+                    "next_billing_date": "2027-05-29 12:35:43"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`subscriptions/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
                 }
               }
             }
@@ -180,7 +234,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -1,0 +1,194 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/pdf-templates/receipt/{template_id}": {
+      "get": {
+        "operationId": "getPdfTemplate",
+        "summary": "GET Get PDF Template",
+        "description": "Retrieve a single receipt PDF template with its block structure.\n\n**Permission:** `is_super_admin` (`manage_options`) · **Policy:** `StoreSensitivePolicy`",
+        "tags": [
+          "PDF Templates"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Template slug, e.g. `order_receipt`, `renewal_receipt`, `refund_notice`, `proforma_invoice`, or a custom slug."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Template slug; matches the key in the `templates` map."
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "is_default": {
+                          "type": "boolean",
+                          "description": "Built-in templates are `true` and cannot be deleted."
+                        },
+                        "pdf_settings": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "active": {
+                                "type": "string",
+                                "description": "`yes` or `no`."
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "preview_image": {
+                                "type": "string"
+                              },
+                              "pdf_structure": {
+                                "type": "object",
+                                "properties": {
+                                  "content": {
+                                    "type": "string",
+                                    "description": "Gutenberg block markup using `wp:fluent-cart/receipt-*` blocks, with `{{order.*}}` merge tags."
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "template": {
+                      "name": "order_receipt",
+                      "title": "Order Receipt",
+                      "description": "Default receipt template for paid orders",
+                      "is_default": true,
+                      "pdf_settings": [
+                        {
+                          "active": "yes",
+                          "title": "Order Receipt",
+                          "preview_image": "",
+                          "pdf_structure": {
+                            "content": "<!-- wp:fluent-cart/receipt-header {\"title\":\"RECEIPT\"} /-->\n\n<!-- wp:fluent-cart/receipt-addresses {\"billingLabel\":\"BILL TO\"} /-->\n\n<!-- wp:fluent-cart/receipt-meta {\"rows\":[{\"label\":\"Order Number\",\"value\":\"{{order.invoice_no}}\"},{\"label\":\"Order Date\",\"value\":\"{{order.created_at}}\"}]} /-->"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user is not a super admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "No template matches `template_id`. Note this is a **422**, not a 404 — the controller uses the framework's default error status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "Template not found"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

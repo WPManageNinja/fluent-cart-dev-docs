@@ -1,0 +1,216 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/transactions/{transaction}/sync": {
+      "post": {
+        "operationId": "syncPendingTransaction",
+        "summary": "POST Sync Pending Transaction",
+        "description": "Re-fetch a pending transaction's current status directly from its payment gateway and update the local record to match. Use this to reconcile a transaction stuck in a pending state after a webhook was missed or delayed.\n\n**Required permission:** `orders/manage`",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Order ID the transaction belongs to."
+          },
+          {
+            "name": "transaction",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Transaction ID to sync."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction synced from the payment gateway successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "transaction": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Transaction has been synced from the payment gateway successfully!",
+                  "transaction": {
+                    "id": 78,
+                    "order_id": 42,
+                    "vendor_charge_id": "ch_3PxKE2JY8q",
+                    "payment_method": "stripe",
+                    "payment_mode": "live",
+                    "payment_method_type": "card",
+                    "currency": "USD",
+                    "transaction_type": "payment",
+                    "card_last_4": "4242",
+                    "card_brand": "visa",
+                    "status": "paid",
+                    "total": 10692,
+                    "uuid": "txn_f7e8d9c0",
+                    "created_at": "2026-08-18 10:00:00"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Transaction has been synced from the payment gateway successfully!",
+                      "transaction": {
+                        "id": 78,
+                        "order_id": 42,
+                        "vendor_charge_id": "ch_3PxKE2JY8q",
+                        "payment_method": "stripe",
+                        "payment_mode": "live",
+                        "payment_method_type": "card",
+                        "currency": "USD",
+                        "transaction_type": "payment",
+                        "card_last_4": "4242",
+                        "card_brand": "visa",
+                        "status": "paid",
+                        "total": 10692,
+                        "uuid": "txn_f7e8d9c0",
+                        "created_at": "2026-08-18 10:00:00"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The 404 fires for whichever route-bound model resolves first: `order` (the plain `$order` string) is not model-bound here, only `transaction` is, so this only fires when the transaction ID doesn't exist. No ordertransaction matches the given ID. Thrown by the framework's route-model-binding, not an explicit controller check, so the message is generic and names the model class.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\OrderTransaction]."
+                },
+                "schema": {
+                  "example": {
+                    "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\OrderTransaction]."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\OrderTransaction]."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The transaction does not belong to the given order, or the gateway sync failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "The selected transaction does not match with the provided order"
+                  }
+                },
+                "example": {
+                  "message": "The selected transaction does not match with the provided order"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "The selected transaction does not match with the provided order"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

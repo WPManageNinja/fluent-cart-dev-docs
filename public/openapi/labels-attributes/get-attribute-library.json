@@ -1,0 +1,208 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/options/attr/groups/library": {
+      "get": {
+        "operationId": "getLibrary",
+        "summary": "GET Get Attribute Groups Library",
+        "description": "Return the attribute-groups library used by the Advanced Variation picker: up to 200 groups ordered by the merchant's manual drag-order, each annotated with a term count computed from a single batched aggregate. Terms are not eager-loaded here — call the group's terms endpoint to expand a specific group's full term list on demand.\n\n**Required permission:** `products/view`",
+        "tags": [
+          "Labels & Attributes"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the attribute groups library.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "groups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "total_groups": {
+                      "type": "integer"
+                    },
+                    "cap": {
+                      "type": "integer"
+                    }
+                  },
+                  "example": {
+                    "groups": [
+                      {
+                        "id": 10,
+                        "title": "Billing Period",
+                        "slug": "billing-period",
+                        "description": null,
+                        "settings": null,
+                        "created_at": "2026-06-15T15:14:49+00:00",
+                        "updated_at": "2026-06-15T15:14:49+00:00",
+                        "is_system": true,
+                        "serial": "1",
+                        "terms_count": 3
+                      },
+                      {
+                        "id": 1,
+                        "title": "Color",
+                        "slug": "color",
+                        "description": null,
+                        "settings": {
+                          "type": "color"
+                        },
+                        "created_at": "2026-06-15T15:14:49+00:00",
+                        "updated_at": "2026-06-15T15:14:49+00:00",
+                        "is_system": true,
+                        "serial": "2",
+                        "terms_count": 10
+                      }
+                    ],
+                    "total_groups": 12,
+                    "cap": 200
+                  }
+                },
+                "example": {
+                  "groups": [
+                    {
+                      "id": 10,
+                      "title": "Billing Period",
+                      "slug": "billing-period",
+                      "description": null,
+                      "settings": null,
+                      "created_at": "2026-06-15T15:14:49+00:00",
+                      "updated_at": "2026-06-15T15:14:49+00:00",
+                      "is_system": true,
+                      "serial": "1",
+                      "terms_count": 3
+                    },
+                    {
+                      "id": 1,
+                      "title": "Color",
+                      "slug": "color",
+                      "description": null,
+                      "settings": {
+                        "type": "color"
+                      },
+                      "created_at": "2026-06-15T15:14:49+00:00",
+                      "updated_at": "2026-06-15T15:14:49+00:00",
+                      "is_system": true,
+                      "serial": "2",
+                      "terms_count": 10
+                    }
+                  ],
+                  "total_groups": 12,
+                  "cap": 200
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "groups": [
+                        {
+                          "id": 10,
+                          "title": "Billing Period",
+                          "slug": "billing-period",
+                          "description": null,
+                          "settings": null,
+                          "created_at": "2026-06-15T15:14:49+00:00",
+                          "updated_at": "2026-06-15T15:14:49+00:00",
+                          "is_system": true,
+                          "serial": "1",
+                          "terms_count": 3
+                        },
+                        {
+                          "id": 1,
+                          "title": "Color",
+                          "slug": "color",
+                          "description": null,
+                          "settings": {
+                            "type": "color"
+                          },
+                          "created_at": "2026-06-15T15:14:49+00:00",
+                          "updated_at": "2026-06-15T15:14:49+00:00",
+                          "is_system": true,
+                          "serial": "2",
+                          "terms_count": 10
+                        }
+                      ],
+                      "total_groups": 12,
+                      "cap": 200
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

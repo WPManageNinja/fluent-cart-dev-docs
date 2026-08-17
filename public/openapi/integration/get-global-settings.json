@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getGlobalIntegrationSettings",
         "summary": "GET Global Integration Settings",
-        "description": "Retrieve global configuration settings for a specific integration provider. Used to get API key configuration, authentication fields, and current saved values.",
+        "description": "Retrieve global configuration settings for a specific integration provider. Used to get API key configuration, authentication fields, and current saved values.\n\n**Required permission:** `integrations/view`",
         "tags": [
           "Integrations"
         ],
@@ -146,6 +146,34 @@
                         "invalid_message": "Your API Key is not valid"
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`integrations/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

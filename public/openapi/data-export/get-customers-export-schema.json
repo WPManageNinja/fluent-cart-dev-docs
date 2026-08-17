@@ -1,0 +1,308 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/data-export/customers/schema": {
+      "get": {
+        "operationId": "getCustomersExportSchema",
+        "summary": "GET Get Customers Export Schema",
+        "description": "Describe what can be exported for customers: the supported output formats, the selectable flat CSV columns, and the selectable nested JSON modules.\n\nCall this first — the `key` values it returns are exactly what the matching `/batch` endpoint accepts in `columns` and `modules`. Unknown keys sent to `/batch` are silently dropped.\n\n**Permission:** `customers/export` · **Policy:** `CustomerPolicy`",
+        "tags": [
+          "Data Export"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "export": {
+                      "type": "object",
+                      "properties": {
+                        "entity": {
+                          "type": "string",
+                          "description": "The exported entity."
+                        },
+                        "schema_version": {
+                          "type": "integer",
+                          "description": "Version of this schema contract."
+                        },
+                        "formats": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "enum": [
+                                  "csv",
+                                  "json"
+                                ]
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Output formats this entity supports."
+                        },
+                        "csv_columns": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "default_selected": {
+                                "type": "boolean",
+                                "description": "Whether the admin UI pre-selects this column."
+                              }
+                            }
+                          },
+                          "description": "Selectable flat columns, used when `format` is `csv`."
+                        },
+                        "json_modules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Selectable nested record groups, used when `format` is `json`."
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "export": {
+                      "entity": "customers",
+                      "schema_version": 1,
+                      "formats": [
+                        {
+                          "value": "csv",
+                          "label": "CSV file"
+                        },
+                        {
+                          "value": "json",
+                          "label": "JSON file"
+                        }
+                      ],
+                      "csv_columns": [
+                        {
+                          "key": "customer_id",
+                          "label": "Customer ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "first_name",
+                          "label": "First name",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "last_name",
+                          "label": "Last name",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "full_name",
+                          "label": "Full name",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "email",
+                          "label": "Email",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "status",
+                          "label": "Status",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "purchase_count",
+                          "label": "Purchases",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "lifetime_value",
+                          "label": "Lifetime value",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "average_order_value",
+                          "label": "Average order value",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "first_purchase_date",
+                          "label": "First purchase date",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "last_purchase_date",
+                          "label": "Last purchase date",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_since",
+                          "label": "Customer since",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "country",
+                          "label": "Country",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "state",
+                          "label": "State",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "city",
+                          "label": "City",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "postcode",
+                          "label": "Postcode",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "wordpress_user_id",
+                          "label": "WordPress user ID",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "contact_id",
+                          "label": "Contact ID",
+                          "default_selected": false
+                        }
+                      ],
+                      "json_modules": [
+                        {
+                          "key": "customers",
+                          "label": "Customers",
+                          "description": "Core rows from the customers table.",
+                          "default_selected": true,
+                          "required": true
+                        },
+                        {
+                          "key": "customer_addresses",
+                          "label": "Customer addresses",
+                          "description": "Saved address-book rows.",
+                          "default_selected": true,
+                          "required": false
+                        },
+                        {
+                          "key": "customer_meta",
+                          "label": "Customer metadata",
+                          "description": "Metadata rows attached to each customer.",
+                          "default_selected": false,
+                          "required": false
+                        }
+                      ],
+                      "batching": {
+                        "initial_records": 500,
+                        "min_records": 100,
+                        "max_records": 1000,
+                        "target_ms": 1500
+                      },
+                      "direct_file_writer": true,
+                      "sensitive_values_redacted": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user lacks `customers/export`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

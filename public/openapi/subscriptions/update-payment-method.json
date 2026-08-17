@@ -27,7 +27,7 @@
       "post": {
         "operationId": "updatePaymentMethod",
         "summary": "POST Update Payment Method",
-        "description": "Update the payment method (e.g., replace the card on file) for an existing subscription within the same payment gateway.",
+        "description": "Update the payment method (e.g., replace the card on file) for an existing subscription within the same payment gateway.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Subscriptions"
         ],
@@ -153,6 +153,34 @@
                     "value": {
                       "message": "Could not update payment method"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

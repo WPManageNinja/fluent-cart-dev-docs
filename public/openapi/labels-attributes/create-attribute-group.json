@@ -27,7 +27,7 @@
       "post": {
         "operationId": "createAttributeGroup",
         "summary": "POST Create Attribute Group",
-        "description": "Create a new attribute group for product variations.",
+        "description": "Create a new attribute group for product variations.\n\n**Required permission:** `products/create`",
         "tags": [
           "Labels"
         ],
@@ -166,6 +166,34 @@
                         ]
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/create`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

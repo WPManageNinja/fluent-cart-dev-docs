@@ -1,0 +1,136 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/pdf-templates/status": {
+      "get": {
+        "operationId": "getPdfStatus",
+        "summary": "GET Get PDF Status",
+        "description": "Report whether the Fluent PDF engine is available. When it is not, the response carries the add-on's install/activate state so the UI can offer a one-click install.\n\nPDF **generation** requires this to report `has_fluent_pdf: true`; template editing works without it.\n\n**Permission:** `is_super_admin` (`manage_options`) · **Policy:** `StoreSensitivePolicy`",
+        "tags": [
+          "PDF Templates"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_fluent_pdf": {
+                      "type": "boolean",
+                      "description": "`true` when the `FLUENT_PDF` constant is defined, i.e. the Fluent PDF plugin is active."
+                    },
+                    "addon_info": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Install/activate state for the Fluent PDF add-on. `null` when Fluent PDF is already active.",
+                      "properties": {
+                        "plugin_slug": {
+                          "type": "string"
+                        },
+                        "plugin_file": {
+                          "type": "string"
+                        },
+                        "source_type": {
+                          "type": "string"
+                        },
+                        "is_installed": {
+                          "type": "boolean"
+                        },
+                        "is_active": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "has_fluent_pdf": false,
+                    "addon_info": {
+                      "plugin_slug": "fluentforms-pdf",
+                      "plugin_file": "fluentforms-pdf/fluentforms-pdf.php",
+                      "source_type": "wordpress",
+                      "is_installed": false,
+                      "is_active": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user is not a super admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

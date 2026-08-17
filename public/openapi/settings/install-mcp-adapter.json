@@ -1,0 +1,198 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/settings/mcp/install-adapter": {
+      "post": {
+        "operationId": "installAdapter",
+        "summary": "POST Install MCP Adapter",
+        "description": "Trigger a one-click install of the FluentHub adapter plugin, which is required for the MCP endpoint to work. The free FluentCart plugin can only detect and trigger this install — the actual installer logic lives in a Fluent Pro plugin (FluentCart Pro, or any other Fluent product) that hooks the `fluent_toolkit/*` contract. If no Pro plugin is active, this returns the manual download link instead of installing anything.\n\n**Required permission:** `is_super_admin`",
+        "tags": [
+          "Settings"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FluentHub installed and activated, or a manual-install link was returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "adapter_available": {
+                      "type": "boolean"
+                    },
+                    "toolkit_installed": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "adapter_available": true,
+                    "toolkit_installed": true,
+                    "message": "FluentHub installed and activated. The MCP endpoint is ready."
+                  }
+                },
+                "example": {
+                  "adapter_available": true,
+                  "toolkit_installed": true,
+                  "message": "FluentHub installed and activated. The MCP endpoint is ready."
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "adapter_available": true,
+                      "toolkit_installed": true,
+                      "message": "FluentHub installed and activated. The MCP endpoint is ready."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Either the current WordPress user lacks the `install_plugins` capability (regardless of the `is_super_admin` route policy — the controller re-checks independently), or no Pro plugin supports automatic install and a manual download link is returned instead. Both cases use the framework's default `sendError()` status of 422; distinguish them by the presence of `toolkit_download_url`.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Automatic install needs FluentCart Pro (or another Fluent Pro plugin). Install FluentHub manually, then reload this page to connect FluentCart with AI agents.",
+                  "toolkit_download_url": "https://github.com/WPManageNinja/fluent-toolkit"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Automatic install needs FluentCart Pro (or another Fluent Pro plugin). Install FluentHub manually, then reload this page to connect FluentCart with AI agents.",
+                    "toolkit_download_url": "https://github.com/WPManageNinja/fluent-toolkit"
+                  }
+                },
+                "examples": {
+                  "no_pro_plugin": {
+                    "summary": "No Pro plugin supports automatic install",
+                    "value": {
+                      "message": "Automatic install needs FluentCart Pro (or another Fluent Pro plugin). Install FluentHub manually, then reload this page to connect FluentCart with AI agents.",
+                      "toolkit_download_url": "https://github.com/WPManageNinja/fluent-toolkit"
+                    }
+                  },
+                  "cannot_install_plugins": {
+                    "summary": "Current user lacks the install_plugins capability",
+                    "value": {
+                      "message": "Sorry, you do not have permission to install plugins."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user is not a super admin.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

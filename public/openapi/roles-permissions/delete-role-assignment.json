@@ -27,7 +27,7 @@
       "delete": {
         "operationId": "deleteRoleAssignment",
         "summary": "DELETE Delete Role Assignment",
-        "description": "Remove a FluentCart role assignment from a user. The user's fluent_cart_admin capability is removed and their role meta is deleted. The user's WordPress account is not affected.",
+        "description": "Remove a FluentCart role assignment from a user. The user's fluent_cart_admin capability is removed and their role meta is deleted. The user's WordPress account is not affected.\n\n**Policy:** `AdminPolicy`",
         "tags": [
           "Roles"
         ],
@@ -169,7 +169,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

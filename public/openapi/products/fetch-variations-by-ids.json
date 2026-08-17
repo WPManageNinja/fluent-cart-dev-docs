@@ -27,7 +27,7 @@
       "get": {
         "operationId": "fetchVariationsByIds",
         "summary": "GET Fetch Variations by IDs",
-        "description": "Retrieve variations by an array of IDs. Returns simplified label/value pairs.",
+        "description": "Retrieve variations by an array of IDs. Returns simplified label/value pairs.\n\n**Required permission:** `products/view`",
         "tags": [
           "Products"
         ],
@@ -96,6 +96,34 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

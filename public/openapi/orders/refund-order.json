@@ -27,7 +27,7 @@
       "post": {
         "operationId": "refundOrder",
         "summary": "POST Refund Order",
-        "description": "Process a full or partial refund for an order. Supports both gateway refunds and manual refunds, with optional subscription cancellation.",
+        "description": "Process a full or partial refund for an order. Supports both gateway refunds and manual refunds, with optional subscription cancellation.\n\n**Required permission:** `orders/can_refund`",
         "tags": [
           "Orders"
         ],
@@ -259,6 +259,34 @@
                     "value": {
                       "message": "Transaction ID is required"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/can_refund`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

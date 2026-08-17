@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getLicenseDetails",
         "summary": "GET Get License Details",
-        "description": "Retrieve the full details of a single license including the associated order, activations, product information, downloads, labels, and previous orders.",
+        "description": "Retrieve the full details of a single license including the associated order, activations, product information, downloads, labels, and previous orders.\n\n**Permission:** `licenses/view` · **Policy:** `LicensePolicy`",
         "tags": [
           "Licensing"
         ],
@@ -66,6 +66,13 @@
                     },
                     "order": {
                       "type": "object"
+                    },
+                    "transactions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Related order transactions. Always present, but only populated when `transactions` is requested in the helper's `$with` list — this route does not request it, so it is always an empty array here."
                     },
                     "activations": {
                       "type": "array",
@@ -186,6 +193,7 @@
                         "country": "US"
                       }
                     },
+                    "transactions": [],
                     "activations": [
                       {
                         "id": 1,
@@ -600,7 +608,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

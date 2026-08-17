@@ -27,7 +27,7 @@
       "put": {
         "operationId": "updateCustomer",
         "summary": "PUT Update Customer",
-        "description": "Update an existing customer. If the customer is linked to a WordPress user, the corresponding WP user profile is also updated.",
+        "description": "Update an existing customer. If the customer is linked to a WordPress user, the corresponding WP user profile is also updated.\n\n**Also used by the customer portal UI.** Update the authenticated customer's profile details. The customerId must match the logged-in customer's record.\n\n**Required permission:** `customers/manage`",
         "tags": [
           "Customers"
         ],
@@ -260,6 +260,58 @@
                         "updated_at": "2025-09-20 14:30:00"
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. The authenticated user does not own this customer record.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not authorized to update this customer"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to update this customer"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not authorized to update this customer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

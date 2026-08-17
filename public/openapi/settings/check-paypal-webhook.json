@@ -27,7 +27,7 @@
       "get": {
         "operationId": "checkPaypalWebhook",
         "summary": "GET Check PayPal Webhook",
-        "description": "Verify the current PayPal webhook registration status and set up the webhook if it is missing.",
+        "description": "Verify the current PayPal webhook registration status and set up the webhook if it is missing. If no PayPal API key has been connected yet for the given `mode`, returns `status`/`message` explaining that PayPal must be connected first. Otherwise it looks up (or registers) the webhook and returns the raw PayPal webhook object (`id`, `url`, `event_types`, `status`) verbatim.\n\n**Required permission:** `super_admin`",
         "tags": [
           "Settings"
         ],
@@ -54,71 +54,32 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful response. Returns the webhook status and configuration details from PayPal.",
+            "description": "Successful response. Returns either a not-connected status message, or the webhook configuration details from PayPal.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Webhook status and configuration details from PayPal.",
+                  "description": "Webhook status. Shape depends on whether a PayPal API key is already connected for `mode` (see examples).",
                   "additionalProperties": true,
                   "example": {
-                    "id": "WH-LIVE-80021663MN711374V",
-                    "url": "https://example.com/wp-json/fluent-cart/v2/webhook/paypal",
-                    "event_types": [
-                      {
-                        "name": "PAYMENT.CAPTURE.COMPLETED",
-                        "description": "Payment capture completed"
-                      },
-                      {
-                        "name": "PAYMENT.CAPTURE.REFUNDED",
-                        "description": "Payment capture refunded"
-                      },
-                      {
-                        "name": "BILLING.SUBSCRIPTION.ACTIVATED",
-                        "description": "Subscription activated"
-                      },
-                      {
-                        "name": "BILLING.SUBSCRIPTION.CANCELLED",
-                        "description": "Subscription cancelled"
-                      },
-                      {
-                        "name": "BILLING.SUBSCRIPTION.PAYMENT.FAILED",
-                        "description": "Subscription payment failed"
-                      }
-                    ],
-                    "status": "ACTIVE"
+                    "status": "false",
+                    "message": "No API key found for webhook setup. Please connect your PayPal account first."
                   }
                 },
                 "example": {
-                  "id": "WH-LIVE-80021663MN711374V",
-                  "url": "https://example.com/wp-json/fluent-cart/v2/webhook/paypal",
-                  "event_types": [
-                    {
-                      "name": "PAYMENT.CAPTURE.COMPLETED",
-                      "description": "Payment capture completed"
-                    },
-                    {
-                      "name": "PAYMENT.CAPTURE.REFUNDED",
-                      "description": "Payment capture refunded"
-                    },
-                    {
-                      "name": "BILLING.SUBSCRIPTION.ACTIVATED",
-                      "description": "Subscription activated"
-                    },
-                    {
-                      "name": "BILLING.SUBSCRIPTION.CANCELLED",
-                      "description": "Subscription cancelled"
-                    },
-                    {
-                      "name": "BILLING.SUBSCRIPTION.PAYMENT.FAILED",
-                      "description": "Subscription payment failed"
-                    }
-                  ],
-                  "status": "ACTIVE"
+                  "status": "false",
+                  "message": "No API key found for webhook setup. Please connect your PayPal account first."
                 },
                 "examples": {
                   "default": {
-                    "summary": "Successful response",
+                    "summary": "No PayPal API key connected for this mode",
+                    "value": {
+                      "status": "false",
+                      "message": "No API key found for webhook setup. Please connect your PayPal account first."
+                    }
+                  },
+                  "webhookActive": {
+                    "summary": "PayPal API key connected \u2014 webhook found or newly registered",
                     "value": {
                       "id": "WH-LIVE-80021663MN711374V",
                       "url": "https://example.com/wp-json/fluent-cart/v2/webhook/paypal",
@@ -146,6 +107,34 @@
                       ],
                       "status": "ACTIVE"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

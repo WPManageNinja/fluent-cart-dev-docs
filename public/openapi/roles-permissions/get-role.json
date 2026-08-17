@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getRole",
         "summary": "GET Get Role",
-        "description": "Retrieve details for a specific role by its key. This endpoint is currently a placeholder and returns no data. It is reserved for future use.",
+        "description": "Retrieve details for a specific role by its key. This endpoint is currently a placeholder and returns no data. It is reserved for future use.\n\n**Policy:** `AdminPolicy`",
         "tags": [
           "Roles"
         ],
@@ -44,7 +44,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "The role key (e.g., manager, worker, accountant)."
+            "description": "Role slug. Valid values come from `PermissionManager::getAllRoles()` — `super_admin`, `manager`, `worker`, `accountant`."
           }
         ],
         "responses": {
@@ -56,14 +56,46 @@
                   "type": "object",
                   "example": {
                     "role": {
-                      "key": "fct_manager",
-                      "display_name": "FluentCart Manager",
-                      "capabilities": {
-                        "fct_manage_orders": true,
-                        "fct_manage_products": true,
-                        "fct_manage_customers": true,
-                        "fct_view_reports": true,
-                        "fct_manage_settings": false
+                      "key": "manager",
+                      "title": "Manager",
+                      "description": "With All Permissions Except Sensitive Settings",
+                      "permissions": [
+                        "store/settings",
+                        "products/view",
+                        "products/create",
+                        "products/edit",
+                        "products/delete",
+                        "customers/view",
+                        "customers/manage",
+                        "orders/view",
+                        "orders/manage",
+                        "orders/export"
+                      ]
+                    }
+                  },
+                  "properties": {
+                    "role": {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "description": "Role slug, e.g. `manager`."
+                        },
+                        "title": {
+                          "type": "string",
+                          "description": "Human-readable role name."
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "What the role is allowed to do."
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Permission slugs granted to the role, e.g. `orders/view`."
+                        }
                       }
                     }
                   }
@@ -101,6 +133,24 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Unknown or empty role key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Invalid role."
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -113,7 +163,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

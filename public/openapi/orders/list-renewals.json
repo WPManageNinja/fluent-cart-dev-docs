@@ -1,0 +1,388 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/renewals": {
+      "get": {
+        "operationId": "index",
+        "summary": "GET List Renewal Invoices",
+        "description": "List orders of type `renewal` (subscription renewal invoices), newest first, paginated. Each row includes its customer relation.\n\n**Required permission:** `orders/view`",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "payment_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by payment status (e.g. paid, pending, failed)."
+          },
+          {
+            "name": "parent_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter to renewal invoices belonging to a specific parent order ID."
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter to renewal invoices belonging to a specific customer ID."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns a paginated list of renewal invoices.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "invoices": {
+                      "type": "object",
+                      "description": "Laravel-style paginator payload"
+                    }
+                  },
+                  "example": {
+                    "invoices": {
+                      "current_page": 1,
+                      "data": [
+                        {
+                          "id": 5151,
+                          "status": "completed",
+                          "parent_id": "1880",
+                          "receipt_number": "6322",
+                          "invoice_no": "INV-6322",
+                          "fulfillment_type": "digital",
+                          "type": "renewal",
+                          "mode": "live",
+                          "shipping_status": "unshipped",
+                          "customer_id": 1484,
+                          "payment_method": "stripe",
+                          "payment_status": "paid",
+                          "payment_method_title": "",
+                          "currency": "USD",
+                          "subtotal": 9900,
+                          "discount_tax": 0,
+                          "manual_discount_total": 0,
+                          "coupon_discount_total": 0,
+                          "shipping_tax": 0,
+                          "shipping_total": 0,
+                          "fee_total": 0,
+                          "tax_total": 0,
+                          "total_amount": 9900,
+                          "total_paid": "9900",
+                          "total_refund": "0",
+                          "rate": "1.0000",
+                          "tax_behavior": 0,
+                          "note": "",
+                          "ip_address": "",
+                          "completed_at": "2026-05-29 12:35:43",
+                          "refunded_at": null,
+                          "uuid": "a8b1c044193c3e27bd593f31bbfb0f8e",
+                          "config": [],
+                          "created_at": "2026-05-29T12:35:43+00:00",
+                          "updated_at": "2026-05-29T14:40:30+00:00",
+                          "customer": {
+                            "id": 1484,
+                            "user_id": "1848",
+                            "contact_id": "0",
+                            "email": "alex.chen@example.com",
+                            "first_name": "Alex",
+                            "last_name": "Chen",
+                            "status": "active",
+                            "purchase_value": null,
+                            "purchase_count": "26",
+                            "ltv": "257400",
+                            "first_purchase_date": "2025-11-25 17:44:02",
+                            "last_purchase_date": "2026-05-29 12:35:43",
+                            "aov": "9900.00",
+                            "notes": "",
+                            "uuid": "8c9bb480491cdc405d6cb104b76972af",
+                            "country": "FR",
+                            "city": "Paris",
+                            "state": "",
+                            "postcode": "75001",
+                            "created_at": "2025-11-25T17:44:02+00:00",
+                            "updated_at": "2026-05-29T12:35:43+00:00",
+                            "full_name": "Alex Chen",
+                            "photo": "https://www.gravatar.com/avatar/00000000000000000000000000000000?s=128&d=mm&r=g",
+                            "country_name": "France",
+                            "formatted_address": {
+                              "country": "France",
+                              "state": "",
+                              "city": "Paris",
+                              "postcode": "75001",
+                              "first_name": "Alex",
+                              "last_name": "Chen",
+                              "full_name": "Alex Chen"
+                            },
+                            "user_link": "https://example.com/wp-admin/user-edit.php?user_id=1848"
+                          }
+                        },
+                        {
+                          "id": 5150,
+                          "status": "completed",
+                          "parent_id": "3248",
+                          "receipt_number": "6321",
+                          "invoice_no": "INV-6321",
+                          "fulfillment_type": "digital",
+                          "type": "renewal",
+                          "mode": "live",
+                          "shipping_status": "",
+                          "customer_id": 594,
+                          "payment_method": "stripe",
+                          "payment_status": "paid",
+                          "payment_method_title": "",
+                          "currency": "USD",
+                          "subtotal": 9900,
+                          "discount_tax": 0,
+                          "manual_discount_total": 0,
+                          "coupon_discount_total": 0,
+                          "shipping_tax": 0,
+                          "shipping_total": 0,
+                          "fee_total": 0,
+                          "tax_total": 0,
+                          "total_amount": 9900,
+                          "total_paid": "9900",
+                          "total_refund": "0",
+                          "rate": "1.0000",
+                          "tax_behavior": 0,
+                          "note": "",
+                          "ip_address": "",
+                          "completed_at": "2026-05-29 11:59:56",
+                          "refunded_at": null,
+                          "uuid": "dbdb4562dbd38b6a0fa04d95090ec822",
+                          "config": [],
+                          "created_at": "2026-05-29T11:59:56+00:00",
+                          "updated_at": "2026-05-29T11:59:56+00:00",
+                          "customer": {
+                            "id": 594,
+                            "user_id": "772",
+                            "contact_id": "0",
+                            "email": "riley.quinn@example.com",
+                            "first_name": "Riley",
+                            "last_name": "Quinn",
+                            "status": "active",
+                            "purchase_value": null,
+                            "purchase_count": "6",
+                            "ltv": "74400",
+                            "first_purchase_date": "2025-10-14 15:02:16",
+                            "last_purchase_date": "2026-05-29 11:59:56",
+                            "aov": "12400.00",
+                            "notes": "",
+                            "uuid": "1c5b9d03149cdf18edd1fdb606f8c00e",
+                            "country": "GB",
+                            "city": "London",
+                            "state": "",
+                            "postcode": "SW1A 1AA",
+                            "created_at": "2025-10-14T15:02:16+00:00",
+                            "updated_at": "2026-05-29T11:59:56+00:00",
+                            "full_name": "Riley Quinn",
+                            "photo": "https://www.gravatar.com/avatar/00000000000000000000000000000000?s=128&d=mm&r=g",
+                            "country_name": "United Kingdom (UK)",
+                            "formatted_address": {
+                              "country": "United Kingdom (UK)",
+                              "state": "",
+                              "city": "London",
+                              "postcode": "SW1A 1AA",
+                              "first_name": "Riley",
+                              "last_name": "Quinn",
+                              "full_name": "Riley Quinn"
+                            },
+                            "user_link": "https://example.com/wp-admin/user-edit.php?user_id=772"
+                          }
+                        }
+                      ],
+                      "first_page_url": "https://example.com/wp-json/fluent-cart/v2/renewals/?page=1",
+                      "from": 1,
+                      "last_page": 175,
+                      "last_page_url": "https://example.com/wp-json/fluent-cart/v2/renewals/?page=175",
+                      "links": [
+                        {
+                          "url": null,
+                          "label": "pagination.previous",
+                          "active": false
+                        },
+                        {
+                          "url": "https://example.com/wp-json/fluent-cart/v2/renewals/?page=1",
+                          "label": "1",
+                          "active": true
+                        }
+                      ],
+                      "next_page_url": "https://example.com/wp-json/fluent-cart/v2/renewals/?page=2",
+                      "path": "https://example.com/wp-json/fluent-cart/v2/renewals",
+                      "per_page": 15,
+                      "prev_page_url": null,
+                      "to": 15,
+                      "total": 2612
+                    }
+                  }
+                },
+                "example": {
+                  "invoices": {
+                    "current_page": 1,
+                    "data": [
+                      {
+                        "id": 5151,
+                        "status": "completed",
+                        "customer_id": 1484,
+                        "payment_status": "paid",
+                        "total_amount": 9900
+                      }
+                    ],
+                    "from": 1,
+                    "last_page": 175,
+                    "per_page": 15,
+                    "to": 15,
+                    "total": 2612
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "invoices": {
+                        "current_page": 1,
+                        "data": [
+                          {
+                            "id": 5151,
+                            "status": "completed",
+                            "customer_id": 1484,
+                            "payment_status": "paid",
+                            "total_amount": 9900
+                          }
+                        ],
+                        "from": 1,
+                        "last_page": 175,
+                        "per_page": 15,
+                        "to": 15,
+                        "total": 2612
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user lacks the orders/view permission.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -27,7 +27,7 @@
       "post": {
         "operationId": "attachNoteToOrder",
         "summary": "POST Attach Note to Order",
-        "description": "Add or update a note on an order. The note is stored directly on the order record.",
+        "description": "Add or update a note on an order. The note is stored directly on the order record.\n\n**Access policy:** `AdminPolicy` \u2014 requires the `is_super_admin` FluentCart capability.",
         "tags": [
           "Dashboard"
         ],
@@ -131,6 +131,34 @@
                     "value": {
                       "message": "Failed to update order note."
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

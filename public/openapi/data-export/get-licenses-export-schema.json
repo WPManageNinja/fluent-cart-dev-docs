@@ -1,0 +1,340 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/data-export/licenses/schema": {
+      "get": {
+        "operationId": "getLicensesExportSchema",
+        "summary": "GET Get Licenses Export Schema",
+        "description": "Describe what can be exported for licenses: the supported output formats, the selectable flat CSV columns, and the selectable nested JSON modules.\n\nCall this first — the `key` values it returns are exactly what the matching `/batch` endpoint accepts in `columns` and `modules`. Unknown keys sent to `/batch` are silently dropped.\n\n::: warning Module-gated\nThese routes are only **registered** when the licensing module is active (`ModuleSettings::isActive('license')`). When it is off the endpoint does not exist at all and WordPress returns `404 rest_no_route` — not the `409` below.\n:::\n\n**Permission:** `licenses/export` · **Policy:** `LicensePolicy`",
+        "tags": [
+          "Data Export"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "export": {
+                      "type": "object",
+                      "properties": {
+                        "entity": {
+                          "type": "string",
+                          "description": "The exported entity."
+                        },
+                        "schema_version": {
+                          "type": "integer",
+                          "description": "Version of this schema contract."
+                        },
+                        "formats": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "enum": [
+                                  "csv",
+                                  "json"
+                                ]
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Output formats this entity supports."
+                        },
+                        "csv_columns": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "default_selected": {
+                                "type": "boolean",
+                                "description": "Whether the admin UI pre-selects this column."
+                              }
+                            }
+                          },
+                          "description": "Selectable flat columns, used when `format` is `csv`."
+                        },
+                        "json_modules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Selectable nested record groups, used when `format` is `json`."
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "export": {
+                      "entity": "licenses",
+                      "schema_version": 1,
+                      "formats": [
+                        {
+                          "value": "csv",
+                          "label": "CSV file"
+                        },
+                        {
+                          "value": "json",
+                          "label": "JSON file"
+                        }
+                      ],
+                      "csv_columns": [
+                        {
+                          "key": "license_id",
+                          "label": "License ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "license_key",
+                          "label": "License key",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "status",
+                          "label": "Status",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "activation_limit",
+                          "label": "Activation limit",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "activation_count",
+                          "label": "Activation count",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_id",
+                          "label": "Customer ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_name",
+                          "label": "Customer name",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_email",
+                          "label": "Customer email",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "order_id",
+                          "label": "Order ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "subscription_id",
+                          "label": "Subscription ID",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "product_id",
+                          "label": "Product ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "variation_id",
+                          "label": "Variation ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "expiration_date",
+                          "label": "Expiration date",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "created_at",
+                          "label": "Created date",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "updated_at",
+                          "label": "Updated date",
+                          "default_selected": false
+                        }
+                      ],
+                      "json_modules": [
+                        {
+                          "key": "licenses",
+                          "label": "Licenses",
+                          "description": "Core rows from the licenses table.",
+                          "default_selected": true,
+                          "required": true
+                        },
+                        {
+                          "key": "customers",
+                          "label": "Customers",
+                          "description": "The customer row linked to each license.",
+                          "default_selected": true,
+                          "required": false
+                        },
+                        {
+                          "key": "orders",
+                          "label": "Orders",
+                          "description": "The order row linked to each license.",
+                          "default_selected": false,
+                          "required": false
+                        },
+                        {
+                          "key": "subscriptions",
+                          "label": "Subscriptions",
+                          "description": "The subscription row linked to each license.",
+                          "default_selected": false,
+                          "required": false
+                        },
+                        {
+                          "key": "license_activations",
+                          "label": "License activations",
+                          "description": "Activation rows attached to each license. Authentication hashes are excluded.",
+                          "default_selected": true,
+                          "required": false
+                        },
+                        {
+                          "key": "license_sites",
+                          "label": "Activated sites",
+                          "description": "Unique site rows referenced by the selected license activations.",
+                          "default_selected": true,
+                          "required": false
+                        },
+                        {
+                          "key": "license_meta",
+                          "label": "License metadata",
+                          "description": "Metadata rows attached directly to each license.",
+                          "default_selected": false,
+                          "required": false
+                        }
+                      ],
+                      "batching": {
+                        "initial_records": 500,
+                        "min_records": 100,
+                        "max_records": 1000,
+                        "target_ms": 1500
+                      },
+                      "direct_file_writer": true,
+                      "sensitive_values_redacted": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user lacks `licenses/export`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The licensing module is not active.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "License export is unavailable because the licensing module is not active."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/onboarding/save-tax": {
+      "post": {
+        "operationId": "saveTaxSettings",
+        "summary": "POST Save Onboarding Tax Settings",
+        "description": "Save the store's tax configuration as part of onboarding. When `enable_tax` is \"no\", tax is simply switched off. When it is \"yes\", the store country is used to determine whether EU VAT handling applies; if it does, tax classes are generated for all EU countries and, for the OSS method, an EU VAT registration is upserted. For non-EU countries with a VAT number, a `fluent_cart_tax_id_{country}` meta record is created or updated instead.\n\n**Access policy:** `AdminPolicy`",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "enable_tax": {
+                    "type": "string",
+                    "description": "\"yes\" or \"no\". Defaults to \"no\". Any other value returns a 422.",
+                    "enum": [
+                      "yes",
+                      "no"
+                    ]
+                  },
+                  "tax_inclusion": {
+                    "type": "string",
+                    "description": "\"included\" or \"excluded\". Only read when enable_tax is \"yes\". Defaults to \"excluded\". Any other value returns a 422.",
+                    "enum": [
+                      "included",
+                      "excluded"
+                    ]
+                  },
+                  "store_country": {
+                    "type": "string",
+                    "description": "Store's country code, uppercased server-side. Must be alphabetic and at most 3 characters, or a 422 is returned. Only read when enable_tax is \"yes\"."
+                  },
+                  "eu_method": {
+                    "type": "string",
+                    "description": "\"oss\", \"home\", or \"specific\". Only required/validated when store_country resolves to an EU tax country. Defaults to \"oss\".",
+                    "enum": [
+                      "oss",
+                      "home",
+                      "specific"
+                    ]
+                  },
+                  "vat_number": {
+                    "type": "string",
+                    "description": "VAT number, truncated to 50 characters. Stored against the EU VAT registration for EU countries, or as tax meta for non-EU countries."
+                  }
+                },
+                "example": {
+                  "enable_tax": "yes",
+                  "tax_inclusion": "excluded",
+                  "store_country": "DE",
+                  "eu_method": "oss",
+                  "vat_number": "DE123456789"
+                }
+              },
+              "example": {
+                "enable_tax": "yes",
+                "tax_inclusion": "excluded",
+                "store_country": "DE",
+                "eu_method": "oss",
+                "vat_number": "DE123456789"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Example request",
+                  "value": {
+                    "enable_tax": "yes",
+                    "tax_inclusion": "excluded",
+                    "store_country": "DE",
+                    "eu_method": "oss",
+                    "vat_number": "DE123456789"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tax settings saved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "tax_enabled": {
+                          "type": "boolean"
+                        },
+                        "classes_created": {
+                          "type": "boolean",
+                          "description": "false if tax class generation threw an exception."
+                        },
+                        "eu_rates_imported": {
+                          "type": "boolean",
+                          "description": "true only when the store country is an EU tax country."
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "data": {
+                      "tax_enabled": true,
+                      "classes_created": true,
+                      "eu_rates_imported": true
+                    },
+                    "message": "Tax settings saved"
+                  }
+                },
+                "example": {
+                  "data": {
+                    "tax_enabled": true,
+                    "classes_created": true,
+                    "eu_rates_imported": true
+                  },
+                  "message": "Tax settings saved"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": {
+                        "tax_enabled": true,
+                        "classes_created": true,
+                        "eu_rates_imported": true
+                      },
+                      "message": "Tax settings saved"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The authenticated user is not an admin.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "An invalid enable_tax, tax_inclusion, store_country, or eu_method value was supplied.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid store_country value"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Invalid store_country value"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Invalid store_country value"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

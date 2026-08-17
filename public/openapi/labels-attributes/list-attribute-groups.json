@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listAttributeGroups",
         "summary": "GET List Attribute Groups",
-        "description": "Retrieve a paginated list of attribute groups with optional search, filtering, and sorting. Attribute groups represent product attribute categories (e.g., Color, Size, Material) used to create product variations.",
+        "description": "Retrieve a paginated list of attribute groups with optional search, filtering, and sorting. Attribute groups represent product attribute categories (e.g., Color, Size, Material) used to create product variations.\n\n**Required permission:** `products/view`",
         "tags": [
           "Labels"
         ],
@@ -149,6 +149,58 @@
                           "type": "integer",
                           "example": 1
                         },
+                        "first_page_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "URL to the first page of results"
+                        },
+                        "from": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "Index of the first item on this page"
+                        },
+                        "last_page_url": {
+                          "type": "string",
+                          "description": "URL to the last page of results"
+                        },
+                        "links": {
+                          "type": "array",
+                          "description": "Pagination links for previous, numbered pages, and next",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "active": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        },
+                        "next_page_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "URL to the next page of results"
+                        },
+                        "path": {
+                          "type": "string",
+                          "description": "Base URL without query string"
+                        },
+                        "prev_page_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "URL to the previous page of results"
+                        },
+                        "to": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "Index of the last item on this page"
+                        },
                         "data": {
                           "type": "array",
                           "items": {
@@ -164,6 +216,30 @@
                       "per_page": 10,
                       "current_page": 1,
                       "last_page": 1,
+                      "first_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                      "from": 1,
+                      "last_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                      "links": [
+                        {
+                          "url": null,
+                          "label": "pagination.previous",
+                          "active": false
+                        },
+                        {
+                          "url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                          "label": "1",
+                          "active": true
+                        },
+                        {
+                          "url": null,
+                          "label": "pagination.next",
+                          "active": false
+                        }
+                      ],
+                      "next_page_url": null,
+                      "path": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups",
+                      "prev_page_url": null,
+                      "to": 3,
                       "data": [
                         {
                           "id": 1,
@@ -195,6 +271,30 @@
                     "per_page": 10,
                     "current_page": 1,
                     "last_page": 1,
+                    "first_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                    "from": 1,
+                    "last_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                    "links": [
+                      {
+                        "url": null,
+                        "label": "pagination.previous",
+                        "active": false
+                      },
+                      {
+                        "url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                        "label": "1",
+                        "active": true
+                      },
+                      {
+                        "url": null,
+                        "label": "pagination.next",
+                        "active": false
+                      }
+                    ],
+                    "next_page_url": null,
+                    "path": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups",
+                    "prev_page_url": null,
+                    "to": 3,
                     "data": [
                       {
                         "id": 1,
@@ -228,6 +328,30 @@
                         "per_page": 10,
                         "current_page": 1,
                         "last_page": 1,
+                        "first_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                        "from": 1,
+                        "last_page_url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                        "links": [
+                          {
+                            "url": null,
+                            "label": "pagination.previous",
+                            "active": false
+                          },
+                          {
+                            "url": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups/?page=1",
+                            "label": "1",
+                            "active": true
+                          },
+                          {
+                            "url": null,
+                            "label": "pagination.next",
+                            "active": false
+                          }
+                        ],
+                        "next_page_url": null,
+                        "path": "https://yoursite.com/wp-json/fluent-cart/v2/options/attr/groups",
+                        "prev_page_url": null,
+                        "to": 3,
                         "data": [
                           {
                             "id": 1,
@@ -252,6 +376,34 @@
                         ]
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "post": {
         "operationId": "bulkActionCustomers",
         "summary": "POST Bulk Actions",
-        "description": "Perform bulk operations on multiple customers such as deletion or status change.",
+        "description": "Perform bulk operations on multiple customers such as deletion or status change.\n\n**Required permission:** `customers/manage`",
         "tags": [
           "Customers"
         ],
@@ -170,6 +170,35 @@
                       "message": "Customers selection is required",
                       "data": ""
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

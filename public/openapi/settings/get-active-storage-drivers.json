@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getActiveStorageDrivers",
         "summary": "GET Get Active Storage Drivers",
-        "description": "Retrieve only the currently active/enabled file storage drivers.",
+        "description": "Retrieve only the currently active/enabled file storage drivers.\n\n**Required permission:** `is_super_admin`",
         "tags": [
           "Settings"
         ],
@@ -45,57 +45,87 @@
                   "type": "object",
                   "properties": {
                     "drivers": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "key": {
-                            "type": "string",
-                            "example": "local"
-                          },
-                          "title": {
-                            "type": "string",
-                            "example": "Local Storage"
-                          },
-                          "is_active": {
-                            "type": "boolean",
-                            "example": true
-                          }
-                        }
+                      "type": "object",
+                      "description": "Currently active/enabled storage drivers, keyed by driver slug.",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/ActiveStorageDriver"
                       }
                     }
                   },
                   "example": {
-                    "drivers": [
-                      {
-                        "key": "local",
-                        "title": "Local Storage",
-                        "is_active": true
+                    "drivers": {
+                      "local": {
+                        "title": "Local",
+                        "route": "local",
+                        "description": "Local allows to upload file in local file storage",
+                        "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/storage-drivers/local.svg",
+                        "dark_logo": null,
+                        "status": true,
+                        "brand_color": "#136196",
+                        "has_bucket": false
                       }
-                    ]
+                    }
                   }
                 },
                 "example": {
-                  "drivers": [
-                    {
-                      "key": "local",
-                      "title": "Local Storage",
-                      "is_active": true
+                  "drivers": {
+                    "local": {
+                      "title": "Local",
+                      "route": "local",
+                      "description": "Local allows to upload file in local file storage",
+                      "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/storage-drivers/local.svg",
+                      "dark_logo": null,
+                      "status": true,
+                      "brand_color": "#136196",
+                      "has_bucket": false
                     }
-                  ]
+                  }
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "drivers": [
-                        {
-                          "key": "local",
-                          "title": "Local Storage",
-                          "is_active": true
+                      "drivers": {
+                        "local": {
+                          "title": "Local",
+                          "route": "local",
+                          "description": "Local allows to upload file in local file storage",
+                          "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/storage-drivers/local.svg",
+                          "dark_logo": null,
+                          "status": true,
+                          "brand_color": "#136196",
+                          "has_bucket": false
                         }
-                      ]
+                      }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`is_super_admin`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }
@@ -106,7 +136,51 @@
     }
   },
   "components": {
-    "schemas": {},
+    "schemas": {
+      "ActiveStorageDriver": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Driver display title",
+            "example": "Local"
+          },
+          "route": {
+            "type": "string",
+            "description": "Driver route/handler slug",
+            "example": "local"
+          },
+          "description": {
+            "type": "string",
+            "example": "Local allows to upload file in local file storage"
+          },
+          "logo": {
+            "type": "string",
+            "example": "https://example.com/wp-content/plugins/fluent-cart/assets/images/storage-drivers/local.svg"
+          },
+          "dark_logo": {
+            "type": "string",
+            "nullable": true,
+            "description": "Dark-mode logo URL, if the driver provides one"
+          },
+          "status": {
+            "type": "boolean",
+            "description": "Whether the driver is currently connected/configured",
+            "example": true
+          },
+          "brand_color": {
+            "type": "string",
+            "description": "Driver brand color as a hex code",
+            "example": "#136196"
+          },
+          "has_bucket": {
+            "type": "boolean",
+            "description": "Whether this driver stores files in a configurable bucket (cloud drivers)",
+            "example": false
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",

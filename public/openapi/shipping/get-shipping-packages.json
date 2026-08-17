@@ -1,0 +1,220 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/shipping/packages": {
+      "get": {
+        "operationId": "getPackages",
+        "summary": "GET Get Shipping Packages",
+        "description": "List the store's configured shipping packages (boxes, envelopes, and soft packages used for rate calculation).\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
+        "tags": [
+          "Shipping"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Returns the configured shipping packages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "packages": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ShippingPackage"
+                      }
+                    }
+                  },
+                  "example": {
+                    "packages": [
+                      {
+                        "slug": "small-box",
+                        "name": "Small Box",
+                        "type": "box",
+                        "length": 20,
+                        "width": 15,
+                        "height": 10,
+                        "dimension_unit": "cm",
+                        "weight": 0.5,
+                        "weight_unit": "kg",
+                        "is_default": true
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "packages": [
+                    {
+                      "slug": "small-box",
+                      "name": "Small Box",
+                      "type": "box",
+                      "length": 20,
+                      "width": 15,
+                      "height": 10,
+                      "dimension_unit": "cm",
+                      "weight": 0.5,
+                      "weight_unit": "kg",
+                      "is_default": true
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "packages": [
+                        {
+                          "slug": "small-box",
+                          "name": "Small Box",
+                          "type": "box",
+                          "length": 20,
+                          "width": 15,
+                          "height": 10,
+                          "dimension_unit": "cm",
+                          "weight": 0.5,
+                          "weight_unit": "kg",
+                          "is_default": true
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShippingPackage": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "description": "Unique package identifier, derived from name if not supplied.",
+            "example": "small-box"
+          },
+          "name": {
+            "type": "string",
+            "example": "Small Box"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "box",
+              "envelope",
+              "soft_package"
+            ],
+            "example": "box"
+          },
+          "length": {
+            "type": "number",
+            "example": 20
+          },
+          "width": {
+            "type": "number",
+            "example": 15
+          },
+          "height": {
+            "type": "number",
+            "nullable": true,
+            "description": "Always null for `envelope` type packages.",
+            "example": 10
+          },
+          "dimension_unit": {
+            "type": "string",
+            "enum": [
+              "cm",
+              "mm",
+              "in",
+              "m"
+            ],
+            "example": "cm"
+          },
+          "weight": {
+            "type": "number",
+            "example": 0.5
+          },
+          "weight_unit": {
+            "type": "string",
+            "enum": [
+              "kg",
+              "g",
+              "lbs",
+              "oz"
+            ],
+            "example": "kg"
+          },
+          "is_default": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

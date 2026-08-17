@@ -1,0 +1,351 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/data-export/orders/schema": {
+      "get": {
+        "operationId": "getOrdersExportSchema",
+        "summary": "GET Get Orders Export Schema",
+        "description": "Describe what can be exported for orders: the supported output formats, the selectable flat CSV columns, and the selectable nested JSON modules.\n\nCall this first — the `key` values it returns are exactly what the matching `/batch` endpoint accepts in `columns` and `modules`. Unknown keys sent to `/batch` are silently dropped.\n\n**Permission:** `orders/export` · **Policy:** `OrderPolicy`",
+        "tags": [
+          "Data Export"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "export": {
+                      "type": "object",
+                      "properties": {
+                        "entity": {
+                          "type": "string",
+                          "description": "The exported entity."
+                        },
+                        "schema_version": {
+                          "type": "integer",
+                          "description": "Version of this schema contract."
+                        },
+                        "formats": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "enum": [
+                                  "csv",
+                                  "json"
+                                ]
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Output formats this entity supports."
+                        },
+                        "csv_columns": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "default_selected": {
+                                "type": "boolean",
+                                "description": "Whether the admin UI pre-selects this column."
+                              }
+                            }
+                          },
+                          "description": "Selectable flat columns, used when `format` is `csv`."
+                        },
+                        "json_modules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Selectable nested record groups, used when `format` is `json`."
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "export": {
+                      "entity": "orders",
+                      "schema_version": 1,
+                      "formats": [
+                        {
+                          "value": "csv",
+                          "label": "CSV file"
+                        },
+                        {
+                          "value": "json",
+                          "label": "JSON file"
+                        }
+                      ],
+                      "csv_columns": [
+                        {
+                          "key": "order_id",
+                          "label": "Order ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "invoice_no",
+                          "label": "Invoice number",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "status",
+                          "label": "Order status",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "payment_status",
+                          "label": "Payment status",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "shipping_status",
+                          "label": "Shipping status",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "currency",
+                          "label": "Currency",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "subtotal",
+                          "label": "Subtotal",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "discount_total",
+                          "label": "Discount total",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "shipping_total",
+                          "label": "Shipping total",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "tax_total",
+                          "label": "Tax total",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "total_amount",
+                          "label": "Total amount",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "total_refund",
+                          "label": "Refund total",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "items_count",
+                          "label": "Items count",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "order_type",
+                          "label": "Order type",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "payment_method",
+                          "label": "Payment method",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_id",
+                          "label": "Customer ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_name",
+                          "label": "Customer name",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_email",
+                          "label": "Customer email",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "mode",
+                          "label": "Mode",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "created_at",
+                          "label": "Order date",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "completed_at",
+                          "label": "Completed date",
+                          "default_selected": false
+                        }
+                      ],
+                      "json_modules": [
+                        {
+                          "key": "orders",
+                          "label": "Orders",
+                          "description": "Core rows from the orders table.",
+                          "default_selected": true,
+                          "required": true
+                        },
+                        {
+                          "key": "customers",
+                          "label": "Customers",
+                          "description": "The customer row linked to each order.",
+                          "default_selected": true,
+                          "required": false
+                        },
+                        {
+                          "key": "order_items",
+                          "label": "Order items",
+                          "description": "Line items linked to each order.",
+                          "default_selected": true,
+                          "required": false
+                        },
+                        {
+                          "key": "order_addresses",
+                          "label": "Order addresses",
+                          "description": "Billing and shipping address rows.",
+                          "default_selected": false,
+                          "required": false
+                        },
+                        {
+                          "key": "order_transactions",
+                          "label": "Transactions",
+                          "description": "Payment transaction rows.",
+                          "default_selected": false,
+                          "required": false
+                        },
+                        {
+                          "key": "order_tax_rates",
+                          "label": "Tax rates",
+                          "description": "Applied order tax rows.",
+                          "default_selected": false,
+                          "required": false
+                        },
+                        {
+                          "key": "order_meta",
+                          "label": "Order metadata",
+                          "description": "Metadata rows attached to each order.",
+                          "default_selected": false,
+                          "required": false
+                        }
+                      ],
+                      "batching": {
+                        "initial_records": 500,
+                        "min_records": 100,
+                        "max_records": 1000,
+                        "target_ms": 1500
+                      },
+                      "direct_file_writer": true,
+                      "sensitive_values_redacted": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user lacks `orders/export`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

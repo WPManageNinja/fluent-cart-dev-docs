@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getCustomer",
         "summary": "GET Get Customer",
-        "description": "Retrieve a single customer by ID with optional eager-loaded relationships.",
+        "description": "Retrieve a single customer by ID with optional eager-loaded relationships.\n\n**Also used by the customer portal UI.** Retrieve the details of the currently authenticated customer. The customerId must match the logged-in customer's record.\n\n**Required permission:** `customers/view`",
         "tags": [
           "Customers"
         ],
@@ -251,6 +251,58 @@
                       "back_text": "Back to Customer List",
                       "back_url": "/customers"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. The authenticated user does not own this customer record.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not authorized to view this customer"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to view this customer"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not authorized to view this customer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

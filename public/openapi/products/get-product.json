@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getProduct",
         "summary": "GET Get Product",
-        "description": "Retrieve a single product by ID.",
+        "description": "Retrieve a single product by ID.\n\n**Required permission:** `products/view`",
         "tags": [
           "Products"
         ],
@@ -67,17 +67,62 @@
                 "example": {
                   "product": {
                     "ID": 123,
-                    "post_title": "Developer Toolkit Pro",
-                    "post_status": "publish",
-                    "post_type": "fluent-products",
                     "post_date": "2025-03-15 10:00:00",
-                    "post_modified": "2025-09-01 15:30:00",
-                    "post_name": "developer-toolkit-pro",
-                    "post_excerpt": "Professional developer tools for building modern applications.",
+                    "post_date_gmt": "2025-03-15 10:00:00",
                     "post_content": "A comprehensive developer toolkit with API access, code generators, and premium support.",
-                    "thumbnail": "https://example.com/wp-content/uploads/2025/03/dev-toolkit.png",
-                    "view_url": "https://example.com/product/developer-toolkit-pro",
-                    "edit_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products/123"
+                    "post_title": "Developer Toolkit Pro",
+                    "post_excerpt": "Professional developer tools for building modern applications.",
+                    "post_status": "publish",
+                    "comment_status": "closed",
+                    "ping_status": "closed",
+                    "post_name": "developer-toolkit-pro",
+                    "post_modified": "2025-09-01 15:30:00",
+                    "post_modified_gmt": "2025-09-01 15:30:00",
+                    "guid": "https://yoursite.com/?post_type=fluent-products&p=123",
+                    "post_type": "fluent-products",
+                    "thumbnail": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                    "detail": {
+                      "id": 1,
+                      "post_id": 123,
+                      "fulfillment_type": "digital",
+                      "min_price": "4999",
+                      "max_price": "9999",
+                      "default_variation_id": null,
+                      "default_media": null,
+                      "manage_stock": "1",
+                      "stock_availability": "in-stock",
+                      "variation_type": "simple_variations",
+                      "manage_downloadable": "1",
+                      "other_info": {
+                        "group_pricing_by": "none",
+                        "sold_individually": "yes",
+                        "use_pricing_table": "no",
+                        "shipping_class": 0,
+                        "tax_class": 0,
+                        "active_editor": "gutenberg"
+                      },
+                      "created_at": "2025-03-15T10:00:00+00:00",
+                      "updated_at": "2025-09-01T15:30:00+00:00",
+                      "featured_media": {
+                        "id": 456,
+                        "url": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                        "title": "Developer Toolkit Pro icon"
+                      },
+                      "formatted_min_price": "&#36;49.99",
+                      "formatted_max_price": "&#36;99.99",
+                      "gallery_image": {
+                        "meta_id": "789",
+                        "post_id": 123,
+                        "meta_key": "fluent-products-gallery-image",
+                        "meta_value": [
+                          {
+                            "id": 456,
+                            "url": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                            "title": "Developer Toolkit Pro icon"
+                          }
+                        ]
+                      }
+                    }
                   },
                   "product_menu": [
                     {
@@ -98,20 +143,66 @@
                   ]
                 },
                 "schema": {
+                  "description": "`product` is the raw WordPress post record (post_type `fluent-products`) with its `detail` relation (pricing, stock, media) always attached, plus an appended `thumbnail` URL. `product_menu` is included only when `product_menu` is passed in the `with[]` query parameter; it is absent otherwise.",
                   "example": {
                     "product": {
                       "ID": 123,
-                      "post_title": "Developer Toolkit Pro",
-                      "post_status": "publish",
-                      "post_type": "fluent-products",
                       "post_date": "2025-03-15 10:00:00",
-                      "post_modified": "2025-09-01 15:30:00",
-                      "post_name": "developer-toolkit-pro",
-                      "post_excerpt": "Professional developer tools for building modern applications.",
+                      "post_date_gmt": "2025-03-15 10:00:00",
                       "post_content": "A comprehensive developer toolkit with API access, code generators, and premium support.",
-                      "thumbnail": "https://example.com/wp-content/uploads/2025/03/dev-toolkit.png",
-                      "view_url": "https://example.com/product/developer-toolkit-pro",
-                      "edit_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products/123"
+                      "post_title": "Developer Toolkit Pro",
+                      "post_excerpt": "Professional developer tools for building modern applications.",
+                      "post_status": "publish",
+                      "comment_status": "closed",
+                      "ping_status": "closed",
+                      "post_name": "developer-toolkit-pro",
+                      "post_modified": "2025-09-01 15:30:00",
+                      "post_modified_gmt": "2025-09-01 15:30:00",
+                      "guid": "https://yoursite.com/?post_type=fluent-products&p=123",
+                      "post_type": "fluent-products",
+                      "thumbnail": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                      "detail": {
+                        "id": 1,
+                        "post_id": 123,
+                        "fulfillment_type": "digital",
+                        "min_price": "4999",
+                        "max_price": "9999",
+                        "default_variation_id": null,
+                        "default_media": null,
+                        "manage_stock": "1",
+                        "stock_availability": "in-stock",
+                        "variation_type": "simple_variations",
+                        "manage_downloadable": "1",
+                        "other_info": {
+                          "group_pricing_by": "none",
+                          "sold_individually": "yes",
+                          "use_pricing_table": "no",
+                          "shipping_class": 0,
+                          "tax_class": 0,
+                          "active_editor": "gutenberg"
+                        },
+                        "created_at": "2025-03-15T10:00:00+00:00",
+                        "updated_at": "2025-09-01T15:30:00+00:00",
+                        "featured_media": {
+                          "id": 456,
+                          "url": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                          "title": "Developer Toolkit Pro icon"
+                        },
+                        "formatted_min_price": "&#36;49.99",
+                        "formatted_max_price": "&#36;99.99",
+                        "gallery_image": {
+                          "meta_id": "789",
+                          "post_id": 123,
+                          "meta_key": "fluent-products-gallery-image",
+                          "meta_value": [
+                            {
+                              "id": 456,
+                              "url": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                              "title": "Developer Toolkit Pro icon"
+                            }
+                          ]
+                        }
+                      }
                     },
                     "product_menu": [
                       {
@@ -138,17 +229,62 @@
                     "value": {
                       "product": {
                         "ID": 123,
-                        "post_title": "Developer Toolkit Pro",
-                        "post_status": "publish",
-                        "post_type": "fluent-products",
                         "post_date": "2025-03-15 10:00:00",
-                        "post_modified": "2025-09-01 15:30:00",
-                        "post_name": "developer-toolkit-pro",
-                        "post_excerpt": "Professional developer tools for building modern applications.",
+                        "post_date_gmt": "2025-03-15 10:00:00",
                         "post_content": "A comprehensive developer toolkit with API access, code generators, and premium support.",
-                        "thumbnail": "https://example.com/wp-content/uploads/2025/03/dev-toolkit.png",
-                        "view_url": "https://example.com/product/developer-toolkit-pro",
-                        "edit_url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products/123"
+                        "post_title": "Developer Toolkit Pro",
+                        "post_excerpt": "Professional developer tools for building modern applications.",
+                        "post_status": "publish",
+                        "comment_status": "closed",
+                        "ping_status": "closed",
+                        "post_name": "developer-toolkit-pro",
+                        "post_modified": "2025-09-01 15:30:00",
+                        "post_modified_gmt": "2025-09-01 15:30:00",
+                        "guid": "https://yoursite.com/?post_type=fluent-products&p=123",
+                        "post_type": "fluent-products",
+                        "thumbnail": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                        "detail": {
+                          "id": 1,
+                          "post_id": 123,
+                          "fulfillment_type": "digital",
+                          "min_price": "4999",
+                          "max_price": "9999",
+                          "default_variation_id": null,
+                          "default_media": null,
+                          "manage_stock": "1",
+                          "stock_availability": "in-stock",
+                          "variation_type": "simple_variations",
+                          "manage_downloadable": "1",
+                          "other_info": {
+                            "group_pricing_by": "none",
+                            "sold_individually": "yes",
+                            "use_pricing_table": "no",
+                            "shipping_class": 0,
+                            "tax_class": 0,
+                            "active_editor": "gutenberg"
+                          },
+                          "created_at": "2025-03-15T10:00:00+00:00",
+                          "updated_at": "2025-09-01T15:30:00+00:00",
+                          "featured_media": {
+                            "id": 456,
+                            "url": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                            "title": "Developer Toolkit Pro icon"
+                          },
+                          "formatted_min_price": "&#36;49.99",
+                          "formatted_max_price": "&#36;99.99",
+                          "gallery_image": {
+                            "meta_id": "789",
+                            "post_id": 123,
+                            "meta_key": "fluent-products-gallery-image",
+                            "meta_value": [
+                              {
+                                "id": 456,
+                                "url": "https://yoursite.com/wp-content/uploads/2025/03/dev-toolkit.png",
+                                "title": "Developer Toolkit Pro icon"
+                              }
+                            ]
+                          }
+                        }
                       },
                       "product_menu": [
                         {
@@ -168,6 +304,49 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/view`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

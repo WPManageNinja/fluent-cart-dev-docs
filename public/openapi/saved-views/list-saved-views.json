@@ -1,0 +1,203 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/saved-views": {
+      "get": {
+        "operationId": "listSavedViews",
+        "summary": "GET List Saved Views",
+        "description": "Retrieve every saved view the current user can see for a given admin table — their own views plus any public views. Results are ordered by ID ascending.\n\n**Permission:** varies by `object_type` (see below) · **Policy:** `SavedViewsPolicy`",
+        "tags": [
+          "Saved Views"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "object_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "product_table",
+                "order_table",
+                "customers",
+                "coupon_table",
+                "subscriptions",
+                "licenses",
+                "order_bump_table",
+                "log_table",
+                "taxes_table",
+                "shipping_zone_table",
+                "shipping_class_table"
+              ]
+            },
+            "description": "The admin table the view belongs to. **Required** — it is read by `SavedViewsPolicy` *before* the controller runs, so omitting it returns `403 rest_forbidden` rather than a validation error. Each value maps to a different capability: `product_table`/`order_bump_table` → `products/view`, `order_table`/`log_table` → `orders/view`, `customers` → `customers/view`, `coupon_table` → `coupons/view`, `subscriptions` → `subscriptions/view`, `licenses` → `licenses/view`, and `taxes_table`/`shipping_zone_table`/`shipping_class_table` → `manage_options`. The map is filterable via `fluent_cart/saved_views_permission_map`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "views": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "object_type": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string",
+                            "description": "Auto-generated from the name plus a 6-character random suffix."
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "query_params": {
+                            "type": "object",
+                            "properties": {
+                              "filter_type": {
+                                "type": "string",
+                                "description": "Filter mode, e.g. `simple` or `advanced`."
+                              },
+                              "advanced_filters": {
+                                "type": "string",
+                                "description": "JSON-encoded advanced filter groups. Invalid JSON is stored as `[[]]`."
+                              },
+                              "search": {
+                                "type": "string",
+                                "description": "Free-text search term."
+                              },
+                              "active_view": {
+                                "type": "string",
+                                "description": "Active tab on the table."
+                              }
+                            },
+                            "example": {
+                              "filter_type": "advanced",
+                              "advanced_filters": "[[{\"source\":\"order\",\"property\":\"status\",\"operator\":\"=\",\"value\":\"completed\"}]]",
+                              "search": "",
+                              "active_view": "all"
+                            }
+                          },
+                          "is_public": {
+                            "type": "boolean",
+                            "description": "`true` when the view is shared with every user who can access this table."
+                          },
+                          "owner_id": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "WordPress user ID of the creator."
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "views": [
+                      {
+                        "id": 41,
+                        "object_type": "order_table",
+                        "slug": "unfulfilled-orders-x7k2p9",
+                        "name": "Unfulfilled orders",
+                        "description": "Paid orders still awaiting fulfillment",
+                        "query_params": {
+                          "filter_type": "advanced",
+                          "advanced_filters": "[[{\"source\":\"order\",\"property\":\"fulfillment_type\",\"operator\":\"=\",\"value\":\"unfulfilled\"}]]",
+                          "search": "",
+                          "active_view": "all"
+                        },
+                        "is_public": false,
+                        "owner_id": 1
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — returned both when `object_type` is missing or unknown and when the user lacks the capability that `object_type` maps to.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

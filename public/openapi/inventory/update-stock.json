@@ -1,0 +1,204 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/inventory/update-stock": {
+      "post": {
+        "operationId": "updateInventoryStock",
+        "summary": "POST Update Stock",
+        "description": "Set the absolute stock level for one variant and record a stock-adjustment entry.\n\n`available` is recalculated as `new_stock - committed - on_hold`, floored at 0. A negative `new_stock` is clamped to 0.\n\n**Permission:** `products/edit` · **Policy:** `ProductPolicy`",
+        "tags": [
+          "Advanced Inventory"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "variant_id": {
+                    "type": "integer",
+                    "description": "ID of the variant to update."
+                  },
+                  "post_id": {
+                    "type": "integer",
+                    "description": "ID of the parent product. Must match the variant's `post_id` or the request 404s."
+                  },
+                  "new_stock": {
+                    "type": "integer",
+                    "description": "Absolute new `total_stock`. Values below 0 are clamped to 0."
+                  },
+                  "reason": {
+                    "type": "string",
+                    "enum": [
+                      "received",
+                      "damage",
+                      "return",
+                      "correction",
+                      "transfer",
+                      "other"
+                    ],
+                    "description": "Why the stock changed. One of `received` (Received Stock), `damage` (Damage/Loss), `return` (Return/Refund), `correction` (Count Correction), `transfer` (Inventory Transfer) or `other`. When `other` is used, `customReason` becomes required."
+                  },
+                  "customReason": {
+                    "type": "string",
+                    "description": "Free-text reason. Required when `reason` is `other`."
+                  }
+                },
+                "required": [
+                  "variant_id",
+                  "post_id",
+                  "new_stock",
+                  "reason"
+                ],
+                "example": {
+                  "variant_id": 22,
+                  "post_id": 31562,
+                  "new_stock": 12,
+                  "reason": "received"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "variant_id": {
+                      "type": "integer"
+                    },
+                    "new_stock": {
+                      "type": "integer"
+                    }
+                  },
+                  "example": {
+                    "message": "Stock updated successfully",
+                    "variant_id": 22,
+                    "new_stock": 12
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing `variant_id`, `post_id` or `new_stock`; or an invalid `reason`; or `reason` is `other` with an empty `customReason`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "Required parameters are missing"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the authenticated user lacks the required permission.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No variant matches that `variant_id` / `post_id` pair.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "example": {
+                    "message": "Variant not found"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

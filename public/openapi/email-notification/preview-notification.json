@@ -27,7 +27,7 @@
       "post": {
         "operationId": "previewEmailNotification",
         "summary": "POST Preview Notification",
-        "description": "Generate an HTML preview of a custom email notification template. Uses the block editor email body from the notification's saved settings, parses it through the block parser, wraps it in the email template layout, and resolves shortcodes using real or fallback order data.",
+        "description": "Generate an HTML preview of a custom email notification template. Uses the block editor email body from the notification's saved settings, parses it through the block parser, wraps it in the email template layout, and resolves shortcodes using real or fallback order data.\n\n**Policy:** `StoreSensitivePolicy`",
         "tags": [
           "Email Notifications"
         ],
@@ -182,7 +182,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

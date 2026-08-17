@@ -1,0 +1,374 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/data-export/subscriptions/schema": {
+      "get": {
+        "operationId": "getSubscriptionsExportSchema",
+        "summary": "GET Get Subscriptions Export Schema",
+        "description": "Describe what can be exported for subscriptions: the supported output formats, the selectable flat CSV columns, and the selectable nested JSON modules.\n\nCall this first — the `key` values it returns are exactly what the matching `/batch` endpoint accepts in `columns` and `modules`. Unknown keys sent to `/batch` are silently dropped.\n\n**Permission:** `subscriptions/export` · **Policy:** `OrderPolicy`",
+        "tags": [
+          "Data Export"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "export": {
+                      "type": "object",
+                      "properties": {
+                        "entity": {
+                          "type": "string",
+                          "description": "The exported entity."
+                        },
+                        "schema_version": {
+                          "type": "integer",
+                          "description": "Version of this schema contract."
+                        },
+                        "formats": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "string",
+                                "enum": [
+                                  "csv",
+                                  "json"
+                                ]
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Output formats this entity supports."
+                        },
+                        "csv_columns": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "default_selected": {
+                                "type": "boolean",
+                                "description": "Whether the admin UI pre-selects this column."
+                              }
+                            }
+                          },
+                          "description": "Selectable flat columns, used when `format` is `csv`."
+                        },
+                        "json_modules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "description": "Selectable nested record groups, used when `format` is `json`."
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "export": {
+                      "entity": "subscriptions",
+                      "schema_version": 1,
+                      "formats": [
+                        {
+                          "value": "csv",
+                          "label": "CSV file"
+                        },
+                        {
+                          "value": "json",
+                          "label": "JSON file"
+                        }
+                      ],
+                      "csv_columns": [
+                        {
+                          "key": "subscription_id",
+                          "label": "Subscription ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "status",
+                          "label": "Status",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "item_name",
+                          "label": "Item name",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_id",
+                          "label": "Customer ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_name",
+                          "label": "Customer name",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "customer_email",
+                          "label": "Customer email",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "parent_order_id",
+                          "label": "Original order ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "product_id",
+                          "label": "Product ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "variation_id",
+                          "label": "Variation ID",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "billing_interval",
+                          "label": "Billing interval",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "quantity",
+                          "label": "Quantity",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "signup_fee",
+                          "label": "Signup fee",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "recurring_amount",
+                          "label": "Recurring amount",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "recurring_tax_total",
+                          "label": "Recurring tax total",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "recurring_total",
+                          "label": "Recurring total",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "bill_times",
+                          "label": "Billing cycles",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "bill_count",
+                          "label": "Completed billings",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "trial_days",
+                          "label": "Trial days",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "collection_method",
+                          "label": "Collection method",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "payment_method",
+                          "label": "Payment method",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "vendor_subscription_id",
+                          "label": "Gateway subscription ID",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "next_billing_date",
+                          "label": "Next billing date",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "trial_ends_at",
+                          "label": "Trial end date",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "expire_at",
+                          "label": "Expiration date",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "canceled_at",
+                          "label": "Canceled date",
+                          "default_selected": false
+                        },
+                        {
+                          "key": "created_at",
+                          "label": "Created date",
+                          "default_selected": true
+                        },
+                        {
+                          "key": "updated_at",
+                          "label": "Updated date",
+                          "default_selected": false
+                        }
+                      ],
+                      "json_modules": [
+                        {
+                          "key": "subscriptions",
+                          "label": "Subscriptions",
+                          "description": "Core rows from the subscriptions table. Sensitive payment credentials are redacted.",
+                          "default_selected": true,
+                          "required": true
+                        },
+                        {
+                          "key": "customers",
+                          "label": "Customers",
+                          "description": "The customer row linked to each subscription.",
+                          "default_selected": true,
+                          "required": false
+                        },
+                        {
+                          "key": "parent_orders",
+                          "label": "Original orders",
+                          "description": "The original order row linked to each subscription.",
+                          "default_selected": false,
+                          "required": false
+                        },
+                        {
+                          "key": "subscription_transactions",
+                          "label": "Transactions",
+                          "description": "Payment transaction rows linked to each subscription. Sensitive values are redacted.",
+                          "default_selected": false,
+                          "required": false
+                        },
+                        {
+                          "key": "subscription_meta",
+                          "label": "Subscription metadata",
+                          "description": "Metadata rows attached to each subscription. Sensitive values are redacted.",
+                          "default_selected": false,
+                          "required": false
+                        },
+                        {
+                          "key": "licenses",
+                          "label": "Licenses",
+                          "description": "License rows linked to each subscription.",
+                          "default_selected": false,
+                          "required": false
+                        }
+                      ],
+                      "batching": {
+                        "initial_records": 500,
+                        "min_records": 100,
+                        "max_records": 1000,
+                        "target_ms": 1500
+                      },
+                      "direct_file_writer": true,
+                      "sensitive_values_redacted": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — the user lacks `subscriptions/export`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

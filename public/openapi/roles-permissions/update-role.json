@@ -27,7 +27,7 @@
       "post": {
         "operationId": "updateRole",
         "summary": "POST Update Role",
-        "description": "Update a specific role definition. This endpoint is currently a placeholder and returns no data. It is reserved for future use.",
+        "description": "Update a specific role definition. This endpoint is currently a placeholder and returns no data. It is reserved for future use.\n\n**Policy:** `AdminPolicy`",
         "tags": [
           "Roles"
         ],
@@ -161,7 +161,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

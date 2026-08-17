@@ -27,7 +27,7 @@
       "post": {
         "operationId": "updateOrderAddressId",
         "summary": "POST Update Order Address ID",
-        "description": "Assign an existing customer address to an order's billing or shipping address.",
+        "description": "Assign an existing customer address to an order's billing or shipping address.\n\n**Required permission:** `orders/manage`",
         "tags": [
           "Orders"
         ],
@@ -147,6 +147,49 @@
                     "value": {
                       "message": "Order not found"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

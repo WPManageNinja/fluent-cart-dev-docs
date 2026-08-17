@@ -27,7 +27,7 @@
       "put": {
         "operationId": "reactivateSubscription",
         "summary": "PUT Reactivate Subscription",
-        "description": "Reactivate a previously canceled or paused subscription. Note: This endpoint is registered but currently returns a 'Not available yet' error. It is reserved for future implementation.",
+        "description": "Reactivate a previously canceled or paused subscription. Note: This endpoint is registered but currently returns a 'Not available yet' error. It is reserved for future implementation.\n\n**Required permission:** `subscriptions/manage`",
         "tags": [
           "Subscriptions"
         ],
@@ -81,6 +81,49 @@
                     "value": {
                       "message": "Not available yet"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`subscriptions/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

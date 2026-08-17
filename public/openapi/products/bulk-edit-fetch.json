@@ -27,7 +27,7 @@
       "get": {
         "operationId": "bulkEditFetch",
         "summary": "GET Bulk Edit Fetch",
-        "description": "Fetch products formatted for the bulk editing spreadsheet view.",
+        "description": "Fetch products formatted for the bulk editing spreadsheet view.\n\n**Required permission:** `products/edit`",
         "tags": [
           "Products"
         ],
@@ -101,53 +101,142 @@
                     {
                       "ID": 123,
                       "post_title": "Developer Toolkit Pro",
+                      "post_content": "<p>A complete developer toolkit.</p>",
+                      "post_excerpt": "A complete developer toolkit for building modern apps.",
                       "post_status": "publish",
-                      "post_date": "2025-03-15 10:00:00",
+                      "view_url": "https://yoursite.com/product/developer-toolkit-pro/",
+                      "gallery": [
+                        {
+                          "id": 456,
+                          "url": "https://yoursite.com/wp-content/uploads/2025/06/toolkit-icon.webp",
+                          "title": "Developer Toolkit icon"
+                        }
+                      ],
                       "detail": {
-                        "id": 89,
-                        "post_id": 123,
+                        "variation_type": "simple_variations",
                         "fulfillment_type": "digital",
-                        "min_price": 4900,
-                        "max_price": 19900,
-                        "variation_type": "multi",
-                        "formatted_min_price": "$49.00",
-                        "formatted_max_price": "$199.00"
-                      }
+                        "manage_stock": 1
+                      },
+                      "variants": [
+                        {
+                          "id": 1,
+                          "post_id": 123,
+                          "variation_title": "Single Site License",
+                          "sku": "DEV-TOOLKIT-1",
+                          "item_price": 49.0,
+                          "compare_price": 0,
+                          "payment_type": "onetime",
+                          "manage_stock": 1,
+                          "total_stock": 100,
+                          "available": 100,
+                          "stock_status": "in-stock",
+                          "serial_index": 1,
+                          "fulfillment_type": "digital",
+                          "other_info": {
+                            "description": "",
+                            "payment_type": "onetime",
+                            "tax_class": "standard",
+                            "tax_exempt": "no",
+                            "tax_inclusion": "",
+                            "package_slug": "",
+                            "weight": null,
+                            "weight_unit": "kg",
+                            "length": null,
+                            "width": null,
+                            "height": null,
+                            "is_bundle_product": null,
+                            "bundle_child_ids": []
+                          },
+                          "media": []
+                        },
+                        {
+                          "id": 2,
+                          "post_id": 123,
+                          "variation_title": "5 Site License",
+                          "sku": "DEV-TOOLKIT-5",
+                          "item_price": 99.0,
+                          "compare_price": 0,
+                          "payment_type": "onetime",
+                          "manage_stock": 1,
+                          "total_stock": 100,
+                          "available": 100,
+                          "stock_status": "in-stock",
+                          "serial_index": 2,
+                          "fulfillment_type": "digital",
+                          "other_info": {
+                            "description": "",
+                            "payment_type": "onetime",
+                            "tax_class": "standard",
+                            "tax_exempt": "no",
+                            "tax_inclusion": "",
+                            "package_slug": "",
+                            "weight": null,
+                            "weight_unit": "kg",
+                            "length": null,
+                            "width": null,
+                            "height": null,
+                            "is_bundle_product": null,
+                            "bundle_child_ids": []
+                          },
+                          "media": []
+                        }
+                      ],
+                      "category_terms": [],
+                      "categories": []
                     },
                     {
                       "ID": 124,
                       "post_title": "Cloud Hosting Starter",
+                      "post_content": "",
+                      "post_excerpt": "",
                       "post_status": "draft",
-                      "post_date": "2025-06-20 08:30:00",
+                      "view_url": "https://yoursite.com/?post_type=fluent-products&p=124",
+                      "gallery": [],
                       "detail": {
-                        "id": 90,
-                        "post_id": 124,
+                        "variation_type": "simple_variations",
                         "fulfillment_type": "digital",
-                        "min_price": 1900,
-                        "max_price": 4900,
-                        "variation_type": "single",
-                        "formatted_min_price": "$19.00",
-                        "formatted_max_price": "$49.00"
-                      }
+                        "manage_stock": 1
+                      },
+                      "variants": [
+                        {
+                          "id": 3,
+                          "post_id": 124,
+                          "variation_title": "Monthly Plan",
+                          "sku": "CLOUD-HOST-M",
+                          "item_price": 19.0,
+                          "compare_price": 0,
+                          "payment_type": "onetime",
+                          "manage_stock": 1,
+                          "total_stock": 1,
+                          "available": 1,
+                          "stock_status": "in-stock",
+                          "serial_index": 1,
+                          "fulfillment_type": "digital",
+                          "other_info": {
+                            "description": "",
+                            "payment_type": "onetime",
+                            "tax_class": "standard",
+                            "tax_exempt": "no",
+                            "tax_inclusion": "",
+                            "package_slug": "",
+                            "weight": null,
+                            "weight_unit": "kg",
+                            "length": null,
+                            "width": null,
+                            "height": null,
+                            "is_bundle_product": null,
+                            "bundle_child_ids": []
+                          },
+                          "media": []
+                        }
+                      ],
+                      "category_terms": [],
+                      "categories": []
                     }
                   ],
-                  "columns": [
-                    {
-                      "key": "post_title",
-                      "label": "Product Title",
-                      "editable": true
-                    },
-                    {
-                      "key": "post_status",
-                      "label": "Status",
-                      "editable": true
-                    },
-                    {
-                      "key": "fulfillment_type",
-                      "label": "Fulfillment",
-                      "editable": true
-                    }
-                  ]
+                  "total": 2,
+                  "per_page": 10,
+                  "page": 1
                 },
                 "schema": {
                   "example": {
@@ -155,53 +244,142 @@
                       {
                         "ID": 123,
                         "post_title": "Developer Toolkit Pro",
+                        "post_content": "<p>A complete developer toolkit.</p>",
+                        "post_excerpt": "A complete developer toolkit for building modern apps.",
                         "post_status": "publish",
-                        "post_date": "2025-03-15 10:00:00",
+                        "view_url": "https://yoursite.com/product/developer-toolkit-pro/",
+                        "gallery": [
+                          {
+                            "id": 456,
+                            "url": "https://yoursite.com/wp-content/uploads/2025/06/toolkit-icon.webp",
+                            "title": "Developer Toolkit icon"
+                          }
+                        ],
                         "detail": {
-                          "id": 89,
-                          "post_id": 123,
+                          "variation_type": "simple_variations",
                           "fulfillment_type": "digital",
-                          "min_price": 4900,
-                          "max_price": 19900,
-                          "variation_type": "multi",
-                          "formatted_min_price": "$49.00",
-                          "formatted_max_price": "$199.00"
-                        }
+                          "manage_stock": 1
+                        },
+                        "variants": [
+                          {
+                            "id": 1,
+                            "post_id": 123,
+                            "variation_title": "Single Site License",
+                            "sku": "DEV-TOOLKIT-1",
+                            "item_price": 49.0,
+                            "compare_price": 0,
+                            "payment_type": "onetime",
+                            "manage_stock": 1,
+                            "total_stock": 100,
+                            "available": 100,
+                            "stock_status": "in-stock",
+                            "serial_index": 1,
+                            "fulfillment_type": "digital",
+                            "other_info": {
+                              "description": "",
+                              "payment_type": "onetime",
+                              "tax_class": "standard",
+                              "tax_exempt": "no",
+                              "tax_inclusion": "",
+                              "package_slug": "",
+                              "weight": null,
+                              "weight_unit": "kg",
+                              "length": null,
+                              "width": null,
+                              "height": null,
+                              "is_bundle_product": null,
+                              "bundle_child_ids": []
+                            },
+                            "media": []
+                          },
+                          {
+                            "id": 2,
+                            "post_id": 123,
+                            "variation_title": "5 Site License",
+                            "sku": "DEV-TOOLKIT-5",
+                            "item_price": 99.0,
+                            "compare_price": 0,
+                            "payment_type": "onetime",
+                            "manage_stock": 1,
+                            "total_stock": 100,
+                            "available": 100,
+                            "stock_status": "in-stock",
+                            "serial_index": 2,
+                            "fulfillment_type": "digital",
+                            "other_info": {
+                              "description": "",
+                              "payment_type": "onetime",
+                              "tax_class": "standard",
+                              "tax_exempt": "no",
+                              "tax_inclusion": "",
+                              "package_slug": "",
+                              "weight": null,
+                              "weight_unit": "kg",
+                              "length": null,
+                              "width": null,
+                              "height": null,
+                              "is_bundle_product": null,
+                              "bundle_child_ids": []
+                            },
+                            "media": []
+                          }
+                        ],
+                        "category_terms": [],
+                        "categories": []
                       },
                       {
                         "ID": 124,
                         "post_title": "Cloud Hosting Starter",
+                        "post_content": "",
+                        "post_excerpt": "",
                         "post_status": "draft",
-                        "post_date": "2025-06-20 08:30:00",
+                        "view_url": "https://yoursite.com/?post_type=fluent-products&p=124",
+                        "gallery": [],
                         "detail": {
-                          "id": 90,
-                          "post_id": 124,
+                          "variation_type": "simple_variations",
                           "fulfillment_type": "digital",
-                          "min_price": 1900,
-                          "max_price": 4900,
-                          "variation_type": "single",
-                          "formatted_min_price": "$19.00",
-                          "formatted_max_price": "$49.00"
-                        }
+                          "manage_stock": 1
+                        },
+                        "variants": [
+                          {
+                            "id": 3,
+                            "post_id": 124,
+                            "variation_title": "Monthly Plan",
+                            "sku": "CLOUD-HOST-M",
+                            "item_price": 19.0,
+                            "compare_price": 0,
+                            "payment_type": "onetime",
+                            "manage_stock": 1,
+                            "total_stock": 1,
+                            "available": 1,
+                            "stock_status": "in-stock",
+                            "serial_index": 1,
+                            "fulfillment_type": "digital",
+                            "other_info": {
+                              "description": "",
+                              "payment_type": "onetime",
+                              "tax_class": "standard",
+                              "tax_exempt": "no",
+                              "tax_inclusion": "",
+                              "package_slug": "",
+                              "weight": null,
+                              "weight_unit": "kg",
+                              "length": null,
+                              "width": null,
+                              "height": null,
+                              "is_bundle_product": null,
+                              "bundle_child_ids": []
+                            },
+                            "media": []
+                          }
+                        ],
+                        "category_terms": [],
+                        "categories": []
                       }
                     ],
-                    "columns": [
-                      {
-                        "key": "post_title",
-                        "label": "Product Title",
-                        "editable": true
-                      },
-                      {
-                        "key": "post_status",
-                        "label": "Status",
-                        "editable": true
-                      },
-                      {
-                        "key": "fulfillment_type",
-                        "label": "Fulfillment",
-                        "editable": true
-                      }
-                    ]
+                    "total": 2,
+                    "per_page": 10,
+                    "page": 1
                   }
                 },
                 "examples": {
@@ -212,54 +390,171 @@
                         {
                           "ID": 123,
                           "post_title": "Developer Toolkit Pro",
+                          "post_content": "<p>A complete developer toolkit.</p>",
+                          "post_excerpt": "A complete developer toolkit for building modern apps.",
                           "post_status": "publish",
-                          "post_date": "2025-03-15 10:00:00",
+                          "view_url": "https://yoursite.com/product/developer-toolkit-pro/",
+                          "gallery": [
+                            {
+                              "id": 456,
+                              "url": "https://yoursite.com/wp-content/uploads/2025/06/toolkit-icon.webp",
+                              "title": "Developer Toolkit icon"
+                            }
+                          ],
                           "detail": {
-                            "id": 89,
-                            "post_id": 123,
+                            "variation_type": "simple_variations",
                             "fulfillment_type": "digital",
-                            "min_price": 4900,
-                            "max_price": 19900,
-                            "variation_type": "multi",
-                            "formatted_min_price": "$49.00",
-                            "formatted_max_price": "$199.00"
-                          }
+                            "manage_stock": 1
+                          },
+                          "variants": [
+                            {
+                              "id": 1,
+                              "post_id": 123,
+                              "variation_title": "Single Site License",
+                              "sku": "DEV-TOOLKIT-1",
+                              "item_price": 49.0,
+                              "compare_price": 0,
+                              "payment_type": "onetime",
+                              "manage_stock": 1,
+                              "total_stock": 100,
+                              "available": 100,
+                              "stock_status": "in-stock",
+                              "serial_index": 1,
+                              "fulfillment_type": "digital",
+                              "other_info": {
+                                "description": "",
+                                "payment_type": "onetime",
+                                "tax_class": "standard",
+                                "tax_exempt": "no",
+                                "tax_inclusion": "",
+                                "package_slug": "",
+                                "weight": null,
+                                "weight_unit": "kg",
+                                "length": null,
+                                "width": null,
+                                "height": null,
+                                "is_bundle_product": null,
+                                "bundle_child_ids": []
+                              },
+                              "media": []
+                            },
+                            {
+                              "id": 2,
+                              "post_id": 123,
+                              "variation_title": "5 Site License",
+                              "sku": "DEV-TOOLKIT-5",
+                              "item_price": 99.0,
+                              "compare_price": 0,
+                              "payment_type": "onetime",
+                              "manage_stock": 1,
+                              "total_stock": 100,
+                              "available": 100,
+                              "stock_status": "in-stock",
+                              "serial_index": 2,
+                              "fulfillment_type": "digital",
+                              "other_info": {
+                                "description": "",
+                                "payment_type": "onetime",
+                                "tax_class": "standard",
+                                "tax_exempt": "no",
+                                "tax_inclusion": "",
+                                "package_slug": "",
+                                "weight": null,
+                                "weight_unit": "kg",
+                                "length": null,
+                                "width": null,
+                                "height": null,
+                                "is_bundle_product": null,
+                                "bundle_child_ids": []
+                              },
+                              "media": []
+                            }
+                          ],
+                          "category_terms": [],
+                          "categories": []
                         },
                         {
                           "ID": 124,
                           "post_title": "Cloud Hosting Starter",
+                          "post_content": "",
+                          "post_excerpt": "",
                           "post_status": "draft",
-                          "post_date": "2025-06-20 08:30:00",
+                          "view_url": "https://yoursite.com/?post_type=fluent-products&p=124",
+                          "gallery": [],
                           "detail": {
-                            "id": 90,
-                            "post_id": 124,
+                            "variation_type": "simple_variations",
                             "fulfillment_type": "digital",
-                            "min_price": 1900,
-                            "max_price": 4900,
-                            "variation_type": "single",
-                            "formatted_min_price": "$19.00",
-                            "formatted_max_price": "$49.00"
-                          }
+                            "manage_stock": 1
+                          },
+                          "variants": [
+                            {
+                              "id": 3,
+                              "post_id": 124,
+                              "variation_title": "Monthly Plan",
+                              "sku": "CLOUD-HOST-M",
+                              "item_price": 19.0,
+                              "compare_price": 0,
+                              "payment_type": "onetime",
+                              "manage_stock": 1,
+                              "total_stock": 1,
+                              "available": 1,
+                              "stock_status": "in-stock",
+                              "serial_index": 1,
+                              "fulfillment_type": "digital",
+                              "other_info": {
+                                "description": "",
+                                "payment_type": "onetime",
+                                "tax_class": "standard",
+                                "tax_exempt": "no",
+                                "tax_inclusion": "",
+                                "package_slug": "",
+                                "weight": null,
+                                "weight_unit": "kg",
+                                "length": null,
+                                "width": null,
+                                "height": null,
+                                "is_bundle_product": null,
+                                "bundle_child_ids": []
+                              },
+                              "media": []
+                            }
+                          ],
+                          "category_terms": [],
+                          "categories": []
                         }
                       ],
-                      "columns": [
-                        {
-                          "key": "post_title",
-                          "label": "Product Title",
-                          "editable": true
-                        },
-                        {
-                          "key": "post_status",
-                          "label": "Status",
-                          "editable": true
-                        },
-                        {
-                          "key": "fulfillment_type",
-                          "label": "Fulfillment",
-                          "editable": true
-                        }
-                      ]
+                      "total": 2,
+                      "per_page": 10,
+                      "page": 1
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`products/edit`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

@@ -27,7 +27,7 @@
       "post": {
         "operationId": "updateZoneOrder",
         "summary": "POST Update Zone Order",
-        "description": "Reorder shipping zones by providing an array of zone IDs in the desired order. Each zone's order field is updated to match its index position.",
+        "description": "Reorder shipping zones by providing an array of zone IDs in the desired order. Each zone's order field is updated to match its index position.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Shipping"
         ],
@@ -138,6 +138,34 @@
                     "value": {
                       "message": "Invalid data provided"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

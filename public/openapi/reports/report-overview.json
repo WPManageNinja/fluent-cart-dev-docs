@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getReportOverview",
         "summary": "GET Get Report Overview",
-        "description": "Retrieve an aggregated report overview including order summary statistics and breakdowns by payment method.",
+        "description": "Retrieve an aggregated report overview including order summary statistics and breakdowns by payment method.\n\n**Access policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -55,109 +55,161 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "_deprecated": {
+                      "type": "string",
+                      "description": "Present because this endpoint is deprecated since v1.4. Use GET /reports/overview instead."
+                    },
                     "data": {
                       "type": "object",
-                      "description": "Aggregated report data"
+                      "description": "Aggregated order totals for the filtered period. Note: values are numeric strings (raw SQL aggregate results) and amounts are in cents.",
+                      "properties": {
+                        "total_sales": {
+                          "type": "string",
+                          "description": "Total sales amount, in cents."
+                        },
+                        "net_sales": {
+                          "type": "string",
+                          "description": "Net sales amount (after discounts), in cents."
+                        },
+                        "total_discounts": {
+                          "type": "string",
+                          "description": "Total discount amount, in cents."
+                        },
+                        "total_shipping_tax": {
+                          "type": "string",
+                          "description": "Total shipping tax amount, in cents."
+                        },
+                        "average_order_value": {
+                          "type": "string",
+                          "description": "Average order value, in cents."
+                        },
+                        "customer_order_count": {
+                          "type": "string",
+                          "description": "Number of orders counted."
+                        }
+                      }
                     },
                     "orders_by_payment_method": {
-                      "type": "object",
-                      "description": "Order breakdown by payment method"
+                      "type": "array",
+                      "description": "Order counts and transaction totals broken down by payment method.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "payment_method": {
+                            "type": "string"
+                          },
+                          "order_count": {
+                            "type": "string"
+                          },
+                          "transactions": {
+                            "type": "string",
+                            "description": "Total transaction amount for this payment method, in cents."
+                          }
+                        }
+                      }
                     }
                   },
                   "example": {
+                    "_deprecated": "This endpoint is deprecated since v1.4 and will be removed in a future release. Use GET /fluent-cart/v2/reports/overview instead.",
                     "data": {
-                      "total_orders": 342,
-                      "total_revenue": 1250000,
-                      "net_revenue": 1180000,
-                      "total_tax": 95000,
-                      "total_shipping": 35000,
-                      "total_discounts": 42000,
-                      "total_refunds": 70000,
-                      "average_order_value": 3655,
-                      "total_customers": 215
+                      "total_sales": "1086707",
+                      "net_sales": "1009851",
+                      "total_discounts": "76856",
+                      "total_shipping_tax": "0",
+                      "average_order_value": "229.5051",
+                      "customer_order_count": "473"
                     },
-                    "orders_by_payment_method": {
-                      "stripe": {
-                        "count": 230,
-                        "revenue": 850000,
-                        "percentage": 67.3
+                    "orders_by_payment_method": [
+                      {
+                        "payment_method": "stripe",
+                        "order_count": "421",
+                        "transactions": "880637"
                       },
-                      "paypal": {
-                        "count": 95,
-                        "revenue": 320000,
-                        "percentage": 27.8
-                      },
-                      "cod": {
-                        "count": 17,
-                        "revenue": 80000,
-                        "percentage": 4.9
+                      {
+                        "payment_method": "offline_payment",
+                        "order_count": "52",
+                        "transactions": "26970"
                       }
-                    }
+                    ]
                   }
                 },
                 "example": {
+                  "_deprecated": "This endpoint is deprecated since v1.4 and will be removed in a future release. Use GET /fluent-cart/v2/reports/overview instead.",
                   "data": {
-                    "total_orders": 342,
-                    "total_revenue": 1250000,
-                    "net_revenue": 1180000,
-                    "total_tax": 95000,
-                    "total_shipping": 35000,
-                    "total_discounts": 42000,
-                    "total_refunds": 70000,
-                    "average_order_value": 3655,
-                    "total_customers": 215
+                    "total_sales": "1086707",
+                    "net_sales": "1009851",
+                    "total_discounts": "76856",
+                    "total_shipping_tax": "0",
+                    "average_order_value": "229.5051",
+                    "customer_order_count": "473"
                   },
-                  "orders_by_payment_method": {
-                    "stripe": {
-                      "count": 230,
-                      "revenue": 850000,
-                      "percentage": 67.3
+                  "orders_by_payment_method": [
+                    {
+                      "payment_method": "stripe",
+                      "order_count": "421",
+                      "transactions": "880637"
                     },
-                    "paypal": {
-                      "count": 95,
-                      "revenue": 320000,
-                      "percentage": 27.8
-                    },
-                    "cod": {
-                      "count": 17,
-                      "revenue": 80000,
-                      "percentage": 4.9
+                    {
+                      "payment_method": "offline_payment",
+                      "order_count": "52",
+                      "transactions": "26970"
                     }
-                  }
+                  ]
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
+                      "_deprecated": "This endpoint is deprecated since v1.4 and will be removed in a future release. Use GET /fluent-cart/v2/reports/overview instead.",
                       "data": {
-                        "total_orders": 342,
-                        "total_revenue": 1250000,
-                        "net_revenue": 1180000,
-                        "total_tax": 95000,
-                        "total_shipping": 35000,
-                        "total_discounts": 42000,
-                        "total_refunds": 70000,
-                        "average_order_value": 3655,
-                        "total_customers": 215
+                        "total_sales": "1086707",
+                        "net_sales": "1009851",
+                        "total_discounts": "76856",
+                        "total_shipping_tax": "0",
+                        "average_order_value": "229.5051",
+                        "customer_order_count": "473"
                       },
-                      "orders_by_payment_method": {
-                        "stripe": {
-                          "count": 230,
-                          "revenue": 850000,
-                          "percentage": 67.3
+                      "orders_by_payment_method": [
+                        {
+                          "payment_method": "stripe",
+                          "order_count": "421",
+                          "transactions": "880637"
                         },
-                        "paypal": {
-                          "count": 95,
-                          "revenue": 320000,
-                          "percentage": 27.8
-                        },
-                        "cod": {
-                          "count": 17,
-                          "revenue": 80000,
-                          "percentage": 4.9
+                        {
+                          "payment_method": "offline_payment",
+                          "order_count": "52",
+                          "transactions": "26970"
                         }
-                      }
+                      ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

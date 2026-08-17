@@ -27,7 +27,7 @@
       "post": {
         "operationId": "deactivateSiteCustomer",
         "summary": "POST Deactivate Site (Customer)",
-        "description": "Deactivate a specific site from a license. The customer can only deactivate sites from their own licenses.",
+        "description": "Deactivate a specific site from a license. The customer can only deactivate sites from their own licenses.\n\n**Policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Licensing"
         ],
@@ -150,7 +150,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

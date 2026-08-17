@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSetupIntentAttempts",
         "summary": "GET Get Setup Intent Remaining Attempts",
-        "description": "Check how many Stripe SetupIntent attempts remain for the customer. Used to enforce rate limiting on payment method update attempts. Only works when the subscription's current_payment_method is stripe.",
+        "description": "Check how many Stripe SetupIntent attempts remain for the customer. Used to enforce rate limiting on payment method update attempts. Only works when the subscription's current_payment_method is stripe.\n\n**Access policy:** `CustomerFrontendPolicy`\n\n**Access policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Subscriptions"
         ],
@@ -97,6 +97,49 @@
                     "value": {
                       "message": "Payment method not supported"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

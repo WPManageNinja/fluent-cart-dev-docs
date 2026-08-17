@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getProductViews",
         "summary": "GET Get Product Views",
-        "description": "Retrieve server-rendered HTML views of product listings. Used by Gutenberg blocks and shortcodes for AJAX-powered product grids.",
+        "description": "Retrieve server-rendered HTML views of product listings. Used by Gutenberg blocks and shortcodes for AJAX-powered product grids.\n\n**Access policy:** `PublicPolicy`",
         "tags": [
           "Public Shop"
         ],
@@ -166,6 +166,10 @@
                         },
                         "to": {
                           "type": "integer"
+                        },
+                        "page": {
+                          "type": "integer",
+                          "description": "Current page number (duplicate of `current_page`)"
                         }
                       }
                     }
@@ -178,7 +182,8 @@
                       "total": 24,
                       "per_page": 10,
                       "from": 1,
-                      "to": 10
+                      "to": 10,
+                      "page": 1
                     }
                   }
                 },
@@ -190,7 +195,8 @@
                     "total": 24,
                     "per_page": 10,
                     "from": 1,
-                    "to": 10
+                    "to": 10,
+                    "page": 1
                   }
                 },
                 "examples": {
@@ -204,9 +210,38 @@
                         "total": 24,
                         "per_page": 10,
                         "from": 1,
-                        "to": 10
+                        "to": 10,
+                        "page": 1
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

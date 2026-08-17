@@ -1,0 +1,249 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/renewals/{order}/void": {
+      "post": {
+        "operationId": "void",
+        "summary": "POST Void Renewal Invoice",
+        "description": "Cancel a pending or scheduled renewal invoice. Sets the order's payment_status to failed and status to canceled, fails any pending transactions on it, advances the subscription past this billing period so the scheduler doesn't immediately regenerate the same invoice, and recounts the customer's stats. If the invoice was paid by a concurrent webhook between validation and the update, the void is rejected instead of overwriting a paid invoice.\n\n**Required permission:** `orders/manage`",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Renewal order ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Renewal invoice voided.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "message": "Renewal order has been voided successfully"
+                  }
+                },
+                "example": {
+                  "message": "Renewal order has been voided successfully"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Renewal order has been voided successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Order is not a renewal, or is not pending/scheduled.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Only pending or scheduled invoices can be voided"
+                },
+                "schema": {
+                  "example": {
+                    "message": "Only pending or scheduled invoices can be voided"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Only pending or scheduled invoices can be voided"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 401
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 401
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user lacks the orders/manage permission.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                },
+                "schema": {
+                  "example": {
+                    "code": "rest_forbidden",
+                    "message": "Sorry, you are not allowed to do that.",
+                    "data": {
+                      "status": 403
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "code": "rest_forbidden",
+                      "message": "Sorry, you are not allowed to do that.",
+                      "data": {
+                        "status": 403
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No order matches the given ID. Thrown by the framework's route-model-binding, not an explicit controller check, so the message is generic and names the model class.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\Order]."
+                },
+                "schema": {
+                  "example": {
+                    "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\Order]."
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "No query results for model [FluentCart\\\\App\\\\Models\\\\Order]."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The invoice was paid by a concurrent webhook and can no longer be voided.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "This invoice was just paid and can no longer be voided"
+                },
+                "schema": {
+                  "example": {
+                    "message": "This invoice was just paid and can no longer be voided"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "This invoice was just paid and can no longer be voided"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

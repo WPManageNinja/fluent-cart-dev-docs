@@ -27,7 +27,7 @@
       "post": {
         "operationId": "createCoupon",
         "summary": "POST Create Coupon",
-        "description": "Create a new discount coupon.",
+        "description": "Create a new discount coupon.\n\n**Required permission:** `coupons/manage`",
         "tags": [
           "Coupons"
         ],
@@ -485,6 +485,34 @@
                         ]
                       }
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`coupons/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

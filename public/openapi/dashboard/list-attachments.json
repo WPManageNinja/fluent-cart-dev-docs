@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listAttachments",
         "summary": "GET List Attachments",
-        "description": "Retrieve all image attachments from the WordPress media library. Used for the media picker in the admin interface.",
+        "description": "Retrieve all image attachments from the WordPress media library. Used for the media picker in the admin interface.\n\n**Access policy:** `AdminPolicy` \u2014 requires the `is_super_admin` FluentCart capability.",
         "tags": [
           "Dashboard"
         ],
@@ -126,6 +126,34 @@
                     "value": {
                       "message": "No Images Found"
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
                   }
                 }
               }

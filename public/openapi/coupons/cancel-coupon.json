@@ -27,7 +27,7 @@
       "post": {
         "operationId": "cancelCoupon",
         "summary": "POST Cancel Coupon",
-        "description": "Remove a coupon from an order and recalculate the remaining discounts. If an order_uuid is provided and the coupon was already persisted to the order, it is deleted from the fct_applied_coupons table and the coupon's use_count is decremented.",
+        "description": "Remove a coupon from an order and recalculate the remaining discounts. If an order_uuid is provided and the coupon was already persisted to the order, it is deleted from the fct_applied_coupons table and the coupon's use_count is decremented.\n\n**Required permissions:** all of `orders/create`, `orders/manage`",
         "tags": [
           "Coupons"
         ],
@@ -240,6 +240,49 @@
                         }
                       ]
                     }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/create, orders/manage`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

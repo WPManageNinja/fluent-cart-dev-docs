@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listCustomerLicenses",
         "summary": "GET List Customer Licenses",
-        "description": "Retrieve a paginated list of licenses belonging to the currently logged-in customer.",
+        "description": "Retrieve a paginated list of licenses belonging to the currently logged-in customer.\n\n**Policy:** `CustomerFrontendPolicy`",
         "tags": [
           "Licensing"
         ],
@@ -241,7 +241,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

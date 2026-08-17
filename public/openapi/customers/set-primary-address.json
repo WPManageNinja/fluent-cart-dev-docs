@@ -27,7 +27,7 @@
       "post": {
         "operationId": "setPrimaryAddress",
         "summary": "POST Set Primary Address",
-        "description": "Set a specific address as the primary address for its type. The previous primary address of the same type is automatically demoted.",
+        "description": "Set a specific address as the primary address for its type. The previous primary address of the same type is automatically demoted.\n\n**Also used by the customer portal UI.** Mark a specific address as the primary address for its type (billing or shipping). All other addresses of the same type are demoted.\n\n**Required permission:** `customers/manage`",
         "tags": [
           "Customers"
         ],
@@ -54,38 +54,52 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "addressId",
-                  "type"
+                  "address"
                 ],
                 "properties": {
-                  "addressId": {
-                    "type": "integer",
-                    "description": "The address record ID to make primary"
-                  },
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "billing",
-                      "shipping"
+                  "address": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "type"
                     ],
-                    "description": "Address type: billing or shipping"
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "The address record ID to set as primary"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "billing",
+                          "shipping"
+                        ],
+                        "description": "Address type: `billing` or `shipping`"
+                      }
+                    }
                   }
                 },
                 "example": {
-                  "addressId": 25,
-                  "type": "billing"
+                  "address": {
+                    "id": 5,
+                    "type": "billing"
+                  }
                 }
               },
               "example": {
-                "addressId": 25,
-                "type": "billing"
+                "address": {
+                  "id": 5,
+                  "type": "billing"
+                }
               },
               "examples": {
                 "default": {
                   "summary": "Example request",
                   "value": {
-                    "addressId": 25,
-                    "type": "billing"
+                    "address": {
+                      "id": 5,
+                      "type": "billing"
+                    }
                   }
                 }
               }
@@ -152,6 +166,58 @@
                       "message": "Address set as primary failed.",
                       "data": ""
                     }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. The authenticated user does not own this address.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You are not authorized to update this address"
+                },
+                "schema": {
+                  "example": {
+                    "message": "You are not authorized to update this address"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "You are not authorized to update this address"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or the referenced record does not exist.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "field_name": [
+                      "This field is required."
+                    ]
                   }
                 }
               }

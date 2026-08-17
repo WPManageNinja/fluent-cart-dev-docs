@@ -578,6 +578,40 @@ add_filter('fluent_cart/subscription/can_reactivate', function($canReactivate, $
 ```
 </details>
 
+### <code> subscription/vendor_id_editing_enabled </code>
+<details>
+<summary><code>fluent_cart/subscription/vendor_id_editing_enabled</code> &mdash; Opt in to admin editing of gateway identifiers</summary>
+
+**When it runs:**
+First statement of `Subscription::canEditVendorIds()`, which is the single gate behind the admin "Edit Vendor IDs" action, the `canEditVendorIds` / `canVerifyVendorIds` permission flags, the `vendor-ids` write endpoint and the `verify-vendor-ids` lookup endpoint. Default is `false`, so the whole feature is off until a site opts in.
+
+**Parameters:**
+
+- `$enabled` (bool): `false` by default
+
+**Returns:**
+- `$enabled` (bool): `true` to expose the repair tool
+
+**Source:** `app/Models/Subscription.php:900`
+
+**Usage:**
+```php
+add_filter('fluent_cart/subscription/vendor_id_editing_enabled', '__return_true');
+```
+
+::: warning This column is what gateway webhooks resolve on
+`fct_subscriptions.vendor_subscription_id` is indexed but not unique, and every gateway IPN finds its subscription through it. Enable this only while a migration or support repair is in progress, or scope it — for example to a single administrator:
+
+```php
+add_filter('fluent_cart/subscription/vendor_id_editing_enabled', function ($enabled) {
+    return current_user_can('manage_options') && defined('FLUENTCART_ALLOW_VENDOR_ID_EDIT');
+});
+```
+:::
+
+See [Editing Vendor IDs](/modules/subscription-vendor-ids) for the full feature.
+</details>
+
 ### <code> available_subscription_interval_options </code>
 <details>
 <summary><code>fluent_cart/available_subscription_interval_options</code> &mdash; Filter subscription interval options</summary>

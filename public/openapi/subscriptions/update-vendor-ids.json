@@ -1,0 +1,175 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/subscriptions/{subscription}/vendor-ids": {
+      "put": {
+        "operationId": "updateVendorIds",
+        "summary": "PUT Update Vendor IDs",
+        "description": "Correct the gateway identifiers (vendor_subscription_id, vendor_customer_id) on a gateway-billed subscription. Opt-in: the endpoint returns an error unless the site enables the `fluent_cart/subscription/vendor_id_editing_enabled` filter. Writes only the identifier columns — no renewal is voided, no invoice re-synced, no status event dispatched, and the payment gateway is not called. Only the keys sent are written. The new vendor_subscription_id is claimed atomically, so another subscription on the same payment method cannot already hold it.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The parent order ID"
+          },
+          {
+            "name": "subscription",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The subscription ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vendor_subscription_id": {
+                    "type": "string",
+                    "maxLength": 45,
+                    "pattern": "^[a-zA-Z0-9_.-]+$",
+                    "description": "The subscription ID at the payment gateway. Send an empty string to clear it. Omit the key to leave it untouched."
+                  },
+                  "vendor_customer_id": {
+                    "type": "string",
+                    "maxLength": 45,
+                    "pattern": "^[a-zA-Z0-9_.-]+$",
+                    "description": "The customer ID at the payment gateway. Send an empty string to clear it. Omit the key to leave it untouched."
+                  }
+                },
+                "example": {
+                  "vendor_subscription_id": "sub_1P9xyzABCdef",
+                  "vendor_customer_id": "cus_NffrFeUfNV2Hib"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vendor IDs updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "subscription": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "message": "Vendor IDs have been updated successfully!",
+                      "subscription": {
+                        "id": 1,
+                        "status": "active",
+                        "collection_method": "automatic",
+                        "current_payment_method": "stripe",
+                        "vendor_subscription_id": "sub_1P9xyzABCdef",
+                        "vendor_customer_id": "cus_NffrFeUfNV2Hib"
+                      }
+                    }
+                  },
+                  "notEditable": {
+                    "summary": "Feature disabled or subscription not eligible",
+                    "value": {
+                      "message": "Vendor IDs can only be edited on an active gateway-billed subscription."
+                    }
+                  },
+                  "duplicate": {
+                    "summary": "Another subscription already holds the ID",
+                    "value": {
+                      "message": "Another subscription on this payment method is already using this Vendor Subscription ID."
+                    }
+                  },
+                  "noChanges": {
+                    "summary": "Payload matches the stored values",
+                    "value": {
+                      "message": "No changes detected."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Invalid ID format",
+                    "value": {
+                      "vendor_subscription_id": [
+                        "Vendor IDs may only contain letters, numbers, dots, dashes and underscores."
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

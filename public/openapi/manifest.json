@@ -355,6 +355,8 @@
     "/openapi/public/subscriptions/resume-subscription.json",
     "/openapi/public/subscriptions/switch-payment-method.json",
     "/openapi/public/subscriptions/update-payment-method.json",
+    "/openapi/public/subscriptions/update-vendor-ids.json",
+    "/openapi/public/subscriptions/verify-vendor-ids.json",
     "/openapi/public/tax/create-tax-class.json",
     "/openapi/public/tax/create-tax-rate.json",
     "/openapi/public/tax/delete-product-override.json",
@@ -383,5 +385,5 @@
     "/openapi/public/tax/update-country-status.json",
     "/openapi/public/tax/update-tax-rate.json"
   ],
-  "generated": "2026-07-29T13:16:51.590Z"
+  "generated": "2026-08-17T10:25:46.877Z"
 }

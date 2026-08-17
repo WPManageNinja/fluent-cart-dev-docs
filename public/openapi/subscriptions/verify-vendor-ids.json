@@ -1,0 +1,187 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/{order}/subscriptions/{subscription}/verify-vendor-ids": {
+      "post": {
+        "operationId": "verifyVendorIds",
+        "summary": "POST Verify Vendor IDs",
+        "description": "Read-only lookup of a candidate vendor subscription ID at the payment gateway, used before saving a correction. Writes nothing locally and nothing at the gateway. Requires the `fluent_cart/subscription/vendor_id_editing_enabled` filter and a gateway declaring the `verify_vendor_ids` capability (Stripe and PayPal); other gateways return an error. A successful lookup proves the ID exists in the merchant account whose credentials this store holds — it is not proof of ownership, since one merchant account can back several stores.",
+        "tags": [
+          "Subscriptions"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The parent order ID"
+          },
+          {
+            "name": "subscription",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The subscription ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vendor_subscription_id": {
+                    "type": "string",
+                    "maxLength": 45,
+                    "pattern": "^[a-zA-Z0-9_.-]+$",
+                    "description": "The candidate subscription ID to look up"
+                  },
+                  "vendor_customer_id": {
+                    "type": "string",
+                    "maxLength": 45,
+                    "pattern": "^[a-zA-Z0-9_.-]+$",
+                    "description": "The candidate customer ID. Sent because some gateways nest the subscription under its customer."
+                  }
+                },
+                "example": {
+                  "vendor_subscription_id": "sub_1P9xyzABCdef",
+                  "vendor_customer_id": "cus_NffrFeUfNV2Hib"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lookup result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "verification": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "The gateway's own status string"
+                        },
+                        "customer_id": {
+                          "type": "string"
+                        },
+                        "amount": {
+                          "type": "string",
+                          "description": "Decimal amount, empty when the gateway does not report one"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "next_billing_date": {
+                          "type": "string",
+                          "description": "GMT, Y-m-d H:i:s; empty when unknown"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Subscription found",
+                    "value": {
+                      "message": "Subscription found at the payment gateway.",
+                      "verification": {
+                        "id": "sub_1P9xyzABCdef",
+                        "status": "active",
+                        "customer_id": "cus_NffrFeUfNV2Hib",
+                        "amount": "29.00",
+                        "currency": "USD",
+                        "next_billing_date": "2026-09-01 00:00:00"
+                      }
+                    }
+                  },
+                  "unsupported": {
+                    "summary": "Gateway does not support lookup",
+                    "value": {
+                      "message": "This payment method does not support subscription lookup."
+                    }
+                  },
+                  "notEditable": {
+                    "summary": "Feature disabled or subscription not eligible",
+                    "value": {
+                      "message": "Vendor IDs can only be edited on an active gateway-billed subscription."
+                    }
+                  },
+                  "gatewayError": {
+                    "summary": "Gateway rejected the lookup",
+                    "value": {
+                      "message": "No such subscription: 'sub_1P9xyzABCdef'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

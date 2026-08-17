@@ -325,6 +325,114 @@ curl -X PUT "https://example.com/wp-json/fluent-cart/v2/orders/10/subscriptions/
 
 ---
 
+### Update Vendor IDs <Badge type="warning" text="Opt-in" />
+
+<badge type="warning">PUT</badge> `/fluent-cart/v2/orders/{order}/subscriptions/{subscription}/vendor-ids`
+
+Correct the gateway identifiers on a gateway-billed (`automatic`) subscription. Writes only `vendor_subscription_id` / `vendor_customer_id` — no renewal is voided, no invoice re-synced, no status event dispatched, and the gateway is not called.
+
+Disabled unless the site opts in:
+
+```php
+add_filter('fluent_cart/subscription/vendor_id_editing_enabled', '__return_true');
+```
+
+- **Permission:** `subscriptions/manage`
+- **Policy:** `OrderPolicy`
+- **Guide:** [Editing Vendor IDs](/modules/subscription-vendor-ids)
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `order` | integer | path | Yes | The parent order ID |
+| `subscription` | integer | path | Yes | The subscription ID |
+| `vendor_subscription_id` | string | body | No | Max 45 chars, `^[a-zA-Z0-9_.-]+$`. Omit to leave untouched; send `""` to clear |
+| `vendor_customer_id` | string | body | No | Same constraints |
+
+At least one of the two body fields must be present. The new `vendor_subscription_id` is claimed atomically — no other subscription on the same payment method may already hold it.
+
+#### Response
+
+```json
+{
+  "message": "Vendor IDs have been updated successfully!",
+  "subscription": {
+    "id": 1,
+    "collection_method": "automatic",
+    "current_payment_method": "stripe",
+    "vendor_subscription_id": "sub_1P9xyzABCdef",
+    "vendor_customer_id": "cus_NffrFeUfNV2Hib"
+  }
+}
+```
+
+#### Error Responses
+
+```json
+{ "message": "Vendor IDs can only be edited on an active gateway-billed subscription." }
+{ "message": "Another subscription on this payment method is already using this Vendor Subscription ID." }
+{ "message": "No changes detected." }
+```
+
+#### Example
+
+```bash
+curl -X PUT "https://example.com/wp-json/fluent-cart/v2/orders/10/subscriptions/1/vendor-ids" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{"vendor_subscription_id": "sub_1P9xyzABCdef"}'
+```
+
+---
+
+### Verify Vendor IDs <Badge type="warning" text="Opt-in" />
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/orders/{order}/subscriptions/{subscription}/verify-vendor-ids`
+
+Read-only lookup of a **candidate** id at the payment gateway, used before saving a correction. Writes nothing anywhere. Requires the same opt-in filter, plus a gateway declaring the `verify_vendor_ids` capability — Stripe and PayPal; every other gateway answers "This payment method does not support subscription lookup."
+
+- **Permission:** `subscriptions/manage`
+- **Policy:** `OrderPolicy`
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `order` | integer | path | Yes | The parent order ID |
+| `subscription` | integer | path | Yes | The subscription ID |
+| `vendor_subscription_id` | string | body | Yes | The candidate subscription ID to look up |
+| `vendor_customer_id` | string | body | No | Sent because some gateways nest the subscription under its customer |
+
+#### Response
+
+```json
+{
+  "message": "Subscription found at the payment gateway.",
+  "verification": {
+    "id": "sub_1P9xyzABCdef",
+    "status": "active",
+    "customer_id": "cus_NffrFeUfNV2Hib",
+    "amount": "29.00",
+    "currency": "USD",
+    "next_billing_date": "2026-09-01 00:00:00"
+  }
+}
+```
+
+A hit proves the id exists in the merchant account whose credentials this store holds — not that it belongs to this store, since one merchant account can back several stores. Verification is advisory; the duplicate check on save is the hard guard.
+
+#### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/orders/10/subscriptions/1/verify-vendor-ids" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{"vendor_subscription_id": "sub_1P9xyzABCdef"}'
+```
+
+---
+
 ### Generate Early Payment Link
 
 <badge type="warning">POST</badge> `/fluent-cart/v2/orders/{order}/subscriptions/{subscription}/early-payment-link`

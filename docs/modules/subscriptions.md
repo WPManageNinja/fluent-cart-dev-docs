@@ -137,6 +137,8 @@ Declared as `$supportedFeatures` on each gateway; tested with `AbstractPaymentGa
 
 `manual_subscription` is independent of `system_subscription` — it only claims a gateway routes a store-managed subscription's first payment through its existing one-time-charge path instead of creating a vendor subscription (`shouldChargeSubscriptionAsOneTime()`, below). COD/offline don't need it: `storeBilledOnly()` already admits them via `has('offline')` / `!has('subscriptions')`. MercadoPago and SSLCommerz declare it anyway even though the same `!has('subscriptions')` short-circuit already admits them — it's redundant, not load-bearing.
 
+A seventh flag, `verify_vendor_ids`, is unrelated to billing: it claims the gateway can look a subscription id up read-only, which the [vendor-id repair tool](/modules/subscription-vendor-ids) uses to preview a correction before it is saved. Only Stripe and PayPal declare it; every other gateway inherits `AbstractSubscriptionModule::verifyVendorSubscription()`, which returns `not_implemented`.
+
 The actual admit/hide decision for store-managed checkout lives in `SubscriptionGatewayGate::storeBilledOnly()` (`app/Modules/Subscriptions/Services/SubscriptionGatewayGate.php`):
 
 ```php
@@ -547,6 +549,7 @@ See [Subscription action hooks](/hooks/actions/subscriptions) for payloads and p
 | **Charge an open renewal now** | ❌ | ❌ | ✅ (one off-session attempt) | `canChargeNow` |
 | Update card on file | ✅ | ✅ | ✅ | `canUpdatePaymentMethod()` |
 | **Switch gateway** | ✅ | ❌ | ❌ | `canSwitchPaymentMethod()` |
+| **[Edit vendor IDs](/modules/subscription-vendor-ids)** | ✅ opt-in | ❌ | ❌ | `canEditVendorIds()` — off unless `fluent_cart/subscription/vendor_id_editing_enabled` returns `true` |
 | Pay Now on an open renewal | n/a | ✅ | ✅ (cancels the queued charge) | — |
 
 Two asymmetries deserve explanation.
@@ -569,6 +572,7 @@ Two asymmetries deserve explanation.
 | `fluent_cart/subscription_collection_method_{gateway}` | filter — `CheckoutProcessor` |
 | `fluent_cart/subscription/management_mode` | filter — `SubscriptionManagementMode`, store-wide mode override |
 | `fluent_cart/checkout_active_payment_methods` | filter — `SubscriptionGatewayGate` gates every subscription cart here |
+| `fluent_cart/subscription/vendor_id_editing_enabled` | filter, default `false` — opt in to [editing vendor identifiers](/modules/subscription-vendor-ids) on an `automatic` subscription |
 
 ### Renewal engine
 
@@ -637,6 +641,7 @@ Recorded so nobody rediscovers them the hard way.
 - [Subscription Action Hooks](/hooks/actions/subscriptions) — lifecycle event payloads
 - [Subscription Filter Hooks](/hooks/filters/customers-and-subscriptions) — advance window, grace, retry offsets
 - [Subscriptions API](/api/subscriptions) — admin and customer REST endpoints
+- [Editing Vendor IDs](/modules/subscription-vendor-ids) — opt-in repair of `vendor_subscription_id` / `vendor_customer_id`
 - [Payment Methods Module](/modules/payment-methods) — the gateway architecture subscriptions build on
 
 ---

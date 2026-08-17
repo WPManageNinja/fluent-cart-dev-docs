@@ -63,6 +63,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'initiate-early-payment', 'generate-early-payment-link',
     'confirm-subscription-switch', 'get-or-create-plan',
     'fetch-subscription-remote', 'get-setup-intent-attempts',
+    'update-vendor-ids', 'verify-vendor-ids',
   ],
   tax: [
     'get-tax-settings', 'save-tax-settings',
@@ -656,6 +657,8 @@ export default defineConfig({
           text: 'Modules',
           items: [
             { text: 'Payment Methods', link: '/modules/payment-methods' },
+            { text: 'Subscriptions', link: '/modules/subscriptions' },
+            { text: 'Editing Vendor IDs', link: '/modules/subscription-vendor-ids' },
             { text: 'Shipping', link: '/modules/shipping' },
             { text: 'Storage Drivers', link: '/modules/storage' }
           ]

@@ -28,8 +28,8 @@ add_action('fluent_cart/register_payment_methods', function() {
 });
 ```
 
-::: warning File loading order
-Load the files that define your gateway class (and call `add_action('fluent_cart/register_payment_methods', ...)`) on `plugins_loaded` with priority **20 or later** — not on `fluentcart_loaded`. FluentCart's own gateway classes (`AbstractPaymentGateway`, `BaseGatewaySettings`, etc.) aren't guaranteed to be autoloadable yet when `fluentcart_loaded` fires for your plugin, so registering there can fatal on class-not-found. `plugins_loaded` (priority 20+) runs after FluentCart has finished bootstrapping.
+::: warning Don't eagerly `require` your gateway class file
+`fluent_cart/register_payment_methods` fires on WordPress `init` (after FluentCart's own `plugins_loaded` → `fluentcart_loaded` → `init` chain), so calling `registerCustomPaymentMethod` inside it — as shown above — is already safe timing-wise. The pitfall is elsewhere: if your plugin's bootstrap `require`s the file that *defines* `class YourGateway extends AbstractPaymentGateway` too early (top-level in your main plugin file, or tied to `fluentcart_loaded`), PHP fatals on class-not-found at include time — `AbstractPaymentGateway`/`BaseGatewaySettings` may not exist yet at that point. Only `require`/autoload the gateway class file from inside the `fluent_cart/register_payment_methods` callback itself (or via lazy PSR-4 autoloading triggered by `new YourGateway()` there), same as the example above.
 :::
 
 Alternatively, you can register on the `init` hook (not recommended):
@@ -927,7 +927,7 @@ A few things that aren't obvious from the interface/base class alone and can cos
 - **`renderStoreModeNotice()` must be `public`.** It's called by the parent class to render the test/live mode notice in admin, so declaring it `protected`/`private` breaks the call even though it feels like an internal helper.
 - **`getOrderInfo(array $data)` is required.** It's declared on `PaymentGatewayInterface`, not flagged with an `abstract` keyword on `AbstractPaymentGateway` itself — easy to miss and skip, but omitting it is a fatal error.
 - **Read the store currency via `CurrencySettings::get('currency')`** (`FluentCart\App\Api\CurrencySettings`), not by re-deriving it from settings/options yourself.
-- **File load timing** — see the warning in [Step 1](#step-1-register-your-gateway): register on `plugins_loaded` priority 20+, not `fluentcart_loaded`.
+- **Don't eagerly `require` your gateway class file** — see the warning in [Step 1](#step-1-register-your-gateway). Load it lazily from inside the `fluent_cart/register_payment_methods` callback, not at plugin bootstrap or on `fluentcart_loaded`.
 
 ## Additional Resources
 

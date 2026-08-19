@@ -28,6 +28,10 @@ add_action('fluent_cart/register_payment_methods', function() {
 });
 ```
 
+::: warning File loading order
+Load the files that define your gateway class (and call `add_action('fluent_cart/register_payment_methods', ...)`) on `plugins_loaded` with priority **20 or later** — not on `fluentcart_loaded`. FluentCart's own gateway classes (`AbstractPaymentGateway`, `BaseGatewaySettings`, etc.) aren't guaranteed to be autoloadable yet when `fluentcart_loaded` fires for your plugin, so registering there can fatal on class-not-found. `plugins_loaded` (priority 20+) runs after FluentCart has finished bootstrapping.
+:::
+
 Alternatively, you can register on the `init` hook (not recommended):
 
 ```php
@@ -110,7 +114,9 @@ class YourGateway extends AbstractPaymentGateway
 
     public function __construct()
     {
-        // Initialize settings
+        // AbstractPaymentGateway::__construct() is type-enforced: it requires a
+        // BaseGatewaySettings instance as its first argument. Passing anything else
+        // (or omitting it) is a fatal TypeError, not a soft failure.
         parent::__construct(new YourGatewaySettings());
 
     }
@@ -171,6 +177,9 @@ class YourGateway extends AbstractPaymentGateway
     // For a comprehensive guide on building gateway settings fields,
     // see the detailed documentation: [Payment Gateway Settings Fields](./payment_setting_fields.md)
 
+    // Required: declared on PaymentGatewayInterface, not just a convention —
+    // omitting it is a fatal "abstract method not implemented" error, even though
+    // AbstractPaymentGateway doesn't spell it out with a PHP `abstract` keyword.
     #required: Get order information for frontend
     public function getOrderInfo(array $data)
     {
@@ -909,6 +918,16 @@ Learn more about hooks in [FluentCart Hooks](../hooks/) documentation.
 3. **Test Payment**: Test a one-time payment on the checkout page
 4. **Test Subscription**: Test a subscription product if supported
 5. **Test Web Hook**: Test web hook processing using a tool like RequestBin
+
+## Common Pitfalls
+
+A few things that aren't obvious from the interface/base class alone and can cost time to reverse-engineer:
+
+- **Amounts are already in minor units.** FluentCart stores/passes order and transaction amounts in minor units (cents/øre — e.g. `$5.00` is `500`). Do not multiply by 100 again when sending amounts to your gateway's API — that doubles (well, 100×s) every charge. Only convert if your gateway's API expects major units.
+- **`renderStoreModeNotice()` must be `public`.** It's called by the parent class to render the test/live mode notice in admin, so declaring it `protected`/`private` breaks the call even though it feels like an internal helper.
+- **`getOrderInfo(array $data)` is required.** It's declared on `PaymentGatewayInterface`, not flagged with an `abstract` keyword on `AbstractPaymentGateway` itself — easy to miss and skip, but omitting it is a fatal error.
+- **Read the store currency via `CurrencySettings::get('currency')`** (`FluentCart\App\Api\CurrencySettings`), not by re-deriving it from settings/options yourself.
+- **File load timing** — see the warning in [Step 1](#step-1-register-your-gateway): register on `plugins_loaded` priority 20+, not `fluentcart_loaded`.
 
 ## Additional Resources
 

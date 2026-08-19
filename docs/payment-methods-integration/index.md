@@ -105,7 +105,11 @@ FluentCart uses a custom event system to load payment methods in the checkout pa
 fluent_cart_load_payments_[payment_method_slug]
 ```
 
-Your JavaScript file should listen for this event and handle the payment process. Here's a simple example:
+::: warning Required
+Registering this listener and calling `e.detail.paymentLoader.enableCheckoutButton()` is mandatory for every gateway — FluentCart keeps the Place Order button greyed out until your listener enables it. See [Step 4 of the integration guide](./quick-implementation#step-4-create-javascript-file-for-frontend-checkout).
+:::
+
+Your JavaScript file must listen for this event and handle the payment process. Here's a simple example:
 
 ```javascript
 // Example for a simple payment method (like Cash on Delivery)

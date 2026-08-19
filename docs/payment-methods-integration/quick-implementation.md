@@ -216,7 +216,11 @@ Now your gateway registration is done, you will see your gateway in the payment 
 
 FluentCart uses a custom event system to load payment methods in the checkout page. When a customer selects your payment method, FluentCart triggers a custom event in the format: `fluent_cart_load_payments_[payment_method_slug]`.
 
-Your JavaScript file should listen for this event and handle the payment process accordingly. Here's a simple example:
+::: warning Required — the Place Order button stays disabled without this
+Every gateway **must** register a listener for its `fluent_cart_load_payments_[payment_method_slug]` event and call `e.detail.paymentLoader.enableCheckoutButton()` once the gateway is ready to accept the order. FluentCart keeps the Place Order button greyed out while the selected payment method is loading, and it is your listener's `enableCheckoutButton()` call that re-enables it. If the listener is missing (or never calls `enableCheckoutButton()`), the Place Order button stays greyed out and the customer cannot check out — even a gateway with no frontend UI (offline/COD-style) needs this listener.
+:::
+
+Your JavaScript file must listen for this event and handle the payment process accordingly. Here's a simple example:
 
 ```javascript
 window.addEventListener("fluent_cart_load_payments_your_gateway", function (e) {
@@ -401,11 +405,16 @@ private function handleOneTimePayment(PaymentInstance $paymentInstance)
             ...
         ]);
         
-        // Return redirect URL (for redirect-based gateways)            
+        // Return the redirect response (for redirect-based gateways)
         return [
-            'redirect_to' => $result['data']['checkout_url'],
-            'status'      => 'success',
-            'message'     => __('Order has been placed successfully', 'fluent-cart'),
+            'status'       => 'success',
+            'nextAction'   => 'your_gateway',
+            'actionName'   => 'redirect',
+            'message'      => __('Redirecting to payment...', 'fluent-cart'),
+            'response'     => $result,
+            'payment_args' => [
+                'checkout_url' => $result['data']['checkout_url'],
+            ],
         ];
     }
 }
@@ -448,6 +457,36 @@ private function handleOneTimePayment(PaymentInstance $paymentInstance)
 
 
 
+```
+
+### Return format of `makePaymentFromPaymentInstance()`
+
+The array returned from `makePaymentFromPaymentInstance()` tells the checkout frontend what to do next. The supported keys:
+
+| Key | Required | Description |
+|---|---|---|
+| `status` | Yes | `'success'` when the payment was initiated successfully. |
+| `actionName` | Yes* | What the frontend should do: `'redirect'` (send the browser to `payment_args.checkout_url`) or `'custom'` (dispatch a `fluent_cart_payment_next_action_{nextAction}` event for your own JS to handle). |
+| `nextAction` | Yes* | Your payment method slug. For `actionName: 'custom'` it names the event your JS listens to (`fluent_cart_payment_next_action_your_gateway`). |
+| `message` | No | Status message shown while processing. |
+| `response` | No | The raw gateway API response. For `actionName: 'custom'` your JS receives it in the event's `detail.response`. |
+| `payment_args` | For redirect | Array of arguments for the next action. For `actionName: 'redirect'`, `payment_args.checkout_url` is the URL the browser is sent to (works inside the modal/iframe checkout too — the top window is redirected). |
+
+\* Alternatively, returning a top-level `redirect_to` key redirects the browser to that URL directly without `actionName`/`payment_args`. The `actionName: 'redirect'` format above is the canonical one used by FluentCart's own gateways.
+
+For a redirect-based (hosted checkout) gateway, the full return looks like:
+
+```php
+return [
+    'status'       => 'success',
+    'nextAction'   => 'your_gateway',
+    'actionName'   => 'redirect',
+    'message'      => __('Redirecting...', 'fluent-cart'),
+    'response'     => $apiResponse,
+    'payment_args' => [
+        'checkout_url' => $redirectUrl,
+    ],
+];
 ```
 
 ## Step 6: Confirm Payment

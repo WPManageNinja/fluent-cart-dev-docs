@@ -541,7 +541,11 @@ add_filter('fluent_cart/product/show_section', function($show, $context) {
 <summary><code>fluent_cart/product/show_{$section}</code> &mdash; Filter whether a specific product render section should be shown</summary>
 
 **When it runs:**
-This dynamic filter is applied first inside `RenderGate::shouldRender()`, before the generic `fluent_cart/product/show_section` filter above wraps its result. The `{$section}` portion is the section name being gated — confirmed examples elsewhere in the renderer include `'title'` and `'image'`; other card/single-page blocks (excerpt, actions, etc.) follow the same pattern.
+This dynamic filter is applied first inside `RenderGate::shouldRender()`, before the generic `fluent_cart/product/show_section` filter above wraps its result. The `{$section}` portion is the section name being gated.
+
+**`{$section}` values:** `RenderGate::SECTIONS` is a fixed set of 9 &mdash; `image`, `title`, `excerpt`, `price`, `quantity`, `actions`, `add_to_cart_button`, `buy_now_button`, `buy_section`. That gives the concrete hook names `fluent_cart/product/show_image`, `show_title`, `show_excerpt`, `show_price`, `show_quantity`, `show_actions`, `show_add_to_cart_button`, `show_buy_now_button`, `show_buy_section`.
+
+Note: `actions` gates the whole purchase-actions row, and `shouldRenderPurchaseButton()` requires that row to be visible before `add_to_cart_button` or `buy_now_button` can render individually &mdash; hiding `actions` hides the buttons too, even if their own gates return `true`.
 
 **Parameters:**
 

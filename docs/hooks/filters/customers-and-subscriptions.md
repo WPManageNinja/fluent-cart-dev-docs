@@ -443,53 +443,12 @@ add_filter('fluent_cart/payment_methods/paypal_client_id', function($clientId, $
 
 ### <code> editable_customer_statuses </code>
 <details>
-<summary><code>fluent-cart/editable_customer_statuses</code> &mdash; Filter editable customer statuses</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent-cart/editable_customer_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/editable_customer_statuses`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter is applied when retrieving the list of customer statuses that can be set in the admin panel.
-
-**Parameters:**
-
-- `$statuses` (array): Associative array of status key => label
-    ```php
-    $statuses = [
-        'active' => 'Active',
-        'inactive' => 'Inactive'
-    ];
-    ```
-- `$context` (array): Additional context data (default: `[]`)
-
-**Returns:**
-- `$statuses` (array): The modified statuses array
-
-**Source:** `app/Helpers/Helper.php:312`, `app/Helpers/Status.php:350`
-
-**Usage:**
-```php
-add_filter('fluent-cart/editable_customer_statuses', function($statuses, $context) {
-    // Add a "suspended" customer status
-    $statuses['suspended'] = __('Suspended', 'my-plugin');
-    return $statuses;
-}, 10, 2);
-```
-
-::: warning Note
-This hook uses a hyphen separator (`fluent-cart/`) instead of the usual underscore separator (`fluent_cart/`).
-:::
-</details>
-
-### <code> editable_customer_statuses (current) </code>
-<details>
-<summary><code>fluent_cart/editable_customer_statuses</code> &mdash; Filter editable customer statuses (current hook)</summary>
+<summary><code>fluent_cart/editable_customer_statuses</code> &mdash; Filter editable customer statuses</summary>
 
 **When it runs:**
-The direct successor to the deprecated `fluent-cart/editable_customer_statuses` above — same call site, same value, underscore-separated `fluent_cart/` prefix.
+Applied when building the list of customer statuses an admin can set.
 
-**Source:** `app/Helpers/Status.php:383`
+**Source:** `app/Helpers/Status.php:375`
 
 **Parameters:**
 
@@ -575,7 +534,7 @@ This filter is applied when retrieving the list of all available subscription st
 **Returns:**
 - `$statuses` (array): The modified subscription statuses array
 
-**Source:** `app/Helpers/Status.php:271`
+**Source:** `app/Helpers/Status.php:265`
 
 **Usage:**
 ```php
@@ -605,7 +564,7 @@ This filter is applied when determining which subscription statuses should be co
 **Returns:**
 - `$statuses` (array): The modified list of valid statuses
 
-**Source:** `app/Helpers/Status.php:289`
+**Source:** `app/Helpers/Status.php:283`
 
 **Usage:**
 ```php
@@ -779,7 +738,7 @@ This filter is applied when retrieving the list of available subscription billin
 **Returns:**
 - `$intervals` (array): The modified intervals array
 
-**Source:** `app/Helpers/Helper.php:1772`
+**Source:** `app/Helpers/Helper.php:1740`
 
 **Usage:**
 ```php
@@ -819,7 +778,7 @@ This filter is applied when converting a subscription interval to its day count.
 **Returns:**
 - `$days` (int): The number of days in this interval
 
-**Source:** `app/Helpers/Helper.php:1833`, `app/Services/Payments/PaymentHelper.php:236`
+**Source:** `app/Helpers/Helper.php:1801`, `app/Services/Payments/PaymentHelper.php:282`
 
 **Usage:**
 ```php
@@ -861,7 +820,7 @@ This filter is applied when calculating adjusted trial days for a subscription i
 **Returns:**
 - `$maxDays` (int): The modified maximum trial days
 
-**Source:** `app/Helpers/Helper.php:1807`
+**Source:** `app/Helpers/Helper.php:1775`
 
 **Usage:**
 ```php
@@ -899,7 +858,7 @@ This filter is applied when generating the human-readable trial information text
 **Returns:**
 - `$trialInfo` (string): The modified trial info text
 
-**Source:** `app/Helpers/Helper.php:1370`
+**Source:** `app/Helpers/Helper.php:1339`
 
 **Usage:**
 ```php

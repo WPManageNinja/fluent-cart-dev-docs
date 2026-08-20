@@ -785,7 +785,7 @@ add_filter('fluent_cart/checkout_page_css_classes', function ($classes, $data) {
 **When it runs:**
 This filter fires during checkout page rendering, allowing you to inject notice messages that appear at the top of the checkout form.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:161`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:160`
 
 **Parameters:**
 
@@ -863,7 +863,7 @@ add_filter('fluent_cart/checkout/summary_extra_lines', function ($extraLines, $d
 **When it runs:**
 This filter fires after the billing address fields have been assembled and rearranged in the checkout renderer. It allows modification of the fully prepared billing field HTML structures before output.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:559`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:558`
 
 **Parameters:**
 
@@ -901,7 +901,7 @@ add_filter('fluent_cart/checkout_renderer/billing_fields', function ($fields, $d
 **When it runs:**
 This filter fires after shipping address fields have been assembled and validated in the checkout renderer, before they are output as HTML.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:632`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:631`
 
 **Parameters:**
 
@@ -939,7 +939,7 @@ add_filter('fluent_cart/checkout_renderer/shipping_fields', function ($fields, $
 **When it runs:**
 This filter fires when the checkout renderer decides whether to show the order notes textarea. By default, order notes are hidden when the cart contains only digital (non-shippable) products.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:671`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:670`
 
 **Parameters:**
 
@@ -971,8 +971,8 @@ add_filter('fluent_cart/disable_order_notes_for_digital_products', function ($di
 This filter fires when listing the available payment methods on both the standard checkout and modal checkout renderers. It lets you add, remove, or reorder payment gateway instances.
 
 **Source:**
-- `app/Services/Renderer/CheckoutRenderer.php:652`
-- `app/Services/Renderer/ModalCheckoutRenderer.php:450`
+- `app/Services/Renderer/CheckoutRenderer.php:781`
+- `app/Services/Renderer/ModalCheckoutRenderer.php:675`
 
 **Parameters:**
 
@@ -1011,7 +1011,7 @@ add_filter('fluent_cart/checkout_active_payment_methods', function ($methods, $d
 **When it runs:**
 This filter fires when the checkout submit button is being rendered, allowing you to change its label.
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:841`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:840`
 
 **Parameters:**
 
@@ -1030,57 +1030,13 @@ add_filter('fluent_cart/checkout_page_order_button_text', function ($text) {
 
 ### <code> payment_method_list_class </code>
 <details>
-<summary><code>fluent_cart_payment_method_list_class</code> &mdash; Add CSS classes to a payment method wrapper</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent_cart_payment_method_list_class` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/payment_method_list_class`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter fires when rendering each individual payment method option in both the standard and modal checkout. It lets you add custom CSS classes to the payment method container element.
-
-> **Note:** This hook uses a non-standard prefix (`fluent_cart_`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
-
-**Source:**
-- `app/Services/Renderer/CheckoutRenderer.php:797`
-- `app/Services/Renderer/ModalCheckoutRenderer.php:569`
-
-**Parameters:**
-
-- `$class` (string): The CSS class string. Default: `''`
-- `$data` (array): Context data
-    ```php
-    $data = [
-        'route'        => 'stripe',   // Payment method route/slug
-        'method_title' => 'Stripe',   // Display title
-        'method_style' => 'logo',     // Display style
-    ];
-    ```
-
-**Returns:**
-- `string` — The modified CSS class string
-
-**Usage:**
-```php
-add_filter('fluent_cart_payment_method_list_class', function ($class, $data) {
-    // Add a highlight class for COD payment
-    if ($data['route'] === 'cod') {
-        return $class . ' payment-method-highlighted';
-    }
-    return $class;
-}, 10, 2);
-```
-</details>
-
-### <code> payment_method_list_class (current) </code>
-<details>
-<summary><code>fluent_cart/payment_method_list_class</code> &mdash; Add CSS classes to a payment method wrapper (current hook)</summary>
+<summary><code>fluent_cart/payment_method_list_class</code> &mdash; Add CSS classes to a payment method wrapper</summary>
 
 **When it runs:**
-The direct successor to the deprecated `fluent_cart_payment_method_list_class` above — same call site, same value, `fluent_cart/` prefix. Fires when rendering each individual payment method option in both the standard and modal checkout.
+Fires when rendering each individual payment method option, in both the standard and the modal checkout. The returned string is appended to the payment method wrapper's class attribute.
 
 **Source:**
-- `app/Services/Renderer/CheckoutRenderer.php:939`
+- `app/Services/Renderer/CheckoutRenderer.php:938`
 - `app/Services/Renderer/ModalCheckoutRenderer.php:806`
 
 **Parameters:**
@@ -1172,7 +1128,7 @@ add_filter('fluent_cart/modal_checkout/before_payment_methods_placement', functi
 **When it runs:**
 This filter fires when checking whether modal (popup) checkout is enabled. By default, modal checkout is disabled.
 
-**Source:** `app/Helpers/Helper.php:1960`
+**Source:** `app/Helpers/Helper.php:1928`
 
 **Parameters:**
 

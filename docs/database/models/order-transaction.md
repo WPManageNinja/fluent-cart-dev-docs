@@ -314,7 +314,7 @@ $text = $transaction->getPaymentMethodText();
 Generate the receipt page URL for this transaction. Appends the `trx_hash` query parameter (the transaction's uuid) to the store's configured receipt page URL.
 
 * Parameters
-   * $filtered - boolean (optional, default `false`) - When `true`, applies the `fluentcart/transaction/receipt_page_url` filter
+   * $filtered - boolean (optional, default `true`) - When `true`, applies the `fluent_cart/transaction/receipt_page_url` filter
 * Returns `string` - The full receipt page URL
 
 #### Usage

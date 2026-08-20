@@ -1717,7 +1717,7 @@ The public license API returns simplified statuses:
 | `fluent_cart/license/check_item_id` | filter | Control whether `item_id` validation is enforced |
 | `fluent_cart/license/site_activated` | action | Fired after a site is successfully activated |
 | `fluent_cart/license/site_deactivated` | action | Fired after a site is successfully deactivated |
-| `fluent_cart/license/santized_url` | filter | Modify the sanitized site URL |
+| `fluent_cart/license/sanitized_url` | filter | Modify the sanitized site URL |
 | `fluent_cart/license/staging_subdomain_patterns` | filter | Customize subdomain patterns for local site detection |
 | `fluent_cart/license/staging_subfolder_patterns` | filter | Customize subfolder patterns for local site detection |
 | `fluent_cart/license/staging_domains` | filter | Customize domain patterns for local site detection |

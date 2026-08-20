@@ -575,7 +575,7 @@ add_action('fluent_cart/order_placed_offline', function ($data) {
 <summary><code>fluent_cart/order_paid_done</code> &mdash; Main lifecycle hook when order payment completes (recommended for integrations)</summary>
 
 **When it runs:**
-Fires asynchronously via Action Scheduler after an order's payment is confirmed as `paid`. The `OrderPaid` event enqueues a `fluent_cart/order_paid_ansyc_private_handle` async action, which validates the order is still paid, then dispatches this hook. This is the **recommended hook for third-party integrations** because it runs outside the payment gateway request cycle, avoiding race conditions and timeouts. For subscription or renewal orders, the associated [Subscription](/database/models/subscription) model is included in the data.
+Fires asynchronously via Action Scheduler after an order's payment is confirmed as `paid`. The `OrderPaid` event enqueues a `fluent_cart/order_paid_async_private_handle` async action, which validates the order is still paid, then dispatches this hook. This is the **recommended hook for third-party integrations** because it runs outside the payment gateway request cycle, avoiding race conditions and timeouts. For subscription or renewal orders, the associated [Subscription](/database/models/subscription) model is included in the data.
 
 **Parameters:**
 
@@ -607,34 +607,6 @@ add_action('fluent_cart/order_paid_done', function ($data) {
         $subscription = $data['subscription'];
         update_user_meta($customer->user_id, 'subscription_id', $subscription->id);
     }
-}, 10, 1);
-```
-</details>
-
-### <code> order_paid_ansyc_private_handle </code>
-<details>
-<summary><code>fluent_cart/order_paid_ansyc_private_handle</code> &mdash; Internal async handler that processes post-payment integrations</summary>
-
-**When it runs:**
-Enqueued by `OrderPaid::afterDispatch()` as an Action Scheduler async action. The handler in `app/Hooks/actions.php` validates the order, clears the scheduler meta, and then dispatches `fluent_cart/order_paid_done`. It is also dispatched manually in `IntegrationEventListener` for retry scenarios. **You should generally hook into `order_paid_done` instead of this hook.**
-
-**Parameters:**
-
-- `$data` (array): Order identifier
-    ```php
-    $data = [
-        'order_id' => 123, // int: The order ID to process
-    ];
-    ```
-
-**Source:** `app/Listeners/IntegrationEventListener.php` (line 360), `app/Hooks/actions.php` (line 126)
-
-**Usage:**
-```php
-// Not recommended for third-party use. Use fluent_cart/order_paid_done instead.
-add_action('fluent_cart/order_paid_ansyc_private_handle', function ($data) {
-    $orderId = $data['order_id'];
-    // Internal processing only
 }, 10, 1);
 ```
 </details>
@@ -710,7 +682,7 @@ add_action('fluent_cart/order_canceled', function ($data) {
 <summary><code>fluent_cart/order_paid_async_private_handle</code> &mdash; Internal async post-payment hook for non-renewal orders</summary>
 
 **When it runs:**
-Fires inside `IntegrationEventListener` after an order is confirmed paid, but only when the order's `type` is **not** `renewal`. This is a distinctly-named, correctly-spelled sibling of the legacy `fluent_cart/order_paid_ansyc_private_handle` hook documented above (note that one has a typo, `ansyc`) — they are two separate hooks fired from different call sites. **You should generally hook into `fluent_cart/order_paid_done` instead of either of these internal hooks.**
+Fires inside `IntegrationEventListener` after an order is confirmed paid, but only when the order's `type` is **not** `renewal`. It is also enqueued as an Action Scheduler job from `OrderPaid`. **You should generally hook into `fluent_cart/order_paid_done` instead of this internal hook.**
 
 **Parameters:**
 

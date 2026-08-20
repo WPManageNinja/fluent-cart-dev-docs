@@ -529,44 +529,12 @@ add_action('fluent_cart/before_checkout_page_start', function ($data) {
 ```
 </details>
 
-### <code> afrer_checkout_page_start </code>
-<details>
-<summary><code>fluent_cart/afrer_checkout_page_start</code> &mdash; After the checkout page wrapper div opens</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent_cart/afrer_checkout_page_start` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/after_checkout_page_start`** instead — it receives the same value.
-:::
-**When it runs:**
-This action fires right after the main checkout page `<div>` wrapper opens. Note the typo in the hook name (`afrer` instead of `after`) — this matches the actual hook name in the source code and must be used as-is.
-
-**Parameters:**
-
-- `$data` (array): The current cart
-    ```php
-    $data = [
-        'cart' => $cart,  // \FluentCart\App\Models\Cart instance
-    ];
-    ```
-
-**Source:** `app/Services/Renderer/CheckoutRenderer.php`
-
-**Usage:**
-```php
-add_action('fluent_cart/afrer_checkout_page_start', function ($data) {
-    $cart = $data['cart'];
-    // Insert a progress indicator at the top of the checkout page
-    echo '<div class="my-checkout-progress-bar">Step 1 of 3: Checkout</div>';
-}, 10, 1);
-```
-</details>
-
 ### <code> after_checkout_page_start </code>
 <details>
-<summary><code>fluent_cart/after_checkout_page_start</code> &mdash; After the checkout page wrapper div opens (corrected hook name)</summary>
+<summary><code>fluent_cart/after_checkout_page_start</code> &mdash; After the checkout page wrapper div opens</summary>
 
 **When it runs:**
-This is the corrected, non-deprecated replacement for `fluent_cart/afrer_checkout_page_start` above (both fire back-to-back from the same call site, via `do_action_deprecated()` followed by `do_action()`). Use this hook name going forward.
+This action fires right after the main checkout page `<div>` wrapper opens, before any checkout content is rendered.
 
 **Parameters:**
 
@@ -577,7 +545,7 @@ This is the corrected, non-deprecated replacement for `fluent_cart/afrer_checkou
     ];
     ```
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:155`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:154`
 
 **Usage:**
 ```php
@@ -743,7 +711,7 @@ This action fires within the billing address fields section of the checkout form
     ];
     ```
 
-**Source:** `app/Services/Renderer/CheckoutRenderer.php:420`
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:419`
 
 **Usage:**
 ```php
@@ -885,7 +853,7 @@ This action fires inside the per-method `fluent-cart-checkout_embed_payment_cont
     ];
     ```
 
-**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:818` (modal checkout) and `app/Services/Renderer/CheckoutRenderer.php:944` (full checkout page)
+**Source:** `app/Services/Renderer/ModalCheckoutRenderer.php:819` (modal checkout) and `app/Services/Renderer/CheckoutRenderer.php:944` (full checkout page)
 
 **Usage:**
 ```php

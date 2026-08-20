@@ -227,51 +227,16 @@ add_action('fluent_cart/register_payment_methods', function ($data) {
 
 ### <code> after_render_payment_method_{$route} </code>
 <details>
-<summary><code>fluent-cart/after_render_payment_method_{$route}</code> &mdash; Fires after a payment method UI renders on the checkout page</summary>
+<summary><code>fluent_cart/after_render_payment_method_{$route}</code> &mdash; Fires after a payment method UI renders on the checkout</summary>
 
-
-::: warning Deprecated since 1.3.16
-`fluent-cart/after_render_payment_method_{var}` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/after_render_payment_method_{var}`** instead — it receives the same value.
-:::
 **When it runs:**
-This action fires after a payment method's frontend UI (logo or radio button) has been rendered on the checkout form. The `{$route}` is the gateway's route identifier. Note that this hook uses a **hyphenated** prefix (`fluent-cart/`) rather than the usual underscored prefix.
+Fires from `AbstractPaymentGateway::prepare()` immediately after a payment method's UI has been rendered on the checkout. `{$route}` is the gateway route slug (e.g. `stripe`, `paypal`).
 
 **Parameters:**
 
 None.
 
-**Source:** `app/Modules/PaymentMethods/Core/AbstractPaymentGateway.php`
-
-**Dynamic variants:**
-- `fluent-cart/after_render_payment_method_stripe`
-- `fluent-cart/after_render_payment_method_paypal`
-- `fluent-cart/after_render_payment_method_square`
-- `fluent-cart/after_render_payment_method_airwallex`
-- `fluent-cart/after_render_payment_method_offline_payment`
-- `fluent-cart/after_render_payment_method_razorpay`
-- `fluent-cart/after_render_payment_method_paystack`
-
-**Usage:**
-```php
-add_action('fluent-cart/after_render_payment_method_stripe', function () {
-    // Add custom messaging below the Stripe payment option
-    echo '<p class="payment-note">Secure payments powered by Stripe.</p>';
-}, 10, 0);
-```
-</details>
-
-### <code> after_render_payment_method_{$route} (current) </code>
-<details>
-<summary><code>fluent_cart/after_render_payment_method_{$route}</code> &mdash; Current (non-deprecated) name for the hook above</summary>
-
-**When it runs:**
-Fires from the exact same call site as `fluent-cart/after_render_payment_method_{$route}` above (`AbstractPaymentGateway::render()`), one line later — this is the underscored, non-deprecated hook name; the hyphenated `fluent-cart/` version is fired first via `do_action_deprecated()` purely for backward compatibility. **Use this hook, not the hyphenated one, in new code.**
-
-**Parameters:**
-
-None.
-
-**Source:** `app/Modules/PaymentMethods/Core/AbstractPaymentGateway.php:552`
+**Source:** `app/Modules/PaymentMethods/Core/AbstractPaymentGateway.php:551`
 
 **Dynamic variants:** same route slugs as above — `stripe`, `paypal`, `square`, `airwallex`, `offline_payment`, `razorpay`, `paystack`.
 

@@ -1256,6 +1256,83 @@ add_filter('fluent_cart/filter_resolve_saved_view', function ($resolvedView, $co
 ```
 </details>
 
+### <code> generatable_pages </code>
+<details>
+<summary><code>fluent_cart/generatable_pages</code> &mdash; Filter the list of pages the Pages Setup screen can generate</summary>
+
+**When it runs:**
+This filter is applied when building the list of pages FluentCart can auto-generate (Checkout, Cart, Receipt, Shop, Account, and any add-on pages). It backs the Pages Setup screen's "+" create button, the dashboard onboarding "Page Setup" step, and the page-creation flow. Add-ons use it to register their own generatable pages alongside the core set.
+
+**Parameters:**
+
+- `$pages` (array): Core generatable pages, keyed by page key (default: the 5 core pages &mdash; `checkout`, `cart`, `receipt`, `shop`, `customer_profile`)
+    ```php
+    $pages = [
+        'checkout' => [
+            'title'   => 'Checkout',
+            'content' => '[fluent_cart_checkout]',
+        ],
+        // ...
+    ];
+    ```
+
+**Returns:** `array` &mdash; The modified pages array. Each entry needs a `title` and a `content` (the block/shortcode content FluentCart uses when it creates the WP page).
+
+**Source:** `app/CPT/Pages.php:19`
+
+**Usage:**
+```php
+add_filter('fluent_cart/generatable_pages', function ($pages) {
+    $pages['withdrawal_rights'] = [
+        'title'   => 'Right of Withdrawal',
+        'content' => '<!-- wp:my-addon/withdrawal-notice /-->',
+    ];
+    return $pages;
+});
+```
+
+Core page keys are always checked before filtered/add-on keys when FluentCart determines which page is missing, regardless of the order this filter leaves the array in. See `fluent_cart/dashboard/page_setup_redirect_url` below.
+</details>
+
+### <code> dashboard/page_setup_redirect_url </code>
+<details>
+<summary><code>fluent_cart/dashboard/page_setup_redirect_url</code> &mdash; Filter the dashboard link for an incomplete page setup step</summary>
+
+**When it runs:**
+This filter is applied when the admin Dashboard onboarding checklist finds a missing generatable page (see `fluent_cart/generatable_pages` above). By default the "Page Setup" step links to the core Pages Setup screen, which doesn't distinguish which page is actually missing. Whichever plugin registered the missing page can hook this filter to redirect the warning straight to that page's own settings screen instead. Core stays agnostic of third-party settings screens &mdash; it only fires the filter with context about the missing page.
+
+**Parameters:**
+
+- `$url` (string): The default redirect URL (core Pages Setup screen, e.g. `.../settings/store-settings/pages_setup`)
+- `$context` (array): Context about the missing page
+    ```php
+    $context = [
+        'missing_page' => [
+            'title'       => 'Right of Withdrawal',
+            'content'     => '<!-- wp:my-addon/withdrawal-notice /-->',
+            'key'         => 'withdrawal_rights',         // the page key from fluent_cart/generatable_pages
+            'setting_key' => 'withdrawal_rights_page_id', // the settings key storing the page ID
+        ],
+        'base_url' => 'https://example.com/wp-admin/admin.php?page=fluent-cart#/',
+    ];
+    ```
+
+**Returns:** `string` &mdash; The URL the dashboard's "Page Setup" onboarding warning should link to.
+
+**Source:** `app/Http/Controllers/DashboardController.php:77`
+
+**Usage:**
+```php
+add_filter('fluent_cart/dashboard/page_setup_redirect_url', function ($url, $context) {
+    $missingKey = $context['missing_page']['key'] ?? null;
+    if ($missingKey === 'withdrawal_rights') {
+        return admin_url('admin.php?page=fluent-cart#/settings/my-addon');
+    }
+    return $url;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Permissions & Auth

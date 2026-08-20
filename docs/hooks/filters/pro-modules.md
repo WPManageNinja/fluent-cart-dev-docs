@@ -126,7 +126,7 @@ Applied to the package download URL before it is handed to an updater client. Us
 - `$package_url` (string) — The generated download URL
 - `$context` (array) — Currently always an empty array
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseManager.php:154`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseManager.php:152`
 
 **Usage:**
 ```php
@@ -148,7 +148,7 @@ Applied after a site URL has been normalised for storage and comparison during a
 - `$url` (string) — The sanitized URL
 - `$originalUrl` (string) — The URL exactly as submitted
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:41`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Services/LicenseHelper.php:39`
 
 **Usage:**
 ```php
@@ -420,7 +420,7 @@ Disable this only for fields whose content you control and which need markup or 
 - `$fieldName` (string) — The meta key being written
 - `$metaData` (string) — The value about to be written
 
-**Source:** `fluent-cart-pro/app/Modules/Integrations/WPUserConnect.php:220`
+**Source:** `fluent-cart-pro/app/Modules/Integrations/WPUserConnect.php:219`
 
 **Usage:**
 ```php

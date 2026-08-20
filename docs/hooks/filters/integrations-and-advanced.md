@@ -1932,36 +1932,6 @@ add_filter('fluent_cart/license/get_version_response', function ($changeLogData)
 ```
 </details>
 
-### <code> license/santized_url </code>
-<details>
-<summary><code>fluent_cart/license/santized_url</code> <Badge type="warning" text="Pro" /> &mdash; Filter sanitized URL for license validation</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent_cart/license/santized_url` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/license/sanitized_url`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter is applied when sanitizing a site URL during license activation or validation.
-
-**Parameters:**
-
-- `$url` (string): The sanitized URL
-- `$originalUrl` (string): The original URL before sanitization
-
-**Returns:**
-- `$url` (string): The modified sanitized URL
-
-**Source:** `LicenseHelper.php:36`
-
-**Usage:**
-```php
-add_filter('fluent_cart/license/santized_url', function ($url, $originalUrl) {
-    // Normalize www subdomain
-    return str_replace('://www.', '://', $url);
-}, 10, 2);
-```
-</details>
-
 ---
 
 ## Pro: License Validation & Staging <Badge type="warning" text="Pro" />
@@ -2368,35 +2338,6 @@ add_filter('fluent_cart_sl/generate_license_key', function ($key, $context) {
 ```
 </details>
 
-### <code> fluent_cart_sl_encoded_package_url </code>
-<details>
-<summary><code>fluent_cart_sl_encoded_package_url</code> <Badge type="warning" text="Pro" /> &mdash; Filter encoded download package URL</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent_cart_sl_encoded_package_url` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart_sl/encoded_package_url`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter is applied to the encoded package download URL returned during update checks.
-
-**Parameters:**
-
-- `$package_url` (string): The encoded package URL
-
-**Returns:**
-- `$package_url` (string): The modified package URL
-
-**Source:** `LicenseManager.php:152`
-
-**Usage:**
-```php
-add_filter('fluent_cart_sl_encoded_package_url', function ($package_url) {
-    // Route downloads through a CDN
-    return str_replace('https://example.com', 'https://cdn.example.com', $package_url);
-});
-```
-</details>
-
 ### <code> fluent_cart_sl/issue_license_data </code>
 <details>
 <summary><code>fluent_cart_sl/issue_license_data</code> <Badge type="warning" text="Pro" /> &mdash; Filter license issue data</summary>
@@ -2422,42 +2363,6 @@ add_filter('fluent_cart_sl/issue_license_data', function ($data) {
     }
     return $data;
 });
-```
-</details>
-
-### <code> fluentcart/sanitize_user_meta </code>
-<details>
-<summary><code>fluentcart/sanitize_user_meta</code> <Badge type="warning" text="Pro" /> &mdash; Filter user metadata sanitization</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluentcart/sanitize_user_meta` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/sanitize_user_meta`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter controls whether a specific user meta field should be sanitized during processing.
-
-> **Note:** This hook uses a non-standard prefix (`fluentcart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
-
-**Parameters:**
-
-- `$sanitize` (bool): Whether to sanitize the field (default `true`)
-- `$metaFieldName` (string): The meta field name
-- `$metaData` (mixed): The meta data value
-
-**Returns:**
-- `$sanitize` (bool): Whether to sanitize
-
-**Source:** `WPUserConnect.php:219`
-
-**Usage:**
-```php
-add_filter('fluentcart/sanitize_user_meta', function ($sanitize, $metaFieldName, $metaData) {
-    // Skip sanitization for specific fields
-    if ($metaFieldName === 'custom_html_field') {
-        return false;
-    }
-    return $sanitize;
-}, 10, 3);
 ```
 </details>
 

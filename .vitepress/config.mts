@@ -479,7 +479,8 @@ export default defineConfig({
             text: 'Developer Hooks',
             items: [
               { text: 'Action Hooks', link: '/hooks/actions' },
-              { text: 'Filter Hooks', link: '/hooks/filters' }
+              { text: 'Filter Hooks', link: '/hooks/filters' },
+              { text: 'Deprecated Hooks', link: '/hooks/deprecated' }
             ]
           },
           { text: 'Rest API', link: '/restapi/' },
@@ -662,6 +663,7 @@ export default defineConfig({
                   { text: 'Pro Modules', link: '/hooks/filters/pro-modules' },
                 ]
              },
+            { text: 'Deprecated Hooks', link: '/hooks/deprecated' },
             // { text: 'Event System', link: '/hooks/events' }
           ]
         }

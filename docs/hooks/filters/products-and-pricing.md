@@ -1147,46 +1147,6 @@ add_filter('fluent_cart/coupon/per_customer_usage_query', function($usageQuery, 
 ```
 </details>
 
-### <code> coupon_statuses </code>
-<details>
-<summary><code>fluent-cart/coupon_statuses</code> &mdash; Filter the available coupon statuses</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent-cart/coupon_statuses` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/coupon_statuses`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter is applied when retrieving the list of available coupon statuses, used in the admin coupon management interface.
-
-**Parameters:**
-
-- `$statuses` (array): Array of coupon statuses (key => label)
-    ```php
-    $statuses = [
-        'active'   => 'Active',
-        'expired'  => 'Expired',
-        'disabled' => 'Disabled'
-    ];
-    ```
-- `$data` (array): Context data (empty array)
-
-**Returns:**
-- `$statuses` (array): The modified coupon statuses array
-
-**Source:** `app/Helpers/Helper.php:1037`
-
-**Note:** This hook uses `fluent-cart/` (with a hyphen) instead of the usual `fluent_cart/` (with an underscore) prefix.
-
-**Usage:**
-```php
-add_filter('fluent-cart/coupon_statuses', function($statuses) {
-    // Add a custom coupon status
-    $statuses['scheduled'] = __('Scheduled', 'fluent-cart');
-    return $statuses;
-}, 10, 1);
-```
-</details>
-
 ### <code> coupon/resolve_coupons </code>
 <details>
 <summary><code>fluent_cart/coupon/resolve_coupons</code> &mdash; Filter the coupons resolved for a cart or order</summary>
@@ -1263,16 +1223,16 @@ add_filter('fluent_cart/discount/pre_apply', function($cartItems, $data) {
 ```
 </details>
 
-### <code> coupon_statuses (current) </code>
+### <code> coupon_statuses </code>
 <details>
-<summary><code>fluent_cart/coupon_statuses</code> &mdash; Filter the available coupon statuses (current hook)</summary>
+<summary><code>fluent_cart/coupon_statuses</code> &mdash; Filter the available coupon statuses</summary>
 
 **When it runs:**
-This is the current, non-deprecated counterpart to the `fluent-cart/coupon_statuses` hook documented above — `Helper::getCouponStatuses()` fires the deprecated hyphenated hook first via `apply_filters_deprecated()` for backward compatibility, then applies this one on the same `$statuses` value and returns its result.
+Applied by `Helper::getCouponStatuses()` to the default coupon status map, and returns its result.
 
 **Parameters:**
 
-- `$statuses` (array): Array of coupon statuses (key => label) — same default shape as the deprecated hook
+- `$statuses` (array): Array of coupon statuses (key => label)
     ```php
     $statuses = [
         'active'   => 'Active',
@@ -1285,7 +1245,7 @@ This is the current, non-deprecated counterpart to the `fluent-cart/coupon_statu
 **Returns:**
 - `$statuses` (array): The modified coupon statuses array
 
-**Source:** `app/Helpers/Helper.php:1045`
+**Source:** `app/Helpers/Helper.php:1014`
 
 **Usage:**
 ```php
@@ -1642,7 +1602,7 @@ This filter is applied after the default variation type list is built, and befor
 **Returns:**
 - `$types` (array): The modified types array
 
-**Source:** `app/Helpers/Helper.php:817`
+**Source:** `app/Helpers/Helper.php:788`
 
 **Usage:**
 ```php

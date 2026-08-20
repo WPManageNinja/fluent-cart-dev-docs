@@ -1063,37 +1063,6 @@ add_filter('fluent_cart/address/postcode/is_valid', function ($valid, $postcode,
 ```
 </details>
 
-### <code> util/countries </code>
-<details>
-<summary><code>fluent-cart/util/countries</code> &mdash; Filter the country list</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent-cart/util/countries` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/util/countries`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter is applied when retrieving the full list of countries.
-
-> **Note:** This hook uses a non-standard hyphenated prefix (`fluent-cart/`) rather than the standard `fluent_cart/` convention. This is a legacy naming that may be standardized in a future release.
-
-**Parameters:**
-
-- `$options` (array): Array of country code => country name pairs
-
-**Returns:**
-- `$options` (array): The modified country list
-
-**Source:** `Helper.php:1140`
-
-**Usage:**
-```php
-add_filter('fluent-cart/util/countries', function ($options) {
-    // Limit to specific countries
-    return array_intersect_key($options, array_flip(['US', 'CA', 'GB', 'AU']));
-});
-```
-</details>
-
 ---
 
 ## Templates & Frontend
@@ -1199,135 +1168,12 @@ add_filter('fluent_cart/template_path', function ($path) {
 ```
 </details>
 
-### <code> fluent_cart_template_part_content </code>
-<details>
-<summary><code>fluent_cart_template_part_content</code> &mdash; Filter template part content</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent_cart_template_part_content` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/template_part_content`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter is applied to template part content before it is rendered, allowing you to modify the HTML content.
-
-**Parameters:**
-
-- `$content` (string): The template part content
-- `$slug` (string): The template part slug
-- `$args` (array): Template arguments
-
-**Returns:**
-- `$content` (string): The modified content
-
-**Source:** `ProductModalTemplatePart.php:245`
-
-**Usage:**
-```php
-add_filter('fluent_cart_template_part_content', function ($content, $slug, $args) {
-    if ($slug === 'product-card') {
-        // Wrap content in a custom div
-        $content = '<div class="custom-wrapper">' . $content . '</div>';
-    }
-    return $content;
-}, 10, 3);
-```
-</details>
-
-### <code> fluent_cart_template_part_content_{$slug} </code>
-<details>
-<summary><code>fluent_cart_template_part_content_{$slug}</code> &mdash; Filter template part content by slug (DYNAMIC)</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent_cart_template_part_content_{var}` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/template_part_content_{var}`** instead — it receives the same value.
-:::
-**When it runs:**
-This dynamic filter is applied to a specific template part's content. The `{$slug}` is replaced with the template part slug.
-
-**Parameters:**
-
-- `$content` (string): The template part content
-- `$args` (array): Template arguments
-
-**Returns:**
-- `$content` (string): The modified content
-
-**Source:** `ProductModalTemplatePart.php:246`
-
-**Usage:**
-```php
-add_filter('fluent_cart_template_part_content_product-card', function ($content, $args) {
-    // Append a badge to product card content
-    $content .= '<span class="badge">New</span>';
-    return $content;
-}, 10, 2);
-```
-</details>
-
-### <code> fluent_cart_template_part_output </code>
-<details>
-<summary><code>fluent_cart_template_part_output</code> &mdash; Filter template part output</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent_cart_template_part_output` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/template_part_output`** instead — it receives the same value.
-:::
-**When it runs:**
-This filter is applied to the final rendered output of a template part.
-
-**Parameters:**
-
-- `$output` (string): The rendered template part output
-
-**Returns:**
-- `$output` (string): The modified output
-
-**Source:** `ProductModalTemplatePart.php:252`
-
-**Usage:**
-```php
-add_filter('fluent_cart_template_part_output', function ($output) {
-    // Minify the output
-    return preg_replace('/\s+/', ' ', $output);
-});
-```
-</details>
-
-### <code> fluent_cart_template_part_output_{$slug} </code>
-<details>
-<summary><code>fluent_cart_template_part_output_{$slug}</code> &mdash; Filter template part output by slug (DYNAMIC)</summary>
-
-
-::: warning Deprecated since 1.3.16
-`fluent_cart_template_part_output_{var}` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/template_part_output_{var}`** instead — it receives the same value.
-:::
-**When it runs:**
-This dynamic filter is applied to the final rendered output of a specific template part. The `{$slug}` is replaced with the template part slug.
-
-**Parameters:**
-
-- `$output` (string): The rendered output
-
-**Returns:**
-- `$output` (string): The modified output
-
-**Source:** `ProductModalTemplatePart.php:253`
-
-**Usage:**
-```php
-add_filter('fluent_cart_template_part_output_product-modal', function ($output) {
-    // Add data attributes to the modal output
-    return str_replace('<div class="fct-modal"', '<div class="fct-modal" data-tracking="true"', $output);
-});
-```
-</details>
-
 ### <code> template_part_content </code>
 <details>
 <summary><code>fluent_cart/template_part_content</code> &mdash; Filter template part content (canonical)</summary>
 
 **When it runs:**
-Applied when a template part (e.g. the product-modal template part) renders, right after the deprecated `fluent_cart_template_part_content` alias runs on the same value and before the driver-specific `fluent_cart/template_part_content_{$slug}` filter and `do_blocks()` parsing. This is the namespaced replacement for `fluent_cart_template_part_content` — prefer it for new code.
+Applied when a template part (e.g. the product-modal template part) renders, before the slug-specific `fluent_cart/template_part_content_{$slug}` filter and before `do_blocks()` parsing.
 
 **Parameters:**
 
@@ -1337,7 +1183,7 @@ Applied when a template part (e.g. the product-modal template part) renders, rig
 
 **Returns:** `string` — the modified template part content
 
-**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:247`
+**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:245`
 
 **Usage:**
 ```php
@@ -1364,7 +1210,7 @@ Fires immediately after `fluent_cart/template_part_content` above, in the same r
 
 **Returns:** `string` — the modified content
 
-**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:248`
+**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:246`
 
 **Usage:**
 ```php
@@ -1381,7 +1227,7 @@ add_filter('fluent_cart/template_part_content_product_modal', function ($content
 <summary><code>fluent_cart/template_part_output</code> &mdash; Filter template part rendered output (canonical)</summary>
 
 **When it runs:**
-Applied after a template part's block markup has been parsed with `do_blocks()`, right after the deprecated `fluent_cart_template_part_output` alias runs on the same value and before the slug-specific `fluent_cart/template_part_output_{$slug}` filter. This is the namespaced replacement for `fluent_cart_template_part_output`.
+Applied after a template part's block markup has been parsed with `do_blocks()`, and before the slug-specific `fluent_cart/template_part_output_{$slug}` filter.
 
 **Parameters:**
 
@@ -1391,7 +1237,7 @@ Applied after a template part's block markup has been parsed with `do_blocks()`,
 
 **Returns:** `string` — the modified output
 
-**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:256`
+**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:252`
 
 **Usage:**
 ```php
@@ -1416,7 +1262,7 @@ Fires immediately after `fluent_cart/template_part_output` above, in the same re
 
 **Returns:** `string` — the modified output
 
-**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:257`
+**Source:** `app/Modules/Templating/BlockTemplates/TemplateParts/ProductModalTemplatePart.php:253`
 
 **Usage:**
 ```php

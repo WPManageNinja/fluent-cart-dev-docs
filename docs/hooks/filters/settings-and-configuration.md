@@ -445,72 +445,19 @@ add_filter('fluent_cart/global_currency_setting', function ($settings, $data) {
 
 ### <code> available_currencies </code>
 <details>
-<summary><code>fluent-cart/available_currencies</code> &mdash; Filter available currencies for the store</summary>
+<summary><code>fluent_cart/available_currencies</code> &mdash; Filter available currencies for the store</summary>
 
-
-::: warning Deprecated since 1.3.16
-`fluent-cart/available_currencies` is fired through `apply_filters_deprecated()` and is kept only for backward compatibility. Use **`fluent_cart/available_currencies`** instead — it receives the same value.
-:::
 **When it runs:**
-This filter is applied when retrieving the list of available currencies for the currency selector in store settings. Note the hyphenated hook prefix (`fluent-cart/` instead of `fluent_cart/`).
+Applied when retrieving the list of available currencies for the currency selector in store settings.
 
 **Parameters:**
 
-- `$currencies` (array): Array of currency definitions keyed by currency code
-    ```php
-    $currencies = [
-        'BDT' => [
-            'label'  => 'Bangladeshi Taka',
-            'value'  => 'BDT',
-            'symbol' => '৳',
-        ],
-        'USD' => [
-            'label'  => 'United State Dollar',
-            'value'  => 'USD',
-            'symbol' => '$',
-        ],
-        'GBP' => [
-            'label'  => 'United Kingdom',
-            'value'  => 'GBP',
-            'symbol' => '£',
-        ],
-    ];
-    ```
+- `$currencies` (array): Array of currency definitions keyed by currency code, each with `label`, `value`, and `symbol`
 - `$data` (array): Additional context data (empty array)
 
 **Returns:** `array` — The modified currencies array
 
-**Source:** `app/Helpers/Helper.php:670`
-
-**Usage:**
-```php
-add_filter('fluent-cart/available_currencies', function ($currencies, $data) {
-    // Add a custom currency option
-    $currencies['BTC'] = [
-        'label'  => 'Bitcoin',
-        'value'  => 'BTC',
-        'symbol' => '₿',
-    ];
-    return $currencies;
-}, 10, 2);
-```
-</details>
-
-### <code> available_currencies (current) </code>
-<details>
-<summary><code>fluent_cart/available_currencies</code> &mdash; Filter available currencies for the store (current hook)</summary>
-
-**When it runs:**
-This is the current, non-hyphenated replacement for the deprecated `fluent-cart/available_currencies` hook documented above — the deprecated hook forwards its value straight into this one via `apply_filters_deprecated()`, so a listener on either hook sees the same currency list.
-
-**Parameters:**
-
-- `$currencies` (array): Array of currency definitions keyed by currency code (same shape as the deprecated hook — `label`, `value`, `symbol`)
-- `$data` (array): Additional context data (empty array)
-
-**Returns:** `array` — The modified currencies array
-
-**Source:** `app/Helpers/Helper.php:690`
+**Source:** `app/Helpers/Helper.php:661`
 
 **Usage:**
 ```php
@@ -666,7 +613,7 @@ This filter is applied during price formatting. When true, prices like `$10.00` 
 
 **Returns:** `bool` — Whether to hide unnecessary trailing zeros
 
-**Source:** `app/Helpers/Helper.php:513`
+**Source:** `app/Helpers/Helper.php:486`
 
 **Usage:**
 ```php
@@ -1085,7 +1032,7 @@ This filter is applied inside `Helper::getUpgradeUrl()`, which builds every "Upg
 
 **Returns:** `string` — The modified base URL
 
-**Source:** `app/Helpers/Helper.php:88`
+**Source:** `app/Helpers/Helper.php:89`
 
 **Usage:**
 ```php
@@ -2646,7 +2593,7 @@ This filter is applied when generating a site-specific prefix string derived fro
 
 **Returns:** `string` — The modified site prefix
 
-**Source:** `app/Helpers/Helper.php:1717`
+**Source:** `app/Helpers/Helper.php:1685`
 
 **Usage:**
 ```php
@@ -2761,10 +2708,10 @@ add_filter('fluent_cart/frontend_assets/should_load_global', function ($shouldLo
 
 ### <code> util/countries </code>
 <details>
-<summary><code>fluent_cart/util/countries</code> &mdash; Filter the countries list used in address selectors (current hook)</summary>
+<summary><code>fluent_cart/util/countries</code> &mdash; Filter the countries list used in address selectors</summary>
 
 **When it runs:**
-This is the current, non-hyphenated replacement for the deprecated `fluent-cart/util/countries` hook — the deprecated hook forwards its value into this one via `apply_filters_deprecated()`. It fires when building the country dropdown options shown in checkout, store settings, and address forms.
+Fires when building the country dropdown options shown in checkout, store settings, and address forms.
 
 **Parameters:**
 
@@ -2773,7 +2720,7 @@ This is the current, non-hyphenated replacement for the deprecated `fluent-cart/
 
 **Returns:** `array` — The modified country options array
 
-**Source:** `app/Helpers/Helper.php:1379`
+**Source:** `app/Helpers/Helper.php:1347`
 
 **Usage:**
 ```php

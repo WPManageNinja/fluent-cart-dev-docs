@@ -791,7 +791,7 @@ This action fires when a subscription's collection method is converted to `autom
     ];
     ```
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/PayPal.php:150`, `app/Modules/PaymentMethods/StripeGateway/Stripe.php:140`
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/PayPal.php:150`, `app/Modules/PaymentMethods/StripeGateway/Stripe.php:148`
 
 **Usage:**
 ```php

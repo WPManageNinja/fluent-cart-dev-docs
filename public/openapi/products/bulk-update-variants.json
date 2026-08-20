@@ -27,7 +27,7 @@
       "post": {
         "operationId": "bulkUpdate",
         "summary": "POST Bulk Update Product Variants",
-        "description": "Update price and status fields on multiple product variants in one request. All targeted variants must belong to the same product. Rows in the payload that target the same variant ID are merged (last field wins), the batch is applied inside a single locked transaction, and the `item_price` / `compare_price` relationship is enforced in both directions — raising `item_price` above an existing `compare_price` clears `compare_price`, and a `compare_price` below `item_price` is rejected back to 0. Up to 500 update rows are processed per request; additional rows are silently dropped. Note `item_price` and `compare_price` are submitted as decimal amounts (e.g. `29.99`), not cents — they are converted to cents internally.\n\n**Required permission:** `products/edit`",
+        "description": "Update price and status fields on multiple product variants in one request. All targeted variants must belong to the same product. Rows in the payload that target the same variant ID are merged (last field wins), the batch is applied inside a single locked transaction, and the `item_price` / `compare_price` relationship is enforced in both directions — raising `item_price` above an existing `compare_price` clears `compare_price`, and a `compare_price` below `item_price` is rejected back to 0. Up to 500 update rows are processed per request; additional rows are silently dropped. `item_price` and `compare_price` are submitted as cents (e.g. `2999` for $29.99), matching every other price field in the API — sending `29.99` creates a 29-cent price, not a $29.99 one.\n\n**Required permission:** `products/edit`",
         "tags": [
           "Products"
         ],
@@ -61,11 +61,11 @@
                         },
                         "item_price": {
                           "type": "number",
-                          "description": "New price as a decimal amount (e.g. 29.99), not cents."
+                          "description": "New price in cents (e.g. 2999 for $29.99)."
                         },
                         "compare_price": {
                           "type": "number",
-                          "description": "New compare-at price as a decimal amount, not cents. Must be 0 or >= item_price."
+                          "description": "New compare-at price in cents. Must be 0 or >= item_price."
                         },
                         "item_status": {
                           "type": "string",
@@ -83,13 +83,13 @@
                   "updates": [
                     {
                       "id": 501,
-                      "item_price": 29.99,
-                      "compare_price": 39.99,
+                      "item_price": 2999,
+                      "compare_price": 3999,
                       "item_status": "active"
                     },
                     {
                       "id": 502,
-                      "item_price": 24.99
+                      "item_price": 2499
                     }
                   ]
                 }
@@ -98,13 +98,13 @@
                 "updates": [
                   {
                     "id": 501,
-                    "item_price": 29.99,
-                    "compare_price": 39.99,
+                    "item_price": 2999,
+                    "compare_price": 3999,
                     "item_status": "active"
                   },
                   {
                     "id": 502,
-                    "item_price": 24.99
+                    "item_price": 2499
                   }
                 ]
               },
@@ -115,13 +115,13 @@
                     "updates": [
                       {
                         "id": 501,
-                        "item_price": 29.99,
-                        "compare_price": 39.99,
+                        "item_price": 2999,
+                        "compare_price": 3999,
                         "item_status": "active"
                       },
                       {
                         "id": 502,
-                        "item_price": 24.99
+                        "item_price": 2499
                       }
                     ]
                   }

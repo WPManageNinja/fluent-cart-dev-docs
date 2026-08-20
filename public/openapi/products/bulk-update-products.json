@@ -27,7 +27,7 @@
       "post": {
         "operationId": "bulkUpdateProducts",
         "summary": "POST Bulk Update Products",
-        "description": "Update multiple products at once from the bulk edit view. Maximum 10 products per request.\n\n**Required permission:** `products/edit`",
+        "description": "Update multiple products at once from the bulk edit view. Maximum 10 products per request. Money fields are in cents: `variants[].item_price`, `variants[].compare_price`, `variants[].item_cost`, and `variants[].other_info.signup_fee` all take cents — e.g. `1999` for $19.99.\n\n**Required permission:** `products/edit`",
         "tags": [
           "Products"
         ],
@@ -52,14 +52,21 @@
                     "items": {
                       "type": "object"
                     },
-                    "description": "Array of product data objects to update (max 10)"
+                    "description": "Array of product data objects to update (max 10). Money fields (variants[].item_price, variants[].compare_price, variants[].item_cost, variants[].other_info.signup_fee) are cents."
                   }
                 },
                 "example": {
                   "products": [
                     {
                       "ID": 123,
-                      "post_title": "Updated Title A"
+                      "post_title": "Updated Title A",
+                      "variants": [
+                        {
+                          "id": 456,
+                          "item_price": 1999,
+                          "compare_price": 2999
+                        }
+                      ]
                     }
                   ]
                 }
@@ -68,7 +75,14 @@
                 "products": [
                   {
                     "ID": 123,
-                    "post_title": "Updated Title A"
+                    "post_title": "Updated Title A",
+                    "variants": [
+                      {
+                        "id": 456,
+                        "item_price": 1999,
+                        "compare_price": 2999
+                      }
+                    ]
                   }
                 ]
               },
@@ -79,7 +93,14 @@
                     "products": [
                       {
                         "ID": 123,
-                        "post_title": "Updated Title A"
+                        "post_title": "Updated Title A",
+                        "variants": [
+                          {
+                            "id": 456,
+                            "item_price": 1999,
+                            "compare_price": 2999
+                          }
+                        ]
                       }
                     ]
                   }

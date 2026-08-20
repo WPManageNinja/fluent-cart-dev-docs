@@ -179,16 +179,19 @@
                           "type": "integer"
                         },
                         "item_price": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Price in cents (min: 0)."
                         },
                         "compare_price": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Compare-at price in cents."
                         },
                         "manage_cost": {
                           "type": "string"
                         },
                         "item_cost": {
-                          "type": "number"
+                          "type": "number",
+                          "description": "Item cost in cents (required if manage_cost is true)."
                         },
                         "serial_index": {
                           "type": "integer"

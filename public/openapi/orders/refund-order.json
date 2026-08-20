@@ -71,7 +71,7 @@
                       },
                       "amount": {
                         "type": "number",
-                        "description": "Refund amount in decimal format (e.g., 10.00 not cents). Will be converted to cents internally"
+                        "description": "Refund amount in cents, matching every other money value in the API (e.g. 2500 refunds $25.00)."
                       },
                       "cancelSubscription": {
                         "type": "string",
@@ -83,7 +83,7 @@
                 "example": {
                   "refund_info": {
                     "transaction_id": 15,
-                    "amount": 25.0,
+                    "amount": 2500,
                     "cancelSubscription": "true"
                   }
                 }
@@ -91,7 +91,7 @@
               "example": {
                 "refund_info": {
                   "transaction_id": 15,
-                  "amount": 25.0,
+                  "amount": 2500,
                   "cancelSubscription": "true"
                 }
               },
@@ -101,7 +101,7 @@
                   "value": {
                     "refund_info": {
                       "transaction_id": 15,
-                      "amount": 25.0,
+                      "amount": 2500,
                       "cancelSubscription": "true"
                     }
                   }

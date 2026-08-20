@@ -27,7 +27,7 @@
       "post": {
         "operationId": "bulkInsertProducts",
         "summary": "POST Bulk Insert Products",
-        "description": "Insert multiple products at once. Maximum 10 products per request.\n\n**Required permission:** `products/create`",
+        "description": "Insert multiple products at once. Maximum 10 products per request. Money fields are in cents: `detail.item_price`, `detail.compare_price` (single-variation products), and `variants[].item_price`, `variants[].compare_price`, `variants[].other_info.signup_fee` (multi-variation products) all take cents — e.g. `1999` for $19.99.\n\n**Required permission:** `products/create`",
         "tags": [
           "Products"
         ],
@@ -52,7 +52,7 @@
                     "items": {
                       "type": "object"
                     },
-                    "description": "Array of product data objects (max 10)"
+                    "description": "Array of product data objects (max 10). Money fields (detail.item_price, detail.compare_price, variants[].item_price, variants[].compare_price, variants[].other_info.signup_fee) are cents."
                   }
                 },
                 "example": {
@@ -60,7 +60,9 @@
                     {
                       "post_title": "Product A",
                       "detail": {
-                        "fulfillment_type": "digital"
+                        "fulfillment_type": "digital",
+                        "item_price": 1999,
+                        "compare_price": 2999
                       }
                     },
                     {
@@ -77,7 +79,9 @@
                   {
                     "post_title": "Product A",
                     "detail": {
-                      "fulfillment_type": "digital"
+                      "fulfillment_type": "digital",
+                      "item_price": 1999,
+                      "compare_price": 2999
                     }
                   },
                   {
@@ -96,7 +100,9 @@
                       {
                         "post_title": "Product A",
                         "detail": {
-                          "fulfillment_type": "digital"
+                          "fulfillment_type": "digital",
+                          "item_price": 1999,
+                          "compare_price": 2999
                         }
                       },
                       {

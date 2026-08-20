@@ -1335,6 +1335,50 @@ add_filter('fluent_cart/dashboard/page_setup_redirect_url', function ($url, $con
 
 ---
 
+## Admin Tables
+
+### <code> {$filterName}_table_sorts </code>
+<details>
+<summary><code>fluent_cart/{$filterName}_table_sorts</code> &mdash; Filter the sort options for a list page's table (DYNAMIC)</summary>
+
+**When it runs:**
+This dynamic filter is applied when a filter class builds the sort options for its admin table (part of `getTableFilterOptions()`, alongside its `advance`/`guide`/`columns` counterparts). It is also the allow-list `parseSortBy()` validates an incoming `sort_by` request value against &mdash; a key that isn't in this map falls back to the filter's default sort instead of reaching `ORDER BY`.
+
+Each entry maps a sort key to a `label` and a `column`. `column` is either the literal DB column to `ORDER BY`, or a callable `($query, $direction)` that applies its own ordering &mdash; the seam for sorting by something that isn't a plain column (an aggregate, a joined relation). Only the `label` is sent to the admin UI; the column/callable stays server side.
+
+**Parameters:**
+
+- `$sortColumns` (array): The filter class's declared sort options (default: whatever that filter's `sortableColumns()` override returns, `[]` if not overridden)
+    ```php
+    $sortColumns = [
+        'id'           => ['label' => 'Order ID', 'column' => 'id'],
+        'total_amount' => ['label' => 'Total', 'column' => 'total_amount'],
+    ];
+    ```
+
+**Returns:** `array` &mdash; The modified sort options map.
+
+**Source:** `app/Services/Filter/BaseFilter.php:1523`
+
+**`{$filterName}` values:** `orders`, `customers`, `products`, `coupons`, `logs`, `attr_groups`, `attr_terms`, `taxes`, `licenses`, `license_sites`, `order_bump`, `shipping_zones`, `shipping_classes`, `subscriptions`.
+
+**Usage:**
+```php
+add_filter('fluent_cart/orders_table_sorts', function ($sortColumns) {
+    // Sort by a joined/aggregated value that isn't a plain column
+    $sortColumns['best_seller'] = [
+        'label'  => 'Best Selling',
+        'column' => function ($query, $direction) {
+            return $query->orderBy('total_paid', $direction);
+        },
+    ];
+    return $sortColumns;
+});
+```
+</details>
+
+---
+
 ## Permissions & Auth
 
 ### <code> permission/all_roles </code>

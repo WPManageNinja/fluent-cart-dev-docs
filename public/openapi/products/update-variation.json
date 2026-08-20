@@ -70,10 +70,12 @@
                         "type": "string"
                       },
                       "item_price": {
-                        "type": "number"
+                        "type": "number",
+                        "description": "Price in cents (min: 0)."
                       },
                       "compare_price": {
-                        "type": "number"
+                        "type": "number",
+                        "description": "Compare-at price in cents."
                       },
                       "sku": {
                         "type": "string"

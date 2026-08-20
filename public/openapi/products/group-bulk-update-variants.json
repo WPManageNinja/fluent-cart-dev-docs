@@ -61,11 +61,11 @@
                   },
                   "item_price": {
                     "type": "number",
-                    "description": "New sale price in decimal (dollars), converted to cents and applied to every targeted variant."
+                    "description": "New sale price in cents, applied to every targeted variant."
                   },
                   "compare_price": {
                     "type": "number",
-                    "description": "New compare-at price in decimal (dollars). Ignored per-row if it would be less than the effective item_price for that row."
+                    "description": "New compare-at price in cents. Ignored per-row if it would be less than the effective item_price for that row."
                   },
                   "manage_stock": {
                     "type": "integer",
@@ -97,11 +97,11 @@
                   },
                   "item_cost": {
                     "type": "number",
-                    "description": "New cost of goods in decimal (dollars), converted to cents."
+                    "description": "New cost of goods in cents."
                   },
                   "other_info": {
                     "type": "object",
-                    "description": "Partial delta merged into each variant's existing other_info JSON (e.g. payment_type, repeat_interval, signup_fee). Only non-null sub-keys are applied."
+                    "description": "Partial delta merged into each variant's existing other_info JSON (e.g. payment_type, repeat_interval, signup_fee). Only non-null sub-keys are applied. signup_fee, when present, is also in cents."
                   }
                 },
                 "example": {
@@ -109,7 +109,7 @@
                     456,
                     457
                   ],
-                  "item_price": 89.0,
+                  "item_price": 8900,
                   "manage_stock": 1,
                   "total_stock": 50
                 }
@@ -119,7 +119,7 @@
                   456,
                   457
                 ],
-                "item_price": 89.0,
+                "item_price": 8900,
                 "manage_stock": 1,
                 "total_stock": 50
               },
@@ -131,7 +131,7 @@
                       456,
                       457
                     ],
-                    "item_price": 89.0,
+                    "item_price": 8900,
                     "manage_stock": 1,
                     "total_stock": 50
                   }

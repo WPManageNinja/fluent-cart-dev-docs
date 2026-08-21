@@ -958,6 +958,67 @@ add_filter('fluent_cart/single_product_page/show_relevant_products', function($s
 ```
 </details>
 
+### <code> related_products/query_args </code>
+<details>
+<summary><code>fluent_cart/related_products/query_args</code> &mdash; Filter the <code>WP_Query</code> arguments used to build the related products list</summary>
+
+**When it runs:**
+Applied inside `ShopResource::getSimilarProducts()`, after the default query arguments are assembled and the ordering (`orderby`/`order`, or the price-ordering `posts_clauses` filter) is resolved, but immediately before `new WP_Query($args)` runs. One code path backs all related-products surfaces, so this filter covers each of them: the `[fluent_cart_related_products]` shortcode, the related products block auto-appended to the single product page, the Related Product Gutenberg block, and the product REST endpoint's similar-products response.
+
+::: warning Runs after price ordering is applied
+When `config['order_by']` is a price sort, `applyPriceOrdering()` has already attached a `posts_clauses` filter by the time this filter runs. Setting `$args['orderby']`/`$args['order']` in that case will not override price ordering — that custom SQL still wins. This is a known limitation, not a bug.
+:::
+
+**Parameters:**
+
+- `$args` (array): The `WP_Query` arguments about to be used.
+    ```php
+    $args = [
+        'post_type'      => $post->post_type,
+        'post_status'    => 'publish',
+        'posts_per_page' => 6,       // clamped 1-24, from $config['posts_per_page']
+        'post__not_in'   => [$id],   // excludes the current product
+        'tax_query'      => $taxQuery,
+        'fields'         => 'ids',
+        // 'orderby' / 'order' are present unless price ordering is active
+    ];
+    ```
+- `$context` (array): Read-only context, not applied to the query directly.
+    ```php
+    $context = [
+        'product_id' => $id,     // int
+        'post'       => $post,   // WP_Post
+        'config'     => $config, // array passed to getSimilarProducts()
+    ];
+    ```
+
+**Returns:**
+- `$args` (array): The modified `WP_Query` arguments.
+
+**Source:** `api/Resource/ShopResource.php:346-356`
+
+**Usage:**
+```php
+// Exclude a specific product from every related-products surface
+add_filter('fluent_cart/related_products/query_args', function ($args, $context) {
+    $args['post__not_in'][] = 1722;
+    return $args;
+}, 10, 2);
+```
+
+```php
+// Exclude multiple products
+add_filter('fluent_cart/related_products/query_args', function ($args) {
+    $args['post__not_in'] = array_merge($args['post__not_in'], [1722, 1692]);
+    return $args;
+}, 10, 2);
+```
+
+::: tip Related
+See [`single_product_page/show_relevant_products`](#single-product-page-show-relevant-products) to toggle related products on/off instead of changing the query.
+:::
+</details>
+
 ### <code> disable_auto_single_product_page </code>
 <details>
 <summary><code>fluent_cart/disable_auto_single_product_page</code> &mdash; Disable automatic single product page rendering</summary>

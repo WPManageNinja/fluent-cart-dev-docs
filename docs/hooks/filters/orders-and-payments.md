@@ -2388,6 +2388,55 @@ add_filter('fluent_cart/should_send_email_notification', function($should, $args
 **Note:** This filter only affects automatic event-driven emails. Manual actions like generating invoices or printing receipts from the admin panel are not affected.
 </details>
 
+### <code> email_notification/mailer </code>
+<details>
+<summary><code>fluent_cart/email_notification/mailer</code> &mdash; Modify the fully prepared Mailer immediately before it sends</summary>
+
+**When it runs:**
+This filter is applied right before an email notification is actually sent — after the recipient, subject, body, and attachments have all been resolved onto the `Mailer` instance. Use it to add CC/BCC recipients, override the From/Reply-To address, attach extra files, or switch HTML/plain-text mode for a specific notification, without touching core code. It fires on every send path: synchronous event-driven sends (`mailEmailsOfEvent()`), direct by-name sends (`mailByEmailName()`), and Action Scheduler async sends (which resolve through `mailByEmailName()`).
+
+**Parameters:**
+
+- `$mailer` (`FluentCart\App\Services\Email\Mailer`): The fully prepared mailer — `to`, `subject`, `body`, and any PDF attachment are already set
+- `$context` (array): Context about the notification being sent
+    ```php
+    $context = [
+        'event'        => 'order_paid',            // The event that triggered the email
+        'mail_name'    => 'order_paid_customer',    // The specific notification identifier
+        'recipient'    => 'customer',               // 'customer' | 'admin' | 'user' | 'subscriber'
+        'notification' => $notification,            // The resolved notification config array
+        'data'         => $data,                    // The raw event payload (order, customer, subscription, etc.)
+    ];
+    ```
+
+**Returns:**
+- `$mailer` (`Mailer`): The mailer to send. Return the same instance (mutated via its fluent methods) or a different one. Any return value that is not a `Mailer` instance is ignored and the originally prepared mailer is sent instead — a misbehaving listener can never block delivery.
+
+**Usage:**
+```php
+// BCC every purchase receipt to a review-collection service, and only that notification
+add_filter(
+    'fluent_cart/email_notification/mailer',
+    function ($mailer, $context) {
+        if ($context['mail_name'] !== 'order_paid_customer') {
+            return $mailer;
+        }
+
+        $mailer->addCC('cc-address@example.com');
+        $mailer->addBCC('bcc-address@example.com');
+        // Also available: $mailer->setFrom(), $mailer->setReplyTo(),
+        // $mailer->addAttachment(), $mailer->setIsHtml()
+
+        return $mailer;
+    },
+    10,
+    2
+);
+```
+
+**Note:** This is a send-time mailer filter, distinct from `fluent_cart/email_notifications` (which shapes the notification *definitions*, not an in-flight send).
+</details>
+
 ### <code> paddle_allowed_email_notifications </code>
 <details>
 <summary><code>fluent_cart/paddle_allowed_email_notifications</code> <Badge type="warning" text="Pro" /> &mdash; Control which email notifications are allowed for Paddle orders</summary>

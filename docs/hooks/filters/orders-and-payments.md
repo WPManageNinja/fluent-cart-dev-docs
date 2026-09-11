@@ -2059,6 +2059,32 @@ add_filter('fluent_cart/paddle_discount_id', function ($discountId) {
 ```
 </details>
 
+### <code> paddle_pin_checkout_currency </code>
+<details>
+<summary><code>fluent_cart/paddle_pin_checkout_currency</code> <Badge type="warning" text="Pro" /> &mdash; Control whether Paddle checkout is pinned to the order currency</summary>
+
+**When it runs:**
+Applied when creating the server-side Paddle transaction for a checkout. When `true` (default), the transaction's `currency_code` is pinned to the order currency, so the charge always settles in the currency the order was placed in. Return `false` to let Paddle localize the currency by the customer's country; the captured payment then goes through the cross-currency reconciliation route.
+
+Not applied when a discount is used at checkout — flat Paddle discounts are currency-bound, so discounted checkouts are always pinned to the order currency.
+
+**Parameters:**
+- `$pinCurrency` (bool): Whether to pin the checkout to the order currency (default `true`)
+- `$context` (array): Context — `order` (`Order` model) and `transaction` (`OrderTransaction` model)
+
+**Returns:** `bool` — `true` to pin the checkout to the order currency, `false` to let Paddle localize it
+
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+
+**Usage:**
+```php
+add_filter('fluent_cart/paddle_pin_checkout_currency', function ($pinCurrency, $context) {
+    // Let Paddle localize the checkout currency by customer country
+    return false;
+}, 10, 2);
+```
+</details>
+
 ### <code> paddle_subscription_product_type </code>
 <details>
 <summary><code>fluent_cart/paddle_subscription_product_type</code> <Badge type="warning" text="Pro" /> &mdash; Filter Paddle subscription product type</summary>

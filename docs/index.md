@@ -30,9 +30,9 @@ features:
   - title: Subscriptions
     details: The subscription engine across both billing models — gateway-managed (automatic) and store-managed (manual / system) — covering collection methods, renewal scheduling, off-session auto-charge, dunning, and gateway participation.
     link: /modules/subscriptions
-  - title: Payment Methods (coming soon)
+  - title: Payment Methods
     details: Payment gateway architecture, supported gateways, and custom gateway development guide for payment processing.
-    link: /
+    link: /modules/payment-methods
 #   - title: Shipping Module
 #     details: Shipping zones, methods, rate calculations, and custom shipping method development for delivery management.
 #     link: /modules/shipping

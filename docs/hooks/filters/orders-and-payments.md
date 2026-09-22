@@ -1449,25 +1449,93 @@ add_filter('fluent_cart/form_disable_stripe_connect', function ($disable, $data)
 
 ### <code> stripe_appearance </code>
 <details>
-<summary><code>fluent_cart/stripe_appearance</code> &mdash; Filter Stripe Elements appearance configuration</summary>
+<summary><code>fluent_cart/stripe_appearance</code> &mdash; Style the embedded Stripe Payment Element</summary>
 
 **When it runs:**
-Applied when initializing Stripe Elements on the checkout page.
+Applied when the embedded checkout builds the Stripe Elements options, before the Payment Element is mounted. The element renders inside a Stripe-hosted iframe, so the store's stylesheet never reaches it — this filter is the only styling channel. The returned array is passed verbatim as the `appearance` option of `stripe.elements()`.
 
 **Parameters:**
-- `$appearance` (array): Stripe Elements appearance configuration (defaults to `['theme' => 'stripe']`)
+- `$appearance` (array): Full [Stripe Appearance API](https://docs.stripe.com/elements/appearance-api) object (defaults to `['theme' => 'stripe']`). Supported keys:
+    - `theme` — `stripe` (default), `night`, or `flat`
+    - `labels` — `above` (default) or `floating`
+    - `variables` — design tokens such as `colorPrimary`, `colorBackground`, `colorText`, `colorDanger`, `fontFamily`, `fontSizeBase`, `spacingUnit`, `borderRadius` (see [variables](https://docs.stripe.com/elements/appearance-api#variables)). Colour variables must be hex or `rgb()`; `rgba()` and `var()` are rejected by Stripe.
+    - `rules` — per-component CSS-like overrides keyed by Stripe selectors such as `.Tab`, `.Tab--selected`, `.Input`, `.Input:focus`, `.Label` (see [rules](https://docs.stripe.com/elements/appearance-api#rules))
+    - `disableAnimations` — `true` to turn off transitions
 
-**Returns:** `array` — The modified appearance configuration (follows the [Stripe Appearance API](https://docs.stripe.com/elements/appearance-api))
+**Returns:** `array` — The appearance object handed to Stripe.js
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php:796`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php` (`Stripe::getElementsAppearance()`)
 
 **Usage:**
 ```php
+// Dark checkout: match the Payment Element to a dark storefront.
 add_filter('fluent_cart/stripe_appearance', function ($appearance) {
-    $appearance['theme'] = 'night';
-    return $appearance;
-}, 10, 1);
+    return [
+        'theme'     => 'night',
+        'labels'    => 'floating',
+        'variables' => [
+            'colorPrimary'    => '#f5c542',
+            'colorBackground' => '#1b1b1f',
+            'colorText'       => '#f4f4f5',
+            'colorDanger'     => '#ff6b6b',
+            'fontFamily'      => 'Inter, system-ui, sans-serif',
+            'borderRadius'    => '10px',
+        ],
+        'rules' => [
+            '.Tab--selected' => ['borderColor' => '#f5c542'],
+            '.Input:focus'   => ['boxShadow' => '0 0 0 2px #f5c542'],
+        ],
+    ];
+});
 ```
+
+A `fontFamily` that is not one of Stripe's built-in fonts only takes effect when the font is also loaded into the iframe via [`fluent_cart/stripe_elements_fonts`](#stripe_elements_fonts).
+</details>
+
+### <code> stripe_elements_fonts </code>
+<details>
+<summary><code>fluent_cart/stripe_elements_fonts</code> &mdash; Load custom fonts into the Stripe Payment Element</summary>
+
+**When it runs:**
+Applied alongside `fluent_cart/stripe_appearance` when the embedded checkout builds the Stripe Elements options. Because the Payment Element lives in a Stripe iframe, fonts loaded on the parent page are invisible to it. Whatever this filter returns is passed as the [`fonts` option](https://docs.stripe.com/js/elements_object/create#stripe_elements-options-fonts) of `stripe.elements()` — a sibling of `appearance`, not part of it — and Stripe loads those sources inside the iframe.
+
+**Parameters:**
+- `$fonts` (array): List of font sources (defaults to `[]`, so Stripe's own font stack applies). Each entry is one of:
+    - [CssFontSource](https://docs.stripe.com/js/appendix/css_font_source_object) — `['cssSrc' => 'https://…']`, a stylesheet URL containing `@font-face` rules. Must be `https`.
+    - [CustomFontSource](https://docs.stripe.com/js/appendix/custom_font_source_object) — `family` and `src` (a CSS `src` value such as `url(https://…/font.woff2)`), plus optional `display`, `style`, `unicodeRange`, `weight`. `weight` is a string (`'400'`), not an integer.
+
+    Entries that are not arrays are dropped before the response is sent.
+
+**Returns:** `array` — The font sources handed to Stripe.js
+
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Stripe.php` (`Stripe::getElementsFonts()`)
+
+**Usage:**
+```php
+// 1. Load the font inside the Stripe iframe.
+add_filter('fluent_cart/stripe_elements_fonts', function ($fonts) {
+    // Google Fonts stylesheet (CssFontSource)
+    $fonts[] = ['cssSrc' => 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap'];
+
+    // Self-hosted font file (CustomFontSource)
+    $fonts[] = [
+        'family'  => 'Brand Sans',
+        'src'     => 'url(https://example.com/wp-content/themes/brand/fonts/brand-sans.woff2)',
+        'weight'  => '400',
+        'display' => 'swap',
+    ];
+
+    return $fonts;
+});
+
+// 2. Tell the Payment Element to use it.
+add_filter('fluent_cart/stripe_appearance', function ($appearance) {
+    $appearance['variables']['fontFamily'] = 'Inter, "Brand Sans", system-ui, sans-serif';
+    return $appearance;
+});
+```
+
+Without step 2 the font is loaded but unused; without step 1 the `fontFamily` falls back to Stripe's default stack.
 </details>
 
 ### <code> stripe/setup_intent_rate_limit_customer_daily </code>

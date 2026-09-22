@@ -1528,10 +1528,25 @@ add_filter('fluent_cart/stripe_elements_fonts', function ($fonts) {
     return $fonts;
 });
 
-// 2. Tell the Payment Element to use it.
+// 2. Tell the Payment Element to use it. Pass the full Appearance API object —
+//    the filter replaces the default, it does not merge into it.
 add_filter('fluent_cart/stripe_appearance', function ($appearance) {
-    $appearance['variables']['fontFamily'] = 'Inter, "Brand Sans", system-ui, sans-serif';
-    return $appearance;
+    return [
+        'theme'     => 'night',
+        'labels'    => 'floating',
+        'variables' => [
+            'colorPrimary'    => '#f5c542',
+            'colorBackground' => '#1b1b1f',
+            'colorText'       => '#f4f4f5',
+            'colorDanger'     => '#ff6b6b',
+            'fontFamily'      => 'Inter, "Brand Sans", system-ui, sans-serif',
+            'borderRadius'    => '10px',
+        ],
+        'rules' => [
+            '.Tab--selected' => ['borderColor' => '#f5c542'],
+            '.Input:focus'   => ['boxShadow' => '0 0 0 2px #f5c542'],
+        ],
+    ];
 });
 ```
 

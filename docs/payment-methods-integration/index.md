@@ -133,6 +133,46 @@ The event object provides these important properties:
 - `e.detail.paymentInfoUrl` - URL to fetch payment information
 - `e.detail.nonce` - WordPress nonce for secure API calls
 
+### Checkout Submission State
+
+FluentCart tracks whether an order attempt is in flight, independently of how the Place Order button happens to be rendered. While that state is held, the checkout handler refuses a second submit — so a customer who edits a card field mid-request cannot start a second order.
+
+The state is released by `paymentLoader.enableCheckoutButton()`. That call is the single signal that the customer may act again, so your gateway must make it on **every** path where a retry is legitimate, not only when the gateway first becomes ready:
+
+- the customer dismissed or cancelled your payment popup or sheet
+- the customer closed a QR or instructions modal without paying
+- a confirmation call failed and the customer should try again
+
+```javascript
+myGatewayPopup.open({
+    onCancel: () => {
+        // Hands the button back AND ends the submission — without this the
+        // customer cannot retry, even if your own button looks clickable.
+        paymentLoader.enableCheckoutButton(submitButton.text);
+    }
+});
+```
+
+If your gateway renders its own checkout button and resets it directly, resetting that button is not enough on its own — pair it with `enableCheckoutButton()`.
+
+::: warning Do not re-enable the button any other way
+Setting `button.disabled = false` yourself, or calling `window.fluent_cart_checkout_ui_service.enableCheckoutButton()`, changes what is on screen without ending the submission. The button looks live and the next click is silently ignored.
+:::
+
+#### Reading the state
+
+A gateway that re-enables the button in response to its own UI events — for example a card element reporting that its fields are now complete — should check the state first, otherwise it will hand the button back in the middle of an order attempt:
+
+```javascript
+if (paymentLoader.isSubmitting?.()) {
+    return;
+}
+
+paymentLoader.enableCheckoutButton(submitButton.text);
+```
+
+Use the optional call (`?.()`), so your gateway still works against a FluentCart release that predates this method.
+
 ### Payment Flow
 
 1. **Registration** - Gateway registers with FluentCart

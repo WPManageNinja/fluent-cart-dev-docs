@@ -227,6 +227,8 @@ FluentCart uses a custom event system to load payment methods in the checkout pa
 
 ::: warning Required — the Place Order button stays disabled without this
 Every gateway **must** register a listener for its `fluent_cart_load_payments_[payment_method_slug]` event and call `e.detail.paymentLoader.enableCheckoutButton()` once the gateway is ready to accept the order. FluentCart keeps the Place Order button greyed out while the selected payment method is loading, and it is your listener's `enableCheckoutButton()` call that re-enables it. If the listener is missing (or never calls `enableCheckoutButton()`), the Place Order button stays greyed out and the customer cannot check out — even a gateway with no frontend UI (offline/COD-style) needs this listener.
+
+The same call also ends the in-flight order attempt FluentCart tracks, so call it again whenever the customer should be able to retry — a cancelled popup, a closed QR, a failed confirmation. See [Checkout Submission State](./index#checkout-submission-state).
 :::
 
 Your JavaScript file must listen for this event and handle the payment process accordingly. Here's a simple example:

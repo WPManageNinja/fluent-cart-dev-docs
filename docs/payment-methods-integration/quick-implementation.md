@@ -844,22 +844,55 @@ $data[
 ];
 ```
 
-### Refund Service for Handling Refunds
+### Refunds
+
+A gateway talks to the provider. FluentCart records the refund. Keep the two apart.
+
+Declare `'refund'` in `$supportedFeatures`. Without it, the admin gets the "record locally" prompt instead of a refund.
+
+#### Admin refund: `processRefund()`
+
+Call the provider and return the vendor refund ID, or a `WP_Error` when the provider reports `failed` or `canceled`.
 
 ```php
-// Use Refund service for all refund operations
-\FluentCart\App\Services\Payments\Refund::createOrRecordRefund([
-    'vendor_charge_id' => $refundId,
-    'payment_method' => 'your_gateway',
-    'status' => 'refunded',
-    'total' => $refundAmount,
-], $parentTransaction);
+public function processRefund($transaction, $amount, $args)
+{
+    $refund = $this->api->refund($transaction->vendor_charge_id, $amount, [
+        'idempotency_key' => 'refund_' . wp_generate_uuid4(),
+    ]);
 
-// This automatically handles:
-// - Creating refund transaction
-// - Updating order status
-// - Firing all refund-related hooks
+    if (is_wp_error($refund) || in_array($refund['status'], ['failed', 'canceled'], true)) {
+        return new \WP_Error('refund_failed', 'Provider message');
+    }
+
+    return $refund['id']; // 'pending' is success; return '' if the provider gives no ID yet
+}
 ```
+
+- Do not write, update or delete a refund row. FluentCart writes it after you return.
+- Do not dispatch `OrderRefund`.
+- A thrown exception or `WP_Error` shows the admin the "record locally" prompt, where the admin can choose to record the refund without the gateway.
+- `$amount` is in cents. Convert it if your provider expects decimals.
+- Generate the idempotency key once per `processRefund()` call and reuse it only to retry that request. A key built only from payment ID and amount makes a second refund of the same amount replay the first.
+
+#### Webhook refund: `Refund::createOrRecordRefund()`
+
+Resolve the parent charge, then record through the core helper. Do not match rows yourself.
+
+```php
+\FluentCart\App\Services\Payments\Refund::createOrRecordRefund([
+    'vendor_charge_id' => $refundId,   // the provider's refund ID
+    'payment_method'   => 'your_gateway',
+    'status'           => 'refunded',  // refunded | pending | failed
+    'total'            => $refundAmount, // cents
+], $parentTransaction);
+```
+
+It matches an existing row by vendor refund ID, then a refund recorded without an ID for the same charge and amount, and otherwise creates one. When a refund first becomes `refunded`, it updates the charge's refunded total and fires `OrderRefund` once, so the refund email and order payment status update run once. A `pending` row adds nothing until it becomes `refunded`. A `failed` report never adopts a locally recorded row.
+
+#### Recording locally
+
+When the provider cannot be reached or rejects the refund, an admin can record the refund in FluentCart only. It does not cancel the subscription and returns no money. If the provider later reports a refund of the same amount on the same charge, the helper above attaches its refund ID to that row instead of adding a second one. A different amount is recorded as a separate refund.
 
 ### Subscription Handling
 

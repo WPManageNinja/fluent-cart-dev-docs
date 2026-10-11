@@ -888,6 +888,17 @@ Resolve the parent charge, then record through the core helper. Do not match row
 ], $parentTransaction);
 ```
 
+Check the return value. If another refund holds the order's lock for 10 seconds, the helper records nothing and returns `WP_Error('refund_lock_timeout')`. Answer a non-2xx (503, or 500) for that code only, so the provider redelivers. Redelivery is safe: the refund matches by vendor refund ID. If you dedupe events before the handler runs, clear that mark first, or the redelivery is skipped.
+
+```php
+$recorded = \FluentCart\App\Services\Payments\Refund::createOrRecordRefund($data, $parentTransaction);
+
+if (is_wp_error($recorded) && $recorded->get_error_code() === 'refund_lock_timeout') {
+    status_header(503);
+    exit;
+}
+```
+
 It matches an existing row by vendor refund ID, then a refund recorded without an ID for the same charge and amount, and otherwise creates one. When a refund first becomes `refunded`, it updates the charge's refunded total and fires `OrderRefund` once, so the refund email and order payment status update run once. A `pending` row adds nothing until it becomes `refunded`. A `failed` report never adopts a locally recorded row.
 
 #### Recording locally

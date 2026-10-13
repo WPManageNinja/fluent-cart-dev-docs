@@ -571,6 +571,66 @@ add_filter('fluent_cart/product/show_title', function($show, $context) {
 
 ---
 
+## Product Reviews
+
+### <code> reviews/star_svg </code>
+<details>
+<summary><code>fluent_cart/reviews/star_svg</code> &mdash; Replace the SVG star used for every server-rendered rating</summary>
+
+**When it runs:**
+This filter runs inside `ReviewThreadMarkup::starSvg()`. Every storefront star the server renders comes from that method:
+
+- the reviews summary, each review, the rating bars and the star filter chips on the single product page
+- the star picker in the review form
+- the star row on product cards ("show rating in shop") and in the Product Rating block, including half stars
+- the review list blocks and the AJAX `stars_html` response
+
+The default markup is read from `app/Views/icons/review-star.svg` and kept in a static cache for the request. The filter still runs on **every call**, so a listener can return different markup for each render.
+
+::: warning Server-rendered stars only
+The admin Reviews screen, the block editor previews and the customer portal's My Reviews page import the star shape in the browser, from the same `review-star.svg` file. This filter does not reach them.
+
+Review emails do not use it either. They still print the text characters `&#9733;` / `&#9734;`, because Gmail and Outlook strip inline SVG.
+:::
+
+**Parameters:**
+
+- `$svg` (string): The full `<svg>` markup for a single star.
+    ```php
+    $svg = '<svg class="fct-star-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M11.16 3.47Q12 1.65 ..."/></svg>';
+    ```
+
+**Returns:**
+- `string` — The SVG markup to render for each star.
+
+::: tip Keep the class, fill and size
+The star CSS depends on three things in the default markup: the `fct-star-svg` class, `fill="currentColor"`, and `width`/`height` of `1em`. Filled, empty and half-star colors are applied through `currentColor`. A half star clips a 50%-wide wrapper around the SVG. Keep all three in your replacement, or the colors, sizing and half-star clipping will break.
+:::
+
+::: danger Output is not escaped
+The filtered value is echoed as-is, the same way the built-in star is. Return only trusted, static SVG markup and never pass user input through this filter.
+:::
+
+**Source:** `app/Services/Renderer/ReviewThreadMarkup.php:455`
+
+**Usage:**
+```php
+// Draw ratings as dots instead of stars
+add_filter('fluent_cart/reviews/star_svg', function ($svg) {
+    return '<svg class="fct-star-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/></svg>';
+});
+```
+
+```php
+// Keep the default star but add a class to it for custom styling
+add_filter('fluent_cart/reviews/star_svg', function ($svg) {
+    return str_replace('class="fct-star-svg"', 'class="fct-star-svg my-theme-star"', $svg);
+});
+```
+</details>
+
+---
+
 ## Product Buttons & Text
 
 ### <code> product/buy_now_button_text </code>

@@ -27,7 +27,7 @@
       "post": {
         "operationId": "createOrder",
         "summary": "POST Create Order",
-        "description": "Create a new order manually from the admin panel.\n\n**Required permission:** `orders/create`\n\n### How the order is priced\n\nThe server prices the order itself. Which rules apply depends on what you send:\n\n| You send | Pricing |\n|---|---|\n| `quote_revision` from [Price Order](./price-order) | Priced again exactly like the preview. If the revision or `total_amount` no longer matches, the call fails with `fx_prices_updated` and nothing is saved. |\n| A `currency` other than the store currency, no `quote_revision` | Priced on the server in that currency. Catalog lines take the product's price converted at the rate. Every posted catalog `unit_price`, and `total_amount` when it is not 0, must match the server's value or the call fails with `fx_prices_updated`. |\n| Store currency, or no `currency` | Posted line prices are used as sent. Coupons and the manual discount are checked and applied on top. |\n\nAll amounts are in cents of the **order's currency**. Coupons are always validated on the server (active, dates, usage limits, per-customer limits, minimum purchase).\n\n### Currency and rate\n\n1. No `currency`, or the store currency: priced from the posted prices. `rate` is ignored.\n2. A foreign currency while Multi-Currency is off: refused with `invalid_currency`. No order is created.\n3. A foreign currency that is not enabled in Multi-Currency settings, or has no exchange rate: refused with `invalid_currency`, even when `rate` is sent.\n4. An enabled foreign currency without `rate`: the store's rate is used, with its margin and rounding.\n5. An enabled foreign currency with `rate`: that rate is used exactly as sent (no margin, rounding, charm pricing or adjustment). It must be a number above 0 with at most 12 integer digits, or the call fails with `invalid_amount`.\n6. `quote_revision` sent: `rate` is ignored and the order must still match the preview, or the call fails with `fx_prices_updated`.\n\nIn cases 4 and 5, every posted catalog `unit_price`, and `total_amount` when it is not 0, must match the server's value, or the call fails with `fx_prices_updated`. Item-level `rate` is always ignored.\n\nUse [List Order Currencies](./list-order-currencies) to find which currencies can be used.",
+        "description": "Create a new order manually from the admin panel.\n\n**Required permission:** `orders/create`\n\nAll amounts are in the smallest unit of the **order's currency**: cents for USD or EUR, whole yen for JPY.\n\n### How the order is priced\n\n| You send | Pricing |\n|---|---|\n| No `currency`, or the store currency | Posted line prices are used as sent. `rate` is ignored. |\n| A foreign currency while Multi-Currency is off, or one that is not enabled or has no exchange rate | Refused with `invalid_currency`, even when `rate` is sent. No order is created. |\n| An enabled foreign currency, no `rate` | Priced at the store's rate, with its margin and rounding. |\n| An enabled foreign currency with `rate` | Priced at that rate exactly as sent: no margin, rounding, charm pricing or adjustment. It must be above 0 with at most 12 integer digits, or the call fails with `invalid_amount`. |\n| `quote_revision` from [Price Order](./price-order) | Priced again exactly like the preview. `rate` is ignored. If the revision or `total_amount` no longer matches, the call fails with `fx_prices_updated`. |\n\nFor a foreign currency, every posted catalog `unit_price`, and `total_amount` when it is not 0, must match the server's value, or the call fails with `fx_prices_updated` and nothing is saved. Item-level `rate` is always ignored. Coupons and the manual discount are always checked and applied on the server (active, dates, usage limits, per-customer limits, minimum purchase).\n\nUse [List Order Currencies](./list-order-currencies) to find which currencies can be used.\n\n### Not supported\n\nThe order is created now, at today's rate. There is no field for a past order date or a historical rate, so this endpoint cannot record old orders.",
         "tags": [
           "Orders"
         ],
@@ -476,6 +476,27 @@
               }
             }
           },
+          "400": {
+            "description": "A line's payment type does not match its product, or subscriptions are turned off for manual orders by the `fluent_cart/order/is_subscription_allowed_in_manual_order` filter.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "payment_type_conflict": {
+                    "summary": "Payment type does not match the product",
+                    "value": {
+                      "message": "One time product cannot be placed as a subscription item."
+                    }
+                  },
+                  "subscription_not_allowed": {
+                    "summary": "Subscriptions turned off for manual orders",
+                    "value": {
+                      "message": "Subscription order with Manual Order is not supported yet!"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated. The request carried no valid WordPress credentials.",
             "content": {
@@ -575,7 +596,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

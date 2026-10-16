@@ -27,7 +27,7 @@
       "post": {
         "operationId": "createOrder",
         "summary": "POST Create Order",
-        "description": "Create a new order manually from the admin panel.\n\n**Required permission:** `orders/create`",
+        "description": "Create a new order manually from the admin panel.\n\n**Required permission:** `orders/create`\n\n### How the order is priced\n\nThe server prices the order itself. Which rules apply depends on what you send:\n\n| You send | Pricing |\n|---|---|\n| `quote_revision` from [Price Order](./price-order) | Priced again exactly like the preview. If the revision or `total_amount` no longer matches, the call fails with `fx_prices_updated` and nothing is saved. |\n| A `currency` other than the store currency, no `quote_revision` | Priced on the server in that currency. Catalog lines take the product's price converted at the rate. Every posted catalog `unit_price`, and `total_amount` when it is not 0, must match the server's value or the call fails with `fx_prices_updated`. |\n| Store currency, or no `currency` | Posted line prices are used as sent. Coupons and the manual discount are checked and applied on top. |\n\nAll amounts are in cents of the **order's currency**. Coupons are always validated on the server (active, dates, usage limits, per-customer limits, minimum purchase).\n\n### Currency and rate\n\n1. No `currency`, or the store currency: priced from the posted prices. `rate` is ignored.\n2. A foreign currency while Multi-Currency is off: refused with `invalid_currency`. No order is created.\n3. A foreign currency that is not enabled in Multi-Currency settings, or has no exchange rate: refused with `invalid_currency`, even when `rate` is sent.\n4. An enabled foreign currency without `rate`: the store's rate is used, with its margin and rounding.\n5. An enabled foreign currency with `rate`: that rate is used exactly as sent (no margin, rounding, charm pricing or adjustment). It must be a number above 0 with at most 12 integer digits, or the call fails with `invalid_amount`.\n6. `quote_revision` sent: `rate` is ignored and the order must still match the preview, or the call fails with `fx_prices_updated`.\n\nIn cases 4 and 5, every posted catalog `unit_price`, and `total_amount` when it is not 0, must match the server's value, or the call fails with `fx_prices_updated`. Item-level `rate` is always ignored.\n\nUse [List Order Currencies](./list-order-currencies) to find which currencies can be used.",
         "tags": [
           "Orders"
         ],
@@ -100,11 +100,15 @@
                         },
                         "price": {
                           "type": "number",
-                          "description": "Item price in cents"
+                          "description": "Item price in cents. Recomputed by the server."
                         },
                         "unit_price": {
                           "type": "number",
-                          "description": "Unit price in cents"
+                          "description": "Unit price in cents of the order's currency. For a catalog line in a foreign currency it must match the server's converted price, unless `has_custom_price` is true."
+                        },
+                        "has_custom_price": {
+                          "type": "boolean",
+                          "description": "`true` when the admin typed this price. The server then keeps `unit_price` as sent (in the order's currency, zero or more, whole units for zero-decimal currencies) instead of the catalog price."
                         },
                         "shipping_charge": {
                           "type": "number",
@@ -140,7 +144,7 @@
                         },
                         "rate": {
                           "type": "number",
-                          "description": "Exchange rate"
+                          "description": "Ignored. The order-level `rate` applies."
                         },
                         "line_meta": {
                           "type": "array",
@@ -186,7 +190,7 @@
                   },
                   "currency": {
                     "type": "string",
-                    "description": "Currency code, e.g., `USD` (max 10 chars)"
+                    "description": "Order currency code, e.g. `EUR` (max 10 chars). Must be the store currency or an enabled Multi-Currency currency with a rate. Defaults to the store currency."
                   },
                   "subtotal": {
                     "type": "number",
@@ -210,7 +214,7 @@
                   },
                   "shipping_total": {
                     "type": "number",
-                    "description": "Shipping total in cents"
+                    "description": "Shipping total in cents of the order's currency (zero or more, whole units for zero-decimal currencies). If items carry `shipping_charge`, those must add up to this value."
                   },
                   "tax_total": {
                     "type": "number",
@@ -218,11 +222,15 @@
                   },
                   "total_amount": {
                     "type": "number",
-                    "description": "Total order amount in cents"
+                    "description": "Order total in cents, before tax. With `quote_revision`, it must equal the preview's `total_amount`. For a foreign currency without `quote_revision`, a non-zero value must equal the server's total; send 0 or omit it to skip the check."
                   },
                   "rate": {
                     "type": "number",
-                    "description": "Exchange rate"
+                    "description": "Exchange rate from the store currency to `currency`. Optional; overrides the store's rate for a foreign currency and is stored exactly as sent. Must be above 0 with at most 12 integer digits. Ignored for the store currency and when `quote_revision` is sent."
+                  },
+                  "quote_revision": {
+                    "type": "string",
+                    "description": "Revision returned by [Price Order](./price-order) (max 32 chars). When sent, the order is priced like that preview and must still match it, or the call fails with `fx_prices_updated`."
                   },
                   "note": {
                     "type": "string",
@@ -250,15 +258,15 @@
                   },
                   "discount": {
                     "type": "object",
-                    "description": "Manual discount details",
+                    "description": "Manual discount. Only `value` (in the order's currency, not cents) is used for the amount; it cannot exceed the order subtotal.",
                     "properties": {
                       "type": {
                         "type": "string",
-                        "description": "Discount type (max 100 chars)"
+                        "description": "Ignored. The value is always a fixed amount."
                       },
                       "value": {
                         "type": "number",
-                        "description": "Discount value"
+                        "description": "Discount amount in the order's currency, e.g. `5` for 5.00."
                       },
                       "label": {
                         "type": "string",
@@ -276,7 +284,7 @@
                   },
                   "shipping": {
                     "type": "array",
-                    "description": "Shipping method details",
+                    "description": "Shipping method details, stored as order meta for display. The charged amount comes from `shipping_total`.",
                     "items": {
                       "type": "object",
                       "properties": {
@@ -296,70 +304,14 @@
                     }
                   },
                   "applied_coupon": {
-                    "type": "array",
-                    "description": "Applied coupon details",
-                    "items": {
+                    "type": "object",
+                    "description": "Coupons to apply, keyed by coupon code, e.g. `{\"SAVE10\": {\"id\": 3}}`. Only the codes are read: discounts are recalculated on the server. On this endpoint each entry must include the coupon `id`.",
+                    "additionalProperties": {
                       "type": "object",
                       "properties": {
                         "id": {
                           "type": "integer",
-                          "description": "Applied coupon record ID"
-                        },
-                        "order_id": {
-                          "type": "integer",
-                          "description": "Order ID"
-                        },
-                        "coupon_id": {
-                          "type": "integer",
-                          "description": "Coupon ID (min: 1)"
-                        },
-                        "code": {
-                          "type": "string",
-                          "description": "Coupon code (max 100 chars)"
-                        },
-                        "amount": {
-                          "type": "number",
-                          "description": "Coupon amount"
-                        },
-                        "discounted_amount": {
-                          "type": "number",
-                          "description": "Discounted amount in cents"
-                        },
-                        "discount": {
-                          "type": "number",
-                          "description": "Discount value"
-                        },
-                        "stackable": {
-                          "type": "integer",
-                          "description": "Whether coupon is stackable (0 or 1)"
-                        },
-                        "priority": {
-                          "type": "integer",
-                          "description": "Coupon priority"
-                        },
-                        "max_uses": {
-                          "type": "integer",
-                          "description": "Maximum uses"
-                        },
-                        "use_count": {
-                          "type": "integer",
-                          "description": "Current use count"
-                        },
-                        "max_per_customer": {
-                          "type": "integer",
-                          "description": "Max uses per customer (min: 1)"
-                        },
-                        "min_purchase_amount": {
-                          "type": "number",
-                          "description": "Minimum purchase amount in cents"
-                        },
-                        "max_discount_amount": {
-                          "type": "number",
-                          "description": "Maximum discount amount in cents"
-                        },
-                        "notes": {
-                          "type": "string",
-                          "description": "Coupon notes (max 100 chars)"
+                          "description": "Coupon ID"
                         }
                       }
                     }
@@ -432,6 +384,47 @@
                     "subtotal": 2500,
                     "total_amount": 2500,
                     "payment_method": "offline_payment"
+                  }
+                },
+                "foreign_currency": {
+                  "summary": "Order in EUR at a fixed rate",
+                  "value": {
+                    "customer_id": 1,
+                    "currency": "EUR",
+                    "rate": "0.92",
+                    "order_items": [
+                      {
+                        "post_id": 10,
+                        "variation_id": 5,
+                        "object_id": 5,
+                        "quantity": 1,
+                        "unit_price": 2300
+                      }
+                    ],
+                    "total_amount": 2300
+                  }
+                },
+                "previewed": {
+                  "summary": "Save after Price Order",
+                  "value": {
+                    "customer_id": 1,
+                    "currency": "EUR",
+                    "quote_revision": "afe0d9020e760936a57bea648532cb53",
+                    "order_items": [
+                      {
+                        "post_id": 10,
+                        "variation_id": 5,
+                        "object_id": 5,
+                        "quantity": 1,
+                        "unit_price": 2300
+                      }
+                    ],
+                    "applied_coupon": {
+                      "SAVE10": {
+                        "id": 3
+                      }
+                    },
+                    "total_amount": 2070
                   }
                 }
               }
@@ -512,15 +505,60 @@
             }
           },
           "422": {
-            "description": "Validation failed, or the referenced record does not exist.",
+            "description": "Validation failed, a price no longer matches, or a currency/amount is not allowed.",
             "content": {
               "application/json": {
-                "example": {
-                  "message": "The given data was invalid.",
-                  "errors": {
-                    "field_name": [
-                      "This field is required."
-                    ]
+                "examples": {
+                  "validation": {
+                    "summary": "Validation failed",
+                    "value": {
+                      "message": "The given data was invalid.",
+                      "errors": {
+                        "field_name": [
+                          "This field is required."
+                        ]
+                      }
+                    }
+                  },
+                  "fx_prices_updated": {
+                    "summary": "Prices changed since the preview, or a posted price/total does not match",
+                    "value": {
+                      "code": "fx_prices_updated",
+                      "message": "Prices were updated to today's exchange rate. Please review your order total before paying.",
+                      "data": {
+                        "status": 422
+                      }
+                    }
+                  },
+                  "invalid_currency": {
+                    "summary": "Currency not enabled",
+                    "value": {
+                      "code": "invalid_currency",
+                      "message": "JPY is not an enabled currency with an exchange rate.",
+                      "data": {
+                        "status": 422
+                      }
+                    }
+                  },
+                  "invalid_amount": {
+                    "summary": "Bad rate or amount",
+                    "value": {
+                      "code": "invalid_amount",
+                      "message": "Rate must be a number above 0.",
+                      "data": {
+                        "status": 422
+                      }
+                    }
+                  },
+                  "invalid_product": {
+                    "summary": "Product removed",
+                    "value": {
+                      "code": "invalid_product",
+                      "message": "A product on this order no longer exists.",
+                      "data": {
+                        "status": 422
+                      }
+                    }
                   }
                 }
               }

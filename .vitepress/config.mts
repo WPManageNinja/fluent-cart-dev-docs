@@ -14,7 +14,7 @@ const projectRoot = join(__dirname, '..')
 // Any slugs not listed here appear at the end (alphabetically)
 const MODULE_ORDER: Record<string, string[]> = {
   orders: [
-    'list-orders', 'get-order', 'create-order', 'update-order', 'delete-order',
+    'list-orders', 'get-order', 'create-order', 'price-order', 'list-order-currencies', 'update-order', 'delete-order',
     'mark-as-paid', 'refund-order', 'accept-dispute',
     'update-order-address', 'update-order-address-id', 'change-customer', 'create-and-change-customer',
     'get-order-transactions', 'get-single-transaction', 'update-transaction-status',

@@ -1,0 +1,359 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/orders/price": {
+      "post": {
+        "operationId": "priceOrder",
+        "summary": "POST Price Order",
+        "description": "Price an admin order before creating it. Nothing is saved.\n\n**Required permission:** `orders/create`\n\nCatalog lines are priced from the product in the requested `currency` at the store's exchange rate. Coupons and the manual discount are validated and applied the same way [Create Order](./create-order) applies them.\n\nTo save exactly what was previewed, send the returned `quote_revision` and `total_amount` to Create Order with the same `currency`, lines, coupons, discount and shipping. If the rate or a price changed in between, Create Order fails with `fx_prices_updated`; price the order again and resend.\n\nAmounts are in cents of the order's currency, before tax.",
+        "tags": [
+          "Orders"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "order_items"
+                ],
+                "properties": {
+                  "customer_id": {
+                    "type": "integer",
+                    "description": "Optional. When given, per-customer coupon limits are checked for this customer."
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "Order currency code, e.g. `EUR` (max 10 chars). Must be the store currency or an enabled Multi-Currency currency with a rate. Defaults to the store currency."
+                  },
+                  "order_items": {
+                    "type": "array",
+                    "description": "Lines to price.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "post_id": {
+                          "type": "integer",
+                          "description": "WordPress post ID of the product"
+                        },
+                        "variation_id": {
+                          "type": "integer",
+                          "description": "Product variation ID"
+                        },
+                        "object_id": {
+                          "type": "integer",
+                          "description": "Product variation ID. The line is priced from this variation."
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "Item quantity (min: 1)",
+                          "minimum": 1
+                        },
+                        "unit_price": {
+                          "type": "number",
+                          "description": "Only read when `has_custom_price` is true. Catalog lines are always priced from the product."
+                        },
+                        "has_custom_price": {
+                          "type": "boolean",
+                          "description": "`true` when the admin typed this price. The server then keeps `unit_price` as sent (in the order's currency, zero or more, whole units for zero-decimal currencies) instead of the catalog price."
+                        },
+                        "shipping_charge": {
+                          "type": "number",
+                          "description": "Shipping charge in cents"
+                        },
+                        "other_info": {
+                          "type": "object",
+                          "description": "Additional item information"
+                        }
+                      }
+                    }
+                  },
+                  "applied_coupon": {
+                    "type": "object",
+                    "description": "Coupons to apply, keyed by coupon code. The `id` is optional here, so a new code can be sent as `{\"SAVE10\": {}}`. An unknown or invalid code fails with 422.",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "Coupon ID (optional)"
+                        }
+                      }
+                    }
+                  },
+                  "discount": {
+                    "type": "object",
+                    "description": "Manual discount. Only `value` (in the order's currency, not cents) is used for the amount; it cannot exceed the order subtotal.",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Ignored. The value is always a fixed amount."
+                      },
+                      "value": {
+                        "type": "number",
+                        "description": "Discount amount in the order's currency, e.g. `5` for 5.00."
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Discount label (max 100 chars)"
+                      },
+                      "reason": {
+                        "type": "string",
+                        "description": "Discount reason (max 100 chars)"
+                      },
+                      "action": {
+                        "type": "string",
+                        "description": "Discount action (max 100 chars)"
+                      }
+                    }
+                  },
+                  "shipping_total": {
+                    "type": "number",
+                    "description": "Shipping total in cents of the order's currency (zero or more, whole units for zero-decimal currencies). If items carry `shipping_charge`, those must add up to this value."
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Price one line in EUR with a coupon",
+                  "value": {
+                    "currency": "EUR",
+                    "order_items": [
+                      {
+                        "post_id": 10,
+                        "variation_id": 5,
+                        "object_id": 5,
+                        "quantity": 1
+                      }
+                    ],
+                    "applied_coupon": {
+                      "SAVE10": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order priced.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "description": "Order currency"
+                    },
+                    "quote_revision": {
+                      "type": "string",
+                      "description": "Send to Create Order to save this exact pricing"
+                    },
+                    "order_items": {
+                      "type": "array",
+                      "description": "Priced lines. `other_info.fx` records the rate used and `other_info.fx_base` the store-currency price.",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "applied_coupons": {
+                      "type": "object",
+                      "description": "Valid coupons keyed by code, with the discount each gave in cents"
+                    },
+                    "shipping_total": {
+                      "type": "integer",
+                      "description": "Shipping in cents"
+                    },
+                    "subtotal": {
+                      "type": "integer",
+                      "description": "Subtotal in cents"
+                    },
+                    "coupon_discount_total": {
+                      "type": "integer",
+                      "description": "Coupon discount in cents"
+                    },
+                    "manual_discount_total": {
+                      "type": "integer",
+                      "description": "Manual discount in cents"
+                    },
+                    "total_amount": {
+                      "type": "integer",
+                      "description": "Total before tax in cents. Send to Create Order with `quote_revision`."
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Priced order",
+                    "value": {
+                      "currency": "EUR",
+                      "quote_revision": "afe0d9020e760936a57bea648532cb53",
+                      "order_items": [
+                        {
+                          "object_id": 5,
+                          "post_id": 10,
+                          "quantity": 1,
+                          "unit_price": 2300,
+                          "price": 2300,
+                          "subtotal": 2300,
+                          "line_total": 2300,
+                          "discount_total": 230,
+                          "coupon_discount": 230,
+                          "manual_discount": 0,
+                          "shipping_charge": 0,
+                          "other_info": {
+                            "payment_type": "onetime",
+                            "fx_base": {
+                              "unit_price": 2500,
+                              "signup_fee": 0
+                            },
+                            "fx": {
+                              "currency": "EUR",
+                              "rate": "0.920000000000",
+                              "rules": "none|none|0"
+                            }
+                          }
+                        }
+                      ],
+                      "applied_coupons": {
+                        "SAVE10": {
+                          "id": 3,
+                          "code": "SAVE10",
+                          "discount": 230
+                        }
+                      },
+                      "shipping_total": 0,
+                      "subtotal": 2300,
+                      "coupon_discount_total": 230,
+                      "manual_discount_total": 0,
+                      "total_amount": 2070
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability (`orders/create`).",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed, or a currency, amount, coupon or product is not allowed.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "validation": {
+                    "summary": "Validation failed",
+                    "value": {
+                      "message": "The given data was invalid.",
+                      "errors": {
+                        "field_name": [
+                          "This field is required."
+                        ]
+                      }
+                    }
+                  },
+                  "invalid_currency": {
+                    "summary": "Currency not enabled",
+                    "value": {
+                      "code": "invalid_currency",
+                      "message": "JPY is not an enabled currency with an exchange rate.",
+                      "data": {
+                        "status": 422
+                      }
+                    }
+                  },
+                  "invalid_amount": {
+                    "summary": "Bad amount",
+                    "value": {
+                      "code": "invalid_amount",
+                      "message": "The discount cannot be more than the order subtotal.",
+                      "data": {
+                        "status": 422
+                      }
+                    }
+                  },
+                  "invalid_product": {
+                    "summary": "Product removed",
+                    "value": {
+                      "code": "invalid_product",
+                      "message": "A product on this order no longer exists.",
+                      "data": {
+                        "status": 422
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -187,9 +187,11 @@
     "/openapi/public/orders/get-renewal.json",
     "/openapi/public/orders/get-shipping-methods.json",
     "/openapi/public/orders/get-single-transaction.json",
+    "/openapi/public/orders/list-order-currencies.json",
     "/openapi/public/orders/list-orders.json",
     "/openapi/public/orders/list-renewals.json",
     "/openapi/public/orders/mark-as-paid.json",
+    "/openapi/public/orders/price-order.json",
     "/openapi/public/orders/refund-order.json",
     "/openapi/public/orders/resend-renewal-invoice.json",
     "/openapi/public/orders/skip-renewal.json",
@@ -438,5 +440,5 @@
     "/openapi/public/tax/update-country-status.json",
     "/openapi/public/tax/update-tax-rate.json"
   ],
-  "generated": "2026-09-22T11:11:03.251Z"
+  "generated": "2026-10-16T10:06:28.385Z"
 }

@@ -25,27 +25,28 @@ For the gateway side of the contract (what `processRefund()` must return and wha
 
 | Kind | Sent when | Amount comes from |
 |---|---|---|
-| Item and shipping | `refunded_items` is not empty, or `shipping_amount` is greater than 0 | The server. Each line's remaining value divided by its current quantity, tax per line, discount already in the line total. |
-| Amount only | Neither is sent | The `amount` the admin typed. Used for goodwill and dispute refunds. No line or stock changes. |
+| Item and shipping | `refunded_items` is not empty, or `shipping_amount` is greater than 0 | The server, in `RefundPlanner::plan()`. Each line's charge left (line total plus any tax added on top, minus `refund_total`) divided by its units left. Refunding every unit left takes the whole remainder. |
+| Amount only | Neither is sent | The `amount` the admin typed. Used for goodwill and dispute refunds. No unit or stock changes; the money is spread over the lines' `refund_total`. |
 
-An item refund shrinks the order line: `quantity`, `line_total` and `tax_amount` go down, and the original quantity is frozen in `line_meta.original_quantity` for the strikethrough display. Shipping is tracked as a running total in order meta `shipping_refunded_amount`; `shipping_refunded` is set to `1` once the whole shipping amount is returned.
+A line keeps what was sold: `quantity`, `line_total` and `tax_amount` never change. An item refund adds the units to `line_meta.refunded_quantity` and caps `fulfilled_quantity` at the units left. The `OrderRefund` listener adds each line's refunded money to `refund_total`. An amount refund is spread over the lines by what each has left, and any part the lines cannot take is counted as shipping, only when the lines plus shipping make up the whole order total. Shipping is tracked as a running total in order meta `shipping_refunded_amount`; `shipping_refunded` is set to `1` once the whole shipping amount is returned.
 
 ## The admin refund, step by step
 
 ```
 Refund modal ── POST orders/{id}/refund ──▶ OrderController::refundOrder()
   1. order must be refundable                       else 400
-  2. take lock fct_refund_<order_id> (no wait)       else 409 "another refund in progress"
-  3. resolve details: items, shipping, amount        else 422
-  4. build persistLocalState (item + shipping writes)
-  5. Refund::processRefund()
+  2. Refund::withOrderRefundLock(order, wait 0)      else 409 "another refund in progress"
+     └ refundOrderUnderLock():
+  3. RefundPlanner::plan(): amount, units per line,  else 422
+     shipping, refund_intent (the item + shipping writes)
+  4. Refund::processRefund(charge, amount, refund_info, refund_intent)
        a. validate amount against order and charge limits
        b. pick a route (remote / local / forced_local / unavailable)
        c. remote: call the gateway          ── fails ──▶ activity log entry only, 422 force-local payload
-       d. save: refund row + charge refunded_total + item/shipping writes, one DB transaction
-       e. dispatch OrderRefund
-  6. optional: cancel the subscription (never on a forced local refund)
-  7. release the lock
+       d. save: refund row + item/shipping writes, one DB transaction
+       e. dispatch OrderRefund: order totals, line refund_total, charge refunded_total
+  5. optional: cancel the subscription (never on a forced local refund)
+  6. release the lock
 ```
 
 ### Routes
@@ -53,9 +54,9 @@ Refund modal ── POST orders/{id}/refund ──▶ OrderController::refundOrd
 | Route | Chosen when | Gateway called |
 |---|---|---|
 | `remote` | The gateway has the `refund` feature and the charge has a `vendor_charge_id` | Yes |
-| `local` | `fluent_cart/order_refund_manually` returned `yes`, or the gateway has `local_refund_only` (Cash on Delivery) | Only for Cash on Delivery, so `fluent_cart/offline_payment_refund_id` still fires |
+| `local` | `fluent_cart/order_refund_manually` returned `yes`, or the gateway has `local_refund_only` (Cash on Delivery), `offline`, or no `refund` feature. The admin returns the money outside FluentCart. | Only for Cash on Delivery, so `fluent_cart/offline_payment_refund_id` still fires |
 | `forced_local` | The request carried `refund_info.force_local` | No |
-| `unavailable` | Gateway not registered, gateway has no `refund` feature, or the charge has no `vendor_charge_id` | No. Same prompt as a failure. |
+| `unavailable` | Gateway not registered, gateway without the `payment` feature (a deactivated Pro or add-on gateway), or the charge has no `vendor_charge_id` | No. Same prompt as a failure. |
 
 Whatever status the gateway returns, a non-error return is success. `pending` is normal on Stripe, Paddle and PayPal.
 
@@ -81,7 +82,7 @@ Nothing is saved except an error entry in the order activity log. The endpoint a
 }
 ```
 
-`code` is `remote_refund_failed` or `gateway_unavailable`. The admin UI shows the gateway message and the impact list. If the admin picks **Record locally only**, the UI resends the exact failed payload with `refund_info.force_local = true`. It is validated against the current order state like any refund.
+`code` is `remote_refund_failed` (the gateway returned a `WP_Error` or threw) or `gateway_unavailable`. The admin UI shows the gateway message and the impact list. If the admin picks **Record locally only**, the UI resends the exact failed payload with `refund_info.force_local = true`. It is validated against the current order state like any refund.
 
 ### Forced local refund
 
@@ -94,10 +95,11 @@ Nothing is saved except an error entry in the order activity log. The endpoint a
 
 | Store | Key | When |
 |---|---|---|
-| `fct_order_transactions` | new row: `transaction_type = refund`, `status = refunded`, `total`, `vendor_charge_id` = gateway refund id, `meta.parent_id`, `meta.reason`, `meta.refund_route` | Once the refund is real |
+| `fct_order_transactions` | new row: `transaction_type = refund`, `status = refunded`, `total`, `vendor_charge_id` = gateway refund id, `meta.parent_id`, `meta.reason`, `meta.created_by`, `meta.refund_route`, `meta.is_item_refund`, `meta.refunded_items`, `meta.manage_stock` | Once the refund is real |
 | `fct_order_transactions` (charge row) | `meta.refunded_total` | Every refund. Recounted from linked refund rows, never lowered. |
 | `fct_orders` | `total_refund`, `payment_status` | By the `OrderRefund` listener |
-| `fct_order_items` | `quantity`, `line_total`, `tax_amount`, `fulfilled_quantity`, `line_meta.original_quantity` | Item refunds |
+| `fct_order_items` | `line_meta.refunded_quantity`, `fulfilled_quantity` | Item refunds |
+| `fct_order_items` | `refund_total` | By the `OrderRefund` listener: the line's own amount on an item refund, a spread on an amount refund. Capped at the line's charge inside the `UPDATE`. |
 | `fct_order_meta` | `shipping_refunded_amount`, `shipping_refunded` | Shipping refunds |
 | Stock tables | `available`, `on_hold`, `committed`, `stock_status`, movement ledger | Item refunds with restock on and stock management enabled |
 
@@ -116,10 +118,20 @@ Several things can try to record the same refund: the admin request, a webhook, 
 
 The money has moved, so the refund must not be lost.
 
-1. The save is retried once.
-2. Then a **bare refund row** is written without item and shipping changes. The row gets `meta.local_sync = pending` and `meta.refund_intent`. The response carries a `local_sync` warning. Pending rows are left out of order refund totals and payment status.
-3. The admin runs **Re-sync refund** from the transaction list. It reapplies the stored item and shipping changes in one DB transaction, marks `local_sync = done` and dispatches the `OrderRefund` event that never fired. If the order has changed since (line quantity differs from the stored `pre_refund_qty`) it answers 409 and asks for manual reconciliation.
-4. If even the bare row cannot be written, the endpoint returns a `refund_not_recorded` error carrying the gateway refund id and amount, and the order log gets an error entry. The admin must not refund again.
+1. The full save (row plus item and shipping writes) is tried twice.
+2. Then a **bare refund row** is written without item and shipping changes. When the refund had such changes, the row gets `meta.local_sync = pending` and `meta.refund_intent`, and the order log gets a warning. The response carries a `local_sync` warning. Pending rows are left out of order refund totals and payment status.
+3. If the row and line writes saved but counting the refund failed (`OrderRefund` threw), the row is marked pending with an empty `refund_intent.items`, since the units are already written, and the log says "Refund recorded without order totals".
+4. The admin runs **Re-sync refund** from the transaction list. It reapplies the stored item and shipping changes in one DB transaction, marks `local_sync = done` and counts the refund once.
+5. If even the bare row cannot be written, the endpoint returns a `refund_not_recorded` error carrying the gateway refund id and amount, and the order log gets an error entry. The admin must not refund again.
+
+Re-sync answers:
+
+| Code | Status | When |
+|---|---|---|
+| `nothing_to_resync` | 400 | The row is not `refunded` or is not awaiting re-sync |
+| `refund_lock_timeout` | 409 | Another refund holds the order's lock |
+| `refund_order_changed` | 409 | A line is gone, or its units left differ from the stored `pre_refund_qty`. Reconcile by hand. |
+| `resync_failed` | 500 | A write or the count failed. The row stays pending; a retry applies only what is still missing and counts the refund once. |
 
 ## Webhook refunds
 

@@ -848,7 +848,7 @@ $data[
 
 A gateway talks to the provider. FluentCart records the refund. Keep the two apart.
 
-Declare `'refund'` in `$supportedFeatures`. Without it, the admin gets the "record locally" prompt instead of a refund.
+Declare `'refund'` in `$supportedFeatures`. Without it, FluentCart records the refund without calling your gateway and tells the admin to return the money through the provider.
 
 #### Admin refund: `processRefund()`
 

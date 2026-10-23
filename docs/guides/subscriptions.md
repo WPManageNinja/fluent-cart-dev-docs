@@ -192,3 +192,32 @@ add_filter('fluent_cart/license/default_validity_by_variation', function ($valid
 :::
 
 Full reference and additional snippets: [fluent-cart-snippets on GitHub](https://github.com/fluent-cart/fluent-cart-snippets/blob/main/Subscriptions/HOW_TO_ADD_CUSTOM_SUBSCRIPTION_INTERVAL.md)
+
+
+## Migrating subscriptions between Stripe accounts
+
+A merchant may use one Stripe account for WooCommerce and a separate Stripe account for FluentCart. Migrating subscription records into FluentCart does not, by itself, make the customers and saved payment methods from the WooCommerce Stripe account available in the FluentCart Stripe account.
+
+The guidance below applies to store-managed subscriptions with automatic charging (`collection_method = system`). FluentCart owns their renewal schedule and charges the reusable payment method associated with each subscription.
+
+### Option 1: Copy customers and payment methods to the FluentCart Stripe account
+
+Before the next renewal, copy the relevant customers and their supported payment methods from the Stripe account used by WooCommerce to the Stripe account connected to FluentCart. Follow Stripe's official guide: [Copy customer and payment method data across Stripe accounts](https://docs.stripe.com/get-started/data-migrations/pan-copy-self-serve).
+
+After the copy is complete, reconcile the Stripe customer and payment-method references stored in FluentCart with the destination account. Stripe preserves customer IDs during an account copy, but payment-method IDs can change. Use the mapping supplied by Stripe to update the affected references; copying customer records alone is insufficient. See [Data that can be copied between Stripe accounts](https://support.stripe.com/questions/data-that-can-be-copied-between-stripe-accounts).
+
+Once each existing system subscription references a valid customer and reusable payment method in the Stripe account connected to FluentCart, it can continue charging future renewals automatically, subject to the usual payment authorization and decline handling. A system subscription does not require a Stripe-managed subscription object to be copied because FluentCart manages its billing schedule.
+
+### Option 2: Collect a payment method through a manual renewal payment
+
+If customer and payment-method data are not copied between Stripe accounts, the customer can pay an outstanding renewal through Stripe and provide a reusable payment method in the account connected to FluentCart. For system subscriptions, the renewal payment must retain the authorization to save and use that method for future automatic charges.
+
+When saved payment methods are enabled, the renewal checkout can also offer **Save this card for faster checkout next time**. The merchant can configure whether this optional checkbox is initially selected, and the customer can change that selection. This option controls whether the card is offered for future checkout; it is separate from the automatic-renewal authorization required by a system subscription.
+
+After a successful payment, verify that the existing system subscription is associated with both the Stripe customer and reusable payment method from the destination account. Once those billing references are valid, subsequent renewals can be charged automatically without requiring the customer to pay each invoice manually. Paying one renewal manually does not, by itself, change a system subscription to manual billing.
+
+::: warning Verify the subscription's billing references after an account change
+The current Stripe renewal confirmation path updates the subscription's `active_payment_method`, but does not replace an existing `vendor_customer_id` with the customer returned by the new payment. If that ID still belongs to the previous Stripe account, a successful manual payment or a card appearing in the saved-card list does not establish that the next automatic charge will succeed. Reconcile the subscription's customer reference as part of the account transition before relying on automatic billing.
+
+A subscription whose collection method is already `manual` remains manual when a card is saved for future checkout. The save-card checkbox does not convert it to `system`.
+:::

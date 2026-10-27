@@ -57,52 +57,43 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
 
 ## Supported Payment Gateways
 
-### Built-in Gateways
+A gateway is "built-in" only if FluentCart or FluentCart Pro registers it. Core
+registers three in `GlobalPaymentHandler::init()`; Pro registers three more. Everything
+else is a separate add-on plugin that registers itself through
+`fluent_cart/register_payment_methods`.
 
-#### **Stripe** 
-- **Features**: Payment, Refund, Webhook, Custom Payment, Card Update, Dispute Handler
-- **Supported**: Credit Cards, Debit Cards, Digital Wallets
-- **Location**: `app/Modules/PaymentMethods/StripeGateway/`
+### Built-in — FluentCart (free)
 
-#### **PayPal** 
-- **Features**: Payment, Refund, Webhook, Subscriptions
-- **Supported**: PayPal, Credit Cards via PayPal
-- **Location**: `app/Modules/PaymentMethods/PayPalGateway/`
+| Gateway | Slug | Location | Declared features |
+|---|---|---|---|
+| Stripe | `stripe` | `app/Modules/PaymentMethods/StripeGateway/` | payment, refund, webhook, custom_payment, card_update, multi_currency, switch_payment_method, dispute_handler, subscriptions, zero_recurring, system_subscription, manual_subscription, verify_vendor_ids |
+| PayPal | `paypal` | `app/Modules/PaymentMethods/PayPalGateway/` | payment, refund, webhook, custom_payment, card_update, multi_currency, switch_payment_method, dispute_handler, subscriptions, resume_subscription, system_subscription, manual_subscription, verify_vendor_ids |
+| Offline / Cash on Delivery | `offline_payment` | `app/Modules/PaymentMethods/Cod/` | payment, refund, offline, local_refund_only, multi_currency |
 
-#### **Mollie** 
-- **Features**: Payment, Refund, Webhook
-- **Supported**: Credit Cards, SEPA, iDEAL, Bancontact
-- **Location**: `app/Modules/PaymentMethods/MollieGateway/`
+Note the slug: the class is `Cod`, but it registers as `offline_payment`.
 
-#### **Square** 
-- **Features**: Payment, Refund, Webhook
-- **Supported**: Credit Cards, Digital Wallets
-- **Location**: `app/Modules/PaymentMethods/SquareGateway/`
+### Built-in — FluentCart Pro
 
-#### **Razorpay** 
-- **Features**: Payment, Refund, Webhook
-- **Supported**: Credit Cards, UPI, Net Banking, Wallets
-- **Location**: `app/Modules/PaymentMethods/RazorpayGateway/`
+| Gateway | Slug | Location | Declared features |
+|---|---|---|---|
+| Paddle | `paddle` | `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/` | payment, refund, webhook, subscriptions, custom_payment, upgrade_plan, card_update, resume_subscription, manual_subscription, first_cycle_discount, multi_currency |
+| Mollie | `mollie` | `fluent-cart-pro/app/Modules/PaymentMethods/MollieGateway/` | payment, refund, webhook, subscriptions, upgrade_plan, manual_subscription, multi_currency |
+| Authorize.Net | `authorize_dot_net` | `fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/` | payment, refund, webhook, subscriptions, custom_payment, manual_subscription |
 
-#### **Paystack** 
-- **Features**: Payment, Refund, Webhook
-- **Supported**: Credit Cards, Bank Transfer, Mobile Money
-- **Location**: `app/Modules/PaymentMethods/PaystackGateway/`
+### Add-on gateways (separate plugins)
 
-#### **Authorize.Net** 
-- **Features**: Payment, Refund, Webhook
-- **Supported**: Credit Cards, ACH
-- **Location**: `app/Modules/PaymentMethods/AuthorizeNetGateway/`
+These are **not** in the core or Pro codebase. `AddonGatewaysHandler` holds an entry for
+each so the admin can offer installation, and the add-on plugin registers the gateway
+itself once active:
 
-#### **Airwallex** 
-- **Features**: Payment, Refund, Webhook
-- **Supported**: Credit Cards, Local Payment Methods
-- **Location**: `app/Modules/PaymentMethods/AirwallexGateway/`
+`paystack`, `razorpay`, `mercado_pago`, `flutterwave`, `square`, `airwallex`, `sslcommerz`
 
-#### **Cash on Delivery (COD)** 
-- **Features**: Payment, Refund
-- **Supported**: Cash on Delivery
-- **Location**: `app/Modules/PaymentMethods/Cod/`
+::: warning Feature flags are declarative
+`has()` tests membership of `$supportedFeatures`. Some flags are acted on — notably
+`subscriptions`, `system_subscription`, `offline`, `local_refund_only`, `refund`,
+`payment` and `multi_currency`. Others, including `webhook`, are declared by every
+built-in gateway but never queried, so adding one does not switch any behaviour on.
+:::
 
 ## Gateway Development
 

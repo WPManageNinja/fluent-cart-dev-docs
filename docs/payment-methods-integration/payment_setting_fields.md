@@ -55,7 +55,7 @@ Basic input fields for text, passwords, number(with min, max), and emails.
     'type'        => 'text',
     'label'       => __('API Key', 'your-plugin'),
     'placeholder' => __('Enter your API key', 'your-plugin'),
-    'help_text'   => __('Find this in your gateway dashboard', 'your-plugin'),
+    'description' => __('Find this in your gateway dashboard', 'your-plugin'),
 ],
 'secret_key' => [
     'type'        => 'password',
@@ -161,7 +161,8 @@ Displays custom HTML content.
 ```php
 'webhook_info' => [
     'type'  => 'html_attr',
-    'value' => '<div class="fc-gateway-webhook-info">Webhook URL: ' . $this->getWebhookUrl() . '</div>',
+    'value' => '<div class="fc-gateway-webhook-info">Webhook URL: '
+        . $this->getListenerUrl()['listener_url'] . '</div>',
 ],
 ```
 
@@ -230,8 +231,9 @@ Here's a complete example of a `fields()` method in a gateway class:
 ```php
 public function fields(): array
 {
-    // Get webhook URL
-    $webhookUrl = $this->getWebhookUrl();
+    // Get the IPN listener URL. getListenerUrl() returns an array; the URL is
+    // under 'listener_url'. There is no getWebhookUrl() method.
+    $webhookUrl = $this->getListenerUrl()['listener_url'];
     
     // Test mode credentials
     $testSchema = [
@@ -290,9 +292,10 @@ public function fields(): array
             'placeholder' => __('Appears on the checkout page', 'your-plugin'),
         ],
         'checkout_description' => [
-            'type'        => 'textarea',
+            // No 'textarea' type exists — the renderer would skip the field
+            // entirely. Use 'text' for single-line copy.
+            'type'        => 'text',
             'label'       => __('Checkout Description', 'your-plugin'),
-            'value'       => __('Pay securely using your credit card.', 'your-plugin'),
             'placeholder' => __('Appears on the checkout page', 'your-plugin'),
         ],
         'webhook_info' => [
@@ -341,7 +344,7 @@ $apiKey = $this->settings->get($mode . '_api_key');
 | `text`, `input` | Standard text input |
 | `password` | Password input (masked text) |
 | `email` | Email input with validation |
-| `textarea` | Multi-line text input |
+| `number` | Numeric input (supports `min` / `max`) |
 | `select` | Dropdown selection |
 | `radio` | Radio button group |
 | `checkbox` | Single checkbox toggle |
@@ -350,6 +353,10 @@ $apiKey = $this->settings->get($mode . '_api_key');
 | `color` | Color picker |
 | `notice` | Information display |
 | `html_attr` | Raw HTML content |
+| `file` | File picker |
+| `webhook_info` | Webhook panel, shown only while the saved mode matches the field's `mode` (`test` / `live`); the HTML goes in `info`, not `value` |
+| `provider` | Gateway connect/provider block |
+| `active_methods` | Active payment-method picker |
 | `tabs` | Tabbed interface |
 
 For more complete payment method integration examples, refer to the [Complete Payment Gateway Integration Guide](quick-implementation).

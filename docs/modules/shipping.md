@@ -409,7 +409,7 @@ class AdvancedShippingCalculator extends ShippingCalculator
 
 #### List Shipping Zones
 ```http
-GET /wp-json/fluent-cart/v1/shipping/zones
+GET /wp-json/fluent-cart/v2/shipping/zones
 ```
 
 **Response:**
@@ -441,7 +441,7 @@ GET /wp-json/fluent-cart/v1/shipping/zones
 
 #### Create Shipping Zone
 ```http
-POST /wp-json/fluent-cart/v1/shipping/zones
+POST /wp-json/fluent-cart/v2/shipping/zones
 ```
 
 **Request Body:**
@@ -455,7 +455,7 @@ POST /wp-json/fluent-cart/v1/shipping/zones
 
 #### Update Shipping Zone
 ```http
-PUT /wp-json/fluent-cart/v1/shipping/zones/{id}
+PUT /wp-json/fluent-cart/v2/shipping/zones/{id}
 ```
 
 **Request Body:**
@@ -469,14 +469,14 @@ PUT /wp-json/fluent-cart/v1/shipping/zones/{id}
 
 #### Delete Shipping Zone
 ```http
-DELETE /wp-json/fluent-cart/v1/shipping/zones/{id}
+DELETE /wp-json/fluent-cart/v2/shipping/zones/{id}
 ```
 
 ### Shipping Methods API
 
 #### Create Shipping Method
 ```http
-POST /wp-json/fluent-cart/v1/shipping/methods
+POST /wp-json/fluent-cart/v2/shipping/methods
 ```
 
 **Request Body:**
@@ -496,7 +496,7 @@ POST /wp-json/fluent-cart/v1/shipping/methods
 
 #### Update Shipping Method
 ```http
-PUT /wp-json/fluent-cart/v1/shipping/methods
+PUT /wp-json/fluent-cart/v2/shipping/methods
 ```
 
 **Request Body:**
@@ -514,14 +514,14 @@ PUT /wp-json/fluent-cart/v1/shipping/methods
 
 #### Delete Shipping Method
 ```http
-DELETE /wp-json/fluent-cart/v1/shipping/methods/{method_id}
+DELETE /wp-json/fluent-cart/v2/shipping/methods/{method_id}
 ```
 
 ### Shipping Classes API
 
 #### List Shipping Classes
 ```http
-GET /wp-json/fluent-cart/v1/shipping/classes
+GET /wp-json/fluent-cart/v2/shipping/classes
 ```
 
 **Response:**
@@ -551,7 +551,7 @@ GET /wp-json/fluent-cart/v1/shipping/classes
 
 #### Create Shipping Class
 ```http
-POST /wp-json/fluent-cart/v1/shipping/classes
+POST /wp-json/fluent-cart/v2/shipping/classes
 ```
 
 **Request Body:**
@@ -569,7 +569,7 @@ POST /wp-json/fluent-cart/v1/shipping/classes
 ### Getting Available Shipping Methods
 
 ```http
-GET /wp-json/fluent-cart/v1/frontend/shipping/methods
+GET /wp-json/fluent-cart/v2/checkout/get-available-shipping-methods
 ```
 
 **Query Parameters:**
@@ -609,7 +609,7 @@ GET /wp-json/fluent-cart/v1/frontend/shipping/methods
 // Get available shipping methods
 async function getShippingMethods(countryCode) {
   try {
-    const response = await fetch(`/wp-json/fluent-cart/v1/frontend/shipping/methods?country_code=${countryCode}`);
+    const response = await fetch(`/wp-json/fluent-cart/v2/checkout/get-available-shipping-methods?country_code=${countryCode}`);
     const data = await response.json();
     
     if (data.status) {

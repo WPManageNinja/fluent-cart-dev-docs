@@ -32,14 +32,14 @@ class ShippingZone extends Model
 {
     protected $table = 'fct_shipping_zones';
     
+    protected $appends = ['formatted_region'];
+
     protected $fillable = [
         'name',
-        'regions',
-        'order'
-    ];
-    
-    protected $casts = [
-        'regions' => 'array'
+        'region',
+        'order',
+        'shipping_class_id',
+        'meta'
     ];
     
     public function methods(): HasMany
@@ -64,11 +64,16 @@ class ShippingMethod extends Model
         'settings',
         'amount',
         'is_enabled',
-        'order'
+        'order',
+        'states',
+        'meta'
     ];
-    
+
+    protected $appends = ['formatted_states'];
+
     protected $casts = [
-        'settings' => 'array',
+        'settings'   => 'array',
+        'states'     => 'array',
         'is_enabled' => 'boolean'
     ];
     
@@ -109,21 +114,25 @@ use FluentCart\App\Models\ShippingZone;
 // Create a new shipping zone
 $zone = ShippingZone::create([
     'name' => 'United States',
-    'regions' => ['US'],
+    'region' => 'US',
     'order' => 1
 ]);
 
 // Create a zone for multiple countries
 $europeZone = ShippingZone::create([
     'name' => 'Europe',
-    'regions' => ['GB', 'DE', 'FR', 'IT', 'ES'],
+    'region' => 'selection',
+    'meta' => [
+        'countries'      => ['GB', 'DE', 'FR', 'IT', 'ES'],
+        'selection_type' => 'included'
+    ],
     'order' => 2
 ]);
 
 // Create a worldwide zone
 $worldwideZone = ShippingZone::create([
     'name' => 'Rest of World',
-    'regions' => [], // Empty array means worldwide
+    'region' => 'all', // Whole World - only one such zone per shipping class
     'order' => 3
 ]);
 ```
@@ -131,18 +140,22 @@ $worldwideZone = ShippingZone::create([
 ### Managing Zone Regions
 
 ```php
-// Add countries to a zone
+// Target a single country
 $zone = ShippingZone::find(1);
-$zone->regions = ['US', 'CA', 'MX'];
+$zone->region = 'US';
 $zone->save();
 
-// Remove countries from a zone
-$zone->regions = ['US']; // Only US remains
+// Target several countries: region becomes 'selection' and the list lives in meta
+$zone->region = 'selection';
+$zone->meta = [
+    'countries'      => ['US', 'CA', 'MX'],
+    'selection_type' => 'included' // or 'excluded'
+];
 $zone->save();
 
-// Get formatted region names
-$formattedRegions = $zone->formatted_regions;
-// Returns: ['United States', 'Canada', 'Mexico']
+// Get the human-readable region label
+$formattedRegion = $zone->formatted_region;
+// 'United States', or 'Whole World' when region is 'all'
 ```
 
 ## Shipping Methods
@@ -157,15 +170,12 @@ The shipping module provides a flexible framework for creating custom shipping m
 $shippingMethod = ShippingMethod::create([
     'zone_id' => 1,
     'title' => 'Standard Shipping',
-    'type' => 'standard',
-    'amount' => 500, // $5.00 in cents
+    'type' => 'flat_rate',
+    'amount' => 5.00, // base-currency major units, not cents
     'is_enabled' => true,
     'settings' => [
-        'cost' => 500,
-        'description' => 'Standard delivery within 5-7 business days',
-        'per_item' => false,
-        'min_amount' => 0,
-        'max_amount' => 10000
+        'configure_rate'    => 'per_order',
+        'class_aggregation' => 'sum_all'
     ]
 ]);
 ```
@@ -176,13 +186,10 @@ $shippingMethod = ShippingMethod::create([
 $freeShipping = ShippingMethod::create([
     'zone_id' => 1,
     'title' => 'Free Shipping',
-    'type' => 'free',
+    'type' => 'free_shipping',
     'amount' => 0,
     'is_enabled' => true,
-    'settings' => [
-        'minimum_amount' => 5000, // Free shipping over $50
-        'description' => 'Free shipping on orders over $50'
-    ]
+    'settings' => []
 ]);
 ```
 
@@ -192,14 +199,15 @@ $freeShipping = ShippingMethod::create([
 $weightBased = ShippingMethod::create([
     'zone_id' => 1,
     'title' => 'Weight Based Shipping',
-    'type' => 'weight_based',
+    'type' => 'flat_rate',
     'amount' => 0,
     'is_enabled' => true,
     'settings' => [
-        'calculation_type' => 'weight',
-        'base_cost' => 500,
-        'per_kg_cost' => 200,
-        'max_weight' => 20
+        'configure_rate' => 'per_weight',
+        'weight_tiers'   => [
+            ['min' => 0, 'max' => 5, 'cost' => 5.00],
+            ['min' => 5, 'max' => 0, 'cost' => 12.00] // max 0 = no upper bound
+        ]
     ]
 ]);
 ```
@@ -421,15 +429,15 @@ GET /wp-json/fluent-cart/v2/shipping/zones
       {
         "id": 1,
         "name": "United States",
-        "regions": ["US"],
+        "region": "US",
         "order": 1,
-        "formatted_regions": ["United States"],
+        "formatted_region": "United States",
         "methods": [
           {
             "id": 1,
             "title": "Standard Shipping",
             "type": "flat_rate",
-            "amount": 500,
+            "amount": "5.00",
             "is_enabled": true
           }
         ]
@@ -448,7 +456,7 @@ POST /wp-json/fluent-cart/v2/shipping/zones
 ```json
 {
   "name": "Europe",
-  "regions": ["GB", "DE", "FR"],
+  "region": "selection",
   "order": 2
 }
 ```
@@ -462,7 +470,7 @@ PUT /wp-json/fluent-cart/v2/shipping/zones/{id}
 ```json
 {
   "name": "European Union",
-  "regions": ["GB", "DE", "FR", "IT", "ES"],
+  "region": "selection",
   "order": 2
 }
 ```
@@ -485,7 +493,7 @@ POST /wp-json/fluent-cart/v2/shipping/methods
   "zone_id": 1,
   "title": "Express Shipping",
   "type": "flat_rate",
-  "amount": 1500,
+  "amount": "15.00",
   "is_enabled": true,
   "settings": {
     "cost": 1500,
@@ -504,7 +512,7 @@ PUT /wp-json/fluent-cart/v2/shipping/methods
 {
   "method_id": 1,
   "title": "Standard Shipping",
-  "amount": 800,
+  "amount": "8.00",
   "settings": {
     "cost": 800,
     "description": "Standard delivery within 5-7 business days"
@@ -585,7 +593,7 @@ GET /wp-json/fluent-cart/v2/checkout/get-available-shipping-methods
       "id": 1,
       "title": "Standard Shipping",
       "type": "flat_rate",
-      "amount": 500,
+      "amount": "5.00",
       "settings": {
         "description": "Standard delivery within 5-7 business days"
       }
@@ -594,7 +602,7 @@ GET /wp-json/fluent-cart/v2/checkout/get-available-shipping-methods
       "id": 2,
       "title": "Express Shipping",
       "type": "flat_rate",
-      "amount": 1500,
+      "amount": "15.00",
       "settings": {
         "description": "Express delivery within 2-3 business days"
       }

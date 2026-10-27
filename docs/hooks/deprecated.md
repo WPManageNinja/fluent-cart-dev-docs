@@ -14,6 +14,7 @@ This page tracks that lifecycle: which hooks are currently deprecated and still 
 | Hook | Deprecated in | Replacement | Scheduled removal | Docs |
 |------|----------------|-------------|--------------------|------|
 | `fluent_cart/transaction/receipt_page_url` (PayPal redirect only) | 1.6.2 | `fluent_cart/payment/success_url` | Not yet scheduled | [Orders & Payments](/hooks/filters/orders-and-payments) |
+| `fluent_cart/renewal_reminder_overdue` (scheduled reminders only) | 1.6.3 | `fluent_cart/renewal_overdue_first`, `_followup`, `_final` | Not yet scheduled | [Subscriptions](/hooks/actions/subscriptions) |
 
 ::: warning This is not a deprecation of the hook itself
 `fluent_cart/transaction/receipt_page_url` remains fully live for its original purpose — building a transaction's receipt page URL (see [Orders & Payments](/hooks/filters/orders-and-payments)). Only one specific caller is deprecating its *use* of that hook: PayPal's `getConfirmRedirectUrl()` currently reuses it as a stand-in for the post-payment redirect URL, and that narrow use is what's migrating to the more purpose-built `fluent_cart/payment/success_url`. If you hook `fluent_cart/transaction/receipt_page_url` for anything other than a PayPal redirect, this doesn't affect you.

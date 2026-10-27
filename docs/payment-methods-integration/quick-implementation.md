@@ -104,11 +104,13 @@ use FluentCart\Framework\Support\Arr;
 class YourGateway extends AbstractPaymentGateway
 {
     // Define supported features
+    // Features the base class actually checks via has(). 'payment' and 'refund'
+    // are the real ones; there is no 'webhook' feature — nothing in core reads it.
+    // Do not list 'subscriptions' here: AbstractPaymentGateway::__construct()
+    // appends it automatically when you pass a subscription module.
     public array $supportedFeatures = [
         'payment',
-        'webhook',
-        'refund',
-        'subscriptions'
+        'refund'
     ];
     
 
@@ -126,7 +128,7 @@ class YourGateway extends AbstractPaymentGateway
         // initialize any hanldere, webhook/ payment confirmation class if needed
     }
 
-    #equired: Return gateway metadata
+    // Required: Return gateway metadata
     public function meta(): array
     {
         return [
@@ -143,11 +145,8 @@ class YourGateway extends AbstractPaymentGateway
         ];
     }
 
-    #equired: Check if gateway supports a feature
-    public function has(string $feature): bool
-    {
-        return in_array($feature, $this->supportedFeatures);
-    }
+    // Not required: AbstractPaymentGateway already implements has() against
+    // $supportedFeatures. Override it only if you need custom feature logic.
 
     // Required: Process payment
     public function makePaymentFromPaymentInstance(PaymentInstance $paymentInstance)
@@ -209,7 +208,7 @@ class YourGateway extends AbstractPaymentGateway
                 'handle' => 'fluent-cart-your-gateway-checkout',
                 'src' => plugin_dir_url(__FILE__) . 'assets/js/your-gateway-checkout.js',
                 'deps' => ['your-gateway-external-lib'],
-                'version' => FLUENTCART_PLUGIN_VERSION
+                'version' => FLUENTCART_VERSION
             ]
         ];
     }
@@ -377,10 +376,6 @@ public function makePaymentFromPaymentInstance(PaymentInstance $paymentInstance)
 {
     $order = $paymentInstance->order;
     
-    if ($paymentInstance->subscription) {
-        return (new Processor())->handleSubscriptionPayment($paymentInstance);
-    }
-    
     // check if this is a subscription payment
     if ($paymentInstance->subscription) {
         return $this->handleSubscriptionPayment($paymentInstance);
@@ -502,7 +497,7 @@ return [
 
 Payment confirmation can be done in two ways:
 
-#### Ajax call From you your-gateway-checkout.js (onsite payment)
+#### Ajax call from your your-gateway-checkout.js (onsite payment)
 
 ```php
 <?php
@@ -833,11 +828,16 @@ FluentCart provides these services to make gateway development easier:
 // Update order status and fire all necessary hooks
 (new \FluentCart\App\Helpers\StatusHelper($order))->syncOrderStatuses($transaction);
 
-// This automatically fires:
-// - fluent_cart/order_paid (for successful payments)
-// - fluent_cart/order_failed (for failed payments)
-// - fluent_cart/order_status_updated
-$data[
+// Hooks that actually fire from this call:
+// - fluent_cart/order_paid, then fluent_cart/order_paid_done
+// - fluent_cart/renewal_paid (renewal orders)
+// - fluent_cart/cart_completed
+// - fluent_cart/subscription_activated (when a subscription starts)
+//
+// fluent_cart/order_failed does not exist, and
+// fluent_cart/order_status_updated never fires — the OrderStatusUpdated event
+// sets autoFireHook = false and its do_action in Order.php is commented out.
+$data = [
     'order'       => $this->order,
     'customer'    => $this->customer ?? null,
     'transaction' => $this->transaction ?? null
@@ -863,17 +863,20 @@ $data[
 
 ### Subscription Handling
 
-For subscription renewals, use the SubscriptionRenewal service:
+For subscription renewals, use `SubscriptionService`. There is no
+`SubscriptionRenewal` class. Note the argument order: the transaction data comes
+**first**, the subscription second.
 
 ```php
-\FluentCart\App\Services\Subscription\SubscriptionRenewal::recordRenewalPayment(
-    $subscription, 
+\FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::recordRenewalPayment(
     [
-        'amount' => $amount,
+        'amount'         => $amount,          // cents
         'transaction_id' => $paymentId,
         'payment_method' => 'your_gateway',
-        'status' => 'completed'
-    ]
+        'status'         => 'completed'
+    ],
+    $subscription,          // optional
+    []                      // optional subscription update args
 );
 ```
 
@@ -883,8 +886,9 @@ Key hooks to be aware of:
 
 1. **Payment Hooks** (Handled by StatusHelper):
    - `fluent_cart/order_paid`
-   - `fluent_cart/order_failed`
-   - `fluent_cart/order_status_updated`
+   - `fluent_cart/order_paid_done`
+   - `fluent_cart/renewal_paid`
+   - `fluent_cart/cart_completed`
 
     ``` php
    $data = array(
@@ -894,11 +898,14 @@ Key hooks to be aware of:
    );
    ```
 
-2. **Subscription Hooks**:
-   - `fluent_cart/subscription_created`
+2. **Subscription Hooks** (dispatched as events):
    - `fluent_cart/subscription_activated`
    - `fluent_cart/subscription_renewed`
-   - `fluent_cart/subscription_cancelled`
+   - `fluent_cart/subscription_canceled` — one `l`, matching `Status::SUBSCRIPTION_CANCELED`
+   - `fluent_cart/subscription_renewal_failed`
+   - `fluent_cart/subscription_paused`, `_resumed`, `_reactivated`
+
+   There is no `subscription_created` or `subscription_cancelled` hook.
 
    <!-- add data passed with these hooks  -->
    ``` php
@@ -926,7 +933,7 @@ A few things that aren't obvious from the interface/base class alone and can cos
 - **Amounts are already in minor units.** FluentCart stores/passes order and transaction amounts in minor units (cents/øre — e.g. `$5.00` is `500`). Do not multiply by 100 again when sending amounts to your gateway's API — that doubles (well, 100×s) every charge. Only convert if your gateway's API expects major units.
 - **`renderStoreModeNotice()` must be `public`.** It's called by the parent class to render the test/live mode notice in admin, so declaring it `protected`/`private` breaks the call even though it feels like an internal helper.
 - **`getOrderInfo(array $data)` is required.** It's declared on `PaymentGatewayInterface`, not flagged with an `abstract` keyword on `AbstractPaymentGateway` itself — easy to miss and skip, but omitting it is a fatal error.
-- **Read the store currency via `CurrencySettings::get('currency')`** (`FluentCart\App\Api\CurrencySettings`), not by re-deriving it from settings/options yourself.
+- **Read the store currency via `CurrencySettings::get('currency')`** (`FluentCart\Api\CurrencySettings`), not by re-deriving it from settings/options yourself.
 - **Don't eagerly `require` your gateway class file** — see the warning in [Step 1](#step-1-register-your-gateway). Load it lazily from inside the `fluent_cart/register_payment_methods` callback, not at plugin bootstrap or on `fluentcart_loaded`.
 
 ## Additional Resources

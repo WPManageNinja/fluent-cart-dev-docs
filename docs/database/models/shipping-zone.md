@@ -27,8 +27,10 @@ The following computed attributes are automatically appended to the model's arra
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
 | id                 | Integer   | Primary Key |
+| shipping_class_id  | Integer   | Scopes the zone to one shipping class; `NULL` means it applies to class-less items |
 | name               | String    | Shipping zone name |
-| region             | String    | Region/country code (or `'all'` for whole world) |
+| region             | String    | A country code, `'all'` (Whole World) or `'selection'` (multiple countries, listed in `meta`) |
+| meta               | Array     | For `'selection'` zones: `countries` and `selection_type` (`included` / `excluded`) |
 | order              | Integer   | Display order |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
@@ -53,6 +55,18 @@ $shippingZone->formatted_region; // returns formatted region name (appended attr
 
 This model has the following relationships that you can use
 
+### shippingClass
+
+Access the shipping class this zone is scoped to, if any.
+
+* return `FluentCart\App\Models\ShippingClass` Model or `null`
+
+#### Example:
+
+```php
+$class = $shippingZone->shippingClass;
+```
+
 ### methods
 
 Access all shipping methods in this zone. Results are ordered by `id` descending.
@@ -74,6 +88,24 @@ $shippingZones = FluentCart\App\Models\ShippingZone::whereHas('methods', functio
 ## Methods
 
 Along with Global Model methods, this model has few helper methods.
+
+### appliesToCountry($country)
+
+Whether this zone covers the given country. Returns `true` for `region = 'all'`. For
+`region = 'selection'` it checks `meta.countries` honouring `meta.selection_type`
+(`included` or `excluded`). Otherwise it compares `region` to the country code.
+
+* Parameters
+   * $country - string (country code)
+* Returns `bool`
+
+#### Usage
+
+```php
+if ($shippingZone->appliesToCountry('DE')) {
+    // zone covers Germany
+}
+```
 
 ### getFormattedRegionAttribute()
 

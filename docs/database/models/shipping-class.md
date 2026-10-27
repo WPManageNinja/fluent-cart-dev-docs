@@ -28,7 +28,8 @@ description: FluentCart ShippingClass model documentation with attributes, scope
 | ------------------ | --------- | ------- |
 | id                 | Integer   | Primary Key |
 | name               | String    | Shipping class name |
-| cost               | Float     | Shipping cost (cast to float) |
+| description        | String    | Shipping class description (max 500 chars) |
+| cost               | Float     | Surcharge in base-currency major units, not cents (cast to float) |
 | type               | String    | Shipping class type |
 | per_item           | Boolean   | Whether cost is per item |
 | created_at         | Date Time | Creation timestamp |
@@ -52,11 +53,19 @@ $shippingClass->per_item; // returns per_item flag
 
 ## Relations
 
-This model does not currently define any relationships.
+This model has the following relationships that you can use
 
-::: info Note
-A `products` relationship (`hasMany` to `Product`) is planned but not yet implemented in the source code.
-:::
+### zones
+
+Access the shipping zones scoped to this class.
+
+* return `FluentCart\App\Models\ShippingZone` Model Collection
+
+#### Example:
+
+```php
+$zones = $shippingClass->zones;
+```
 
 ## Usage Examples
 

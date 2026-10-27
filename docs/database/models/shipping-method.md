@@ -80,10 +80,15 @@ This model has the following scopes that you can use
 ### applicableToCountry($country, $state)
 
 Filter methods applicable to a specific country and state. This scope:
-1. Filters by zone region matching the country or `'all'`
-2. Filters by states -- includes methods with empty states array, or methods whose states contain the given state
-3. Orders results by `amount` descending
-4. Only returns enabled methods (`is_enabled = 1`)
+1. Filters by zone region matching the country, `'all'`, or `'selection'`
+2. Only considers class-less zones -- those whose `shipping_class_id` is `NULL` or `0`
+3. Filters by states -- includes methods with empty states array, or methods whose states contain the given state
+4. Orders results by `amount` descending
+5. Only returns enabled methods (`is_enabled = 1`)
+
+Because step 1 admits every `'selection'` zone, this scope alone can return methods
+from selection zones that do not actually cover the country. Use
+`getApplicableForCountry()` when that matters.
 
 Supports both MySQL (using JSON functions) and SQLite (using string search) for state filtering.
 
@@ -168,6 +173,23 @@ Get meta with automatic JSON decoding (accessor). Decodes the stored JSON string
 
 ```php
 $meta = $shippingMethod->meta; // Returns decoded array
+```
+
+### getApplicableForCountry($country, $state = null)
+
+Static helper that runs the `applicableToCountry` scope, eager-loads `zone`, then
+post-filters `'selection'` zones through `ShippingZone::appliesToCountry()` so only
+zones that genuinely cover the country remain. Prefer this over the raw scope.
+
+* Parameters
+   * $country - string (country code)
+   * $state - string|null (state code)
+* Returns `FluentCart\Framework\Database\Orm\Collection` of `ShippingMethod`
+
+#### Usage
+
+```php
+$methods = FluentCart\App\Models\ShippingMethod::getApplicableForCountry('DE');
 ```
 
 ## Usage Examples

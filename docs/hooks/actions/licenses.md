@@ -141,6 +141,12 @@ add_action('fluent_cart_sl/license_activation_status_updated_to_active', functio
 <details>
 <summary><code>fluent_cart_sl/license_limit_increased</code> <Badge type="warning" text="Pro" /> &mdash; Fires when the license activation count is increased</summary>
 
+::: warning Not currently fired
+The only site that fires this action is `License::increaseActivationCount()`, which nothing in FluentCart or
+FluentCart Pro calls outside Pro's wp-browser tests. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 This action fires when a [License](/database/models/license)'s activation count is increased.
 
@@ -334,6 +340,12 @@ add_action('fluent_cart/licensing/license_issued', function ($data) {
 ### <code> license_issued (manager) </code>
 <details>
 <summary><code>fluent_cart_sl/license_issued</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a license is issued via the license manager</summary>
+
+::: warning Not currently fired
+The only site that fires this action is `LicenseManager::issueLicense()`, which nothing in FluentCart or
+FluentCart Pro calls outside Pro's wp-browser tests. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
 
 **When it runs:**
 This action fires when a license is created through the admin license management interface.
@@ -737,6 +749,12 @@ add_action('fluent_cart_sl/site_license_deactivated', function ($data) {
 <details>
 <summary><code>fluent_cart_sl/before_deleting_licenses</code> <Badge type="warning" text="Pro" /> &mdash; Fires before licenses are bulk deleted by order</summary>
 
+::: warning Not currently fired
+The only site that fires this action is `LicenseManager::deleteLicensesByOrderId()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 This action fires immediately before a collection of licenses is deleted as part of a bulk operation (e.g., when an order is deleted).
 
@@ -763,6 +781,12 @@ add_action('fluent_cart_sl/before_deleting_licenses', function ($data) {
 <details>
 <summary><code>fluent_cart_sl/after_deleting_licenses</code> <Badge type="warning" text="Pro" /> &mdash; Fires after licenses are bulk deleted</summary>
 
+::: warning Not currently fired
+The only site that fires this action is `LicenseManager::deleteLicensesByOrderId()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 This action fires immediately after a collection of licenses has been deleted.
 
@@ -786,6 +810,12 @@ add_action('fluent_cart_sl/after_deleting_licenses', function ($data) {
 ### <code> before_updating_licenses_status </code>
 <details>
 <summary><code>fluent_cart_sl/before_updating_licenses_status</code> <Badge type="warning" text="Pro" /> &mdash; Fires before a bulk license status update</summary>
+
+::: warning Not currently fired
+The only site that fires this action is `LicenseManager::disableLicenseByOrderId()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
 
 **When it runs:**
 This action fires immediately before a collection of licenses has their status updated in bulk.
@@ -811,6 +841,12 @@ add_action('fluent_cart_sl/before_updating_licenses_status', function ($data) {
 <details>
 <summary><code>fluent_cart_sl/before_updating_licenses_status_to_disabled</code> <Badge type="warning" text="Pro" /> &mdash; Fires before licenses are bulk disabled</summary>
 
+::: warning Not currently fired
+The only site that fires this action is `LicenseManager::disableLicenseByOrderId()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 This action fires immediately before a collection of licenses is bulk-disabled.
 
@@ -835,6 +871,12 @@ add_action('fluent_cart_sl/before_updating_licenses_status_to_disabled', functio
 <details>
 <summary><code>fluent_cart_sl/after_updating_licenses_status</code> <Badge type="warning" text="Pro" /> &mdash; Fires after a bulk license status update</summary>
 
+::: warning Not currently fired
+The only site that fires this action is `LicenseManager::disableLicenseByOrderId()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 This action fires immediately after a collection of licenses has had their status updated in bulk.
 
@@ -858,6 +900,12 @@ add_action('fluent_cart_sl/after_updating_licenses_status', function ($data) {
 ### <code> after_updating_licenses_status_to_disabled </code>
 <details>
 <summary><code>fluent_cart_sl/after_updating_licenses_status_to_disabled</code> <Badge type="warning" text="Pro" /> &mdash; Fires after licenses are bulk disabled</summary>
+
+::: warning Not currently fired
+The only site that fires this action is `LicenseManager::disableLicenseByOrderId()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
 
 **When it runs:**
 This action fires immediately after a collection of licenses has been bulk-disabled.

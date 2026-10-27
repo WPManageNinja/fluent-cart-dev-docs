@@ -369,6 +369,12 @@ add_filter('fluent_cart/variation/can_purchase_bundle', function ($result, $data
 <details>
 <summary><code>fluent_cart/cart/context_data</code> &mdash; Filter the cart's context data snapshot</summary>
 
+::: warning Not currently fired
+The only site that applies this filter is `Cart::getContextData()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 This filter is applied at the end of the [Cart](/database/models/cart) model's context-data builder, which assembles a snapshot describing the current cart used by gateways and integrations that need cart context without holding the full model.
 
@@ -1485,6 +1491,12 @@ add_filter('fluent_cart/checkout_shipping_fields', function ($fields, $data) {
 <details>
 <summary><code>fluent_cart/checkout_signup_fields</code> &mdash; Modify the account signup form fields</summary>
 
+::: warning Not currently fired
+The only site that applies this filter is `CartCheckoutHelper::getSignupFields()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 This filter fires when the guest checkout signup form fields (username, email, password) are assembled.
 
@@ -1529,6 +1541,12 @@ add_filter('fluent_cart/checkout_signup_fields', function ($fields) {
 ### <code> checkout_login_fields </code>
 <details>
 <summary><code>fluent_cart/checkout_login_fields</code> &mdash; Modify the checkout login form fields</summary>
+
+::: warning Not currently fired
+The only site that applies this filter is `CartCheckoutHelper::getLoginFields()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
 
 **When it runs:**
 This filter fires when the login form fields (username, password) are assembled for the checkout page.
@@ -1575,6 +1593,12 @@ add_filter('fluent_cart/checkout_login_fields', function ($fields) {
 ### <code> checkout_coupon_fields </code>
 <details>
 <summary><code>fluent_cart/checkout_coupon_fields</code> &mdash; Modify the coupon input fields</summary>
+
+::: warning Not currently fired
+The only site that applies this filter is `CartCheckoutHelper::getCouponFields()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
 
 **When it runs:**
 This filter fires when the coupon code input fields are assembled for the checkout page.

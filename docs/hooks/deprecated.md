@@ -1,6 +1,6 @@
 ---
 title: Deprecated Hooks
-description: Status registry for FluentCart hooks — which are deprecated and still fire, and which have been fully removed, with replacements and version numbers.
+description: Status registry for FluentCart hooks — which are deprecated and still fire, which have been fully removed, and which exist but are never fired, with replacements and version numbers.
 ---
 
 # Deprecated Hooks
@@ -8,6 +8,45 @@ description: Status registry for FluentCart hooks — which are deprecated and s
 FluentCart deprecates a hook through WordPress's `apply_filters_deprecated()` / `do_action_deprecated()` for at least one release before removing it outright. While deprecated, the old name still fires (usually forwarding into the new name's default value) so existing integrations keep working, but it logs a deprecation notice and will stop firing in a future release.
 
 This page tracks that lifecycle: which hooks are currently deprecated and still fire today, and which have been removed and no longer fire at all. It's updated as hooks move through that lifecycle — check back here before assuming an old hook name still works.
+
+It also lists hooks that are **not currently fired** — present in source, never deprecated, but unreachable because their only call site sits in a method nothing calls.
+
+## Not currently fired
+
+These hooks exist in source, but their only `do_action()` / `apply_filters()` site sits
+inside a method that nothing in FluentCart or FluentCart Pro calls. They are not
+deprecated — nothing is scheduled to remove them — but a callback added to one will not
+run on its own. It fires only if your own code calls the listed method directly.
+
+| Hook | Only firing site | Docs |
+|------|------------------|------|
+| `fluent_cart/cart/context_data` | `Cart::getContextData()` | [Cart & Checkout](/hooks/filters/cart-and-checkout) |
+| `fluent_cart/checkout_signup_fields` | `CartCheckoutHelper::getSignupFields()` | [Cart & Checkout](/hooks/filters/cart-and-checkout) |
+| `fluent_cart/checkout_login_fields` | `CartCheckoutHelper::getLoginFields()` | [Cart & Checkout](/hooks/filters/cart-and-checkout) |
+| `fluent_cart/checkout_coupon_fields` | `CartCheckoutHelper::getCouponFields()` | [Cart & Checkout](/hooks/filters/cart-and-checkout) |
+| `fluent_cart/coupon_statuses` | `Helper::getCouponStatuses()` | [Products & Pricing](/hooks/filters/products-and-pricing) |
+| `fluent_cart/integration/save_integration_values_{$name}` | `GlobalIntegrationSettings::prepareFeedData()` | [Integrations & Advanced](/hooks/filters/integrations-and-advanced) |
+| `fluent_cart/integration/editing_integration_{$key}` | `IntegrationHelper::formatFeedDataForEditing()` | [Integrations & Advanced](/hooks/filters/integrations-and-advanced) |
+| `fluent_cart_sl/issue_license_data` | `LicenseManager::issueLicense()` | [Integrations & Advanced](/hooks/filters/integrations-and-advanced) |
+| `fluent_cart_sl/license_issued` (manager path) | `LicenseManager::issueLicense()` | [Licenses](/hooks/actions/licenses) |
+| `fluent_cart_sl/before_deleting_licenses` | `LicenseManager::deleteLicensesByOrderId()` | [Licenses](/hooks/actions/licenses) |
+| `fluent_cart_sl/after_deleting_licenses` | `LicenseManager::deleteLicensesByOrderId()` | [Licenses](/hooks/actions/licenses) |
+| `fluent_cart_sl/before_updating_licenses_status` | `LicenseManager::disableLicenseByOrderId()` | [Licenses](/hooks/actions/licenses) |
+| `fluent_cart_sl/before_updating_licenses_status_to_disabled` | `LicenseManager::disableLicenseByOrderId()` | [Licenses](/hooks/actions/licenses) |
+| `fluent_cart_sl/after_updating_licenses_status` | `LicenseManager::disableLicenseByOrderId()` | [Licenses](/hooks/actions/licenses) |
+| `fluent_cart_sl/after_updating_licenses_status_to_disabled` | `LicenseManager::disableLicenseByOrderId()` | [Licenses](/hooks/actions/licenses) |
+| `fluent_cart_sl/license_limit_increased` (activation-count path, `old_count`) | `License::increaseActivationCount()` | [Licenses](/hooks/actions/licenses) |
+
+::: tip The limit-slot path does fire
+`fluent_cart_sl/license_limit_increased` has two call sites. The one above is
+unreachable, but `License::increaseLimit()` is called from `LicenseController` and fires
+the same hook name with `old_limit` rather than `old_count`. If you listen on this hook,
+expect the `old_limit` payload.
+:::
+
+`LicenseManager`'s methods are public statics, so calling them from your own integration
+is a legitimate way to issue or revoke licences — and doing so will fire these hooks.
+They are listed here because nothing in the shipped plugins reaches them.
 
 ## Deprecated — still fires, not yet removed
 

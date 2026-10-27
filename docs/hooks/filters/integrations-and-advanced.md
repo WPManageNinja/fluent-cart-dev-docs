@@ -358,6 +358,12 @@ add_filter('fluent_cart/integration/get_integration_settings_fields_zapier', fun
 <details>
 <summary><code>fluent_cart/integration/save_integration_values_{$name}</code> &mdash; Filter before saving integration data (DYNAMIC)</summary>
 
+::: warning Not currently fired
+The only site that applies this filter is `GlobalIntegrationSettings::prepareFeedData()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 This dynamic filter is applied just before integration settings are saved to the database. The `{$name}` is replaced with the integration name.
 
@@ -474,6 +480,12 @@ add_filter('fluent_cart/integration/integration_saving_data_mailchimp', function
 ### <code> editing_integration_{$key} </code>
 <details>
 <summary><code>fluent_cart/integration/editing_integration_{$key}</code> &mdash; Filter integration data when editing (DYNAMIC)</summary>
+
+::: warning Not currently fired
+The only site that applies this filter is `IntegrationHelper::formatFeedDataForEditing()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
 
 **When it runs:**
 This dynamic filter is applied when an integration is being loaded for editing in the admin UI.
@@ -2341,6 +2353,12 @@ add_filter('fluent_cart_sl/generate_license_key', function ($key, $context) {
 ### <code> fluent_cart_sl/issue_license_data </code>
 <details>
 <summary><code>fluent_cart_sl/issue_license_data</code> <Badge type="warning" text="Pro" /> &mdash; Filter license issue data</summary>
+
+::: warning Not currently fired
+The only site that applies this filter is `LicenseManager::issueLicense()`, which nothing in FluentCart or
+FluentCart Pro calls outside Pro's wp-browser tests. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
 
 **When it runs:**
 This filter is applied to license data when issuing a new license through the license manager.

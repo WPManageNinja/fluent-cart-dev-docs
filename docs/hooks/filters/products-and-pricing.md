@@ -1348,6 +1348,12 @@ add_filter('fluent_cart/discount/pre_apply', function($cartItems, $data) {
 <details>
 <summary><code>fluent_cart/coupon_statuses</code> &mdash; Filter the available coupon statuses</summary>
 
+::: warning Not currently fired
+The only site that applies this filter is `Helper::getCouponStatuses()`, which nothing in FluentCart or
+FluentCart Pro calls. A callback added here will not run unless your own code calls
+that method directly. See [Hook Status](/hooks/deprecated#not-currently-fired).
+:::
+
 **When it runs:**
 Applied by `Helper::getCouponStatuses()` to the default coupon status map, and returns its result.
 

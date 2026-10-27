@@ -11,7 +11,9 @@ Configure shipping zones, manage shipping methods within zones, and organize pro
 
 **Policy:** `StoreSensitivePolicy`
 
-> All monetary values are in **cents** (e.g., `$10.00` = `1000`).
+> Shipping amounts on this page are **decimal base-currency major units**, not cents
+> (`5.00` means $5.00). Method `amount` and class `cost` are both `DECIMAL(10,2)`.
+> When a method's `settings.configure_rate` is `per_price`, `amount` is a percentage instead.
 
 ---
 
@@ -94,7 +96,10 @@ Create a new shipping zone.
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `name` | string | body | Yes | Zone name (max 192 characters) |
-| `region` | string | body | No | ISO 3166-1 alpha-2 country code (e.g., `US`, `GB`) or `all` for worldwide. Only one `all` zone is allowed. |
+| `region` | string | body | No | ISO 3166-1 alpha-2 country code (e.g., `US`, `GB`), `all` for worldwide, or `selection` for several countries. Only one `all` zone is allowed **per shipping class** — one for `shipping_class_id` and one for class-less zones. |
+| `shipping_class_id` | integer | body | No | Scopes the zone to one shipping class. Omit or send `null` for class-less items. |
+| `meta.countries` | array | body | No | Country codes, used when `region` is `selection` |
+| `meta.selection_type` | string | body | No | `included` or `excluded` — whether `meta.countries` is an allow or deny list |
 | `order` | integer | body | No | Sort order for display priority |
 
 #### Response
@@ -339,13 +344,13 @@ Retrieve state/province options and address locale configuration for a given cou
 {
   "data": {
     "country_code": "US",
-    "states": {
-      "AL": "Alabama",
-      "AK": "Alaska",
-      "AZ": "Arizona",
-      "CA": "California",
-      "NY": "New York"
-    },
+    "states": [
+      { "value": "AL", "name": "Alabama" },
+      { "value": "AK", "name": "Alaska" },
+      { "value": "AZ", "name": "Arizona" },
+      { "value": "CA", "name": "California" },
+      { "value": "NY", "name": "New York" }
+    ],
     "address_locale": {
       "state": {
         "label": "State",
@@ -359,6 +364,9 @@ Retrieve state/province options and address locale configuration for a given cou
   }
 }
 ```
+
+`address_locale` only carries the fields that differ for the requested country, so its
+keys vary from one country to the next.
 
 When no country code is provided or the country has no states:
 
@@ -401,12 +409,13 @@ Create a new shipping method within a shipping zone.
 | `zone_id` | integer | body | Yes | ID of the parent shipping zone |
 | `title` | string | body | Yes | Method display title (max 192 characters) |
 | `type` | string | body | Yes | Shipping method type (max 192 characters), e.g., `flat_rate`, `free_shipping`, `local_pickup` |
-| `amount` | string | body | No | Shipping cost in cents (e.g., `500` for $5.00) |
+| `amount` | number | body | No | Base rate in major units (e.g., `5.00` for $5.00); a percentage when `configure_rate` is `per_price` |
 | `is_enabled` | integer | body | No | Enable/disable the method: `1` (enabled) or `0` (disabled). Default: `1` |
 | `states` | array | body | No | Array of state/province codes to restrict this method to (e.g., `["CA", "NY"]`). Empty array means all states. |
 | `settings` | object | body | No | Additional settings for the method |
-| `settings.configure_rate` | string | body | No | Rate configuration type |
-| `settings.class_aggregation` | string | body | No | How shipping classes are aggregated |
+| `settings.configure_rate` | string | body | No | `per_order` (default), `per_price`, `per_weight`, or per item |
+| `settings.class_aggregation` | string | body | No | `sum_all` (default) or `highest_class` |
+| `settings.weight_tiers` | array | body | No | Used when `configure_rate` is `per_weight`; each tier is `{min, max, cost}`, `max` of `0` meaning no upper bound |
 | `meta` | object | body | No | Additional metadata key-value pairs (string values only) |
 
 #### Response
@@ -432,7 +441,7 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/shipping/methods" \
     "states": ["CA", "NY"],
     "settings": {
       "configure_rate": "per_order",
-      "class_aggregation": "per_class"
+      "class_aggregation": "sum_all"
     }
   }'
 ```
@@ -456,12 +465,13 @@ Update an existing shipping method. The method ID is passed in the request body.
 | `zone_id` | integer | body | Yes | ID of the parent shipping zone |
 | `title` | string | body | Yes | Method display title (max 192 characters) |
 | `type` | string | body | Yes | Shipping method type (max 192 characters), e.g., `flat_rate`, `free_shipping`, `local_pickup` |
-| `amount` | string | body | No | Shipping cost in cents (e.g., `500` for $5.00) |
+| `amount` | number | body | No | Base rate in major units (e.g., `5.00` for $5.00); a percentage when `configure_rate` is `per_price` |
 | `is_enabled` | integer | body | No | Enable/disable the method: `1` (enabled) or `0` (disabled) |
 | `states` | array | body | No | Array of state/province codes to restrict this method to. Empty array means all states. |
 | `settings` | object | body | No | Additional settings for the method |
-| `settings.configure_rate` | string | body | No | Rate configuration type |
-| `settings.class_aggregation` | string | body | No | How shipping classes are aggregated |
+| `settings.configure_rate` | string | body | No | `per_order` (default), `per_price`, `per_weight`, or per item |
+| `settings.class_aggregation` | string | body | No | `sum_all` (default) or `highest_class` |
+| `settings.weight_tiers` | array | body | No | Used when `configure_rate` is `per_weight`; each tier is `{min, max, cost}`, `max` of `0` meaning no upper bound |
 | `meta` | object | body | No | Additional metadata key-value pairs (string values only) |
 
 #### Response
@@ -601,7 +611,8 @@ Create a new shipping class.
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `name` | string | body | Yes | Class name (max 192 characters) |
-| `cost` | numeric | body | Yes | Cost value (minimum: `0`). For `fixed` type, this is a flat amount. For `percentage` type, this is a percentage value. |
+| `description` | string | body | No | Class description (max 500 characters) |
+| `cost` | numeric | body | Yes | Cost value (minimum: `0`). For `fixed` type, a flat surcharge in major units, not cents. For `percentage` type, a percentage value. |
 | `type` | string | body | Yes | Cost type: `fixed` or `percentage` |
 | `per_item` | integer | body | No | Apply cost per item (`1`) or per order (`0`). Default: `0` |
 
@@ -760,6 +771,99 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/shipping/classes/1" \
 
 ---
 
+### Get Shipping Class Profile
+
+Return one shipping class with its zones and each zone's methods eager-loaded.
+
+```http
+GET /wp-json/fluent-cart/v2/shipping/classes/{id}/profile
+```
+
+- **Permission:** `store/sensitive`
+- Unknown `id` returns a 404 (`findOrFail`).
+
+#### Response
+
+```json
+{
+  "shipping_class": {
+    "id": 2,
+    "name": "Bulky",
+    "description": "Oversized items",
+    "cost": "7.50",
+    "type": "fixed",
+    "per_item": 0,
+    "zones": [
+      { "id": 5, "name": "Europe", "region": "selection", "methods": [] }
+    ]
+  }
+}
+```
+
+---
+
+### Get Countries by Continent
+
+Countries grouped by continent, for building zone pickers.
+
+```http
+GET /wp-json/fluent-cart/v2/shipping/zone/countries
+```
+
+- **Permission:** `store/sensitive`
+- Continents with no known countries are omitted.
+
+#### Response
+
+```json
+{
+  "data": {
+    "EU": {
+      "name": "Europe",
+      "countries": [
+        { "code": "DE", "name": "Germany" },
+        { "code": "FR", "name": "France" }
+      ]
+    }
+  }
+}
+```
+
+---
+
+## Shipping Packages
+
+Packages are stored as the `shipping_packages` store option, not in a database table.
+
+### Get Shipping Packages
+
+```http
+GET /wp-json/fluent-cart/v2/shipping/packages
+```
+
+- **Permission:** `store/sensitive`
+- Returns `{ "packages": [] }` when none are configured.
+
+### Save Shipping Packages
+
+```http
+POST /wp-json/fluent-cart/v2/shipping/packages
+```
+
+- **Permission:** `store/sensitive`
+- Replaces the whole list. A non-array `packages` value is stored as an empty list.
+- At most **50** packages are kept; the rest are dropped.
+- `type` must be one of `box`, `envelope`, `soft_package`.
+- Dimension units: `cm`, `mm`, `in`, `m`. Weight units: `kg`, `g`, `lbs`, `oz`.
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `packages` | array | body | Yes | The full package list; capped at 50 entries |
+
+---
+
 ## Data Models
 
 ### Shipping Zone Object
@@ -768,7 +872,9 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/shipping/classes/1" \
 |-------|------|-------------|
 | `id` | integer | Unique zone identifier |
 | `name` | string | Zone display name |
-| `region` | string | ISO 3166-1 alpha-2 country code or `all` for worldwide |
+| `region` | string | ISO 3166-1 alpha-2 country code, `all` for worldwide, or `selection` for several countries |
+| `shipping_class_id` | integer | Scopes the zone to one shipping class; `null` means it applies to class-less items |
+| `meta` | object | For `selection` zones: `countries` and `selection_type` (`included` / `excluded`) |
 | `order` | integer | Sort order for display priority |
 | `formatted_region` | string | Human-readable region name (computed) |
 | `methods` | array | Associated shipping methods (included when using `show` endpoint) |
@@ -783,7 +889,7 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/shipping/classes/1" \
 | `zone_id` | integer | Parent shipping zone ID |
 | `title` | string | Method display title |
 | `type` | string | Method type (e.g., `flat_rate`, `free_shipping`, `local_pickup`) |
-| `amount` | integer | Shipping cost in cents |
+| `amount` | string | Base rate as a decimal in major units (`"5.00"`); a percentage when `settings.configure_rate` is `per_price` |
 | `is_enabled` | boolean | Whether the method is active |
 | `states` | array | State/province codes this method applies to (empty = all states) |
 | `settings` | object | Additional configuration settings |
@@ -799,7 +905,8 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/shipping/classes/1" \
 |-------|------|-------------|
 | `id` | integer | Unique class identifier |
 | `name` | string | Class display name |
-| `cost` | float | Cost value (flat amount or percentage, depending on `type`) |
+| `description` | string | Class description (max 500 characters) |
+| `cost` | float | Surcharge in major units, not cents (or a percentage when `type` is `percentage`) |
 | `type` | string | Cost type: `fixed` or `percentage` |
 | `per_item` | integer | `1` = cost applied per item, `0` = cost applied per order |
 | `created_at` | string | Creation timestamp (UTC) |

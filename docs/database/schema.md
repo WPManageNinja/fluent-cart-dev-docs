@@ -779,14 +779,17 @@ This table stores shipping zones configuration
 | Column      | Type                                  | Comment |
 |------------|---------------------------------------|---------|
 | id         | BIGINT UNSIGNED _Auto Increment_      | Primary key |
+| shipping_class_id | BIGINT UNSIGNED NULL           | Scopes the zone to one shipping class; NULL means it applies to class-less items |
 | name       | VARCHAR(192) NOT NULL                 | Zone name |
-| regions    | LONGTEXT NULL                         | Zone regions (JSON) |
+| region     | VARCHAR(192) NOT NULL                 | A country code, `all` (Whole World) or `selection` |
+| meta       | JSON NULL                             | For `selection` zones: `countries` and `selection_type` (`included` / `excluded`) |
 | order      | INT UNSIGNED NOT NULL DEFAULT 0       | Display order |
 | created_at | DATETIME NULL                         | |
 | updated_at | DATETIME NULL                         | |
 
 Indexes:
 - order
+- shipping_class_id
 
 
 ## fct_shipping_methods Table
@@ -799,10 +802,12 @@ This table stores shipping methods within zones
 | zone_id    | BIGINT UNSIGNED NOT NULL              | Reference to shipping zone |
 | title      | VARCHAR(192) NOT NULL                 | Method title |
 | type       | VARCHAR(50) NOT NULL                  | Method type |
-| settings   | LONGTEXT NULL                         | Method settings |
+| settings   | LONGTEXT NULL                         | Method settings: `configure_rate`, `class_aggregation`, `weight_tiers` |
 | is_enabled | TINYINT(1) NOT NULL DEFAULT 1         | Enabled flag |
-| amount     | BIGINT UNSIGNED NULL DEFAULT 0        | Shipping amount |
+| states     | JSON NULL                             | Restricts the method to these states within the zone |
+| amount     | DECIMAL(10,2) NULL DEFAULT 0.00       | Base rate in base-currency major units, not cents (a percentage when `configure_rate` is `per_price`) |
 | order      | INT UNSIGNED NOT NULL DEFAULT 0       | Display order |
+| meta       | JSON NULL                             | |
 | created_at | DATETIME NULL                         | |
 | updated_at | DATETIME NULL                         | |
 
@@ -819,7 +824,8 @@ This table stores shipping classes
 |------------|---------------------------------------|---------|
 | id         | BIGINT UNSIGNED _Auto Increment_      | Primary key |
 | name       | VARCHAR(192) NOT NULL                 | Class name |
-| cost       | DECIMAL(10,2) NOT NULL DEFAULT 0.00   | Shipping cost |
+| description | VARCHAR(500) NULL                    | Class description |
+| cost       | DECIMAL(10,2) NOT NULL DEFAULT 0.00   | Surcharge in base-currency major units, not cents |
 | per_item   | TINYINT(1) NOT NULL DEFAULT 0         | Per item flag |
 | type       | VARCHAR(20) NOT NULL DEFAULT 'fixed'  | Class type |
 | created_at | DATETIME NULL                         | |

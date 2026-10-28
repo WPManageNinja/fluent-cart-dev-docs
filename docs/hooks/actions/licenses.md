@@ -312,7 +312,7 @@ This action fires when a new license is generated as part of an order fulfillmen
     - `order` ([`\FluentCart\App\Models\Order`](/database/models/order)) — The associated order
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)|null) — The associated subscription, if any
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:566`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:624`
 
 **Usage:**
 ```php
@@ -363,10 +363,10 @@ add_action('fluent_cart_sl/license_issued', function ($data) {
 
 ### <code> license_renewed </code>
 <details>
-<summary><code>fluent_cart/licensing/license_renewed</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a license expiration is extended on subscription renewal</summary>
+<summary><code>fluent_cart/licensing/license_renewed</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a license's expiration date follows its subscription to a new date</summary>
 
 **When it runs:**
-This action fires when a license's expiration date is extended because the associated subscription has been successfully renewed.
+This action fires when a license's expiration date changes to match its subscription's next billing date: on a paid renewal, or when the billing date is updated (gateway sync, admin edit, skipped period). It fires only when the date actually changed. A disabled (refunded or revoked) license is extended only by a paid renewal. If the license also returns to active, [`license_reactivated`](./pro-modules#license-reactivated) fires right after.
 
 **Parameters:**
 
@@ -375,7 +375,7 @@ This action fires when a license's expiration date is extended because the assoc
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)) — The associated subscription
     - `prev_status` (string) — The previous license status
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:231`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:287`
 
 **Usage:**
 ```php
@@ -407,7 +407,7 @@ This action fires when a license is marked as expired, either because the associ
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)) — The associated subscription
     - `prev_status` (string) — The previous license status
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:267`, `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseSchedulerHandler.php:46`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:327`, `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseSchedulerHandler.php:46`
 
 **Usage:**
 ```php
@@ -440,7 +440,7 @@ This action fires when a license is disabled, typically because the associated o
     - `order` ([`\FluentCart\App\Models\Order`](/database/models/order)) — The associated order
     - `reason` (string|undefined) — The reason for disabling (only present on payment failure; absent on refund)
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:158`, `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:196`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:159`, `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:197`
 
 **Usage:**
 ```php
@@ -472,7 +472,7 @@ This action fires when a license is converted to a lifetime license because its 
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)) — The associated subscription
     - `prev_status` (string) — The previous license status
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:302`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:362`
 
 **Usage:**
 ```php
@@ -505,7 +505,7 @@ This action fires when a license is upgraded to a different plan, typically thro
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)) — The associated subscription
     - `updates` (array) — The update data applied to the license
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:378`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:436`
 
 **Usage:**
 ```php

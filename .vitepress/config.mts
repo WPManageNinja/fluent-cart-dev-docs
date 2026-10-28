@@ -702,6 +702,7 @@ export default defineConfig({
           text: 'Modules',
           items: [
             { text: 'Payment Methods', link: '/modules/payment-methods' },
+            { text: 'Refunds', link: '/modules/refunds' },
             { text: 'Subscriptions', link: '/modules/subscriptions' },
             { text: 'Editing Vendor IDs', link: '/modules/subscription-vendor-ids' },
             { text: 'Shipping', link: '/modules/shipping' },

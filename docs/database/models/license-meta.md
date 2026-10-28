@@ -60,7 +60,9 @@ Along with Global Model methods, this model has few helper methods.
 
 ### getMetaValueAttribute($value)
 
-Get meta value with automatic JSON decoding (accessor). If the stored value is a JSON string, it is decoded to an array. Otherwise returns the original value.
+Get meta value with automatic JSON decoding (accessor). Every stored string is passed
+through `json_decode()`, so a value that is not valid JSON decodes to `null`. Store
+values as JSON if you need them back intact.
 
 * Parameters
    * $value - mixed

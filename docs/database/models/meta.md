@@ -46,6 +46,26 @@ $meta->meta_value; // returns meta value (auto-decoded from JSON)
 
 ## Scopes
 
+### Tax override scopes
+
+Nine scopes narrow `fct_meta` rows that store per-product and per-category tax overrides:
+
+| Scope | Narrows by |
+|---|---|
+| `productCategoryTaxOverrides()` | rows holding category-level tax overrides |
+| `forTaxOverrideCountry($country)` | a single country |
+| `forTaxOverrideCountries($countries)` | several countries |
+| `forTaxOverrideState($state)` | state |
+| `forTaxOverrideCategoryId($id)` | category ID |
+| `forTaxOverrideCity($city)` | city |
+| `forTaxOverridePostcode($postcode)` | postcode |
+| `forTaxOverrideClassId($id)` | tax class ID |
+| `legacyTaxOverrideObjectId($id)` | the pre-migration object ID layout |
+
+They compose, so a lookup can be narrowed from country down to postcode in one query.
+
+
+
 This model has the following scopes that you can use
 
 ### userTheme()
@@ -94,7 +114,7 @@ $variants = $meta->upgradeableVariants;
 
 // For Filtering by upgradeable variants relationship
 $metas = FluentCart\App\Models\Meta::whereHas('upgradeableVariants', function($query) {
-    $query->where('status', 'active');
+    $query->where('item_status', 'active');
 })->get();
 ```
 

@@ -17,8 +17,23 @@ FluentCart offers helper functions and methods to interact with FluentCart's dat
 
 All the built-in database models are available at
 
-* `fluent-cart/app/Models/` (Core version)
-* `fluent-cart-pro/app/Models/` (Pro version)
+* `fluent-cart/app/Models/` — core models
+* `fluent-cart-pro/app/Models/` — a small number of Pro models, such as the extended `User`
+* `fluent-cart-pro/app/Modules/*/Models/` — most Pro models, grouped by the module that
+  owns them
+
+Pro models that live under `app/Modules/`:
+
+| Model | Module | Table |
+|---|---|---|
+| `License`, `LicenseActivation`, `LicenseSite`, `LicenseMeta` | Licensing | `fct_licenses`, `fct_license_activations`, `fct_license_sites`, `fct_license_meta` |
+| `StockAdjustment` | AdvancedInventory | `fct_stock_adjustments` |
+| `PricingRule`, `AppliedPricingRule` | DynamicPricing | `fct_pricing_rules`, `fct_applied_pricing_rules` |
+| `CurrencyRate` | MultiCurrency | `fct_currency_rates` |
+| `ReviewInteraction` | Reviews | `fct_review_interactions` |
+| `OrderPromotion`, `OrderPromotionStat` | Promotional | `fct_order_promotions`, `fct_order_promotion_stats` |
+
+`ProductReview` is a **core** model on `fct_product_reviews`.
 
 In this Article we will use `FluentCart\App\Models\Order` model as an example.
 

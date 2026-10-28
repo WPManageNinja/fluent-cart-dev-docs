@@ -49,7 +49,7 @@ No parameters required.
         "text": "Store details such as addresses, company info etc.",
         "icon": "StoreIcon",
         "completed": true,
-        "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/settings/store-settings/"
+        "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/settings/store-settings"
       },
       "product_info": {
         "title": "Add Your First Product",
@@ -109,33 +109,49 @@ No parameters required.
   "stats": [
     {
       "title": "Total Products",
-      "current_count": 45,
+      "current_count": "45",
       "icon": "Frame",
       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products?active_view=all"
     },
     {
       "title": "Orders",
-      "current_count": 128,
+      "current_count": "128",
       "icon": "AllOrdersIcon",
       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/orders"
     },
     {
       "title": "Revenue",
-      "current_count": 15420.50,
+      "current_count": "15420.5000",
       "icon": "Currency",
       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
-      "has_currency": true
+      "has_currency": true,
+      "currency": "USD",
+      "excluded_orders": 0
     },
     {
       "title": "Refund",
-      "current_count": 350.00,
+      "current_count": "350.0000",
       "icon": "Failed",
       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
-      "has_currency": true
+      "has_currency": true,
+      "currency": "USD",
+      "excluded_orders": 0
     }
   ]
 }
 ```
+
+`current_count` is always a **string**, because the value is returned straight from the
+database driver.
+
+Count stats (`Total Products`, `Orders`) come from `COUNT()`, so they are integer
+strings. Money stats (`Revenue`, `Refund`) are a cents column divided by 100 in SQL and
+passed through unrounded, so they arrive with MySQL's division precision — four extra
+decimal places under the default `div_precision_increment`. Treat the trailing zeros as
+an artifact of that division rather than a fixed contract, and format the value for
+display instead of relying on the decimal count.
+
+Money stats also carry `currency` and `excluded_orders`, which count stats do not.
 
 ::: info
 - **Orders, Revenue, and Refunds** are calculated for the last 30 days only (from the start of the day 30 days ago to the end of the current day).
@@ -178,22 +194,14 @@ No parameters required.
 ```json
 {
   "pages": [
-    {
-      "id": 10,
-      "title": "Shop",
-      "link": "https://example.com/shop/"
-    },
-    {
-      "id": 12,
-      "title": "Checkout",
-      "link": "https://example.com/checkout/"
-    }
+    { "label": "Shop", "value": 10 },
+    { "label": "Checkout", "value": 12 }
   ],
-  "currencies": {
-    "USD": "United States Dollar ($)",
-    "EUR": "Euro (EUR)",
-    "GBP": "British Pound (GBP)"
-  },
+  "currencies": [
+    { "label": "United States Dollar ($)", "value": "USD" },
+    { "label": "Euro (EUR)", "value": "EUR" },
+    { "label": "British Pound (GBP)", "value": "GBP" }
+  ],
   "default_settings": {
     "store_name": "My Store",
     "store_logo": "",
@@ -201,6 +209,12 @@ No parameters required.
     "shop_page_id": "10",
     "checkout_page_id": "12",
     "customer_profile_page_id": ""
+  },
+  "tax_settings": {
+    "enable_tax": "no",
+    "tax_inclusion": "exclusive",
+    "eu_method": "",
+    "vat_number": ""
   }
 }
 ```

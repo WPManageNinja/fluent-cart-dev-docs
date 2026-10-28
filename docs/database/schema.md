@@ -73,7 +73,6 @@ erDiagram
         bigint id PK
         bigint order_id FK
         bigint coupon_id FK
-        bigint customer_id FK
     }
     
     fct_licenses {
@@ -92,7 +91,7 @@ erDiagram
     
     fct_license_sites {
         bigint id PK
-        bigint license_id FK
+        varchar site_url
     }
     
     fct_carts {
@@ -113,7 +112,6 @@ erDiagram
     fct_customers ||--o{ fct_subscriptions : customer_id
     fct_customers ||--o{ fct_carts : customer_id
     fct_customers ||--o{ fct_licenses : customer_id
-    fct_customers ||--o{ fct_applied_coupons : customer_id
     
     %% Order Relationships
     fct_orders ||--o{ fct_order_items : order_id
@@ -136,7 +134,6 @@ erDiagram
     
     %% License Relationships
     fct_licenses ||--o{ fct_license_activations : license_id
-    fct_licenses ||--o{ fct_license_sites : license_id
     fct_license_sites ||--o{ fct_license_activations : site_id
     
     %% Subscription Relationships
@@ -169,7 +166,9 @@ The FluentCart database schema is built around these core concepts:
 1. **Currency Precision**: All monetary values stored as BIGINT in cents to avoid floating-point precision issues
 2. **Flexible Configuration**: JSON columns used for extensible configuration data
 3. **Audit Trail**: Comprehensive activity logging for all important operations
-4. **Referential Integrity**: Proper foreign key relationships maintained throughout
+4. **Referential Integrity**: Enforced in model code and application services. The
+   migrations declare no SQL `FOREIGN KEY` constraints, so cascades and orphan cleanup
+   are handled by FluentCart, not the database
 5. **Performance Optimization**: Strategic indexing on frequently queried columns
 6. **Multi-tenancy Ready**: UUID-based public identifiers for external integrations 
 
@@ -234,11 +233,12 @@ This table stores the basic information of an order
 | coupon_discount_total | BIGINT NOT NULL DEFAULT '0' | Amount in cents |
 | shipping_tax        | BIGINT NOT NULL DEFAULT '0' | Amount in cents |
 | shipping_total      | BIGINT NOT NULL DEFAULT '0' | Amount in cents |
+| fee_total           | BIGINT NOT NULL DEFAULT '0' | Amount in cents |
 | tax_total           | BIGINT NOT NULL DEFAULT '0' | Amount in cents |
 | total_amount        | BIGINT NOT NULL DEFAULT '0' | Amount in cents |
 | total_paid          | BIGINT NOT NULL DEFAULT '0' | Amount in cents |
 | total_refund        | BIGINT NOT NULL DEFAULT '0' | Amount in cents |
-| rate                | DECIMAL(12,4) NOT NULL DEFAULT '1.0000' | Exchange rate |
+| rate                | DECIMAL(24,12) NOT NULL DEFAULT '1.000000000000' | Base to presentment exchange rate, frozen at order time |
 | tax_behavior        | TINYINT(1) NOT NULL DEFAULT 0 | 0 => no_tax, 1 => exclusive, 2 => inclusive |
 | note                | TEXT NOT NULL DEFAULT '' | |
 | ip_address          | TEXT NOT NULL DEFAULT '' | |
@@ -377,7 +377,7 @@ This table stores payment transactions for orders
 | order_type          | VARCHAR(100) NOT NULL DEFAULT ''       | |
 | transaction_type    | VARCHAR(192) DEFAULT 'charge'          | charge, refund, etc. |
 | subscription_id     | INT(11) NULL                           | Reference to subscription |
-| card_last_4         | INT(4)                                 | Last 4 digits of card |
+| card_last_4         | VARCHAR(4) NULL                        | Last 4 digits of card |
 | card_brand          | VARCHAR(100)                           | Card brand |
 | vendor_charge_id    | VARCHAR(192) NOT NULL DEFAULT ''       | Payment gateway transaction ID |
 | payment_method      | VARCHAR(100) NOT NULL DEFAULT ''       | |
@@ -386,7 +386,7 @@ This table stores payment transactions for orders
 | status              | VARCHAR(20) NOT NULL DEFAULT ''        | Transaction status |
 | currency            | VARCHAR(10) NOT NULL DEFAULT ''        | Transaction currency |
 | total               | BIGINT NOT NULL DEFAULT '0'            | Transaction amount in cents |
-| rate                | BIGINT NOT NULL DEFAULT '1'            | Exchange rate |
+| rate                | DECIMAL(24,12)                         | Exchange rate |
 | uuid                | VARCHAR(100) NULL DEFAULT ''           | |
 | meta                | JSON DEFAULT NULL                      | Transaction metadata |
 | created_at          | DATETIME NULL                          | |
@@ -415,9 +415,12 @@ This table stores order shipping and billing addresses
 | state      | VARCHAR(192) NULL                     | State |
 | postcode   | VARCHAR(50) NULL                      | Postal code |
 | country    | VARCHAR(100) NULL                     | Country |
+| meta       | JSON NULL                             | VAT number, legal registration ID and other extras |
 | created_at | DATETIME NULL                         | |
 | updated_at | DATETIME NULL                         | |
 
+Indexes:
+- (order_id, type)
 
 
 ## fct_order_operations Table
@@ -484,7 +487,8 @@ This table stores product variations with pricing and inventory
 | serial_index        | INT(5) NULL                           | Variation order |
 | sold_individually   | TINYINT(1) UNSIGNED NULL DEFAULT 0    | Sold individually flag |
 | variation_title     | VARCHAR(192) NOT NULL                 | Variation title |
-| variation_identifier| VARCHAR(100) NULL                     | SKU or identifier |
+| variation_identifier| VARCHAR(100) NULL                     | Legacy identifier |
+| sku                 | VARCHAR(30) NULL                      | Stock keeping unit, unique across variations |
 | manage_stock        | TINYINT(1) NULL DEFAULT 0             | Stock management enabled |
 | payment_type        | VARCHAR(50) NULL                      | onetime, subscription |
 | stock_status        | VARCHAR(30) NULL DEFAULT 'out-of-stock'| in-stock, out-of-stock, backorder |
@@ -563,7 +567,6 @@ This table stores applied coupons to orders
 | id           | BIGINT UNSIGNED _Auto Increment_      | Primary key |
 | order_id     | BIGINT UNSIGNED NOT NULL              | Reference to order |
 | coupon_id    | BIGINT UNSIGNED NULL                  | Reference to coupon |
-| customer_id  | BIGINT UNSIGNED NULL                  | Reference to customer |
 | code         | VARCHAR(100) NOT NULL                 | Coupon code |
 | amount       | double NOT NULL                       | Discount amount |
 | created_at   | DATETIME NULL                         | |
@@ -571,6 +574,7 @@ This table stores applied coupons to orders
 
 Indexes:
 - code
+- (coupon_id, order_id) — per-customer usage counting joins through these
 
 
 
@@ -595,6 +599,7 @@ This table stores customer shipping and billing addresses
 | email      | VARCHAR(192) NULL                     | Email address |
 | postcode   | VARCHAR(32) NULL                      | Postal code |
 | country    | VARCHAR(100) NULL                     | Country |
+| meta       | JSON NULL                             | VAT number, legal registration ID and other extras |
 | created_at | DATETIME NULL                         | |
 | updated_at | DATETIME NULL                         | |
 
@@ -712,65 +717,6 @@ This table stores system activity and audit logs
 
 Indexes:
 - module_id
-
-## fct\_licenses Table (Pro Plugin)
-
-This table stores software license management
-
-| Column | Type | Comment |
-|--------|------|---------|
-| id | bigint unsigned _Auto Increment_ | |
-| status | varchar(45) _NULL_ | active, inactive, expired |
-| limit | bigint unsigned | Activation limit |
-| activation_count | bigint unsigned | Current activations |
-| license_key | varchar(192) _NULL_ | License key |
-| product_id | bigint unsigned | WordPress post ID |
-| variation_id | bigint unsigned | Variation ID |
-| order_id | bigint unsigned | Reference to fct_orders |
-| parent_id | bigint unsigned _NULL_ | Parent license ID |
-| customer_id | bigint unsigned | Reference to fct_customers |
-| expiration_date | datetime _NULL_ | License expiration |
-| last_reminder_sent | datetime _NULL_ | Last reminder date |
-| last_reminder_type | varchar(50) _NULL_ | Reminder type |
-| subscription_id | bigint unsigned | Associated subscription |
-| config | json _NULL_ | License configuration |
-| created_at | timestamp _NULL_ | |
-| updated_at | timestamp _NULL_ | |
-
-## fct\_license\_activations Table (Pro Plugin)
-
-This table stores license activation tracking
-
-| Column | Type | Comment |
-|--------|------|---------|
-| id | bigint unsigned _Auto Increment_ | |
-| site_id | bigint unsigned | Reference to fct_license_sites |
-| license_id | bigint unsigned | Reference to fct_licenses |
-| status | varchar(45) _NULL_ | active, inactive |
-| is_local | tinyint _NULL_ | Local activation flag |
-| product_id | bigint unsigned | WordPress post ID |
-| variation_id | bigint unsigned | Variation ID |
-| activation_method | varchar(45) _NULL_ | key_based, etc. |
-| activation_hash | varchar(99) _NULL_ | Activation hash |
-| last_update_version | varchar(45) _NULL_ | Last update version |
-| last_update_date | datetime _NULL_ | Last update date |
-| created_at | timestamp _NULL_ | |
-| updated_at | timestamp _NULL_ | |
-
-## fct\_license\_sites Table (Pro Plugin)
-
-This table stores license site management
-
-| Column | Type | Comment |
-|--------|------|---------|
-| id | bigint unsigned _Auto Increment_ | |
-| license_id | bigint unsigned | Reference to fct_licenses |
-| site_url | varchar(255) | Site URL |
-| site_name | varchar(255) _NULL_ | Site name |
-| status | varchar(45) _NULL_ | active, inactive |
-| created_at | timestamp _NULL_ | |
-| updated_at | timestamp _NULL_ | |
-
 
 ## fct_shipping_zones Table
 
@@ -996,10 +942,12 @@ This table stores attribute groups for product attributes
 | Column      | Type                                  | Comment |
 |------------|---------------------------------------|---------|
 | id         | BIGINT(20) UNSIGNED _Auto Increment_  | Primary key |
-| title      | VARCHAR(192) NOT NULL UNIQUE           | Group title |
+| title      | VARCHAR(192) NOT NULL                  | Group title |
 | slug       | VARCHAR(192) NOT NULL UNIQUE           | Group slug |
 | description| LONGTEXT NULL                          | Group description |
 | settings   | LONGTEXT NULL                          | Group settings |
+| serial     | INT(11) UNSIGNED NOT NULL DEFAULT 0    | Manual drag-order of groups in the admin |
+| is_system  | TINYINT(1) NOT NULL DEFAULT 0          | Marks a group FluentCart created itself |
 | created_at | DATETIME NULL                          | |
 | updated_at | DATETIME NULL                          | |
 
@@ -1066,51 +1014,76 @@ Indexes:
 
 ### fct\_licenses Table
 
-This table stores software licenses (Pro feature)
+Software licences issued for a purchase (Pro).
 
 | Column | Type | Comment |
 |--------|------|---------|
-| id | bigint unsigned _Auto Increment_ | |
-| status | varchar(45) | active, inactive, expired |
-| limit | int _NULL_ | Activation limit |
-| license_key | varchar(192) | License key |
-| product_id | bigint unsigned _NULL_ | Related product |
-| customer_id | bigint unsigned _NULL_ | License owner |
-| order_id | bigint unsigned _NULL_ | Related order |
-| expiration_date | datetime _NULL_ | License expiration |
-| created_at | datetime _NULL_ | |
-| updated_at | datetime _NULL_ | |
+| id | BIGINT UNSIGNED _Auto Increment_ | |
+| status | VARCHAR(45) NULL DEFAULT 'active' | active, inactive, expired, disabled |
+| limit | BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 | Activation limit |
+| activation_count | BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 | Current activations |
+| license_key | VARCHAR(192) NULL | Licence key |
+| product_id | BIGINT(20) UNSIGNED NOT NULL | WordPress post ID of the product |
+| variation_id | BIGINT(20) UNSIGNED NOT NULL | Variation the licence was issued for |
+| order_id | BIGINT(20) UNSIGNED NOT NULL | Order the licence came from |
+| parent_id | BIGINT(20) UNSIGNED NULL | Parent licence, for upgrades and renewals |
+| customer_id | BIGINT(20) UNSIGNED NOT NULL | Licence owner |
+| expiration_date | DATETIME NULL | `NULL` means lifetime |
+| last_reminder_sent | DATETIME NULL | When the last expiry reminder went out |
+| last_reminder_type | VARCHAR(50) NULL | Which reminder stage was sent |
+| subscription_id | BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 | Linked subscription, `0` when none |
+| config | json NULL | Extra licence configuration |
+| created_at | TIMESTAMP NULL | |
+| updated_at | TIMESTAMP NULL | |
+
+Indexes:
+- order_id
+- license_key
+- product_id
+- customer_id (`idx_licenses_customer_recovery`)
 
 ### fct\_license\_activations Table
 
-This table stores license activation records (Pro feature)
+One row per site a licence is activated on (Pro). This table carries both
+`license_id` and `site_id`, so it is the join between licences and sites.
 
 | Column | Type | Comment |
 |--------|------|---------|
-| id | bigint unsigned _Auto Increment_ | |
-| site_id | bigint unsigned | Reference to license site |
-| license_id | bigint unsigned | Reference to license |
-| status | varchar(45) | active, inactive |
-| product_id | bigint unsigned _NULL_ | Related product |
-| activation_hash | varchar(192) | Activation hash |
-| created_at | datetime _NULL_ | |
-| updated_at | datetime _NULL_ | |
+| id | BIGINT UNSIGNED _Auto Increment_ | |
+| site_id | BIGINT(20) UNSIGNED NOT NULL | Reference to fct_license_sites |
+| license_id | BIGINT(20) UNSIGNED NOT NULL | Reference to fct_licenses |
+| status | VARCHAR(45) NULL DEFAULT 'active' | Activation status |
+| is_local | TINYINT NULL DEFAULT 0 | Local or staging install |
+| product_id | BIGINT(20) UNSIGNED NOT NULL | Product |
+| variation_id | BIGINT(20) UNSIGNED NOT NULL | Variation |
+| activation_method | VARCHAR(45) NULL DEFAULT 'key_based' | How the site activated |
+| activation_hash | VARCHAR(99) NULL | Activation hash |
+| last_update_version | VARCHAR(45) NULL | Version at the last update check |
+| last_update_date | DATETIME NULL | Last update check |
+| created_at | TIMESTAMP NULL | |
+| updated_at | TIMESTAMP NULL | |
+
+Indexes:
+- license_id
+- site_id
 
 ### fct\_license\_sites Table
 
-This table stores licensed sites (Pro feature)
+The sites themselves (Pro). Join through `fct_license_activations` to reach a licence's
+sites.
 
 | Column | Type | Comment |
 |--------|------|---------|
-| id | bigint unsigned _Auto Increment_ | |
-| license_id | bigint unsigned | Reference to license |
-| site_url | varchar(500) | Site URL |
-| site_name | varchar(192) _NULL_ | Site name |
-| status | varchar(45) | active, inactive |
-| created_at | datetime _NULL_ | |
-| updated_at | datetime _NULL_ | |
+| id | BIGINT UNSIGNED _Auto Increment_ | |
+| site_url | VARCHAR(192) NULL | Site URL |
+| server_version | VARCHAR(50) NULL | Server software version |
+| platform_version | VARCHAR(50) NULL | WordPress version |
+| other | JSON NULL | Additional site data |
+| created_at | TIMESTAMP NULL | |
+| updated_at | TIMESTAMP NULL | |
 
-
+Indexes:
+- site_url
 
 ### fct_license_meta Table
 

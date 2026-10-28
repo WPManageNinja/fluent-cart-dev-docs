@@ -106,7 +106,14 @@ Search for WordPress users who can be assigned a FluentCart role. Returns users 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `search` | string | query | No | Search by display name or email address. Partial matches supported. |
-| `user_ids` | string/array | query | No | Comma-separated user IDs to include in results regardless of search filter |
+| `user_ids` | string | query | No | A single user ID to include regardless of the search filter. The value is passed through `sanitize_text_field()` and then wrapped as one element, so `user_ids=1,2,3` is matched as the literal string `1,2,3` rather than as three IDs |
+
+Users who already hold a FluentCart role are excluded — the query is
+`whereDoesntHave('adminRole')`, which tests for the `_fluent_cart_admin_role` user meta.
+WordPress administrators are not excluded by virtue of being administrators, so an admin
+with no FluentCart role still appears.
+
+Each row carries `ID`, `name` (from `display_name`) and `email` (from `user_email`).
 
 ### Response
 
@@ -255,9 +262,23 @@ Retrieve details for a specific role by its key.
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
-| `key` | string | path | Yes | The role key (e.g., `manager`, `worker`, `accountant`) |
+| `key` | string | path | Yes | The role key — `super_admin`, `manager`, `worker` or `accountant` |
 
-> This endpoint is currently a placeholder and returns no data. It is reserved for future use.
+### Response
+
+```json
+{
+  "role": {
+    "key": "manager",
+    "title": "Manager",
+    "description": "With All Permissions Except Sensitive Settings",
+    "permissions": ["store/settings", "products/view", "products/create"]
+  }
+}
+```
+
+`permissions` is the flat list of permission strings the role grants — 34 of them for
+`manager`. An unrecognised key returns `404` with `{"message": "Invalid role."}`.
 
 ### Example
 
@@ -278,9 +299,14 @@ Update a specific role definition.
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
-| `key` | string | path | Yes | The role key to update |
+| `key` | string | path | Yes | The role to assign — must be one of the known role keys |
+| `user_id` | integer | body | Yes | The WordPress user to assign the role to |
 
-> This endpoint is currently a placeholder and returns no data. It is reserved for future use.
+Despite the name, this assigns an existing role to a user rather than editing the role
+definition. The role set itself is defined in code.
+
+An unknown `key` returns `404` with `{"message": "Invalid role."}`; a missing or zero
+`user_id` returns an error with `{"message": "User id is required"}`.
 
 ### Example
 
@@ -288,7 +314,7 @@ Update a specific role definition.
 curl -X POST "https://example.com/wp-json/fluent-cart/v2/roles/manager" \
   -u "username:app_password" \
   -H "Content-Type: application/json" \
-  -d '{}'
+  -d '{"user_id": 42}'
 ```
 
 ---

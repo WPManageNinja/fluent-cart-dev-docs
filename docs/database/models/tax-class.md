@@ -23,7 +23,7 @@ This model uses both `$guarded` and `$fillable`:
 
 The model registers lifecycle hooks in the `booted()` method:
 
-- **Creating:** Automatically generates a unique slug from `title` via `generateUniqueSlug()`.
+- **Creating:** Generates a unique slug from `title` via `generateUniqueSlug()`, but only when no `slug` was supplied — a slug passed in is kept as given.
 - **Updating:** If `title` has changed (is dirty), the slug is regenerated to match the new title. The built-in slugs `standard`, `reduced`, and `zero` are protected -- classes with those slugs are never re-slugged on title change.
 
 ## Attributes

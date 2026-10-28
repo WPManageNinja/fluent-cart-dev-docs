@@ -12,6 +12,18 @@ description: FluentCart Product model documentation with attributes, scopes, rel
 | Name Space    | FluentCart\App\Models                          |
 | Class         | FluentCart\App\Models\Product                  |
 
+## Traits
+
+`CanSearch`, which supplies the search scopes.
+
+## Hidden Attributes
+
+These `wp_posts` columns are in `$hidden`, so they are omitted from `toArray()` and
+`toJson()`:
+
+`post_content_filtered`, `post_password`, `post_author`, `to_ping`, `pinged`,
+`post_parent`, `menu_order`, `post_mime_type`, `comment_count`
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |

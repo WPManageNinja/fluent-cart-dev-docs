@@ -52,7 +52,7 @@ These virtual attributes are appended to every serialized Customer instance via 
 | Attribute         | Accessor Method               | Return Type | Description |
 | ----------------- | ----------------------------- | ----------- | ----------- |
 | full_name         | `getFullNameAttribute()`      | String      | Concatenation of first_name and last_name |
-| photo             | `getPhotoAttribute()`         | String      | Custom photo URL from user meta, or Gravatar fallback |
+| photo             | `getPhotoAttribute()`         | String      | Avatar URL from `Helper::getUserAvatarUrl($user_id, $email)`; an empty string when there is no avatar |
 | country_name      | `getCountryNameAttribute()`   | String      | Human-readable country name from country code |
 | formatted_address | `getFormattedAddressAttribute()` | Array    | Formatted address data array |
 | user_link         | `getUserLinkAttribute()`      | String      | WordPress admin user-edit URL (empty if no user_id) |
@@ -178,7 +178,19 @@ $customer->recountStats();
 
 ### recountStat()
 
-Recount detailed customer purchase statistics from successful payment orders only. Updates `purchase_count`, `first_purchase_date`, `last_purchase_date`, `ltv` (lifetime value as net paid minus refunds), and `aov` (average order value = ltv / purchase_count). Saves the model.
+Recount detailed customer purchase statistics from successful payment orders only.
+
+Totals are grouped **per currency** and only added together after each order's amount is
+converted at the rate frozen on that order, so a multi-currency customer's lifetime value
+is not a sum of mixed units:
+
+- `purchase_value` — net paid minus refunds, kept per currency
+- `ltv` — the same figure converted to the store's base currency
+- `aov` — `ltv` divided by the count of orders with a trusted exchange rate, not by all
+  orders
+- `purchase_count`, `first_purchase_date`, `last_purchase_date`
+
+Saves the model.
 
 * Returns `FluentCart\App\Models\Customer` - Updated customer instance
 
@@ -207,22 +219,24 @@ $customer->updateCustomerStatus('active');
 
 ### getWpUserId($recheck = false)
 
-Get WordPress user ID. When `$recheck` is true, looks up the WordPress user by the customer's email and updates the stored `user_id` if it has changed.
+Returns the stored `user_id`. The `$recheck` parameter is accepted for backward
+compatibility and has no effect — the method performs no email lookup and never rewrites
+`user_id`.
 
-* Parameters: `$recheck` (Boolean) - Whether to recheck by looking up the WP user by email (default: false)
-* Returns `Integer|null` - WordPress user ID
+* Parameters: `$recheck` (Boolean) - accepted and ignored
+* Returns `Integer|null` - the stored WordPress user ID
 
 ```php
 $customer = FluentCart\App\Models\Customer::find(1);
 $wpUserId = $customer->getWpUserId();
-$wpUserId = $customer->getWpUserId(true); // recheck and sync user_id
 ```
 
 ### getWpUser()
 
-Get WordPress user object. First tries to find by `user_id`, then falls back to email lookup. If found by email and the `user_id` differs, updates the stored `user_id` and saves.
+Get the WordPress user by the stored `user_id`. Returns `false` when the customer has no
+`user_id`, i.e. when the account is unclaimed.
 
-* Returns `WP_User|false` - WordPress user object or false if not found
+* Returns `WP_User|false` - WordPress user object, or `false` when unlinked
 
 ```php
 $customer = FluentCart\App\Models\Customer::find(1);
@@ -372,6 +386,16 @@ $user = $customer->wpUser;
 ```
 
 ## Scopes
+
+### unclaimed()
+
+Customers with no linked WordPress user — `user_id` is `NULL` or `0`. These are guest
+purchases that nobody has claimed by registering with the same email.
+
+```php
+$guests = FluentCart\App\Models\Customer::unclaimed()->get();
+```
+
 
 This model has the following scopes that you can use
 

@@ -63,44 +63,57 @@ class CustomCRMIntegration
 {
     public function register()
     {
-        add_action('fluent_cart/customer/created', [$this, 'syncCustomer']);
-        add_action('fluent_cart/order/completed', [$this, 'syncOrder']);
+        // There is no customer-created hook. A customer is created during
+        // checkout, so read $order->customer from the order hook instead.
+        // fluent_cart/order_paid_done fires once per paid initial order and passes
+        // a single array:
+        //   ['order' => Order, 'transaction' => OrderTransaction|null,
+        //    'customer' => Customer]  (+ 'subscription' for subscription/renewal orders)
+        // Renewals do not fire it — listen to fluent_cart/renewal_paid for those.
+        add_action('fluent_cart/order_paid_done', [$this, 'syncCustomer']);
+        add_action('fluent_cart/order_paid_done', [$this, 'syncOrder']);
     }
     
-    public function syncCustomer($customer)
+    public function syncCustomer($data)
     {
-        $data = [
+        // fluent_cart/order_paid_done passes an array, not a model
+        $customer = $data['customer'];
+
+        $payload = [
             'email' => $customer->email,
             'first_name' => $customer->first_name,
             'last_name' => $customer->last_name,
-            'phone' => $customer->phone,
+            // Customer has no phone column — read it from the order's billing address
+            // instead: $order->billing_address->phone
             'source' => 'fluent-cart'
         ];
         
-        $this->sendToCRM('/api/customers', $data);
+        $this->sendToCRM('/api/customers', $payload);
     }
     
-    public function syncOrder($order)
+    public function syncOrder($data)
     {
-        $data = [
+        $order = $data['order'];
+
+        $payload = [
             'customer_email' => $order->customer->email,
             'order_id' => $order->id,
-            'total' => $order->total,
+            'total' => $order->total_amount, // cents
             'status' => $order->status,
             'items' => $order->order_items->map(function($item) {
                 return [
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product_name,
+                    'product_id' => $item->post_id,
+                    'product_name' => $item->title,
                     'quantity' => $item->quantity,
-                    'price' => $item->price
+                    'price' => $item->unit_price
                 ];
             })
         ];
         
-        $this->sendToCRM('/api/orders', $data);
+        $this->sendToCRM('/api/orders', $payload);
     }
     
-    private function sendToCRM($endpoint, $data)
+    private function sendToCRM($endpoint, $payload)
     {
         $api_key = get_option('custom_crm_api_key');
         $api_url = get_option('custom_crm_api_url');
@@ -110,7 +123,7 @@ class CustomCRMIntegration
                 'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type' => 'application/json'
             ],
-            'body' => json_encode($data)
+            'body' => json_encode($payload)
         ]);
     }
 }
@@ -138,13 +151,18 @@ class MailchimpIntegration
     
     public function register()
     {
-        add_action('fluent_cart/customer/created', [$this, 'addToMailchimp']);
-        add_action('fluent_cart/order/completed', [$this, 'updateMailchimpTags']);
+        // There is no customer-created hook. A customer is created during
+        // checkout, so read $order->customer from the order hook instead.
+        add_action('fluent_cart/order_paid_done', [$this, 'addToMailchimp']);
+        add_action('fluent_cart/order_paid_done', [$this, 'updateMailchimpTags']);
     }
     
-    public function addToMailchimp($customer)
+    public function addToMailchimp($data)
     {
-        $data = [
+        // fluent_cart/order_paid_done passes an array, not a model
+        $customer = $data['customer'];
+
+        $payload = [
             'email_address' => $customer->email,
             'status' => 'subscribed',
             'merge_fields' => [
@@ -154,11 +172,13 @@ class MailchimpIntegration
             'tags' => ['fluent-cart-customer']
         ];
         
-        $this->callMailchimpAPI('POST', "/lists/{$this->list_id}/members", $data);
+        $this->callMailchimpAPI('POST', "/lists/{$this->list_id}/members", $payload);
     }
     
-    public function updateMailchimpTags($order)
+    public function updateMailchimpTags($data)
     {
+        $order = $data['order'];
+
         $subscriber_hash = md5(strtolower($order->customer->email));
         $tags = [
             ['name' => 'customer', 'status' => 'active'],
@@ -203,49 +223,57 @@ class ActiveCampaignIntegration
     
     public function register()
     {
-        add_action('fluent_cart/customer/created', [$this, 'syncContact']);
-        add_action('fluent_cart/order/completed', [$this, 'addOrderTag']);
+        // There is no customer-created hook. A customer is created during
+        // checkout, so read $order->customer from the order hook instead.
+        add_action('fluent_cart/order_paid_done', [$this, 'syncContact']);
+        add_action('fluent_cart/order_paid_done', [$this, 'addOrderTag']);
     }
     
-    public function syncContact($customer)
+    public function syncContact($data)
     {
-        $data = [
+        // fluent_cart/order_paid_done passes an array, not a model
+        $customer = $data['customer'];
+
+        $payload = [
             'contact' => [
                 'email' => $customer->email,
                 'firstName' => $customer->first_name,
                 'lastName' => $customer->last_name,
-                'phone' => $customer->phone
+                // Customer has no phone column — read it from the order's billing address
+                // instead: $order->billing_address->phone
             ]
         ];
         
-        $this->callActiveCampaignAPI('POST', '/contacts', $data);
+        $this->callActiveCampaignAPI('POST', '/contacts', $payload);
     }
     
-    public function addOrderTag($order)
+    public function addOrderTag($data)
     {
+        $order = $data['order'];
+
         $contact_id = $this->getContactId($order->customer->email);
         
         if ($contact_id) {
-            $data = [
+            $payload = [
                 'contactTag' => [
                     'contact' => $contact_id,
                     'tag' => 'order-completed'
                 ]
             ];
             
-            $this->callActiveCampaignAPI('POST', '/contactTags', $data);
+            $this->callActiveCampaignAPI('POST', '/contactTags', $payload);
         }
     }
     
     private function getContactId($email)
     {
         $response = $this->callActiveCampaignAPI('GET', '/contacts?email=' . urlencode($email));
-        $data = json_decode($response['body'], true);
+        $payload = json_decode($response['body'], true);
         
-        return $data['contacts'][0]['id'] ?? null;
+        return $payload['contacts'][0]['id'] ?? null;
     }
     
-    private function callActiveCampaignAPI($method, $endpoint, $data = [])
+    private function callActiveCampaignAPI($method, $endpoint, $payload = [])
     {
         return wp_remote_request($this->api_url . $endpoint, [
             'method' => $method,
@@ -253,7 +281,7 @@ class ActiveCampaignIntegration
                 'Api-Token' => $this->api_key,
                 'Content-Type' => 'application/json'
             ],
-            'body' => json_encode($data)
+            'body' => json_encode($payload)
         ]);
     }
 }
@@ -268,25 +296,27 @@ class GoogleAnalyticsIntegration
 {
     public function register()
     {
-        add_action('fluent_cart/order/completed', [$this, 'trackPurchase']);
+        add_action('fluent_cart/order_paid_done', [$this, 'trackPurchase']);
         add_action('wp_footer', [$this, 'addTrackingCode']);
     }
     
-    public function trackPurchase($order)
+    public function trackPurchase($data)
     {
+        $order = $data['order'];
+
         $items = $order->order_items->map(function($item) {
             return [
-                'item_id' => $item->product_id,
-                'item_name' => $item->product_name,
+                'item_id' => $item->post_id,
+                'item_name' => $item->title,
                 'category' => $item->product->category ?? 'Uncategorized',
                 'quantity' => $item->quantity,
-                'price' => $item->price
+                'price' => $item->unit_price
             ];
         });
         
         $purchase_data = [
             'transaction_id' => $order->id,
-            'value' => $order->total,
+            'value' => $order->total_amount, // cents
             'currency' => $order->currency,
             'items' => $items
         ];
@@ -297,7 +327,7 @@ class GoogleAnalyticsIntegration
     
     public function addTrackingCode()
     {
-        if (is_fluent_cart_page()) {
+        if ($this->isFluentCartPage()) {
             $ga_id = get_option('google_analytics_id');
             
             if ($ga_id) {
@@ -327,16 +357,18 @@ class FacebookPixelIntegration
 {
     public function register()
     {
-        add_action('fluent_cart/order/completed', [$this, 'trackPurchase']);
+        add_action('fluent_cart/order_paid_done', [$this, 'trackPurchase']);
         add_action('wp_footer', [$this, 'addPixelCode']);
     }
     
-    public function trackPurchase($order)
+    public function trackPurchase($data)
     {
+        $order = $data['order'];
+
         $purchase_data = [
             'content_type' => 'product',
-            'content_ids' => $order->order_items->pluck('product_id')->toArray(),
-            'value' => $order->total,
+            'content_ids' => $order->order_items->pluck('post_id')->toArray(),
+            'value' => $order->total_amount, // cents
             'currency' => $order->currency
         ];
         
@@ -345,7 +377,7 @@ class FacebookPixelIntegration
     
     public function addPixelCode()
     {
-        if (is_fluent_cart_page()) {
+        if ($this->isFluentCartPage()) {
             $pixel_id = get_option('facebook_pixel_id');
             
             if ($pixel_id) {
@@ -391,7 +423,7 @@ use FluentCart\App\Modules\Integrations\Webhook\WebhookIntegration;
 // Webhook events include:
 $events = [
     'fluent_cart/order/created',
-    'fluent_cart/order/completed',
+    'fluent_cart/order_paid_done',
     'fluent_cart/order/refunded',
     'fluent_cart/customer/created',
     'fluent_cart/subscription/created',
@@ -415,14 +447,14 @@ Webhooks are processed asynchronously using Action Scheduler:
 
 ```php
 // Webhooks are automatically queued when events occur
-add_action('fluent_cart/order/completed', function($order) {
+add_action('fluent_cart/order_paid_done', function($order) {
     // Webhook is automatically queued for processing
     // No additional code needed
 });
 
 // Manual webhook triggering
 $webhookIntegration = new WebhookIntegration();
-$webhookIntegration->maybeHandleWebHookAsync($order, $customer, 'fluent_cart/order/completed');
+$webhookIntegration->maybeHandleWebHookAsync($order, $customer, 'fluent_cart/order_paid_done');
 ```
 
 ### Webhook Endpoint Handler
@@ -501,7 +533,7 @@ class FluentCartCustomIntegration
     public function register()
     {
         // Register hooks
-        add_action('fluent_cart/order/completed', [$this, 'handleOrderCompleted']);
+        add_action('fluent_cart/order_paid_done', [$this, 'handleOrderCompleted']);
         add_filter('fluent_cart/customer/data', [$this, 'modifyCustomerData']);
         
         // Add admin settings
@@ -509,8 +541,10 @@ class FluentCartCustomIntegration
         add_action('admin_init', [$this, 'registerSettings']);
     }
     
-    public function handleOrderCompleted($order)
+    public function handleOrderCompleted($data)
     {
+        $order = $data['order'];
+
         // Custom logic here
         error_log("Order completed: {$order->id}");
     }

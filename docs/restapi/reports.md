@@ -203,38 +203,6 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/quick-order-stat
 
 ---
 
-### Get Sales Growth
-
-<badge type="tip">GET</badge> `/fluent-cart/v2/reports/sales-growth`
-
-Retrieve sales growth data over a specified period. Filters to orders with successful payment and order statuses.
-
-- **Permission:** `reports/view`
-
-#### Parameters
-
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `start_date` | string | query | No | Start date. Defaults to the earliest order date. |
-| `end_date` | string | query | No | End date. Defaults to the latest order date. |
-
-#### Response
-
-```json
-{
-    "sales_data": { }
-}
-```
-
-#### Example
-
-```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/sales-growth?start_date=2025-01-01&end_date=2025-12-31" \
-  -u "username:app_password"
-```
-
----
-
 ### Get Report Overview
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/reports/report-overview`
@@ -1738,6 +1706,13 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/customer-report?
 ## Source Reports
 
 ### Get Source Report
+
+::: tip Comparison fields are always returned
+`compare_range` and `compare_ranges` appear on every response from this endpoint, as well
+as from the product report and the subscription chart. `compare_range` is `null` when no
+comparison was requested; `compare_ranges` lists the available windows —
+`previous_period`, `previous_month`, `previous_quarter` and `previous_year`.
+:::
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/reports/sources`
 

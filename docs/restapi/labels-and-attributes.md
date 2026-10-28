@@ -193,12 +193,16 @@ Retrieve a paginated list of attribute groups with optional search, filtering, a
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
-| `search` | object | query | No | Search criteria. Each key is a column name with `column`, `operator`, and `value` fields. Searchable columns: `title`, `slug`. |
-| `filters` | object | query | No | Filter criteria. Same format as `search`. Supports `terms_count` with comparison operators. |
-| `with` | array | query | No | Relations to eager load (e.g., `["terms"]`) |
-| `order_by` | string | query | No | Column to sort by: `title`, `id`, `slug`, `created_at` (default: `title`) |
-| `order_type` | string | query | No | Sort direction: `ASC` or `DESC` (default: `ASC`) |
+| `search` | string | query | No | Matches against the group's id, title or slug |
+| `active_view` | string | query | No | Tab filter — `dropdown` and `button` both map to the `styling` view |
 | `per_page` | integer | query | No | Number of results per page (default: `10`) |
+
+::: warning Sort order is fixed
+`AttrGroupFilter` overrides `parseSortBy()` and `parseSortType()` to return `serial` and
+`asc` unconditionally, with `id ASC` as a tie-breaker. `order_by` and `order_type` have
+no effect — the list always renders in the merchant's manual drag order, matching what
+the reorder endpoint persists.
+:::
 | `page` | integer | query | No | Page number for pagination |
 
 #### Response
@@ -214,8 +218,11 @@ Retrieve a paginated list of attribute groups with optional search, filtering, a
       {
         "id": 1,
         "title": "Color",
-        "slug": "color",
-        "description": "Product color options",
+        "settings": { "type": "color" },
+        "serial": "1",
+        "is_system": true,
+        "terms_count": "10",
+        "used_terms_count": "0",
         "settings": null,
         "created_at": "2025-01-10 08:30:00",
         "updated_at": "2025-01-10 08:30:00",
@@ -224,8 +231,11 @@ Retrieve a paginated list of attribute groups with optional search, filtering, a
       {
         "id": 2,
         "title": "Size",
-        "slug": "size",
-        "description": "Product size options",
+        "settings": null,
+        "serial": "2",
+        "is_system": true,
+        "terms_count": "6",
+        "used_terms_count": "0",
         "settings": null,
         "created_at": "2025-01-10 08:35:00",
         "updated_at": "2025-01-10 08:35:00",
@@ -239,9 +249,38 @@ Retrieve a paginated list of attribute groups with optional search, filtering, a
 #### Example
 
 ```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/options/attr/groups?with[]=terms&order_by=title&order_type=ASC&per_page=20" \
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/options/attr/groups?search=color&per_page=20" \
   -u "username:app_password"
 ```
+
+---
+
+### Get Attribute Library
+
+<badge type="tip">GET</badge> `/fluent-cart/v2/options/attr/groups/library`
+
+The full group list with their terms, plus the frequently-used term IDs the picker shows
+as quick-select chips.
+
+- **Permission:** `products/view`
+
+Returns `groups`, `total_groups` and `cap` — the last being the maximum number of groups
+the picker will render.
+
+---
+
+### Reorder Attribute Groups
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/options/attr/groups/reorder`
+
+Persist the manual drag order of groups. Since the list endpoint always sorts by
+`serial`, this is what changes the order groups appear in.
+
+- **Permission:** `products/edit`
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `ids` | array | body | Yes | Group IDs in the desired order |
 
 ---
 
@@ -547,17 +586,18 @@ Retrieve a paginated list of terms for a specific attribute group.
 #### Example
 
 ```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/options/attr/group/1/terms?order_by=serial&order_type=ASC" \
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/options/attr/group/1/terms" \
   -u "username:app_password"
 ```
 
 ---
 
-### Create Attribute Term
+### Create Attribute Terms
 
-<badge type="warning">POST</badge> `/fluent-cart/v2/options/attr/group/{group_id}/term`
+<badge type="warning">POST</badge> `/fluent-cart/v2/options/attr/group/{group_id}/terms`
 
-Create a new term within an attribute group.
+Create terms within an attribute group. Creation is **bulk only**: the body carries a
+`terms` array, with a maximum of 10 per request.
 
 - **Permission:** `products/create`
 - **Request Class:** `AttrTermRequest`
@@ -567,19 +607,21 @@ Create a new term within an attribute group.
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `group_id` | integer | path | Yes | The attribute group ID |
-| `title` | string | body | Yes | Term title (max 50 characters). Must be unique across all terms. |
-| `slug` | string | body | Yes | Term slug (max 50 characters). Must be unique across all terms. Used as an identifier in variation data. |
-| `description` | string | body | No | Term description |
-| `serial` | integer | body | No | Sort order position (default: `10`). Lower values appear first. |
+| `terms` | array | body | Yes | The terms to create. **At most 10 per request** |
+| `terms[].title` | string | body | Yes | Term title (max 50 characters) |
+| `terms[].settings` | object | body | No | Type-aware. A `color` group expects `settings.color` (hex); an `image` group expects `settings.image` (URL) |
+
+Slugs are generated rather than supplied. They are unique **per group**, enforced by a
+composite `UNIQUE (group_id, slug)` index, so `red` can exist in both a Color and a Theme
+group. The resource layer de-duplicates and auto-suffixes within the group.
 
 #### Validation Rules
 
 | Field | Rules |
 |-------|-------|
-| `title` | Required, sanitized text, max 50 chars, unique in `fct_atts_terms` |
-| `slug` | Required, sanitized text, max 50 chars, unique in `fct_atts_terms` |
-| `description` | Nullable, sanitized textarea |
-| `serial` | Nullable, numeric |
+| `terms` | Required; more than 10 entries is rejected |
+| `terms.*.title` | Required, sanitized text, max 50 chars |
+| `terms.*.settings` | Nullable; validated against the group's `settings.type` |
 
 #### Response
 
@@ -623,7 +665,7 @@ Create a new term within an attribute group.
 #### Example
 
 ```bash
-curl -X POST "https://example.com/wp-json/fluent-cart/v2/options/attr/group/1/term" \
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/options/attr/group/1/terms" \
   -u "username:app_password" \
   -H "Content-Type: application/json" \
   -d '{
@@ -741,55 +783,27 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/options/attr/group/1/
 
 ---
 
-### Change Term Sort Order
+### Reorder Attribute Terms
 
-<badge type="warning">POST</badge> `/fluent-cart/v2/options/attr/group/{group_id}/term/{term_id}/serial`
+<badge type="warning">POST</badge> `/fluent-cart/v2/options/attr/group/{group_id}/terms/reorder`
 
-Move a term up or down in the sort order by incrementing or decrementing its `serial` value.
+Persist the manual drag order of a group's terms. Terms always list in `serial` order, so
+this is what changes the order the picker renders.
 
-- **Permission:** `products/edit`
+- **Permission:** `products/update`
 
 #### Parameters
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `group_id` | integer | path | Yes | The attribute group ID |
-| `term_id` | integer | path | Yes | The term ID to reorder |
-| `direction` | string | body | No | Direction to move: `up` (decrements serial) or `down` (increments serial). Default: `up`. |
-
-#### Behavior
-
-- **`up`** -- Decrements the serial value by 1. If the serial is already `0`, it stays at `0`.
-- **`down`** -- Increments the serial value by 1.
-
-#### Response
-
-```json
-{
-  "data": 2,
-  "message": "Serial updated."
-}
-```
-
-The `data` field contains the new serial value after the change.
-
-#### Error Response
-
-**Term not found or group mismatch:**
-```json
-{
-  "message": "Info mismatch.",
-  "code": 404
-}
-```
+| `ids` | array | body | Yes | Term IDs in the desired order |
 
 #### Example
 
 ```bash
-curl -X POST "https://example.com/wp-json/fluent-cart/v2/options/attr/group/1/term/2/serial" \
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/options/attr/group/1/terms/reorder" \
   -u "username:app_password" \
   -H "Content-Type: application/json" \
-  -d '{
-    "direction": "up"
-  }'
+  -d '{"ids": [6, 4, 5]}'
 ```

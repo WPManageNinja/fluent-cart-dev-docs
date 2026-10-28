@@ -147,6 +147,17 @@ foreach ($variations as $variation) {
 
 ## Relations
 
+### attrMap / attrRelations
+
+Both are `hasMany` to `AttributeRelation` on `object_id` — the variation's attribute term
+links. `attrMap` is also what the model's `deleting` hook clears: deleting a variation
+removes its attribute relations and its variation media.
+
+```php
+$terms = $variation->attrRelations;
+```
+
+
 This model has the following relationships that you can use
 
 ### product
@@ -299,6 +310,35 @@ foreach ($variations as $variation) {
 ```
 
 ## Methods
+
+### isStock($bundleChildren = null)
+
+Whether the variation is in stock. For a bundle, pass the already-loaded children so the
+check does not re-query them per variation.
+
+* Parameters
+   * `$bundleChildren` - array|null (optional) - pre-loaded bundle children
+* Returns `bool`
+
+### loadBundleChildren($variations) (static)
+
+Resolve the bundle children for a set of variations in one pass, so `isStock()` can then
+be called per variation without an N+1.
+
+* Parameters
+   * `$variations` - the variations to resolve children for
+
+### getVariationLabel()
+
+The variation's label, built from its attribute terms.
+
+* Returns `string`
+
+### getDisplayTitle()
+
+The title shown to customers for this variation.
+
+* Returns `string`
 
 Along with Global Model methods, this model has few helper methods.
 

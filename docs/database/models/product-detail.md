@@ -138,29 +138,15 @@ $productDetails = FluentCart\App\Models\ProductDetail::whereHas('variants', func
 })->get();
 ```
 
-### attrMap
+## Scopes
 
-Access all attribute relations. Linked via `object_id` (on `AttributeRelation`) to `id` (on `ProductDetail`).
+### reviewsDisabled()
 
-When a `ProductDetail` record is deleted, all related `attrMap` records are automatically cascade-deleted via the model's `boot()` method.
-
-* Relationship type: `HasMany`
-* return `FluentCart\App\Models\AttributeRelation` Model Collection
-
-#### Example:
+Product details whose `other_info.reviews_enabled` is `"no"`. Implemented as a JSON
+extract on the `other_info` column, so it filters in SQL rather than in PHP.
 
 ```php
-// Accessing Attribute Relations
-$attrMap = $productDetail->attrMap;
-```
-
-## Cascade Deletes
-
-The model registers a `deleting` event in its `boot()` method. When a `ProductDetail` is deleted, all associated `attrMap` (AttributeRelation) records are automatically deleted:
-
-```php
-// When you delete a ProductDetail, its attrMap relations are removed automatically
-$productDetail->delete(); // Also deletes all related AttributeRelation records
+$noReviews = FluentCart\App\Models\ProductDetail::reviewsDisabled()->get();
 ```
 
 ## Methods

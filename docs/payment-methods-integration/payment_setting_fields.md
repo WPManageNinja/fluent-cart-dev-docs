@@ -231,8 +231,7 @@ Here's a complete example of a `fields()` method in a gateway class:
 ```php
 public function fields(): array
 {
-    // Get the IPN listener URL. getListenerUrl() returns an array; the URL is
-    // under 'listener_url'. There is no getWebhookUrl() method.
+    // getListenerUrl() returns an array; the URL is under 'listener_url'.
     $webhookUrl = $this->getListenerUrl()['listener_url'];
     
     // Test mode credentials
@@ -292,8 +291,6 @@ public function fields(): array
             'placeholder' => __('Appears on the checkout page', 'your-plugin'),
         ],
         'checkout_description' => [
-            // No 'textarea' type exists — the renderer would skip the field
-            // entirely. Use 'text' for single-line copy.
             'type'        => 'text',
             'label'       => __('Checkout Description', 'your-plugin'),
             'placeholder' => __('Appears on the checkout page', 'your-plugin'),

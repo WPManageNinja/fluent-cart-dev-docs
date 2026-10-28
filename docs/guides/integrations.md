@@ -63,8 +63,7 @@ class CustomCRMIntegration
 {
     public function register()
     {
-        // There is no customer-created hook. A customer is created during
-        // checkout, so read $order->customer from the order hook instead.
+        // A customer is created during checkout, so read $order->customer here.
         // fluent_cart/order_paid_done fires once per paid initial order and passes
         // a single array:
         //   ['order' => Order, 'transaction' => OrderTransaction|null,
@@ -151,8 +150,7 @@ class MailchimpIntegration
     
     public function register()
     {
-        // There is no customer-created hook. A customer is created during
-        // checkout, so read $order->customer from the order hook instead.
+        // A customer is created during checkout, so read $order->customer here.
         add_action('fluent_cart/order_paid_done', [$this, 'addToMailchimp']);
         add_action('fluent_cart/order_paid_done', [$this, 'updateMailchimpTags']);
     }
@@ -223,8 +221,7 @@ class ActiveCampaignIntegration
     
     public function register()
     {
-        // There is no customer-created hook. A customer is created during
-        // checkout, so read $order->customer from the order hook instead.
+        // A customer is created during checkout, so read $order->customer here.
         add_action('fluent_cart/order_paid_done', [$this, 'syncContact']);
         add_action('fluent_cart/order_paid_done', [$this, 'addOrderTag']);
     }

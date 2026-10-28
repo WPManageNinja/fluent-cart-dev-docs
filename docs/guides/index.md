@@ -56,7 +56,7 @@ define('WP_DEBUG', true);
 define('WP_DEBUG_LOG', true);
 define('WP_DEBUG_DISPLAY', false);
 
-// FluentCart's own switch. There is no FLUENT_CART_DEBUG constant.
+// FluentCart's own switch
 define('FLUENT_CART_DEV_MODE', true);
 ```
 

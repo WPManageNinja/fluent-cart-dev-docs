@@ -131,9 +131,8 @@ $url = $this->getListenerUrl()['listener_url'];
 // https://example.com/?fluent-cart=fct_payment_listener_ipn&method=your_gateway
 ```
 
-Point your gateway's webhook configuration at that URL. There is no `test_mode` or
-`debug_mode` gateway setting — the store's `order_mode` decides whether the store is in
-test or live mode, and `BaseGatewaySettings::getMode()` reads it.
+Point your gateway's webhook configuration at that URL. The store's `order_mode` decides
+whether the store is in test or live mode, and `BaseGatewaySettings::getMode()` reads it.
 
 ---
 

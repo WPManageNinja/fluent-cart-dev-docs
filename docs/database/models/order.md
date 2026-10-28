@@ -12,6 +12,12 @@ description: FluentCart Order model documentation with attributes, scopes, relat
 | Name Space    | FluentCart\App\Models                    |
 | Class         | FluentCart\App\Models\Order              |
 
+## Traits
+
+`CanSearch`, `HasActivity` and `CanUpdateBatch`. `HasActivity` supplies the `activities`
+relation; `CanSearch` supplies the search scopes; `CanUpdateBatch` supplies
+`Order::batchUpdate()`.
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |
@@ -30,6 +36,9 @@ description: FluentCart Order model documentation with attributes, scopes, relat
 | payment_status     | String    | Payment status |
 | payment_method_title | String | Payment method title |
 | currency           | String    | Currency code |
+| fee_total          | Double    | Surcharges on the order, in cents (cast to double) |
+| rate               | Decimal   | DECIMAL(24,12) base-to-presentment exchange rate, frozen at order time |
+| tax_behavior       | Integer   | Cast to integer |
 | subtotal           | Integer   | Subtotal in cents (cast to double) |
 | discount_tax       | Integer   | Discount tax in cents (cast to double) |
 | manual_discount_total | Integer | Manual discount total in cents (cast to double) |
@@ -73,10 +82,14 @@ Along with Global Model methods, this model has few helper methods.
 
 ### updateStatus($key, $newStatus)
 
-Update order status
+Set the given status column and save. Returns early without saving when the value has not
+changed. Stamps `completed_at` when `status` becomes `completed`, and `refunded_at` when
+`payment_status` becomes `refunded`. It fires no hooks — use `StatusHelper` when listeners
+should run.
 
-* Parameters: `$key` (String) - Status key, `$newStatus` (String) - New status
-* Returns `FluentCart\App\Models\Order` - Updated order instance
+* Parameters: `$key` (String) - the status column, `status` or `payment_status`,
+  `$newStatus` (String) - New status
+* Returns `FluentCart\App\Models\Order` - the order instance
 
 ```php
 $order = FluentCart\App\Models\Order::find(1);
@@ -290,15 +303,18 @@ $order = FluentCart\App\Models\Order::find(1);
 $downloads = $order->getDownloadsById(42);
 ```
 
-### getReceiptUrl()
+### getReceiptViewUrl() and getReceiptDownloadUrl()
 
-Get receipt URL
+Build the customer-facing receipt links — one to view the receipt in the browser, one to
+download it.
 
-* Returns `String` - Receipt URL
+* Returns `String`
 
 ```php
 $order = FluentCart\App\Models\Order::find(1);
-$receiptUrl = $order->getReceiptUrl();
+
+$view     = $order->getReceiptViewUrl();
+$download = $order->getReceiptDownloadUrl();
 ```
 
 ### addLog($title, $description = '', $type = 'info', $by = '')
@@ -325,6 +341,10 @@ $canBeRefunded = $order->canBeRefunded();
 
 ### generateReceiptNumber()
 
+Claims the next receipt number atomically, so concurrent requests cannot take the same
+one. A losing request discards its candidate, which means the sequence can contain gaps.
+Fires `fluent_cart/order/invoice_number_added` once a number is assigned.
+
 Generate receipt number and invoice number if not already set
 
 * Returns `FluentCart\App\Models\Order` - Updated order instance
@@ -336,7 +356,16 @@ $order->generateReceiptNumber();
 
 ### canBeDeleted()
 
-Check if order can be deleted. Validates order status, payment status, mode, and subscription state. Test mode orders can always be deleted. Live orders must be canceled or on-hold, and must not have an active subscription.
+Check if order can be deleted. Test-mode orders can always be deleted. For live orders:
+
+- the status must be `canceled` or `on-hold`, otherwise a `WP_Error` names the status
+- a successfully-paid order is blocked unless its `total_amount` is `0`, so free and
+  unpaid cancelled orders delete but a paid one does not
+- an order of `type = 'subscription'` is blocked while a subscription on its
+  `parent_order_id` is still `active`
+
+The result passes through the `fluent_cart/order_can_be_deleted` filter, so an
+integration can relax or tighten any of it.
 
 * Returns `Boolean|WP_Error` - True if order can be deleted, or WP_Error with reason
 
@@ -347,6 +376,49 @@ if (is_wp_error($canBeDeleted)) {
     echo $canBeDeleted->get_error_message();
 }
 ```
+
+### Items and fees
+
+| Method | Returns |
+|---|---|
+| `getProductItems()` | the order's product line items, excluding fee lines |
+| `getAppliedFees()` | applied fees as a plain array, for display |
+
+Fee lines are `order_items` rows with `payment_type = 'fee'`, also reachable as the
+`feeItems` relation.
+
+### Review links
+
+| Method | Returns |
+|---|---|
+| `getOrderReviewUrl()` | the review link for this order |
+| `Order::reviewUrlForHash($hash)` | the same link built from an order hash, for email and webhook contexts where no order instance is loaded |
+
+### Tax and B2B
+
+Thirteen helpers read the order's frozen tax snapshot rather than recomputing it:
+
+| Method | Returns |
+|---|---|
+| `getBusinessInfo()` | the buyer's business details |
+| `getStoreBusinessInfo()` | five seller fields from the order's `store_business_info` meta snapshot, each falling back to live store settings |
+| `isB2BOrder()` | whether the order was placed as a business |
+| `getPrimaryOrderTaxRate()` | the main tax rate applied |
+| `getReversedTaxTotal()` | tax reversed under a reverse charge |
+| `isReverseChargeTaxOrder()` | whether reverse charge applied |
+| `getOrderRcMode()` | the reverse-charge mode |
+| `getDisplayTaxLines()` | tax lines for display |
+| `getDisplayShippingTaxLines()` | shipping tax lines for display |
+| `getCustomerTaxNumber()` | the buyer's tax number |
+| `hasValidatedCustomerTaxNumber()` | whether that number was validated |
+| `getCustomerTaxName()` | the label for the buyer's tax number in their country |
+| `getMoRVatRemovedAmount()` | VAT removed under a merchant-of-record arrangement |
+| `netAmount()` | the order total net of tax |
+
+### generateOrderUuid()
+
+Static. Produces the order's public `uuid`, and runs on the `creating` event, so a new
+order gets one without the caller doing anything.
 
 ## Relations
 

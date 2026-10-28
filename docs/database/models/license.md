@@ -201,19 +201,6 @@ Alias for variation - access the associated product variation (BelongsTo)
 $variant = $license->productVariant;
 ```
 
-### productDetails
-
-Access the associated product details (BelongsTo)
-
-* return `FluentCart\App\Models\ProductDetail` Model
-
-#### Example:
-
-```php
-// Accessing Product Details
-$details = $license->productDetails;
-```
-
 ### subscription
 
 Access the associated subscription (BelongsTo)
@@ -263,6 +250,20 @@ Access license labels (MorphMany)
 $labels = $license->labels;
 ```
 
+## Expiration handling
+
+`expiration_date` is normalised on both sides:
+
+- `setExpirationDateAttribute()` stores `NULL` when given `'lifetime'` or an empty value,
+  so a lifetime licence has no date rather than a sentinel one
+- `getExpirationDateAttribute()` returns `null` for an empty or zero date
+
+### isLifetime()
+
+Whether the licence never expires — that is, `expiration_date` is `NULL`.
+
+* Returns `bool`
+
 ## Methods
 
 Along with Global Model methods, this model has few helper methods.
@@ -311,7 +312,10 @@ $isActive = $license->isActive();
 
 ### isExpired()
 
-Check if license is expired. Takes into account the configurable grace period from `LicenseHelper::getLicenseGracePeriodDays()`.
+Check if license is expired. Returns `true` immediately when `status` is already
+`expired`, and `false` when there is no `expiration_date` — a lifetime licence never
+expires. Otherwise the stored date is compared against now plus the configurable grace
+period from `LicenseHelper::getLicenseGracePeriodDays()`.
 
 * Parameters
    * none

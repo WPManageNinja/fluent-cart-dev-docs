@@ -63,15 +63,24 @@ $activity->module_id; // returns module ID (always cast to integer)
 
 This model has the following relationships that you can use
 
-### activity
+### Reaching activities from the owning model
 
-Access the parent activity model (polymorphic). Uses `module_type` and `module_id` columns for polymorphic resolution.
-
-* Returns `MorphTo` - Polymorphic relationship
+Activity is polymorphic on `module`, stored as `module_type` and `module_id`. Read it from
+the model that owns it — the `HasActivity` trait gives `Order`, `Subscription` and
+`Coupon` an `activities` relation:
 
 ```php
-$activity = FluentCart\App\Models\Activity::find(1);
-$parentModel = $activity->activity; // Returns the related model (Order, Product, etc.)
+$order->activities;
+$subscription->activities;
+$coupon->activities;
+```
+
+To query the table directly, filter on the stored columns:
+
+```php
+$activities = FluentCart\App\Models\Activity::where('module_type', Order::class)
+    ->where('module_id', $order->id)
+    ->get();
 ```
 
 ### user

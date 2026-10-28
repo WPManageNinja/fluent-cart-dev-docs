@@ -19,6 +19,24 @@ description: FluentCart User model documentation with attributes, scopes, relati
 - **Guarded**: `['password']`
 - **Fillable**: Not explicitly defined (uses guarded approach)
 
+## Hidden Attributes
+
+`user_pass` and `user_activation_key` are in `$hidden`, so they are stripped from
+`toArray()`, `toJson()` and every `with('wpUser')` eager load. Direct property access
+still works, so internal reads are unaffected.
+
+`$guarded` is `['password']`. That is mass-assignment protection only and has no effect
+on serialization — and `password` is not a column of `wp_users`.
+
+## Pro relations
+
+FluentCart Pro extends this model with two `hasOne` relations to `UserMeta`:
+
+| Relation | Meta key |
+|---|---|
+| `capabilities` | `wp_capabilities` |
+| `adminRole` | `_fluent_cart_admin_role` |
+
 ## Attributes
 
 | Attribute          | Data Type | Comment |

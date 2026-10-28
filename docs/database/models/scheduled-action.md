@@ -26,14 +26,14 @@ This model uses both `$guarded` and `$fillable`:
 | id                 | Integer   | Primary Key (guarded) |
 | scheduled_at       | Date Time | When the action is scheduled to run |
 | action             | String    | Action to be performed |
-| status             | String    | Action status (pending, completed, failed) |
+| status             | String    | Action status. The lifecycle is `pending` -> `processing` -> `completed` -> `failed` |
 | group              | String    | Action group |
 | object_id          | Integer   | ID of the associated object |
 | object_type        | String    | Type of the associated object |
 | completed_at       | Date Time | When the action was completed |
 | retry_count        | Integer   | Number of retry attempts |
 | data               | JSON      | Action data and parameters (manual JSON mutator/accessor) |
-| response_note      | String    | Response or error note |
+| response_note      | Text      | LONGTEXT — response or error note |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 

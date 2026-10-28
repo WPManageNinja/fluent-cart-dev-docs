@@ -30,8 +30,8 @@ description: FluentCart Pro OrderPromotionStat model documentation with attribut
 | promotion_id       | Integer   | Reference to order promotion |
 | order_id           | Integer   | Reference to order |
 | object_id          | Integer   | Reference to object (product, variation, etc.) |
-| amount             | Decimal   | Promotion amount |
-| status             | String    | Promotion status |
+| amount             | Integer   | Promotion amount in cents (BIGINT) |
+| status             | String    | Promotion status; defaults to `offered` |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 

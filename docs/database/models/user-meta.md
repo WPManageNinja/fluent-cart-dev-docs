@@ -81,7 +81,7 @@ echo "Meta Value: " . $userMeta->meta_value;
 ```php
 $userMeta = FluentCartPro\App\Models\UserMeta::create([
     'user_id' => 123,
-    'meta_key' => 'fluent_cart_admin_role',
+    'meta_key' => '_fluent_cart_admin_role',
     'meta_value' => 'store_manager'
 ]);
 ```
@@ -107,7 +107,7 @@ $userMetas = FluentCartPro\App\Models\UserMeta::where('user_id', 123)->get();
 ### Get Meta by Key
 
 ```php
-$adminRoleMetas = FluentCartPro\App\Models\UserMeta::where('meta_key', 'fluent_cart_admin_role')->get();
+$adminRoleMetas = FluentCartPro\App\Models\UserMeta::where('meta_key', '_fluent_cart_admin_role')->get();
 ```
 
 ### Get Meta with User Information
@@ -126,7 +126,7 @@ foreach ($userMetas as $meta) {
 
 ```php
 $userMeta = FluentCartPro\App\Models\UserMeta::where('user_id', 123)
-    ->where('meta_key', 'fluent_cart_admin_role')
+    ->where('meta_key', '_fluent_cart_admin_role')
     ->first();
 ```
 
@@ -142,7 +142,7 @@ $userMeta->update([
 ### Get Users with Specific Meta
 
 ```php
-$storeManagers = FluentCartPro\App\Models\UserMeta::where('meta_key', 'fluent_cart_admin_role')
+$storeManagers = FluentCartPro\App\Models\UserMeta::where('meta_key', '_fluent_cart_admin_role')
     ->where('meta_value', 'store_manager')
     ->get();
 ```
@@ -163,7 +163,7 @@ $userMetas = FluentCartPro\App\Models\UserMeta::whereIn('user_id', [123, 124, 12
 ### Get Meta for Multiple Keys
 
 ```php
-$userMetas = FluentCartPro\App\Models\UserMeta::whereIn('meta_key', ['fluent_cart_admin_role', 'fluent_cart_permissions'])->get();
+$userMetas = FluentCartPro\App\Models\UserMeta::whereIn('meta_key', ['_fluent_cart_admin_role', 'wp_capabilities'])->get();
 ```
 
 ---

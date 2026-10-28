@@ -149,12 +149,22 @@ $subscription->meta;          // hasMany SubscriptionMeta
 | transactions | hasMany | OrderTransaction | subscription_id | id |
 | meta | hasMany | SubscriptionMeta | subscription_id | id |
 | billing_addresses | hasMany | CustomerAddresses | customer_id | customer_id |
+| license | hasOne | License (Pro) | subscription_id | id |
+| licenses | hasMany | License (Pro) | subscription_id | id |
 | labels | morphMany | LabelRelationship | labelable | — |
 | activities | morphMany | Activity (`module`) | module_id | id |
 
 A subscription points **up** to the order that created it through `parent_order_id`. Its
 renewal invoices are orders in their own right — reach them from the parent order's
 `children`, or query `Order` by `type = 'renewal'`.
+
+`license` and `licenses` are guarded by `class_exists(License::class)` and return `null`
+when FluentCart Pro is not active, so check before chaining:
+
+```php
+$relation = $subscription->licenses();
+$licenses = $relation ? $relation->get() : collect();
+```
 
 ## Pro Plugin Relationships
 

@@ -35,6 +35,7 @@ description: FluentCart Subscription model documentation with attributes, scopes
 | quantity               | Integer   | Quantity                          |
 | recurring_amount       | Integer   | Recurring amount in cents         |
 | recurring_tax_total    | Integer   | Recurring tax total in cents      |
+| initial_tax_total | Integer | Tax charged on the first payment, in cents |
 | recurring_total        | Integer   | Recurring total in cents          |
 | bill_times             | Integer   | Number of times to bill (0 = unlimited) |
 | bill_count             | Integer   | Number of times billed            |
@@ -66,7 +67,7 @@ These virtual attributes are automatically appended when the model is serialized
 | payment_info      | String | Human-readable subscription billing summary (interval, amount, trial) |
 | billingInfo       | Array  | Active payment method details from subscription meta |
 | overridden_status | String | Display-corrected status (handles simulated trial days and actual trial period detection) |
-| currency          | String | Uppercase currency code (from config or store settings fallback) |
+| currency          | String | Uppercase currency code. A real column, also exposed through an accessor that falls back to config, the parent order, then the base currency |
 | reactivate_url    | String | Frontend URL for reactivating a canceled/expired subscription |
 
 ## Usage
@@ -90,6 +91,25 @@ $subscription->overridden_status; // returns display-corrected status (appended 
 
 ## Scopes
 
+### visibleToCustomer()
+
+Limits results to subscriptions a customer should see in their portal. Excludes `pending`
+and `intended` rows unless they have billed at least once (`bill_count > 0`) or carry a
+`reactivation_order_id` in `config`.
+
+```php
+$subscriptions = $customer->subscriptions()->visibleToCustomer()->get();
+```
+
+### ofPlanType($planType)
+
+Filters by plan shape. `'installment'` matches `bill_times > 0`; `'recurring'` matches
+`bill_times <= 0`. Any other value leaves the query untouched.
+
+```php
+$installments = Subscription::ofPlanType('installment')->get();
+```
+
 ### scopeBatchUpdate (via CanUpdateBatch trait)
 
 Perform a bulk update of multiple rows in a single query.
@@ -106,6 +126,44 @@ Subscription::batchUpdate([
 ```
 
 ## Methods
+
+### Collection method
+
+`collection_method` is one of `automatic`, `manual` or `system`, and most capability
+checks branch on it:
+
+| Method | Returns true when |
+|---|---|
+| `isAutomatic()` | the gateway bills the subscription |
+| `isManual()` | the store raises invoices and the customer pays each one |
+| `isSystem()` | the store raises invoices and charges the saved method automatically |
+| `usesRenewalEngine()` | `manual` or `system` — the store, not the gateway, owns billing |
+
+### canPause()
+
+For store-billed subscriptions (`usesRenewalEngine()`), only `active` and `trialing` rows
+with a currently-valid local state can pause. Pausing voids renewal invoices, so an
+overdue balance has to stay payable — `past_due` and `expiring` subscriptions therefore
+cannot be paused.
+
+For gateway-billed subscriptions the gateway must declare the `pause_subscription`
+feature.
+
+```php
+if ($subscription->canPause()) {
+    $subscription->pauseSubscription();
+}
+```
+
+### deleteMeta($key) and mergeConfig($values)
+
+`deleteMeta()` removes a `SubscriptionMeta` row by key. `mergeConfig()` merges an array
+into the `config` JSON column without replacing the keys already there.
+
+```php
+$subscription->deleteMeta('reactivation_attempt');
+$subscription->mergeConfig(['cancel_reason' => 'customer_request']);
+```
 
 Along with Global Model methods, this model has the following helper methods.
 
@@ -172,7 +230,15 @@ $billingInfo = $subscription->billingInfo; // returns billing info array
 
 ### getCurrencyAttribute()
 
-Get subscription currency. Reads from `config.currency` first, falls back to store currency settings.
+Get subscription currency, resolved in this order:
+
+1. the `currency` column, when it is set
+2. `config.currency`
+3. the parent order's `currency`, when the subscription has a `parent_order_id`
+4. the store's base currency
+
+Deliberately not `CurrencySettings::get()` — on a storefront request that returns the
+visitor's currency, not the subscription's.
 
 * Returns `String` - Uppercase currency code (e.g., `USD`, `EUR`)
 
@@ -300,6 +366,12 @@ $canUpdate = $subscription->canUpdatePaymentMethod();
 
 ### canSwitchPaymentMethod()
 
+Store-billed subscriptions — those where `usesRenewalEngine()` is true, i.e.
+`collection_method` of `manual` or `system` — always return `false`. Switching moves a
+subscription onto another gateway's vendor subscription, which would bill it a second
+time alongside the invoice engine. Those customers change the card on file through
+`canUpdatePaymentMethod()` instead.
+
 Check if the payment method can be switched to a different gateway entirely. The current gateway must support the `switch_payment_method` feature, and the subscription must be `active`, `trialing`, or `paused`.
 
 * Returns `Boolean` - True if payment method can be switched
@@ -321,7 +393,7 @@ $methods = $subscription->switchablePaymentMethods();
 // e.g., ['stripe', 'paypal']
 ```
 
-### canReactive()
+### canReactivate()
 
 Check if the subscription can be reactivated. Returns empty string (falsy) if:
 - FluentCart Pro is not active
@@ -335,7 +407,7 @@ Otherwise checks if status is one of: `canceled`, `failing`, `expired`, `paused`
 
 ```php
 $subscription = FluentCart\App\Models\Subscription::find(1);
-if ($subscription->canReactive()) {
+if ($subscription->canReactivate()) {
     // subscription can be reactivated
 }
 ```
@@ -660,7 +732,7 @@ $subscriptions = Subscription::where('status', 'active')->get();
 
 ```php
 $subscription = Subscription::find(1);
-$subscription->status = 'cancelled';
+$subscription->status = 'canceled';
 $subscription->canceled_at = gmdate('Y-m-d H:i:s');
 $subscription->save();
 ```

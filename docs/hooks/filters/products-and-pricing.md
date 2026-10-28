@@ -1344,40 +1344,6 @@ add_filter('fluent_cart/discount/pre_apply', function($cartItems, $data) {
 ```
 </details>
 
-### <code> coupon_statuses </code>
-<details>
-<summary><code>fluent_cart/coupon_statuses</code> &mdash; Filter the available coupon statuses</summary>
-
-**When it runs:**
-Applied by `Helper::getCouponStatuses()` to the default coupon status map, and returns its result.
-
-**Parameters:**
-
-- `$statuses` (array): Array of coupon statuses (key => label)
-    ```php
-    $statuses = [
-        'active'   => 'Active',
-        'expired'  => 'Expired',
-        'disabled' => 'Disabled',
-    ];
-    ```
-- `$data` (array): Context data (empty array)
-
-**Returns:**
-- `$statuses` (array): The modified coupon statuses array
-
-**Source:** `app/Helpers/Helper.php:1014`
-
-**Usage:**
-```php
-add_filter('fluent_cart/coupon_statuses', function($statuses) {
-    $statuses['scheduled'] = __('Scheduled', 'fluent-cart');
-    return $statuses;
-}, 10, 1);
-```
-</details>
-
----
 
 ## Variant Options & Attributes
 

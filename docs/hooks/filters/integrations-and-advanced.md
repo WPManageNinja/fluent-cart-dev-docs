@@ -354,36 +354,6 @@ add_filter('fluent_cart/integration/get_integration_settings_fields_zapier', fun
 ```
 </details>
 
-### <code> save_integration_values_{$name} </code>
-<details>
-<summary><code>fluent_cart/integration/save_integration_values_{$name}</code> &mdash; Filter before saving integration data (DYNAMIC)</summary>
-
-**When it runs:**
-This dynamic filter is applied just before integration settings are saved to the database. The `{$name}` is replaced with the integration name.
-
-**Parameters:**
-
-- `$integration` (Meta): The Meta model instance containing the integration data
-
-**Returns:**
-- `$integration` (Meta): The modified Meta model
-
-**Source:** `GlobalIntegrationSettings.php:248`
-
-**Usage:**
-```php
-add_filter('fluent_cart/integration/save_integration_values_mailchimp', function ($integration) {
-    // Encrypt API key before saving
-    $value = $integration->value;
-    if (!empty($value['api_key'])) {
-        $value['api_key_encrypted'] = encrypt($value['api_key']);
-    }
-    $integration->value = $value;
-    return $integration;
-});
-```
-</details>
-
 ### <code> get_integration_merge_fields_{$name} </code>
 <details>
 <summary><code>fluent_cart/integration/get_integration_merge_fields_{$name}</code> &mdash; Filter integration merge/mapping fields (DYNAMIC)</summary>
@@ -471,36 +441,6 @@ add_filter('fluent_cart/integration/integration_saving_data_mailchimp', function
 ```
 </details>
 
-### <code> editing_integration_{$key} </code>
-<details>
-<summary><code>fluent_cart/integration/editing_integration_{$key}</code> &mdash; Filter integration data when editing (DYNAMIC)</summary>
-
-**When it runs:**
-This dynamic filter is applied when an integration is being loaded for editing in the admin UI.
-
-**Parameters:**
-
-- `$data` (array): The integration data for editing
-- `$args` (array): Additional context arguments
-
-**Returns:**
-- `$data` (array): The modified integration data
-
-**Source:** `IntegrationHelper.php:80`
-
-**Usage:**
-```php
-add_filter('fluent_cart/integration/editing_integration_mailchimp', function ($data, $args) {
-    // Decrypt API key for display
-    if (!empty($data['api_key_encrypted'])) {
-        $data['api_key'] = decrypt($data['api_key_encrypted']);
-    }
-    return $data;
-}, 10, 2);
-```
-</details>
-
----
 
 ## Integration Addons
 
@@ -2338,35 +2278,6 @@ add_filter('fluent_cart_sl/generate_license_key', function ($key, $context) {
 ```
 </details>
 
-### <code> fluent_cart_sl/issue_license_data </code>
-<details>
-<summary><code>fluent_cart_sl/issue_license_data</code> <Badge type="warning" text="Pro" /> &mdash; Filter license issue data</summary>
-
-**When it runs:**
-This filter is applied to license data when issuing a new license through the license manager.
-
-**Parameters:**
-
-- `$data` (array): The license issue data
-
-**Returns:**
-- `$data` (array): The modified license data
-
-**Source:** `LicenseManager.php:257`
-
-**Usage:**
-```php
-add_filter('fluent_cart_sl/issue_license_data', function ($data) {
-    // Set default activation limit
-    if (empty($data['activation_limit'])) {
-        $data['activation_limit'] = 5;
-    }
-    return $data;
-});
-```
-</details>
-
----
 
 ## Pro: Plugin Updater <Badge type="warning" text="Pro" />
 

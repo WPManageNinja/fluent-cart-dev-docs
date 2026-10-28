@@ -880,32 +880,44 @@ None.
                 "md": 1
             },
             "schema": {
-                "shipping": {
-                    "title": "Shipping",
-                    "type": "toggle",
-                    ...
-                },
-                "tax": {
-                    "title": "Tax",
-                    "type": "toggle",
-                    ...
-                },
-                "coupons": { ... },
-                "subscriptions": { ... }
+                "turnstile":        { "title": "Turnstile", "description": "...", "type": "...", "component": "..." },
+                "reviews":          { "title": "Reviews", "hidden": false },
+                "stock_management": { "title": "Stock Management", "description": "...", "type": "...", "component": "...",
+                                      "settings": { "enable_advanced_inventory": { "label": "...", "default": "no" } } },
+                "license":          { "title": "Licensing", "description": "...", "type": "...", "component": "..." },
+                "order_bump":       { "title": "Order Bump", "description": "...", "type": "...", "component": "..." },
+                "dynamic_pricing":  { "title": "Dynamic Pricing", "description": "...", "type": "...", "component": "..." },
+                "mcp":              { "title": "MCP", "description": "...", "type": "...", "component": "..." }
             }
         }
     },
     "settings": {
-        "shipping": {
-            "active": "yes"
+        "turnstile": {
+            "active": "no",
+            "site_key": "",
+            "secret_key": ""
         },
-        "tax": {
-            "active": "no"
+        "reviews": {
+            "active": "yes",
+            "review_permission_mode": "verified_buyers",
+            "auto_approve_reviews": "no",
+            "show_verified_badge": "yes",
+            "enable_star_rating": "yes",
+            "star_rating_required": "yes",
+            "reviews_per_page": 10
         },
-        ...
+        "stock_management": {
+            "active": "yes",
+            "enable_advanced_inventory": "no"
+        }
     }
 }
 ```
+
+`fields.modules_settings.schema` describes **every** module the admin can toggle, while
+`settings` carries only the modules that have stored values. A module absent from
+`settings` has never been configured on that store, so read defaults from the schema
+rather than assuming the key is present.
 
 Module keys are dynamically registered via the `fluent_cart/module_setting/fields` filter.
 
@@ -1085,22 +1097,35 @@ None.
 
 ```json
 {
-    "drivers": [
-        {
-            "key": "local",
-            "title": "Local Storage",
-            "description": "Store files on your server",
-            "is_active": true,
-            "logo": "https://..."
+    "drivers": {
+        "local": {
+            "title": "Local",
+            "route": "local",
+            "description": "Local allows to upload file in local file storage",
+            "logo": "https://example.com/wp-content/plugins/fluent-cart/assets/images/storage-drivers/local.svg",
+            "dark_logo": null,
+            "status": true,
+            "brand_color": "#136196",
+            "has_bucket": false,
+            "instance": { "slug": "local", "title": "Local", "brandColor": "#136196" }
         },
-        {
-            "key": "s3",
+        "s3": {
             "title": "Amazon S3",
-            "description": "Store files on Amazon S3",
-            "is_active": false,
-            "logo": "https://..."
+            "route": "s3",
+            "status": false,
+            "has_bucket": true,
+            "need_reconfigure": false,
+            "buckets": []
+        },
+        "r2": {
+            "title": "Cloudflare R2",
+            "route": "r2",
+            "status": false,
+            "has_bucket": true,
+            "need_reconfigure": false,
+            "buckets": []
         }
-    ]
+    }
 }
 ```
 

@@ -141,9 +141,17 @@ No parameters required.
 }
 ```
 
-`current_count` is always a **string**. Count stats return a plain integer string; money
-stats return four decimal places. Money stats also carry `currency` and
-`excluded_orders`, which count stats do not.
+`current_count` is always a **string**, because the value is returned straight from the
+database driver.
+
+Count stats (`Total Products`, `Orders`) come from `COUNT()`, so they are integer
+strings. Money stats (`Revenue`, `Refund`) are a cents column divided by 100 in SQL and
+passed through unrounded, so they arrive with MySQL's division precision — four extra
+decimal places under the default `div_precision_increment`. Treat the trailing zeros as
+an artifact of that division rather than a fixed contract, and format the value for
+display instead of relying on the decimal count.
+
+Money stats also carry `currency` and `excluded_orders`, which count stats do not.
 
 ::: info
 - **Orders, Revenue, and Refunds** are calculated for the last 30 days only (from the start of the day 30 days ago to the end of the current day).

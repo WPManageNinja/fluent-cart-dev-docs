@@ -11,81 +11,116 @@ This guide covers frontend development for FluentCart, including Vue.js integrat
 
 ### Template Hierarchy
 
-FluentCart uses a comprehensive template system with PHP templates for frontend display and Vue.js components for admin interface:
+The storefront is not rendered from a `Views/` template tree. FluentCart builds its
+markup in PHP renderer classes under `app/Services/Renderer/`:
 
 ```
-app/FC/Template/DefaultTemplate/Views/
-├── checkout/
-│   ├── checkout.php
-│   ├── payment-methods/
-│   ├── forms/
-│   ├── inputs/
-│   └── order/
-├── cart/
-│   ├── cart-drawer.php
-│   ├── cart-content-wrapper.php
-│   └── list/
-├── product-card/
-│   ├── single-product.php
-│   └── components/
-├── single-product-page/
-│   ├── single-product.php
-│   └── components/
-├── shop/
-│   ├── shop.php
-│   ├── filters/
-│   └── list/
-└── pricing-table/
-    ├── wrapper.php
-    └── components/
+app/Services/Renderer/
+├── ProductRenderer.php          # single product
+├── ProductCardRender.php        # product cards in listings
+├── CartItemRenderer.php         # cart line items
+├── CartSummaryRender.php        # cart totals
+├── CheckoutRenderer.php         # checkout form
+├── PricingTableRenderer.php     # variant pricing tables
+├── TaxRenderer.php              # tax line display
+├── AdvancedVariationRenderer.php
+├── RenderHelper.php             # shared helpers
+├── RenderContext.php            # decorates hook payloads with source / source_name
+└── Receipt/
+    ├── ReceiptRenderer.php
+    ├── ThankYouRender.php
+    └── StoreBusinessInfoHelper.php
 ```
+
+`app/Views/` does exist, but it holds admin, email, invoice and print templates — not the
+storefront.
+
+The matching browser assets live under `resources/public/`, one directory per surface
+(`cart`, `checkout`, `product-card`, `single-product`, `product-page`, `receipt`,
+`customer-profile`, `payment-methods`, `search-bar-app`, and others).
 
 ### Custom Templates
 
-FluentCart supports template overrides through WordPress's `locate_template` function:
+Theme overrides go through the template loader rather than through a copied view tree.
+`TemplateLoader::templatePath()` returns the directory the loader looks for inside the
+active theme, filterable:
 
 ```php
-// Templates are automatically located in this order:
-// 1. yourtheme/fluent-cart/{template-name}.php
-// 2. plugin/templates/{template-name}.php
-// 3. plugin fallback template
+// Default: 'fluent-cart/'
+add_filter('fluent_cart/template_path', function ($path) {
+    return 'my-theme-cart/';
+});
+```
 
-// Example: Override checkout template
-// Create: yourtheme/fluent-cart/checkout/checkout.php
+Two further filters control the lookup:
+
+```php
+// Add or reorder candidate template files
+add_filter('fluent_cart/template_loader_files', function ($templates, $context) {
+    return $templates;
+}, 10, 2);
+
+// Tell FluentCart whether the block theme already provides a template
+add_filter('fluent_cart/has_block_template', function ($hasTemplate, $context) {
+    return $hasTemplate;
+}, 10, 2);
 ```
 
 ### Template Loading
 
-Templates are loaded through the `TemplateLoader` class:
+`TemplateLoader` is an all-static class in `FluentCart\App\Modules\Templating`. There is
+no `FluentCart\App\FC\Template\DefaultTemplate\TemplateLoader`, and it is not
+instantiated with the app container:
 
 ```php
-use FluentCart\App\FC\Template\DefaultTemplate\TemplateLoader;
+use FluentCart\App\Modules\Templating\TemplateLoader;
 
-// Load a template part
-$templateLoader = new TemplateLoader($app);
-$templateLoader->loadTemplate('checkout', 'payment-methods');
+// Called by the plugin during boot
+TemplateLoader::init();
+
+// Resolve the template WordPress should use for the current query
+$template = TemplateLoader::loadTemplate($template);
+
+// Where the loader looks inside the theme
+$dir = TemplateLoader::templatePath();      // 'fluent-cart/'
+
+// Whether the active theme declares support
+$supported = TemplateLoader::hasThemeSupport();
 ```
 
 ### Template Hooks
 
-FluentCart provides extensive template hooks for customization:
+Storefront hooks are namespaced with a slash and fire from the renderer classes. The
+three names this guide used previously — `fluent_cart_single_product_summary`,
+`fluent_cart_checkout_before_order_review` and `fluent_cart_cart_table_after` — do not
+exist anywhere in FluentCart.
 
 ```php
-// Product page hooks
-add_action('fluent_cart_single_product_summary', function() {
+// Single product: around the price block
+add_action('fluent_cart/product/single/after_price_block', function ($data) {
     echo '<div class="custom-product-info">Custom content here</div>';
 }, 20);
 
-// Checkout page hooks
-add_action('fluent_cart_checkout_before_order_review', function() {
+// Single product: other anchors on the same page
+// fluent_cart/product/single/after_title_block
+// fluent_cart/product/single/after_excerpt_block
+// fluent_cart/product/single/after_quantity_block
+// fluent_cart/product/single/after_actions_block
+
+// Checkout: before the form opens
+add_action('fluent_cart/checkout_form_opening', function ($data) {
     echo '<div class="checkout-notice">Important notice</div>';
 });
 
-// Cart page hooks
-add_action('fluent_cart_cart_table_after', function() {
+// Cart line items
+add_action('fluent_cart/cart/line_item/after_main_title', function ($data) {
     echo '<div class="cart-recommendations">Recommended products</div>';
 });
 ```
+
+Payloads are wrapped by `RenderContext::decorate()`, so every one of these carries
+`source` and `source_name` alongside the entry's own keys. The full set is in the
+[action](/hooks/actions) and [filter](/hooks/filters) references.
 
 ## Vue.js Integration
 
@@ -108,17 +143,22 @@ resources/admin/
 
 ### Frontend Vue Components
 
-Frontend Vue components are located in `resources/public/`:
+Only the customer profile is built with Vue. Every other storefront surface is plain
+JavaScript, despite the directory names reading like component folders:
 
 ```
 resources/public/
-├── cart/Cart.js
-├── checkout/           # 19 components
-├── customer-profile/   # 74 components
-├── product-card/       # 3 components
-├── pricing-table/      # 4 components
-└── search-bar-app/     # 3 components
+├── customer-profile/   # 48 .vue files — the only Vue app on the storefront
+├── cart/               # plain JS
+├── checkout/           # plain JS
+├── product-card/       # plain JS
+├── pricing-table/      # plain JS
+├── single-product/     # plain JS
+└── search-bar-app/     # plain JS
 ```
+
+The admin is the Vue-heavy side, with roughly 840 `.vue` files under
+`resources/admin/`.
 
 ### Component Example
 
@@ -184,11 +224,15 @@ export const useCartStore = defineStore('cart', {
         async addToCart(productId, quantity = 1) {
             this.loading = true
             try {
-                const response = await fetch('/wp-json/fluent-cart/v1/cart', {
+                // No REST cart route exists — this is the AJAX endpoint the
+                // bundled cart uses. Prefer window.fluentCartCart over calling it.
+                const response = await fetch(window.fluentCartRestVars.ajaxurl
+                    + '?action=fluent_cart_checkout_routes'
+                    + '&fc_checkout_action=fluent_cart_cart_update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-WP-Nonce': window.fluentCart.nonce
+                        'X-WP-Nonce': window.fluentCartRestVars.nonce
                     },
                     body: JSON.stringify({
                         action: 'add_to_cart',
@@ -216,21 +260,50 @@ app.use(pinia)
 
 ### Event Handling
 
-Handle FluentCart events in Vue components:
+FluentCart dispatches `CustomEvent`s on `window`. There is no `fluent-cart:cart-updated`
+event, and no `window.fluentCart` object — the globals are named individually:
 
-```javascript
-// Listen for FluentCart events
-window.addEventListener('fluent-cart:cart-updated', (event) => {
-    // Update Vue component state
-    this.items = event.detail.items
-    this.total = event.detail.total
-})
+| Global | What it is |
+|---|---|
+| `window.fluentCartCart` | the cart instance (add, update, remove) |
+| `window.fluentCartRestVars` | `ajaxurl`, nonce and REST config |
+| `window.fluentCartCheckout` | checkout controller |
+| `window.fluentCartCheckoutParams` | checkout configuration |
+| `window.fluentCartSingleProduct` | single-product controller |
+| `window.fluentCartShopApps` | mounted storefront apps |
 
-// Dispatch custom events
-window.dispatchEvent(new CustomEvent('fluent-cart:custom-action', {
-    detail: { productId: 123, action: 'view' }
-}))
+Events you can listen for include:
+
+```js
+// Payment method lifecycle
+window.addEventListener('fluent_cart_payment_method_loading', (e) => {});
+window.addEventListener('fluent_cart_payment_method_loading_success', (e) => {});
+window.addEventListener('fluent_cart_payment_method_loading_failed', (e) => {});
+
+// Per-gateway load hook: fluent_cart_load_payments_{slug}
+window.addEventListener('fluent_cart_load_payments_stripe', (e) => {
+    // e.detail carries orderHandler, isZeroPayment, hasSubscriptions and more
+});
+
+// Nonce refresh
+window.addEventListener('fcart_renew_rest_nonce', (e) => {});
 ```
+
+Reviews add their own `fct-review-*` events (`fct-review-form-mounted`,
+`fct-review-form-before-submit`, `fct-review-submitted`, `fct-review-form-saved`).
+
+#### Updating the cart
+
+There is no `/wp-json/fluent-cart/v1/cart` REST route. The `cart` route group exists but
+every route in it is commented out — cart changes go through the WordPress AJAX handler:
+
+```js
+// What window.fluentCartCart does internally
+const url = window.fluentCartRestVars.ajaxurl
+    + '?action=fluent_cart_checkout_routes&fc_checkout_action=fluent_cart_cart_update';
+```
+
+Prefer the `window.fluentCartCart` instance over calling that URL yourself.
 
 ## Asset Management
 
@@ -248,9 +321,10 @@ export default defineConfig({
     build: {
         rollupOptions: {
             input: {
-                'checkout': 'resources/js/checkout.js',
-                'cart': 'resources/js/cart.js',
-                'product': 'resources/js/product.js'
+                // Real entries, as listed in vite.config.mjs
+                'admin': 'resources/admin/bootstrap/app.js',
+                'tailwind': 'resources/styles/tailwind/style.css',
+                'shop-app': 'resources/admin/BlockEditor/ShopApp/ShopAppBlockEditor.jsx'
             }
         }
     }
@@ -262,7 +336,7 @@ export default defineConfig({
 Organize styles with SCSS:
 
 ```scss
-// resources/scss/checkout.scss
+// resources/styles/… (there is no resources/scss directory)
 @import 'variables';
 @import 'mixins';
 
@@ -305,7 +379,7 @@ $spacing: 1rem;
 Structure JavaScript files for optimal loading:
 
 ```javascript
-// resources/js/checkout.js
+// resources/public/checkout/… (there is no resources/js directory)
 import { createApp } from 'vue'
 import CheckoutComponent from './components/Checkout.vue'
 import '../scss/checkout.scss'

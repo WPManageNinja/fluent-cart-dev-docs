@@ -19,10 +19,9 @@ description: FluentCart OrderOperation model documentation with attributes, scop
 | id                 | Integer   | Primary Key (guarded) |
 | order_id           | Integer   | Reference to order |
 | created_via        | String    | How the order was created |
-| has_tax            | Boolean   | Whether order has tax |
-| has_discount       | Boolean   | Whether order has discount |
-| coupons_counted    | Integer   | Number of coupons applied |
-| emails_sent        | Integer   | Number of emails sent |
+| emails_sent        | Boolean   | TINYINT(1) — whether the order's emails have been sent |
+| sales_recorded     | Boolean   | Whether the sale has been counted into reports |
+| meta               | JSON      | Fillable |
 | sales_recorded     | Boolean   | Whether sales were recorded |
 | utm_campaign       | String    | UTM campaign parameter |
 | utm_term           | String    | UTM term parameter |
@@ -50,7 +49,7 @@ $orderOperation = FluentCart\App\Models\OrderOperation::find(1);
 $orderOperation->id; // returns id
 $orderOperation->order_id; // returns order ID
 $orderOperation->created_via; // returns creation method
-$orderOperation->has_tax; // returns tax status
+$orderOperation->emails_sent; // whether order emails have gone out
 ```
 
 ## Relations

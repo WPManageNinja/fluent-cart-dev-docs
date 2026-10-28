@@ -25,10 +25,10 @@ description: FluentCart AppliedCoupon model documentation with attributes, scope
 | coupon_id          | Integer   | Reference to coupon |
 | code               | String    | Coupon code |
 | amount             | Decimal   | Discount amount applied (in cents) |
-| settings           | JSON      | (Dynamic/Meta) Coupon settings, may not be a physical DB column |
-| other_info         | JSON      | (Dynamic/Meta) Additional coupon information (buy/get product IDs), may not be a physical DB column |
-| categories         | JSON      | (Dynamic/Meta) Product categories, may not be a physical DB column |
-| products           | JSON      | (Dynamic/Meta) Product IDs (stored as integers), may not be a physical DB column |
+
+`fct_applied_coupons` has exactly these columns: `id`, `order_id`, `coupon_id`, `code`,
+`amount` and the timestamps. It records which code was applied to an order and for how
+much; the coupon's own definition stays on `fct_coupons`.
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -249,7 +249,7 @@ echo "Order ID: " . $appliedCoupon->order_id;
 
 ```php
 $order = FluentCart\App\Models\Order::find(123);
-$appliedCoupons = $order->applied_coupons;
+$appliedCoupons = $order->appliedCoupons;
 
 foreach ($appliedCoupons as $appliedCoupon) {
     echo "Coupon: " . $appliedCoupon->code;

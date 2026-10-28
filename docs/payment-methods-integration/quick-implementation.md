@@ -104,13 +104,17 @@ use FluentCart\Framework\Support\Arr;
 class YourGateway extends AbstractPaymentGateway
 {
     // Define supported features
-    // Features the base class actually checks via has(). 'payment' and 'refund'
-    // are the real ones; there is no 'webhook' feature — nothing in core reads it.
+    // Every built-in gateway declares these. 'payment' and 'refund' are queried
+    // through has(); 'webhook' is declarative only — nothing calls
+    // has('webhook') — but the built-in gateways all list it, so keep it for
+    // consistency if your gateway handles IPN.
+    //
     // Do not list 'subscriptions' here: AbstractPaymentGateway::__construct()
     // appends it automatically when you pass a subscription module.
     public array $supportedFeatures = [
         'payment',
-        'refund'
+        'refund',
+        'webhook'
     ];
     
 

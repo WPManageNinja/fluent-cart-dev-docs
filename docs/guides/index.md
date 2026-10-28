@@ -31,9 +31,9 @@ This section provides comprehensive guides for developers working with FluentCar
 
 ### Prerequisites
 
-- WordPress 5.0 or higher
+- WordPress 6.7 or higher (tested up to 7.1)
 - PHP 7.4 or higher
-- MySQL 5.7 or higher
+- MySQL or MariaDB with InnoDB support — no minimum version is enforced in code
 - Basic knowledge of WordPress development
 - Familiarity with Vue.js (for frontend development)
 
@@ -55,8 +55,14 @@ Enable WordPress debugging in your `wp-config.php`:
 define('WP_DEBUG', true);
 define('WP_DEBUG_LOG', true);
 define('WP_DEBUG_DISPLAY', false);
-define('FLUENT_CART_DEBUG', true);
+
+// FluentCart's own switch. There is no FLUENT_CART_DEBUG constant.
+define('FLUENT_CART_DEV_MODE', true);
 ```
+
+`FLUENT_CART_DEV_MODE` gates FluentCart's activity logging — `fluent_cart_error_log()`,
+`fluent_cart_success_log()` and `fluent_cart_warning_log()` all return early unless it is
+on (`boot/globals.php:46`) — and makes the payment gateways keep extra IPN diagnostics.
 
 ## Getting Help
 

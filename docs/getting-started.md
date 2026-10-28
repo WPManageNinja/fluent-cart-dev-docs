@@ -19,7 +19,7 @@ FluentCart is designed to be highly extensible, allowing developers to customize
 
 ### 🔧 **Built for Customization**
 
-- **Extensive hook system** - 315+ action and filter hooks for custom functionality
+- **Extensive hook system** - over 750 action and filter hooks; see the [Action](/hooks/actions) and [Filter](/hooks/filters) references
 - **Modular architecture** - Clean separation allows safe modifications and additions
 - **RESTful API** - Complete programmatic access to all e-commerce data and functions
 - **WordPress-native** - Follows WordPress coding standards and best practices
@@ -50,6 +50,12 @@ The free version includes powerful core functionalities:
 - ✅ **Payment Processing** - Multiple payment gateway support
 - ✅ **Shipping Management** - Flexible shipping options
 - ✅ **Coupon System** - Discount and promotional codes
+- ✅ **Subscriptions** - Recurring billing, including store-managed renewals
+- ✅ **Tax** - Tax classes, rates and EU VAT handling
+- ✅ **Reporting** - Sales, product, customer and subscription reports
+- ✅ **Product Reviews** - Review collection and display
+- ✅ **Multi-Currency engine** - Currency settings and rate storage
+- ✅ **MCP** - Model Context Protocol abilities for AI tooling
 - ✅ **Developer API** - Full access to hooks and REST API
 
 ### FluentCart Pro (Premium)
@@ -57,12 +63,20 @@ The free version includes powerful core functionalities:
 The premium version adds advanced e-commerce features:
 
 - 🚀 **Licensing System** - Software license management
-- 🚀 **Order Bumps** - Advanced upselling and promotional tools
+- 🚀 **Order Bumps** - Upselling and promotional offers
 - 🚀 **Roles & Permissions** - Advanced user role management
-- 🚀 **Advanced Analytics** - Detailed sales and performance analytics
-- 🚀 **Subscription Management** - Recurring billing and subscriptions
+- 🚀 **Dynamic Pricing** - Rule-based pricing and discounts
+- 🚀 **Inline Checkout** - On-page checkout
+- 🚀 **Advanced Inventory** - Stock adjustments and inventory history
+- 🚀 **Saved Payment Methods** - Stored cards for repeat purchases
+- 🚀 **Data & Accounting Export** - Order, customer, licence and OSS exports
+- 🚀 **Advanced Filters** - Extended filtering across admin lists
+- 🚀 **Multi-Currency storefront** - Customer-facing currency switching on top of the free engine
+- 🚀 **Paddle, Mollie and Authorize.Net** - Additional payment gateways
 - 🚀 **Advanced Integrations** - Deep third-party integrations
-- 🚀 **Custom Modules** - Extensible module system
+
+Subscriptions, Tax, Reporting, Reviews and MCP are **free** modules. Reviews, MCP and
+Multi-Currency ship a free engine that Pro extends, rather than being Pro-only.
 
 ## Core Development Concepts
 
@@ -119,17 +133,20 @@ fluent-cart/
 │   │   └── filters.php    # Filter hooks
 │   ├── Http/              # Request handling and routing
 │   │   ├── Controllers/   # API and admin controllers
-│   │   ├── Middleware/    # Request middleware
+│   │   ├── Policies/      # Route permission policies
+│   │   ├── Requests/      # FormRequest validation / sanitisation
+│   │   ├── Rules/         # Custom validation rules
 │   │   └── Routes/        # API route definitions
-│   ├── Models/            # Database models and relationships (45 files)
+│   ├── Models/            # Database models (37 models + Model and DynamicModel bases)
 │   │   ├── Order.php      # Order model
 │   │   ├── Customer.php   # Customer model
 │   │   ├── Product.php    # Product model
 │   │   └── ...           # Additional models
 │   ├── Services/          # Business logic and services
-│   │   ├── Payment/      # Payment processing services
-│   │   ├── Shipping/     # Shipping calculation services
-│   │   └── Helper.php    # Core helper utilities
+│   │   ├── Payments/     # Payment processing services
+│   │   ├── Renderer/     # Storefront rendering
+│   │   └── Tax/          # Tax calculation services
+│   ├── Helpers/          # Helper.php and other helper utilities
 │   ├── Views/            # PHP template files
 │   ├── Events/           # Event system
 │   ├── Listeners/        # Event listeners
@@ -138,14 +155,16 @@ fluent-cart/
 ├── api/                   # REST API endpoints and utilities
 │   ├── Orders.php        # Order management API
 │   ├── Customers.php     # Customer management API
-│   ├── Products.php      # Product catalog API
+│   ├── StoreSettings.php # Store settings API
+│   ├── Checkout/         # Checkout API
 │   ├── Resource/         # API resource classes
 │   └── ...              # Additional API endpoints
 │
 ├── resources/           # Frontend assets and templates
 │   ├── admin/          # Admin interface (Vue.js) + Gutenberg blocks (React)
-│   │   ├── Components/ # Vue components
+│   │   ├── Pages/      # Vue page components
 │   │   ├── Modules/    # Feature modules
+│   │   ├── shared/     # Shared module API and utilities
 │   │   └── BlockEditor/# React Gutenberg blocks
 │   ├── public/         # Public-facing components
 │   │   ├── cart/       # Cart functionality
@@ -157,14 +176,15 @@ fluent-cart/
 ├── boot/                # Plugin initialization
 ├── config/              # Configuration files
 ├── database/            # Database migrations and schema
-│   ├── Migrations/      # Database migration files (34 files)
+│   ├── Migrations/      # Database migration files (39 files)
 │   ├── Seeder/         # Database seeders
 │   └── DBMigrator.php  # Migration handler
 │
 ├── dev/                 # Development tools and testing
 │   ├── cli/            # CLI commands
-│   ├── test/           # Test files
-│   └── factories/      # Model factories
+│   ├── wp-browser/     # wp-browser test suite
+│   ├── factories/      # Model factories
+│   └── seeds/          # Seed data
 │
 └── fluent-cart.php     # Plugin entry point
 ```
@@ -173,9 +193,9 @@ fluent-cart/
 
 ### Prerequisites
 
-- **WordPress 5.0+** - Modern WordPress installation
+- **WordPress 6.7+** - the plugin header requires it; tested up to 7.1
 - **PHP 7.4+** - Recent PHP version with required extensions
-- **MySQL 5.6+** - Database with InnoDB support
+- **MySQL or MariaDB with InnoDB** - FluentCart's tables are InnoDB. The plugin does not check a MySQL version, so no specific minimum is enforced
 - **Basic WordPress Development** - Understanding of hooks, plugins, and themes
 
 ### Development Tools

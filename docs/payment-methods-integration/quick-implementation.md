@@ -104,13 +104,11 @@ use FluentCart\Framework\Support\Arr;
 class YourGateway extends AbstractPaymentGateway
 {
     // Define supported features
-    // Every built-in gateway declares these. 'payment' and 'refund' are queried
-    // through has(); 'webhook' is declarative only — nothing calls
-    // has('webhook') — but the built-in gateways all list it, so keep it for
-    // consistency if your gateway handles IPN.
+    // 'payment' and 'refund' are queried through has(). 'webhook' is
+    // declarative, and every built-in gateway lists it.
     //
-    // Do not list 'subscriptions' here: AbstractPaymentGateway::__construct()
-    // appends it automatically when you pass a subscription module.
+    // Leave 'subscriptions' out: AbstractPaymentGateway::__construct() appends
+    // it when you pass a subscription module.
     public array $supportedFeatures = [
         'payment',
         'refund',
@@ -832,15 +830,11 @@ FluentCart provides these services to make gateway development easier:
 // Update order status and fire all necessary hooks
 (new \FluentCart\App\Helpers\StatusHelper($order))->syncOrderStatuses($transaction);
 
-// Hooks that actually fire from this call:
+// Hooks this call fires:
 // - fluent_cart/order_paid, then fluent_cart/order_paid_done
 // - fluent_cart/renewal_paid (renewal orders)
 // - fluent_cart/cart_completed
 // - fluent_cart/subscription_activated (when a subscription starts)
-//
-// fluent_cart/order_failed does not exist, and
-// fluent_cart/order_status_updated never fires — the OrderStatusUpdated event
-// sets autoFireHook = false and its do_action in Order.php is commented out.
 $data = [
     'order'       => $this->order,
     'customer'    => $this->customer ?? null,
@@ -908,8 +902,6 @@ Key hooks to be aware of:
    - `fluent_cart/subscription_canceled` — one `l`, matching `Status::SUBSCRIPTION_CANCELED`
    - `fluent_cart/subscription_renewal_failed`
    - `fluent_cart/subscription_paused`, `_resumed`, `_reactivated`
-
-   There is no `subscription_created` or `subscription_cancelled` hook.
 
    <!-- add data passed with these hooks  -->
    ``` php

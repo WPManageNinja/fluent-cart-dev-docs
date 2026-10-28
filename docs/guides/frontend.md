@@ -90,10 +90,7 @@ $supported = TemplateLoader::hasThemeSupport();
 
 ### Template Hooks
 
-Storefront hooks are namespaced with a slash and fire from the renderer classes. The
-three names this guide used previously — `fluent_cart_single_product_summary`,
-`fluent_cart_checkout_before_order_review` and `fluent_cart_cart_table_after` — do not
-exist anywhere in FluentCart.
+Storefront hooks are namespaced with a slash and fire from the renderer classes:
 
 ```php
 // Single product: around the price block
@@ -101,7 +98,7 @@ add_action('fluent_cart/product/single/after_price_block', function ($data) {
     echo '<div class="custom-product-info">Custom content here</div>';
 }, 20);
 
-// Single product: other anchors on the same page
+// Other anchors on the same page
 // fluent_cart/product/single/after_title_block
 // fluent_cart/product/single/after_excerpt_block
 // fluent_cart/product/single/after_quantity_block
@@ -144,7 +141,7 @@ resources/admin/
 ### Frontend Vue Components
 
 Only the customer profile is built with Vue. Every other storefront surface is plain
-JavaScript, despite the directory names reading like component folders:
+JavaScript:
 
 ```
 resources/public/
@@ -224,8 +221,8 @@ export const useCartStore = defineStore('cart', {
         async addToCart(productId, quantity = 1) {
             this.loading = true
             try {
-                // No REST cart route exists — this is the AJAX endpoint the
-                // bundled cart uses. Prefer window.fluentCartCart over calling it.
+                // The AJAX endpoint the bundled cart uses — prefer
+                // window.fluentCartCart over calling it directly.
                 const response = await fetch(window.fluentCartRestVars.ajaxurl
                     + '?action=fluent_cart_checkout_routes'
                     + '&fc_checkout_action=fluent_cart_cart_update', {
@@ -260,8 +257,8 @@ app.use(pinia)
 
 ### Event Handling
 
-FluentCart dispatches `CustomEvent`s on `window`. There is no `fluent-cart:cart-updated`
-event, and no `window.fluentCart` object — the globals are named individually:
+FluentCart dispatches `CustomEvent`s on `window`, and exposes its storefront objects as
+individually named globals:
 
 | Global | What it is |
 |---|---|
@@ -294,8 +291,7 @@ Reviews add their own `fct-review-*` events (`fct-review-form-mounted`,
 
 #### Updating the cart
 
-There is no `/wp-json/fluent-cart/v1/cart` REST route. The `cart` route group exists but
-every route in it is commented out — cart changes go through the WordPress AJAX handler:
+Cart changes go through the WordPress AJAX handler, not a REST route:
 
 ```js
 // What window.fluentCartCart does internally
@@ -336,7 +332,7 @@ export default defineConfig({
 Organize styles with SCSS:
 
 ```scss
-// resources/styles/… (there is no resources/scss directory)
+// resources/styles/…
 @import 'variables';
 @import 'mixins';
 
@@ -379,7 +375,7 @@ $spacing: 1rem;
 Structure JavaScript files for optimal loading:
 
 ```javascript
-// resources/public/checkout/… (there is no resources/js directory)
+// resources/public/checkout/…
 import { createApp } from 'vue'
 import CheckoutComponent from './components/Checkout.vue'
 import '../scss/checkout.scss'

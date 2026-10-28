@@ -32,10 +32,9 @@ global $wpdb;
 Writing `fct_orders` in raw SQL fails with `Unknown column 'fct_orders.id'`.
 :::
 
-::: warning There is no global now() helper
-FluentCart does not define `now()`. Use `DateTime::gmtNow()` from
-`FluentCart\App\Services\DateTime\DateTime`, which returns UTC — all FluentCart
-timestamps are stored in GMT.
+::: tip Timestamps
+Use `DateTime::gmtNow()` from `FluentCart\App\Services\DateTime\DateTime`, which
+returns UTC — all FluentCart timestamps are stored in GMT.
 
 ```php
 use FluentCart\App\Services\DateTime\DateTime;
@@ -683,7 +682,7 @@ Both of these methods accept at least one argument: the column to modify. A seco
 // Decrement product stock when order is placed
 App::db()->table('fct_product_variations')->decrement('available', 1);
 
-// Increment the customer's purchase count (the column is purchase_count, not order_count)
+// Increment the customer's purchase count
 App::db()->table('fct_customers')->increment('purchase_count');
 ```
 
@@ -723,7 +722,7 @@ $orderActivities = App::db()->table('fct_activity')
     ->get();
 
 // Get failed activities in the last 24 hours.
-// The logger writes info / success / warning / error — nothing writes 'failed'.
+// The logger writes info / success / warning / error.
 $failedActivities = App::db()->table('fct_activity')
     ->where('status', 'error')
     ->where('created_at', '>=', DateTime::gmtNow()->modify('-1 day')->format('Y-m-d H:i:s'))
@@ -800,9 +799,8 @@ $activationCount = App::db()->table('fct_license_activations')
     ->where('status', 'active')
     ->count();
 
-// Get all sites for a license.
-// fct_license_sites has no license_id and no status column — reach it through
-// fct_license_activations, which carries both license_id and site_id.
+// Get all sites for a license, through fct_license_activations, which carries
+// both license_id and site_id.
 $licenseSites = App::db()->table('fct_license_sites')
     ->join('fct_license_activations', 'fct_license_sites.id', '=', 'fct_license_activations.site_id')
     ->where('fct_license_activations.license_id', 456)

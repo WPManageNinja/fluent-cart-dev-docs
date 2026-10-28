@@ -49,7 +49,22 @@ The following attributes are appended to every model serialization (e.g. `toArra
 | Attribute          | Type   | Description |
 | ------------------ | ------ | ----------- |
 | formatted_address  | Array  | Full formatted address with resolved country/state names, full address string, etc. |
-| company_name       | String | Company name extracted from `meta->other_data.company_name` |
+| company_name       | String | Company name, from `meta.other_data.company_name` |
+| vat_number         | String | VAT number, from `meta.other_data.vat_number` |
+| legal_registration_id | String | Legal registration ID, from `meta.other_data.legal_registration_id` |
+
+All four are virtual: they live inside the `meta` JSON column rather than in columns of
+their own, and none is fillable. Set them as attributes and the mutators write them into
+`meta`:
+
+```php
+$address->company_name = 'Acme Ltd';
+$address->vat_number = 'GB123456789';
+$address->save();
+```
+
+`company_name`, `vat_number` and `legal_registration_id` also appear in
+`formatted_address` and in `getFormattedDataForCheckout()` output.
 
 ## Usage
 
@@ -270,7 +285,9 @@ $shippingData = $customerAddress->getFormattedDataForCheckout('shipping_'); // U
 
 ```php
 $customer = FluentCart\App\Models\Customer::find(123);
-$addresses = $customer->addresses;
+
+// Customer exposes the addresses by type, not as one `addresses` relation
+$addresses = $customer->billing_address->merge($customer->shipping_address);
 
 foreach ($addresses as $address) {
     echo "Address Type: " . $address->type;

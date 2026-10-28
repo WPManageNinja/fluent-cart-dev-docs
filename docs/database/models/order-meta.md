@@ -199,6 +199,22 @@ $orderMeta = FluentCart\App\Models\OrderMeta::find(1);
 $result = $orderMeta->updateMeta('custom_field', ['key' => 'value']);
 ```
 
+## Reading and writing order meta
+
+Order meta is reached from the order, not through a `meta()` relation:
+
+```php
+$order = FluentCart\App\Models\Order::find(1);
+
+$order->orderMeta;                       // hasMany OrderMeta
+$order->getMeta('key', $default);
+$order->updateMeta('key', $value);
+$order->deleteMeta('key');
+```
+
+`OrderMeta::updateMeta()` on a meta row keys off that row's own `id`, so prefer
+`Order::updateMeta()` when you mean "set this key on this order".
+
 ## Common Meta Keys
 
 Here are some common meta keys used in FluentCart:

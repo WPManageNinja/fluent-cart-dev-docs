@@ -42,13 +42,13 @@ The following columns are searchable via the `CanSearch` trait:
 | ------------------- | --------- | ------- |
 | id                  | Integer   | Primary Key |
 | order_id            | Integer   | Reference to order |
-| order_type          | String    | Order type (onetime, subscription, signup_fee) |
+| order_type          | String    | Order type — `payment`, `subscription` or `renewal` |
 | vendor_charge_id    | String    | Payment gateway transaction ID |
 | payment_method      | String    | Payment method key |
 | payment_mode        | String    | Payment mode (live, test) |
 | payment_method_type | String    | Payment method type (card, bank, etc.) |
 | currency            | String    | Transaction currency |
-| transaction_type    | String    | Transaction type (charge, refund, partial_refund, dispute) |
+| transaction_type    | String    | Transaction type — `charge`, `refund`, `dispute` or `signup_fee` |
 | subscription_id     | Integer   | Reference to subscription (if applicable) |
 | card_last_4         | String    | Last 4 digits of card |
 | card_brand          | String    | Card brand (visa, mastercard, etc.) |
@@ -194,6 +194,24 @@ $transactions = FluentCart\App\Models\OrderTransaction::whereHas('subscription',
 })->get();
 ```
 
+## Appended Attributes
+
+- `url` — the gateway's transaction page, when the gateway supplies one
+- `refundable` — the amount still refundable on this transaction
+- `payment_method_title` — the human-readable payment method
+
+## Boot behaviour
+
+On `creating`, a `uuid` is generated when none is set, and `CurrencySnapshot::
+applyToNewTransaction()` copies the order's frozen exchange rate and flags a foreign
+currency.
+
+On `saving`, when the status changes to `succeeded` the model writes `meta.settled_at` if
+it is empty. `created_at` is the checkout time, which for payment links or delayed
+webhooks can be weeks earlier, so settlement is recorded at this transition. A gateway
+that knows the exact remote charge time sets `meta.settled_at` itself, and this fallback
+never overwrites it.
+
 ## Methods
 
 Along with Global Model methods, this model has few helper methods.
@@ -283,6 +301,10 @@ FluentCart\App\Models\OrderTransaction::bulkDeleteByOrderIds([123, 456, 789]);
 
 Calculate the maximum refundable amount for this transaction. Returns 0 if the transaction status is not `succeeded`. Subtracts any already-refunded amount (from `meta.refunded_total`) from the transaction total.
 
+The result passes through `fluent_cart/transaction/max_refundable_amount`, receiving the
+base amount and the transaction. The filtered value is then clamped to `0 … base`, so a
+filter can only reduce what is refundable, never raise it above what was charged.
+
 * Parameters
    * none
 * Returns `int` - The maximum refundable amount in cents
@@ -294,12 +316,13 @@ $maxRefund = $transaction->getMaxRefundableAmount();
 // If total is 5000 (cents) and 2000 has been refunded, returns 3000
 ```
 
-### getPaymentMethodText()
+### getPaymentMethodText($order = null)
 
-Get a human-readable payment method description. If card brand and last 4 digits are available, returns a formatted string like "visa ***4242". Otherwise returns the raw payment method key.
+Get a human-readable payment method description. If card brand and last 4 digits are available, returns a formatted string like "visa ***4242". Otherwise returns the payment method title.
 
 * Parameters
-   * none
+   * $order - `Order|null` (optional) - the parent order. Its stored title applies when
+     the transaction used the same gateway as the order.
 * Returns `string`
 
 #### Usage
@@ -309,7 +332,23 @@ $text = $transaction->getPaymentMethodText();
 // Returns "visa ***4242" or "stripe" (fallback)
 ```
 
-### getReceiptPageUrl($filtered = false)
+### getSuccessUrl($args = [])
+
+Build the post-payment success URL for this transaction, with any extra query arguments
+merged in.
+
+* Parameters
+   * $args - array (optional) - additional query arguments
+* Returns `string`
+
+### syncPendingTransaction()
+
+Re-check a pending transaction against its gateway and bring the local record into line
+with the remote state.
+
+* Returns `bool`
+
+### getReceiptPageUrl($filtered = true)
 
 Generate the receipt page URL for this transaction. Appends the `trx_hash` query parameter (the transaction's uuid) to the store's configured receipt page URL.
 
@@ -354,12 +393,12 @@ if (is_wp_error($result)) {
 Common transaction statuses in FluentCart:
 
 - `pending` - Transaction is pending
-- `processing` - Transaction is being processed
+
 - `succeeded` - Transaction succeeded
 - `failed` - Transaction failed
-- `cancelled` - Transaction was cancelled
+
 - `refunded` - Transaction was refunded
-- `partially_refunded` - Transaction was partially refunded
+
 - `dispute_lost` - Dispute accepted/lost
 
 ## Transaction Types
@@ -368,7 +407,7 @@ Common transaction types in FluentCart:
 
 - `charge` - Initial charge/payment
 - `refund` - Full refund
-- `partial_refund` - Partial refund
+
 - `dispute` - Payment dispute
 
 ## Usage Examples
@@ -395,7 +434,7 @@ $transactions = FluentCart\App\Models\OrderTransaction::ofStatus('succeeded')
 ### Get Refund Transactions
 
 ```php
-$refunds = FluentCart\App\Models\OrderTransaction::whereIn('transaction_type', ['refund', 'partial_refund'])
+$refunds = FluentCart\App\Models\OrderTransaction::where('transaction_type', 'refund')
     ->get();
 ```
 

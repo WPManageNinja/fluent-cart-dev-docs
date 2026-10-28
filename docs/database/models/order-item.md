@@ -46,7 +46,7 @@ description: FluentCart OrderItem model documentation with attributes, casts, ap
 | line_meta          | JSON      | Line-specific metadata (auto-encoded/decoded) |
 | referrer           | Text      | Referral information |
 | object_type        | String    | Object type |
-| payment_type       | String    | Payment type (onetime, subscription, signup_fee) |
+| payment_type        | String    | `onetime`, `subscription`, `signup_fee`, `fee` or `bundle` |
 | created_at         | Date Time | Creation timestamp |
 | updated_at         | Date Time | Last update timestamp |
 
@@ -74,7 +74,7 @@ The following virtual attributes are appended to the model:
 | payment_info    | string  | Subscription payment info (empty string if not a subscription) |
 | setup_info      | string  | Subscription setup fee info (empty string if not a subscription) |
 | is_custom       | boolean | Whether the item is a custom item (from `other_info['is_custom']`) |
-| formatted_total | float   | Decimal-formatted subtotal (appended via `booted()` on retrieval) |
+| formatted_total     | String    | `line_total` formatted in the order's currency, falling back to `subtotal` when both `line_total` and `discount_total` are 0 |
 
 ## Usage
 
@@ -203,6 +203,19 @@ Access the variant thumbnail image via product meta
 // Accessing Variant Image
 $variantImage = $orderItem->variantImages;
 ```
+
+## Appended Attributes
+
+- `payment_info`
+- `setup_info`
+- `is_custom`
+- `variation_display_title` — the variation label shown to customers
+
+## Other accessors and relations
+
+- `coupon_discount` — the discount attributed to this line
+- `product_reviews` — reviews for the same product, matched on `post_id`
+- `getDisplayTitle()` — the line title as shown in the admin and on receipts
 
 ## Methods
 

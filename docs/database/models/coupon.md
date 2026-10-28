@@ -24,7 +24,7 @@ description: FluentCart Coupon model documentation with attributes, scopes, rela
 | Attribute          | Data Type | Comment |
 | ------------------ | --------- | ------- |
 | id                 | Integer (BIGINT UNSIGNED) | Primary Key, auto-increment |
-| parent             | Integer   | Parent coupon ID |
+
 | title              | String (VARCHAR 200) | Coupon title |
 | code               | String (VARCHAR 50) | Coupon code (unique) |
 | status             | String (VARCHAR 20) | Coupon status (active, inactive, expired) |
@@ -36,10 +36,12 @@ description: FluentCart Coupon model documentation with attributes, scopes, rela
 | use_count          | Integer   | Number of times used (default 0) |
 | notes              | Text (LONGTEXT) | Coupon notes |
 | show_on_checkout   | String (VARCHAR 3) | Show on checkout page ('yes' or 'no', default 'yes') |
-| settings           | JSON      | Coupon settings (auto-encoded/decoded via mutator) |
-| other_info         | JSON      | Additional info like buy/get products (auto-encoded/decoded via mutator) |
-| categories         | JSON      | Category IDs for coupon applicability (auto-encoded/decoded via mutator) |
-| products           | JSON      | Product IDs for coupon applicability (auto-encoded/decoded via mutator, values cast to integer) |
+
+The `fct_coupons` columns are `id`, `title`, `code`, `type`, `amount`, `conditions`,
+`priority`, `stackable`, `show_on_checkout`, `status`, `notes`, `use_count`,
+`start_date`, `end_date` and the timestamps. Coupon targeting — categories, products and
+buy/get sets — lives inside the `conditions` JSON column rather than in columns of its
+own.
 | start_date         | Timestamp | Start date |
 | end_date           | Timestamp | End date |
 | created_at         | DateTime  | Creation timestamp |
@@ -184,6 +186,13 @@ WHERE column LIKE %value query.
 ```php
 $coupons = FluentCart\App\Models\Coupon::whereEndsWith('code', '10')->get();
 ```
+
+## Boot behaviour
+
+`saving` returns `false` when the model is a converted-currency copy
+(`CouponCurrency::isConvertedCopy()`). Those copies exist in memory so a cart can price a
+coupon in its own currency; writing one back would store the converted amount on the real
+coupon.
 
 ## Methods
 

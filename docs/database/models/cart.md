@@ -65,6 +65,35 @@ $cart->coupons; // returns decoded coupon codes array
 $cart->utm_data; // returns decoded UTM data array
 ```
 
+## Boot behaviour
+
+- `creating` — generates `cart_hash` when none is set
+- `saving` — `CartCurrency::reconcile()` keeps one currency and one locked rate per cart
+- `saved` — follow-up currency reconciliation
+
+## Fees
+
+A cart's fees are stored on the cart and surfaced as cart items:
+
+| Method | Purpose |
+|---|---|
+| `getFees()` | the cart's fees, refreshing stale dynamic ones first |
+| `getStoredFees()` | the fees as stored, without refreshing |
+| `addFee(array $fee)` | add or replace a fee |
+| `removeFee(string $key, ?string $source = null)` | remove one fee, optionally scoped to a source |
+| `removeFeesBySource(string $source)` | remove every fee added by one source |
+| `getFeeTotal()` | the summed fee amount |
+| `getFeeCartItems()` | the fees as cart-item rows |
+| `Cart::buildFeeCartItem(array $fee)` | build a single fee cart item (static) |
+| `refreshStaleDynamicFees()` | recompute fees whose inputs have changed |
+| `clearFeeCache()` | drop the in-request fee cache |
+
+### acceptsAdditionalItems()
+
+Whether more items may be added to this cart in its current stage.
+
+* Returns `bool`
+
 ## Methods
 
 Along with Global Model methods, this model has the following helper methods.
@@ -396,7 +425,19 @@ $subtotal = $cart->getItemsSubtotal();
 
 #### getEstimatedTotal($extraAmount = 0)
 
-Get the estimated cart total including item totals, shipping, and custom checkout adjustments. Combines one-time and subscription items via `CheckoutService`, calculates item totals via `OrderService::getItemsAmountTotal()`, adds shipping charges, handles custom checkout shipping amounts, and ensures the total is never negative. Applies the `fluent_cart/cart/estimated_total` filter.
+Get the estimated cart total including item totals, fees, shipping, and custom checkout
+adjustments. The sequence is:
+
+1. A **recursion guard** — if a hook calls `getEstimatedTotal()` again, the call falls
+   through to the private raw calculation so hooks run only once.
+2. `do_action('fluent_cart/cart/before_totals_calculation')`.
+3. `apply_filters('fluent_cart/cart/item_dynamic_discount', $cart_data, ...)`, so a
+   filter can rewrite line items before they are priced.
+4. One-time and subscription items are combined via `CheckoutService`, then totalled by
+   `OrderService::getItemsAmountTotal()`.
+5. Fees, shipping, prorate credit and upgrade discounts are applied.
+6. `apply_filters('fluent_cart/cart/estimated_total', ...)`, and the result is floored at
+   0.
 
 * Parameters: `$extraAmount` (Integer) - Extra amount in cents to include (default: 0)
 * Returns `Integer` - Estimated total in cents (minimum 0)

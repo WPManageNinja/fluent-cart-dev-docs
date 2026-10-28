@@ -18,7 +18,8 @@ Configure tax classes, manage country-specific tax rates, set up tax configurati
 Manage order-level tax records for filing and reporting purposes.
 
 **Prefix:** `/fluent-cart/v2/taxes`
-**Policy:** `AdminPolicy`
+**Policy:** `AdminPolicy` — requires `is_super_admin`, i.e. `manage_options`. Route
+`permissions` meta is not consulted for this group.
 
 ---
 
@@ -33,7 +34,7 @@ Retrieve a paginated list of order tax rate records with optional filtering, sor
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `page` | integer | query | No | Page number for pagination |
-| `per_page` | integer | query | No | Number of records per page (default: 10, max: 200) |
+| `per_page` | integer | query | No | Records per page. Accepted when greater than 0 and **less than 200**, so the effective maximum is 199; anything else falls back to the default of 10 |
 | `search` | string | query | No | Search term. If numeric, searches by `id` or `order_id`. Also searches related tax rate `country`, `state`, `postcode`, and `name` fields. Supports operator syntax (e.g., `id = 5`, `order_id > 100`) |
 | `sort_by` | string | query | No | Column to sort by (default: `id`). Must be a fillable column on the OrderTaxRate model |
 | `sort_type` | string | query | No | Sort direction: `asc` or `desc` (default: `desc`) |
@@ -138,7 +139,8 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/taxes" \
 Manage tax classes that group tax rates by category (e.g., Standard, Reduced, Zero).
 
 **Prefix:** `/fluent-cart/v2/tax/classes`
-**Policy:** `StoreSettingsPolicy`
+**Policy:** `StoreSettingsPolicy`, with the permission taken from each route's
+`permissions` meta — `store/settings` for reads and `store/sensitive` for writes.
 
 A maximum of **6** tax classes is allowed. The built-in `standard` class always exists and cannot be deleted; `reduced` and `zero` are built-in classes that can be created on demand.
 
@@ -287,7 +289,8 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/tax/classes/4" \
 Manage country-specific tax rates, shipping tax overrides, and country tax IDs.
 
 **Prefix:** `/fluent-cart/v2/tax`
-**Policy:** `StoreSettingsPolicy`
+**Policy:** `StoreSettingsPolicy`, with the permission taken from each route's
+`permissions` meta — `store/settings` for reads and `store/sensitive` for writes.
 
 ---
 
@@ -475,29 +478,29 @@ Create a new tax rate entry for a country.
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
-| `class_id` | integer | body | Yes | ID of the tax class this rate belongs to |
+| `class_id` | integer | body | No | ID of the tax class this rate belongs to. Optional — validated as `nullable|numeric|min:1` |
 | `country` | string | body | No | ISO 3166-1 alpha-2 country code (max 45 characters) |
 | `state` | string | body | No | State/province code (max 45 characters) |
 | `postcode` | string | body | No | Postcode/ZIP code (max 45 characters) |
 | `city` | string | body | No | City name (max 45 characters) |
-| `rate` | string | body | No | Tax rate percentage (e.g., `"19.0000"`, max 45 characters) |
+| `rate` | number | body | No | Tax rate percentage. Validated as `nullable|numeric|min:0|max:99999` |
 | `name` | string | body | No | Display name for the tax rate (max 45 characters) |
 | `group` | string | body | No | Geographic group/continent code, e.g., `EU`, `NA` (max 45 characters) |
 | `priority` | integer | body | No | Priority for rate application order (min: 1) |
 | `is_compound` | integer | body | No | Whether this rate is compound (applied on top of other taxes). `0` or `1` (default: `0`) |
-| `for_shipping` | integer | body | No | Shipping tax override rate. `null` means no override |
+| `for_shipping` | number | body | No | Shipping tax override rate. Validated as `nullable|numeric|min:0` |
 | `for_order` | integer | body | No | Whether this rate applies at order level. `0` or `1` (default: `0`) |
 
 ### Validation Rules
 
 | Field | Rules |
 |-------|-------|
-| `class_id` | Required, minimum 0 |
+| `class_id` | Nullable, numeric, minimum 1 |
 | `country` | Nullable, sanitized text, max 45 characters |
 | `state` | Nullable, sanitized text, max 45 characters |
 | `postcode` | Nullable, sanitized text, max 45 characters |
 | `city` | Nullable, sanitized text, max 45 characters |
-| `rate` | Nullable, sanitized text, max 45 characters |
+| `rate` | Nullable, numeric, between 0 and 99999 |
 | `name` | Nullable, sanitized text, max 45 characters |
 | `group` | Nullable, sanitized text, max 45 characters |
 | `priority` | Nullable, numeric, minimum 1 |
@@ -570,7 +573,7 @@ Update an existing tax rate.
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `id` | integer | path | Yes | Tax rate ID |
-| `class_id` | integer | body | Yes | ID of the tax class this rate belongs to |
+| `class_id` | integer | body | No | ID of the tax class this rate belongs to. Optional — validated as `nullable|numeric|min:1` |
 | `country` | string | body | No | ISO 3166-1 alpha-2 country code (max 45 characters) |
 | `state` | string | body | No | State/province code (max 45 characters) |
 | `postcode` | string | body | No | Postcode/ZIP code (max 45 characters) |
@@ -976,7 +979,8 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/country-tax-id/DE" 
 Manage global tax settings including enabling/disabling tax, inclusion/exclusion behavior, calculation basis, and rounding.
 
 **Prefix:** `/fluent-cart/v2/tax/configuration`
-**Policy:** `StoreSettingsPolicy`
+**Policy:** `StoreSettingsPolicy`, with the permission taken from each route's
+`permissions` meta — `store/settings` for reads and `store/sensitive` for writes.
 
 ---
 
@@ -1235,7 +1239,8 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/tax/configuration/setti
 Manage European Union VAT settings, OSS (One-Stop Shop) compliance, and cross-border tax configurations.
 
 **Prefix:** `/fluent-cart/v2/tax/configuration/settings/eu-vat`
-**Policy:** `StoreSettingsPolicy`
+**Policy:** `StoreSettingsPolicy`, with the permission taken from each route's
+`permissions` meta — `store/settings` for reads and `store/sensitive` for writes.
 
 ---
 

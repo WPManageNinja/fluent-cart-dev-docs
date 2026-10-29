@@ -27,7 +27,7 @@
       "post": {
         "operationId": "saveSchedulingSettings",
         "summary": "POST Save Scheduling Settings",
-        "description": "Update reminder/scheduling settings for automated email notifications. Each reminder type has an enable toggle and a days configuration that controls how many days before the event the reminder is sent.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
+        "description": "Update the store's reminder settings. Each reminder type has an enable toggle and, for the scheduled cycles, a days value that controls how many days before the event the reminder is sent. Overdue renewal reminders take a comma-separated list of day offsets instead.\n\nThe submitted keys are merged into the existing store settings, so keys left out keep their current values. The response returns the merged settings in full.\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Email Notifications"
         ],
@@ -52,25 +52,18 @@
                     "description": "Master toggle for all reminders",
                     "example": "yes"
                   },
-                  "invoice_reminders_enabled": {
+                  "renewal_reminders_enabled": {
                     "type": "string",
                     "enum": [
                       "yes",
                       "no"
                     ],
-                    "description": "Enable invoice payment reminders",
-                    "example": "yes"
+                    "description": "Enable overdue payment reminders for store-managed renewal orders",
+                    "example": "no"
                   },
-                  "invoice_reminder_due_days": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 365,
-                    "description": "Days before due date to send invoice reminder. Required when invoice_reminders_enabled is yes",
-                    "example": 3
-                  },
-                  "invoice_reminder_overdue_days": {
+                  "renewal_reminder_overdue_days": {
                     "type": "string",
-                    "description": "Comma-separated day intervals for overdue reminders (e.g., 1,3,7)",
+                    "description": "Comma-separated day offsets after the due date at which overdue reminders are sent",
                     "example": "1,3,7"
                   },
                   "yearly_renewal_reminders_enabled": {
@@ -151,14 +144,13 @@
                     "minimum": 7,
                     "maximum": 60,
                     "description": "Days before renewal to send reminder. Required when half_yearly_renewal_reminders_enabled is yes",
-                    "example": 14
+                    "example": 21
                   }
                 },
                 "example": {
                   "reminders_enabled": "yes",
-                  "invoice_reminders_enabled": "yes",
-                  "invoice_reminder_due_days": 3,
-                  "invoice_reminder_overdue_days": "1,3,7",
+                  "renewal_reminders_enabled": "no",
+                  "renewal_reminder_overdue_days": "1,3,7",
                   "yearly_renewal_reminders_enabled": "yes",
                   "yearly_renewal_reminder_days": 30,
                   "trial_end_reminders_enabled": "yes",
@@ -168,14 +160,13 @@
                   "quarterly_renewal_reminders_enabled": "no",
                   "quarterly_renewal_reminder_days": 14,
                   "half_yearly_renewal_reminders_enabled": "no",
-                  "half_yearly_renewal_reminder_days": 14
+                  "half_yearly_renewal_reminder_days": 21
                 }
               },
               "example": {
                 "reminders_enabled": "yes",
-                "invoice_reminders_enabled": "yes",
-                "invoice_reminder_due_days": 3,
-                "invoice_reminder_overdue_days": "1,3,7",
+                "renewal_reminders_enabled": "no",
+                "renewal_reminder_overdue_days": "1,3,7",
                 "yearly_renewal_reminders_enabled": "yes",
                 "yearly_renewal_reminder_days": 30,
                 "trial_end_reminders_enabled": "yes",
@@ -185,7 +176,7 @@
                 "quarterly_renewal_reminders_enabled": "no",
                 "quarterly_renewal_reminder_days": 14,
                 "half_yearly_renewal_reminders_enabled": "no",
-                "half_yearly_renewal_reminder_days": 14
+                "half_yearly_renewal_reminder_days": 21
               },
               "examples": {
                 "default": {
@@ -221,7 +212,7 @@
                   "properties": {
                     "data": {
                       "type": "object",
-                      "description": "Updated settings data"
+                      "description": "The merged store settings after the save."
                     },
                     "message": {
                       "type": "string",
@@ -231,9 +222,8 @@
                   "example": {
                     "data": {
                       "reminders_enabled": "yes",
-                      "invoice_reminders_enabled": "yes",
-                      "invoice_reminder_due_days": 3,
-                      "invoice_reminder_overdue_days": "1,3,7",
+                      "renewal_reminders_enabled": "no",
+                      "renewal_reminder_overdue_days": "1,3,7",
                       "yearly_renewal_reminders_enabled": "yes",
                       "yearly_renewal_reminder_days": 30,
                       "trial_end_reminders_enabled": "yes",
@@ -243,7 +233,7 @@
                       "quarterly_renewal_reminders_enabled": "no",
                       "quarterly_renewal_reminder_days": 14,
                       "half_yearly_renewal_reminders_enabled": "no",
-                      "half_yearly_renewal_reminder_days": 14
+                      "half_yearly_renewal_reminder_days": 21
                     },
                     "message": "Scheduling settings saved successfully"
                   }
@@ -251,9 +241,8 @@
                 "example": {
                   "data": {
                     "reminders_enabled": "yes",
-                    "invoice_reminders_enabled": "yes",
-                    "invoice_reminder_due_days": 3,
-                    "invoice_reminder_overdue_days": "1,3,7",
+                    "renewal_reminders_enabled": "no",
+                    "renewal_reminder_overdue_days": "1,3,7",
                     "yearly_renewal_reminders_enabled": "yes",
                     "yearly_renewal_reminder_days": 30,
                     "trial_end_reminders_enabled": "yes",
@@ -263,7 +252,7 @@
                     "quarterly_renewal_reminders_enabled": "no",
                     "quarterly_renewal_reminder_days": 14,
                     "half_yearly_renewal_reminders_enabled": "no",
-                    "half_yearly_renewal_reminder_days": 14
+                    "half_yearly_renewal_reminder_days": 21
                   },
                   "message": "Scheduling settings saved successfully"
                 },
@@ -363,6 +352,16 @@
                       "This field is required."
                     ]
                   }
+                }
+              }
+            }
+          },
+          "423": {
+            "description": "The settings could not be saved.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Failed to save scheduling settings"
                 }
               }
             }

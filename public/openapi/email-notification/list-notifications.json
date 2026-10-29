@@ -639,7 +639,7 @@
                       ],
                       "template_path": "order.paid.admin",
                       "is_async": false,
-                      "pre_header": "You got a new order on your shop! Order #{{order.invoice_no}} totaling {{order.total_amount_formatted}}.",
+                      "pre_header": "You got a new order on your shop. Congratulations! Checkout all the details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
                       "name": "order_paid_admin",
                       "settings": {
                         "active": "yes",
@@ -686,7 +686,6 @@
                       ],
                       "template_path": "order.refunded.admin",
                       "is_async": false,
-                      "pre_header": "A refund has been processed for order #{{order.invoice_no}}.",
                       "name": "order_refunded_admin",
                       "settings": {
                         "active": "yes",
@@ -1212,7 +1211,7 @@
                           ],
                           "template_path": "order.paid.admin",
                           "is_async": false,
-                          "pre_header": "You got a new order on your shop! Order #{{order.invoice_no}} totaling {{order.total_amount_formatted}}.",
+                          "pre_header": "You got a new order on your shop. Congratulations! Checkout all the details in this email. You can also go to FluentCart Dashboard to view the order details and manage it. Thank you for using FluentCart.",
                           "name": "order_paid_admin",
                           "settings": {
                             "active": "yes",
@@ -1259,7 +1258,6 @@
                           ],
                           "template_path": "order.refunded.admin",
                           "is_async": false,
-                          "pre_header": "A refund has been processed for order #{{order.invoice_no}}.",
                           "name": "order_refunded_admin",
                           "settings": {
                             "active": "yes",

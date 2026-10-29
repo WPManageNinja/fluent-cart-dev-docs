@@ -116,6 +116,21 @@
                     },
                     "updated_at": {
                       "type": "string"
+                    },
+                    "subscription_status": {
+                      "type": "string",
+                      "description": "The subscription's effective status. Present only when the license is tied to a subscription and its `expiration_date` is not `lifetime`.",
+                      "example": "active"
+                    },
+                    "customer_name": {
+                      "type": "string",
+                      "description": "The license owner's full name. Present when the license has a customer.",
+                      "example": "Jane Doe"
+                    },
+                    "customer_email_masked": {
+                      "type": "string",
+                      "description": "The owner's email with the local part and host partly masked.",
+                      "example": "ja**e@e*****.com"
                     }
                   },
                   "example": {
@@ -147,7 +162,10 @@
                   "variation_title": "Pro License",
                   "product_title": "My Plugin",
                   "created_at": "2025-01-15 10:30:00",
-                  "updated_at": "2025-06-15 10:35:00"
+                  "updated_at": "2025-06-15 10:35:00",
+                  "subscription_status": "active",
+                  "customer_name": "Jane Doe",
+                  "customer_email_masked": "ja**e@e*****.com"
                 },
                 "examples": {
                   "default": {
@@ -165,7 +183,10 @@
                       "variation_title": "Pro License",
                       "product_title": "My Plugin",
                       "created_at": "2025-01-15 10:30:00",
-                      "updated_at": "2025-06-15 10:35:00"
+                      "updated_at": "2025-06-15 10:35:00",
+                      "subscription_status": "active",
+                      "customer_name": "Jane Doe",
+                      "customer_email_masked": "ja**e@e*****.com"
                     }
                   }
                 }

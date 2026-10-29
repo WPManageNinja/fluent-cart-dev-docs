@@ -23,7 +23,7 @@
     }
   ],
   "paths": {
-    "/settings/license/": {
+    "/settings/license": {
       "post": {
         "operationId": "activatePluginLicense",
         "summary": "POST Activate Plugin License",
@@ -190,7 +190,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

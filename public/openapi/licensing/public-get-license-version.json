@@ -27,7 +27,7 @@
       "get": {
         "operationId": "publicGetLicenseVersion",
         "summary": "GET Get License Version",
-        "description": "Retrieve the latest version information for a licensed product. This endpoint is designed to integrate with WordPress plugin/theme update mechanisms. It returns version data, changelog, download links, and banner/icon URLs. This is a public endpoint that does not use the WordPress REST API. No authentication required.",
+        "description": "Retrieve the latest version information for a licensed product. This endpoint is designed to integrate with WordPress plugin/theme update mechanisms. It returns version data, changelog, download links, and banner/icon URLs. This is a public endpoint that does not use the WordPress REST API. No authentication required.\n\nThe `package` URL carries an unsigned `fct_package` envelope that **does not expire**. It is deterministic for a given license and site, which lets a CDN build it at the edge and cache version responses per product rather than per license. Entitlement is not decided by the token: the product is derived from the license each time the link is followed and the license is re-checked then. What is short-lived is the file URL the download endpoint redirects to, signed and valid for 60 minutes by default (`fluent_cart/download_link_validity_in_minutes`).\n\nA store that signs its releases also gets `manifest` and `signature` here, echoed byte for byte, for a valid license and an invalid one alike.",
         "tags": [
           "Licensing"
         ],
@@ -68,6 +68,33 @@
               "type": "string"
             },
             "description": "The site URL making the request"
+          },
+          {
+            "name": "current_version",
+            "in": "query",
+            "required": false,
+            "description": "The version installed on the calling site. Recorded on the activation as `last_update_version`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "server_version",
+            "in": "query",
+            "required": false,
+            "description": "The calling site's PHP version. Recorded on the site record.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "platform_version",
+            "in": "query",
+            "required": false,
+            "description": "The calling site's WordPress version. Recorded on the site record.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -117,9 +144,10 @@
                       "type": "string",
                       "enum": [
                         "valid",
-                        "invalid",
-                        "expired"
-                      ]
+                        "invalid"
+                      ],
+                      "description": "Only these two values are returned here: `valid` on the branch that issues download links and `invalid` on the one that does not.",
+                      "example": "valid"
                     },
                     "license_message": {
                       "type": "string",
@@ -157,6 +185,14 @@
                           "type": "string"
                         }
                       }
+                    },
+                    "manifest": {
+                      "type": "string",
+                      "description": "Signed release manifest, present only on a store that signs its releases."
+                    },
+                    "signature": {
+                      "type": "string",
+                      "description": "The manifest's detached signature."
                     }
                   },
                   "example": {

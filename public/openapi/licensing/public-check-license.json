@@ -27,7 +27,7 @@
       "get": {
         "operationId": "publicCheckLicense",
         "summary": "GET Check License",
-        "description": "Verify the validity of a license key and check its activation status for a specific site. This is a public endpoint that does not use the WordPress REST API -- it uses query parameter-based URLs on the site's front end. No authentication required.",
+        "description": "Verify the validity of a license key and check its activation status for a specific site. This is a public endpoint that does not use the WordPress REST API -- it uses query parameter-based URLs on the site's front end. No authentication required.\n\n**Every outcome answers HTTP 200 with `success: true`, failures included.** A rejected check is reported as `status: \"invalid\"` with an `error_type`, so a caller that branches on the status code or on `success` reads a failed check as a pass. Branch on `status`. The activate endpoint does not share this shape: its validation failure answers 422 with `success: false`.",
         "tags": [
           "Licensing"
         ],
@@ -126,6 +126,25 @@
                     },
                     "updated_at": {
                       "type": "string"
+                    },
+                    "subscription_status": {
+                      "type": "string",
+                      "description": "The subscription's effective status. Present only when the license is tied to a subscription and its `expiration_date` is not `lifetime`.",
+                      "example": "active"
+                    },
+                    "customer_name": {
+                      "type": "string",
+                      "description": "The license owner's full name. Present when the license has a customer.",
+                      "example": "Jane Doe"
+                    },
+                    "customer_email_masked": {
+                      "type": "string",
+                      "description": "The owner's email with the local part and host partly masked.",
+                      "example": "ja**e@e*****.com"
+                    },
+                    "error_type": {
+                      "type": "string",
+                      "description": "Present on a rejected check. One of `validation_error`, `invalid_license`, `invalid_activation`, `key_mismatch`, or `license_error` when the `fluent_cart/license/check_license_response` filter returned a WP_Error."
                     }
                   },
                   "example": {
@@ -157,7 +176,10 @@
                   "variation_title": "Pro License",
                   "product_title": "My Plugin",
                   "created_at": "2025-01-15 10:30:00",
-                  "updated_at": "2025-06-15 10:35:00"
+                  "updated_at": "2025-06-15 10:35:00",
+                  "subscription_status": "active",
+                  "customer_name": "Jane Doe",
+                  "customer_email_masked": "ja**e@e*****.com"
                 },
                 "examples": {
                   "default": {
@@ -175,7 +197,10 @@
                       "variation_title": "Pro License",
                       "product_title": "My Plugin",
                       "created_at": "2025-01-15 10:30:00",
-                      "updated_at": "2025-06-15 10:35:00"
+                      "updated_at": "2025-06-15 10:35:00",
+                      "subscription_status": "active",
+                      "customer_name": "Jane Doe",
+                      "customer_email_masked": "ja**e@e*****.com"
                     }
                   }
                 }

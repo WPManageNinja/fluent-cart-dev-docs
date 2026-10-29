@@ -27,7 +27,7 @@
       "get": {
         "operationId": "listLicenses",
         "summary": "GET List Licenses",
-        "description": "Retrieve a paginated list of all licenses with optional filtering, sorting, and search.\n\n**Permission:** `licenses/view` · **Policy:** `LicensePolicy`",
+        "description": "Retrieve a paginated list of all licenses with optional filtering, sorting, and search.\n\nA license whose `expiration_date` has passed is reported with `status: \"expiring\"` unless its stored status is already `expired` or `disabled`. The relabel applies to this response only; the stored status is unchanged.\n\n**Permission:** `licenses/view` \u00b7 **Policy:** `LicensePolicy`",
         "tags": [
           "Licensing"
         ],
@@ -64,7 +64,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Search term. Searches across license key, order ID, customer name, customer email, and activated site URLs. Also supports operator syntax (e.g., `license_key = abc123`)"
+            "description": "Search term. Searches across license key, order ID, customer name, customer email, and activated site URLs. Also supports operator syntax (e.g., `key = abc123`)"
           },
           {
             "name": "sort_by",
@@ -454,7 +454,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

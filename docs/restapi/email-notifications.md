@@ -1158,6 +1158,6 @@ Each notification object contains the following properties:
 | `subject` | string | Email subject line. Supports shortcodes |
 | `is_default_body` | string | Whether to use the built-in PHP template: `yes` or `no` |
 | `email_body` | string | Custom email body content (HTML). Empty when using default body |
-| `attach_pdf_template` | string | Slug of the receipt PDF template to attach, or an empty string for none. A legacy `attach_pdf: "yes"` is migrated to `order_receipt` on read |
+| `attach_pdf_template` | string | Slug of the receipt PDF template to attach, or an empty string for none |
 
 </div>

@@ -80,7 +80,7 @@ Paginated list of stock-managed products with their variants. A product appears 
 | `with` | array | query | No | Eager-load relations. See below. |
 
 ::: danger Send `with` as an array
-`with` must be an array — `?with[]=detail`. A bare string (`?with=detail`) is rejected by the filter's type declaration and the request fails with `500 plugin_exception`. This applies to every filtered list endpoint in the API, not just this one.
+`with` must be an array — `?with[]=detail`. A bare string (`?with=detail`) answers `500 plugin_exception` instead of a validation error. This applies to every filtered list endpoint in the API, not just this one.
 :::
 
 The `with` parameter is **allowlisted** — arbitrary relation names are rejected rather than passed through:
@@ -88,7 +88,7 @@ The `with` parameter is **allowlisted** — arbitrary relation names are rejecte
 | Value | Effect |
 |-------|--------|
 | `admin_inventory_list_v2` | Both relations, with variant columns narrowed and the variant list capped at 10 per product. What the current admin table sends. |
-| `admin_inventory_list` | The legacy shape: both relations, variant columns narrowed, no cap on the variant list. Kept so an older free-plugin frontend running against a newer Pro keeps working. |
+| `admin_inventory_list` | The legacy shape: both relations, variant columns narrowed, no cap on the variant list. Kept for backward compatibility; prefer the v2 key for new work. |
 | `detail` | The catalogue detail row on its own. |
 | `variants` | The variant rows on their own, unnarrowed. |
 

@@ -500,7 +500,7 @@
               },
               "attach_pdf_template": {
                 "type": "string",
-                "description": "Slug of the receipt PDF template to attach, or an empty string for none. A legacy `attach_pdf: \"yes\"` is migrated to `order_receipt` on read.",
+                "description": "Slug of the receipt PDF template to attach, or an empty string for none.",
                 "example": ""
               }
             }

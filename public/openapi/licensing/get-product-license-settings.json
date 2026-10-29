@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getProductLicenseSettings",
         "summary": "GET Get Product License Settings",
-        "description": "Retrieve the license configuration for a specific product, including per-variation activation limits and validity periods.\n\n**Permission:** `licenses/view` · **Policy:** `LicensePolicy`",
+        "description": "Retrieve the license configuration for a specific product, including per-variation activation limits and validity periods.\n\n**Permission:** `licenses/view` \u00b7 **Policy:** `LicensePolicy`",
         "tags": [
           "Licensing"
         ],
@@ -172,6 +172,16 @@
                         "license_keys": {
                           "type": "string",
                           "description": "Pre-defined license keys (if applicable)"
+                        },
+                        "manifest": {
+                          "type": "string",
+                          "description": "The signed release manifest, stored and returned byte for byte. Only on a store that signs its releases.",
+                          "example": ""
+                        },
+                        "signature": {
+                          "type": "string",
+                          "description": "The manifest's detached signature, stored and returned byte for byte.",
+                          "example": ""
                         }
                       }
                     },
@@ -181,7 +191,8 @@
                     },
                     "signed_releases_enabled": {
                       "type": "boolean",
-                      "description": "Whether release signing is active, from `ReleaseSignature::isEnabled()`. Gates the two release-signing inputs on the product screen; stores that do not sign releases never see the fields. Toggled with the `fluent_cart/licensing/enable_signed_releases` filter."
+                      "description": "Whether release signing is enabled for this store. The admin screen shows the two signing inputs only while this is true, so a store that does not sign never sees them and never stores them.",
+                      "example": false
                     }
                   },
                   "example": {
@@ -310,9 +321,12 @@
                     },
                     "prefix": "",
                     "changelog": "<h4>1.2.0</h4><ul><li>New feature added</li></ul>",
-                    "license_keys": ""
+                    "license_keys": "",
+                    "manifest": "",
+                    "signature": ""
                   },
-                  "is_bundle_product": false
+                  "is_bundle_product": false,
+                  "signed_releases_enabled": false
                 },
                 "examples": {
                   "default": {
@@ -377,9 +391,12 @@
                         },
                         "prefix": "",
                         "changelog": "<h4>1.2.0</h4><ul><li>New feature added</li></ul>",
-                        "license_keys": ""
+                        "license_keys": "",
+                        "manifest": "",
+                        "signature": ""
                       },
-                      "is_bundle_product": false
+                      "is_bundle_product": false,
+                      "signed_releases_enabled": false
                     }
                   }
                 }
@@ -397,7 +414,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

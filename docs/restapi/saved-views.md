@@ -33,11 +33,14 @@ Each value maps to a different capability, so access is inherited from the under
 | `coupon_table` | `coupons/view` |
 | `subscriptions` | `subscriptions/view` |
 | `licenses` | `licenses/view` |
+| `license_sites` | `licenses/view` |
 | `order_bump_table` | `products/view` |
 | `log_table` | `orders/view` |
-| `taxes_table` | `manage_options` |
-| `shipping_zone_table` | `manage_options` |
-| `shipping_class_table` | `manage_options` |
+| `taxes_table` | `is_super_admin` |
+| `shipping_zone_table` | `is_super_admin` |
+| `shipping_class_table` | `is_super_admin` |
+
+The three `is_super_admin` entries are resolved with `user_can($user, 'manage_options')` rather than through FluentCart's permission system, so a shop manager with `orders/view` still cannot save a view on the tax or shipping tables.
 
 The map is filterable:
 
@@ -54,7 +57,7 @@ For `PUT` and `DELETE` the `object_type` is **not** sent — the policy resolves
 
 ## Limits and behaviour
 
-- **20 views per user per table.** Creating the 21st returns `422`.
+- **20 views per user per table.** Creating the 21st returns `422`. The count is of the user's own *private* views for that table; views they created as public are stored against `object_id = 0` and do not count against the cap.
 - **Names are capped at 50 characters** and are required.
 - **Slugs are generated,** never supplied: `sanitize_title(name)` plus a 6-character random suffix, so two views may share a name safely.
 - **`query_params` is allowlisted.** Only `filter_type`, `advanced_filters`, `search` and `active_view` are stored; every other key is silently dropped. An `advanced_filters` value that is not valid JSON is stored as `[[]]`.
@@ -84,7 +87,7 @@ Returns the current user's own views plus all public views for one table, ordere
 
 <badge type="tip">POST</badge> `/fluent-cart/v2/saved-views`
 
-Creates a view and returns it with its generated `id` and `slug`. Responds `201`.
+Creates a view and returns it with its generated `id` and `slug`. Responds `200` — every FluentCart success response is `200`, including creates.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -102,7 +105,9 @@ Creates a view and returns it with its generated `id` and `slug`. Responds `201`
 
 Partial update — only the fields present in the body are changed. Sending `is_public` re-owns the record (`object_id` flips between `0` and the user ID).
 
-Returns `403` if the authenticated user is not the creator, `404` if no such view exists.
+Returns `403` if the authenticated user is not the creator.
+
+An ID that does not exist also returns `403`, not `404`: the policy resolves the record before the controller runs, and a missing record is a failed permission check.
 
 ---
 
@@ -110,7 +115,7 @@ Returns `403` if the authenticated user is not the creator, `404` if no such vie
 
 <badge type="danger">DELETE</badge> `/fluent-cart/v2/saved-views/{id}`
 
-Permanently deletes the view. Only the creator may delete it.
+Permanently deletes the view. Only the creator may delete it; anyone else gets `403`, as does an ID that does not exist.
 
 ---
 
@@ -139,3 +144,26 @@ Permanently deletes the view. Only the creator may delete it.
 ```
 
 `owner_id` is the creator's WordPress user ID. `is_public` is derived from `object_id` being empty rather than being stored directly.
+
+`GET` returns the list under `views`. `POST` and `PUT` return a single record under `view`, alongside a `message`:
+
+```json
+{
+  "message": "View saved successfully.",
+  "view": {
+    "id": 41,
+    "object_type": "order_table",
+    "slug": "unfulfilled-orders-x7k2p9",
+    "name": "Unfulfilled orders",
+    "description": "",
+    "query_params": {
+      "filter_type": "advanced",
+      "advanced_filters": "[[]]"
+    },
+    "is_public": false,
+    "owner_id": 1
+  }
+}
+```
+
+`DELETE` returns only `{ "message": "View deleted successfully." }`.

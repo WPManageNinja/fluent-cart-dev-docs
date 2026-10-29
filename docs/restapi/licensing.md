@@ -36,13 +36,13 @@ Retrieve a paginated list of all licenses with optional filtering, sorting, and 
 |-----------|------|----------|----------|-------------|
 | `page` | integer | query | No | Page number for pagination |
 | `per_page` | integer | query | No | Number of records per page (default: 10, max: 200) |
-| `search` | string | query | No | Search term. Searches across license key, order ID, customer name, customer email, and activated site URLs. Also supports operator syntax (e.g., `license_key = abc123`) |
+| `search` | string | query | No | Search term. Searches across license key, order ID, customer name, customer email, and activated site URLs. Operator syntax uses `key` for the license key, as in `key = abc123`. An operator search naming a column that is not searchable matches nothing rather than reporting an error |
 | `sort_by` | string | query | No | Column to sort by (default: `id`). Must be a fillable column on the License model |
 | `sort_type` | string | query | No | Sort direction: `asc` or `desc` (default: `desc`) |
 | `active_view` | string | query | No | Tab filter. One of: `active`, `expired`, `disabled`, `inactive` |
 | `filter_type` | string | query | No | Filter mode: `simple` (default) or `advanced` |
 | `advanced_filters` | string (JSON) | query | No | JSON-encoded array of advanced filter groups (requires Pro). Supports filtering by product, customer, and license properties |
-| `with` | array/string | query | No | Eager-load relations. Supports relation names and `{relation}Count` for counts |
+| `with` | array | query | No | Eager-load relations. Supports relation names and `{relation}Count` for counts. Send it as an array (`with[]=customer`) -- see the note below |
 | `select` | array/string | query | No | Comma-separated list of columns to select |
 | `scopes` | array | query | No | Model scopes to apply |
 | `include_ids` | array/string | query | No | Comma-separated IDs that must always be included in results |
@@ -55,9 +55,9 @@ Retrieve a paginated list of all licenses with optional filtering, sorting, and 
 | `active_view` Value | Behavior |
 |---------------------|----------|
 | `active` | Licenses with status `active` whose expiration date is in the future or is null (lifetime) |
-| `expired` | Licenses whose expiration date is in the past |
+| `expired` | Licenses whose expiration date is in the past, whatever their stored status. Disabled and already-expired licenses appear here too |
 | `disabled` | Licenses with status `disabled` |
-| `inactive` | Licenses with status `active` but no site activations |
+| `inactive` | Licenses whose stored status is `inactive` |
 
 #### Advanced Filter Options
 
@@ -104,8 +104,16 @@ When using `filter_type=advanced`, the following filter categories are available
 }
 ```
 
-::: tip Status Override
-If a license has an `expiration_date` in the past, its `status` field is dynamically overridden to `expired` in the response, even if the stored status is `active`.
+::: tip Status override
+A license whose `expiration_date` has passed is reported with `status: "expiring"`, unless its stored
+status is already `expired` or `disabled`. The override applies to the response only -- the stored
+status is unchanged, so a later write still sees `active`.
+:::
+
+::: danger Send `with` as an array
+`with` must be an array — `?with[]=customer&with[]=order`. A bare string (`?with=customer`)
+answers **500** `plugin_exception` instead of a validation error. This applies to every filtered
+list endpoint in the API, not just this one.
 :::
 
 #### Example
@@ -589,6 +597,158 @@ curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/licensing/licenses/1/
 
 ---
 
+## Activated Sites
+
+Licenses are activated against sites. These two endpoints list the sites themselves, across every
+license, which is the view to reach for when the question is "what is installed on this site?"
+rather than "where is this license used?".
+
+---
+
+### List Activated Sites
+
+<badge type="tip">GET</badge> `/fluent-cart/v2/licensing/sites`
+
+Retrieve a paginated list of activated sites, each enriched with the products licensed on it and the
+customers who own those licenses.
+
+- **Permission:** `licenses/view`
+- **Policy:** `LicensePolicy`
+
+#### Parameters
+
+Standard list parameters apply (`page`, `per_page`, `search`, `sort_by`, `sort_type`,
+`active_view`, `filter_type`, `advanced_filters`).
+
+#### Response
+
+The payload is unwrapped under `sites`, which is a paginator. Each row is a license-site record with
+four computed fields added:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `products` | array | Unique products licensed on this site, each `{ name, variation }`. One entry per product and variation pair |
+| `customers` | array | Full names of the customers owning those licenses |
+| `is_local` | boolean | `true` when any activation on the site is flagged local or staging |
+| `last_activity` | string | Latest `last_update_date` across the site's activations, or `null` |
+
+`site_url` is stored normalised rather than as sent: `LicenseHelper::sanitizeSiteUrl()` strips the
+scheme, any trailing slash and a leading `www.`, so `https://www.client.example.com/` is stored and
+matched as `client.example.com`. The `fluent_cart/license/sanitized_url` filter can change that.
+
+```json
+{
+  "sites": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 12,
+        "site_url": "client.example.com",
+        "server_version": "8.2.0",
+        "platform_version": "6.7",
+        "other": [],
+        "active_licenses_count": "1",
+        "created_at": "2026-02-01 10:00:00",
+        "updated_at": "2026-10-01 09:12:44",
+        "products": [
+          { "name": "My Plugin", "variation": "Agency" }
+        ],
+        "customers": ["Jane Doe"],
+        "is_local": false,
+        "last_activity": "2026-10-01 09:12:44"
+      }
+    ],
+    "per_page": 10,
+    "total": 1,
+    "last_page": 1
+  }
+}
+```
+
+#### Example
+
+```bash
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/licensing/sites?page=1&per_page=20" \
+  -u "username:app_password"
+```
+
+---
+
+### Get Activated Site
+
+<badge type="tip">GET</badge> `/fluent-cart/v2/licensing/sites/{id}`
+
+Retrieve one activated site with its activations, and the customers and orders behind them.
+
+- **Permission:** `licenses/view`
+- **Policy:** `LicensePolicy`
+
+#### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `id` | integer | path | Yes | The license-site ID |
+| `per_page` | integer | query | No | Activations per page. Clamped to 1-100, default 15 |
+| `page` | integer | query | No | Page of activations to return |
+
+An unknown `id` answers 404.
+
+#### Response
+
+```json
+{
+  "site": { },
+  "activations": {
+    "data": [
+      {
+        "id": 88,
+        "license_id": 4,
+        "license_key": "XXXX-XXXX-XXXX-XXXX",
+        "product_id": 10,
+        "product_name": "My Plugin",
+        "variation_title": "Agency",
+        "license_status": "active",
+        "activation_status": "active",
+        "is_local": "0",
+        "last_update_version": "1.4.2",
+        "last_update_date": "2026-10-01 09:12:44",
+        "customer": {
+          "id": 7,
+          "full_name": "Jane Doe",
+          "email": "jane@example.com"
+        },
+        "order_id": 42,
+        "expiration_date": "2027-01-15 00:00:00",
+        "activation_limit": 5,
+        "activation_count": 2,
+        "created_at": "2026-02-01 10:00:00"
+      }
+    ],
+    "total": 1,
+    "per_page": 15,
+    "current_page": 1,
+    "last_page": 1
+  },
+  "customers": [],
+  "orders": []
+}
+```
+
+`activations` is a trimmed paginator -- `data`, `total`, `per_page`, `current_page` and `last_page`
+only, without the URL fields a full paginator carries. `product_name` falls back to
+`"Unknown Product"` when the product behind a license has gone. `customers` and `orders` collect the
+distinct records referenced by the activations on this page, so the client does not have to fetch
+them one at a time.
+
+#### Example
+
+```bash
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/licensing/sites/12?per_page=25" \
+  -u "username:app_password"
+```
+
+---
+
 ## Product License Settings
 
 Endpoints for configuring license settings on a per-product basis. These control how licenses are generated when customers purchase the product.
@@ -659,9 +819,12 @@ Retrieve the license configuration for a specific product, including per-variati
     },
     "prefix": "",
     "changelog": "<h4>1.2.0</h4><ul><li>New feature added</li></ul>",
-    "license_keys": ""
+    "license_keys": "",
+    "manifest": "",
+    "signature": ""
   },
-  "is_bundle_product": false
+  "is_bundle_product": false,
+  "signed_releases_enabled": false
 }
 ```
 
@@ -679,7 +842,10 @@ Retrieve the license configuration for a specific product, including per-variati
 | `settings.wp` | object | WordPress-specific settings for plugin/theme update API |
 | `settings.changelog` | string | HTML changelog content |
 | `settings.license_keys` | string | Pre-defined license keys (if applicable) |
+| `settings.manifest` | string | The signed release manifest, stored and echoed byte for byte. Present only on a store that signs its releases |
+| `settings.signature` | string | The manifest's detached signature. Stored and echoed byte for byte |
 | `is_bundle_product` | boolean | Whether the product is a bundle (licensing is disabled for bundles) |
+| `signed_releases_enabled` | boolean | Whether release signing is enabled for this store. The admin screen shows the two signing inputs only while this is `true` |
 
 ::: warning Bundle Products
 Licensing is automatically disabled for bundle products. Bundle item licenses are generated based on each individual bundle item's license settings.
@@ -728,6 +894,18 @@ Update the license configuration for a specific product.
 | `settings.wp.required_wp` | string | body | No | Minimum required WordPress version |
 | `settings.changelog` | string | body | No | HTML changelog content |
 | `settings.license_keys` | string | body | No | Pre-defined license keys |
+| `settings.manifest` | string | body | No | The signed release manifest. Stored verbatim apart from trimmed surrounding whitespace |
+| `settings.signature` | string | body | No | The manifest's detached signature. Stored verbatim apart from trimmed surrounding whitespace |
+
+#### Signed releases
+
+A store that signs its releases sends `manifest` and `signature` alongside the version. They are
+checked as a pair against the version being saved and against the manifest already stored, and a
+failed check rejects the whole save with 422 -- the previous manifest is never overwritten by a
+value that did not verify. Sending neither field leaves the stored pair untouched.
+
+The two values are opaque to the API: they are produced by the vendor's signing step and verified on
+the customer's site, so they are stored and returned byte for byte.
 
 #### Response
 
@@ -812,7 +990,7 @@ All customer portal license endpoints use the **license key** (not the numeric I
 
 ### List Customer Licenses
 
-<badge type="tip">GET</badge> `/fluent-cart/v2/customer-profile/licenses/`
+<badge type="tip">GET</badge> `/fluent-cart/v2/customer-profile/licenses`
 
 Retrieve a paginated list of licenses belonging to the currently logged-in customer.
 
@@ -890,7 +1068,7 @@ Successful response with data:
 #### Example
 
 ```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/customer-profile/licenses/?page=1&per_page=10" \
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/customer-profile/licenses?page=1&per_page=10" \
   -H "X-WP-Nonce: <nonce>"
 ```
 
@@ -1095,13 +1273,14 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/customer-profile/licens
 
 These endpoints manage the FluentCart Pro plugin's own license activation on your WordPress site. They are used by the FluentCart Pro settings panel to activate, check, and deactivate the plugin license.
 
-Authorization is handled by the `AdminPolicy` (requires WordPress administrator).
+Authorization is handled by the `AdminPolicy`, which grants the `is_super_admin` permission -- in
+practice a user with `manage_options`.
 
 ---
 
 ### Get Plugin License Status
 
-<badge type="tip">GET</badge> `/fluent-cart/v2/settings/license/`
+<badge type="tip">GET</badge> `/fluent-cart/v2/settings/license`
 
 Retrieve the current activation status of the FluentCart Pro plugin license on this site.
 
@@ -1109,25 +1288,47 @@ Retrieve the current activation status of the FluentCart Pro plugin license on t
 
 #### Parameters
 
-None.
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `verify` | boolean | query | No | Re-check the key with the licensing store before answering, so activations removed remotely are reflected. When the store cannot be reached, the last known local status is returned instead |
 
 #### Response
 
+With no license stored:
+
 ```json
 {
-  "status": "valid",
-  "license_key": "XXXX-XXXX-XXXX-XXXX",
-  "expires": "2026-01-15",
-  ...
+  "license_key": "",
+  "status": "unregistered",
+  "variation_id": "",
+  "variation_title": "",
+  "expires": "",
+  "activation_hash": ""
 }
 ```
 
-The response structure depends on the FluentCart licensing server's response format.
+With a license stored, the same keys carry their stored values. A `verify=1` request that reaches the
+store also refreshes `status`, `expires`, `variation_id` and `variation_title` from it, persists them,
+and adds three more fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `renew_url` | string | Renewal URL from the store, or an empty string |
+| `is_expired` | boolean | Whether the store reports the license as expired |
+| `error_type` | string | Present only when the store returned an error type |
+| `error_message` | string | Present only alongside `error_type` |
+
+| `status` | Meaning |
+|----------|---------|
+| `unregistered` | No license key is stored on this site |
+| `valid` | The store confirmed the key |
+| `expired` | The store reports the key as expired |
+| `error` | A remote check came back for a license with no stored status |
 
 #### Example
 
 ```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/settings/license/" \
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/settings/license" \
   -u "username:app_password"
 ```
 
@@ -1135,7 +1336,7 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/settings/license/" \
 
 ### Activate Plugin License
 
-<badge type="warning">POST</badge> `/fluent-cart/v2/settings/license/`
+<badge type="warning">POST</badge> `/fluent-cart/v2/settings/license`
 
 Activate a FluentCart Pro license key on this WordPress site.
 
@@ -1171,7 +1372,7 @@ Returns a `WP_Error` if the license key is invalid or activation fails.
 #### Example
 
 ```bash
-curl -X POST "https://example.com/wp-json/fluent-cart/v2/settings/license/" \
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/settings/license" \
   -u "username:app_password" \
   -H "Content-Type: application/json" \
   -d '{"license_key": "XXXX-XXXX-XXXX-XXXX"}'
@@ -1181,7 +1382,7 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/settings/license/" \
 
 ### Deactivate Plugin License
 
-<badge type="danger">DELETE</badge> `/fluent-cart/v2/settings/license/`
+<badge type="danger">DELETE</badge> `/fluent-cart/v2/settings/license`
 
 Deactivate the FluentCart Pro license from this WordPress site.
 
@@ -1207,7 +1408,7 @@ None.
 #### Example
 
 ```bash
-curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/settings/license/" \
+curl -X DELETE "https://example.com/wp-json/fluent-cart/v2/settings/license" \
   -u "username:app_password"
 ```
 
@@ -1258,7 +1459,10 @@ Verify the validity of a license key and check its activation status for a speci
   "variation_title": "Pro License",
   "product_title": "My Plugin",
   "created_at": "2025-01-15 10:30:00",
-  "updated_at": "2025-06-15 10:35:00"
+  "updated_at": "2025-06-15 10:35:00",
+  "subscription_status": "active",
+  "customer_name": "Jane Doe",
+  "customer_email_masked": "ja**e@e*****.com"
 }
 ```
 
@@ -1276,8 +1480,20 @@ Verify the validity of a license key and check its activation status for a speci
 | `variation_id` | integer | The product variation ID |
 | `variation_title` | string | The product variation title |
 | `product_title` | string | The product title |
+| `subscription_status` | string | The subscription's effective status, present only when the license is tied to a subscription and its `expiration_date` is not `lifetime` |
+| `customer_name` | string | The licence owner's full name, present when the license has a customer |
+| `customer_email_masked` | string | The owner's email with the local part and host partly masked, for example `ja**e@e*****.com`. Present alongside `customer_name` |
 
-#### Error Response (Validation)
+#### Errors
+
+::: warning Branch on `status`, not on the HTTP code
+Every outcome of this endpoint, failures included, answers **HTTP 200** with `"success": true`. A
+rejected check is reported as `"status": "invalid"` with an `error_type`, so a caller that only looks
+at the status code or at `success` reads a failed check as a pass.
+
+The activate endpoint does not share this shape -- its validation failure answers 422 with
+`"success": false`.
+:::
 
 ```json
 {
@@ -1296,6 +1512,7 @@ Verify the validity of a license key and check its activation status for a speci
 | `invalid_license` | License key not found |
 | `invalid_activation` | No activation found for this site |
 | `key_mismatch` | License key does not match the provided `item_id` |
+| `license_error` | The `fluent_cart/license/check_license_response` filter returned a `WP_Error`. The filter's message is passed through |
 
 #### Example
 
@@ -1339,9 +1556,17 @@ Activate a license key on a specific site URL. If the site is already activated 
   "variation_title": "Pro License",
   "product_title": "My Plugin",
   "created_at": "2025-01-15 10:30:00",
-  "updated_at": "2025-06-15 10:35:00"
+  "updated_at": "2025-06-15 10:35:00",
+  "subscription_status": "active",
+  "customer_name": "Jane Doe",
+  "customer_email_masked": "ja**e@e*****.com"
 }
 ```
+
+`subscription_status`, `customer_name` and `customer_email_masked` are added the same way as on
+[Check License](#check-license): the subscription status only for a license tied to a subscription
+whose `expiration_date` is not `lifetime`, and the two customer fields only when the license has a
+customer.
 
 ::: tip Local/Staging Detection
 Sites matching common local/staging patterns are automatically detected and marked with `is_local = 1`. These activations do not count toward the activation limit. Detected patterns include:
@@ -1526,6 +1751,9 @@ Retrieve the latest version information for a licensed product. This endpoint is
 | `license_key` | string | Conditional | License key for authenticated download links. Required if `activation_hash` is not provided |
 | `activation_hash` | string | Conditional | Activation hash for authenticated download links. Required if `license_key` is not provided |
 | `site_url` | string | No | The site URL making the request |
+| `current_version` | string | No | The version installed on the calling site. Recorded on the activation as `last_update_version` |
+| `server_version` | string | No | The calling site's PHP version. Recorded on the site record |
+| `platform_version` | string | No | The calling site's WordPress version. Recorded on the site record |
 
 #### Response (Valid License)
 
@@ -1558,6 +1786,15 @@ Retrieve the latest version information for a licensed product. This endpoint is
 }
 ```
 
+A store that signs its releases also gets `manifest` and `signature` in this response, echoed byte
+for byte from the product's license settings. They are present whenever the values are stored, for a
+valid licence and an invalid one alike, because the signature covers the manifest's decoded bytes and
+any re-encoding would leave the site with a pair that verifies against nothing.
+
+`license_status` here is only ever `valid` or `invalid`. The `expired` value listed under
+[Public Status Mapping](#public-status-mapping) applies to the check and activate endpoints, not to
+this one.
+
 #### Response (Invalid License)
 
 When the license is invalid or expired, version information is still returned but without download links:
@@ -1579,8 +1816,16 @@ When the license is invalid or expired, version information is still returned bu
 }
 ```
 
-::: tip Download Link Expiry
-The `package` / `download_link` URL contains a time-limited token that expires after 48 hours. WordPress will use this URL to download the update package.
+::: tip Download links and their lifetime
+Two different URLs are involved, with different lifetimes.
+
+The `package` / `download_link` URL does not expire, and it is the same URL for a given license and
+site. Do not treat it as a short-lived credential: access is controlled by the license, which is
+re-checked every time the link is followed, so the link stops working once the license is revoked,
+disabled or expired.
+
+Following it redirects to the actual file URL, which is signed and valid for **60 minutes** by
+default. Adjust that with the `fluent_cart/download_link_validity_in_minutes` filter.
 :::
 
 #### Error Response (422)
@@ -1627,19 +1872,30 @@ curl -X GET "https://example.com/?fluent-cart=get_license_version&item_id=10&lic
 
 `GET` `https://your-site.com/?fluent-cart=download_license_package`
 
-Download the product's update package file. This endpoint is not called directly -- it is used via the signed URLs generated by the [Get License Version](#get-license-version) endpoint. The URL contains an encoded token (`fct_package`) that includes the license key, activation hash, site URL, product ID, and expiration timestamp.
+Download the product's update package file. This endpoint is normally reached through the `package`
+URL that [Get License Version](#get-license-version) returns rather than called directly. The URL
+carries a base64 token (`fct_package`) holding the license key or activation hash, the site URL, and
+the product ID it expects to be served.
 
-- **Auth:** None required (authentication is embedded in the signed URL)
+- **Auth:** None required -- the license in the token is re-checked on every request
 
 #### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `fct_package` | string | Yes | Base64-encoded package data containing license credentials and expiration. This is automatically generated by the version check endpoint |
+| `fct_package` | string | Yes | Base64-encoded envelope holding the license key (or activation hash), the site URL and the product ID. Generated by the version check endpoint |
+
+A token is tied to one license and one product. The license is re-checked each time the link is
+followed, so a link stops working as soon as the license is revoked, disabled or expires.
 
 #### Response
 
-On success, the endpoint responds with an HTTP 302 redirect to the signed download URL for the file. The browser or update mechanism follows the redirect to download the file.
+On success the endpoint answers an HTTP 302 redirect to a signed file URL, valid for 60 minutes by
+default. Following that redirect downloads the file, and the activation's `last_update_version` and
+`last_update_date` are stamped on the way through.
+
+When the product has no resolvable downloadable file the endpoint prints
+`Download link is not available for this product.` instead of redirecting.
 
 #### Error Responses (422)
 
@@ -1678,7 +1934,7 @@ No downloadable file:
 This endpoint is typically not called directly. It is accessed via the `package` URL returned by the version check endpoint:
 
 ```
-https://example.com/?fluent-cart=download_license_package&fct_package=WFhYWC1YWFhYLVhYWFgtWFhYWDo6Y3VzdG9tZXItc2l0ZS5jb206MTA6MTczNzAwMDAwMA==
+https://example.com/?fluent-cart=download_license_package&fct_package=eyJsaWNlbnNlX2tleSI6IlhYWFgtWFhYWC1YWFhYLVhYWFgiLCJhY3RpdmF0aW9uX2hhc2giOiIiLCJzaXRlX3VybCI6ImN1c3RvbWVyLXNpdGUuY29tIiwiaXRlbV9pZCI6IjEwIn0=
 ```
 
 ---
@@ -1688,7 +1944,7 @@ https://example.com/?fluent-cart=download_license_package&fct_package=WFhYWC1YWF
 | Status | Description |
 |--------|-------------|
 | `active` | License is valid and in use |
-| `inactive` | License is valid but has no site activations |
+| `inactive` | A stored status the store sets. It still counts as active for validity, so a license with this status checks out as `valid` |
 | `expired` | License expiration date has passed (includes a configurable grace period, default 15 days) |
 | `disabled` | License has been manually disabled by an admin |
 

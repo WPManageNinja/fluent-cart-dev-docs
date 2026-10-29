@@ -23,11 +23,11 @@
     }
   ],
   "paths": {
-    "/settings/license/": {
+    "/settings/license": {
       "get": {
         "operationId": "getPluginLicenseStatus",
         "summary": "GET Get Plugin License Status",
-        "description": "Retrieve the current activation status of the FluentCart Pro plugin license on this site.\n\n**Policy:** `AdminPolicy`",
+        "description": "Retrieve the current activation status of the FluentCart Pro plugin license on this site.\n\n**Permission:** `is_super_admin` (in practice `manage_options`) \u00b7 **Policy:** `AdminPolicy`",
         "tags": [
           "Licensing"
         ],
@@ -36,7 +36,17 @@
             "ApplicationPasswords": []
           }
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "verify",
+            "in": "query",
+            "required": false,
+            "description": "Re-check the key with the licensing store before answering, so activations removed remotely are reflected. When the store cannot be reached, the last known local status is returned instead.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful response",
@@ -45,55 +55,86 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "License status (e.g., `valid`, `invalid`, `expired`)"
-                    },
                     "license_key": {
                       "type": "string",
-                      "description": "The activated license key"
+                      "example": ""
                     },
-                    "expires": {
+                    "status": {
                       "type": "string",
-                      "description": "License expiration date"
-                    },
-                    "activation_hash": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "Opaque hash identifying this site's activation record."
+                      "enum": [
+                        "unregistered",
+                        "valid",
+                        "expired",
+                        "error"
+                      ],
+                      "description": "`unregistered` when no key is stored. `error` when a remote check came back for a license with no stored status.",
+                      "example": "unregistered"
                     },
                     "variation_id": {
-                      "type": "integer",
-                      "nullable": true,
-                      "description": "ID of the purchased product variation."
+                      "type": "string",
+                      "example": ""
                     },
                     "variation_title": {
                       "type": "string",
-                      "nullable": true,
-                      "description": "Human-readable variation title, e.g. `5 Sites - Yearly`."
+                      "example": ""
+                    },
+                    "expires": {
+                      "type": "string",
+                      "example": ""
+                    },
+                    "activation_hash": {
+                      "type": "string",
+                      "example": ""
+                    },
+                    "renew_url": {
+                      "type": "string",
+                      "description": "Only on a `verify` request that reached the store."
+                    },
+                    "is_expired": {
+                      "type": "boolean",
+                      "description": "Only on a `verify` request that reached the store."
+                    },
+                    "error_type": {
+                      "type": "string",
+                      "description": "Only when the store returned an error type."
+                    },
+                    "error_message": {
+                      "type": "string",
+                      "description": "Only alongside `error_type`."
                     }
-                  },
-                  "example": {
-                    "status": "valid",
-                    "license_key": "DTPRO-A1B2-C3D4-E5F6",
-                    "expires": "2026-01-15",
-                    "activation_hash": "a1b2c3d4e5f60718293a4b5c6d7e8f90",
-                    "variation_id": 15,
-                    "variation_title": "5 Sites - Yearly"
                   }
                 },
                 "example": {
-                  "status": "valid",
-                  "license_key": "DTPRO-A1B2-C3D4-E5F6",
-                  "expires": "2026-01-15"
+                  "license_key": "",
+                  "status": "unregistered",
+                  "variation_id": "",
+                  "variation_title": "",
+                  "expires": "",
+                  "activation_hash": ""
                 },
                 "examples": {
-                  "default": {
-                    "summary": "Successful response",
+                  "unregistered": {
+                    "summary": "No license stored on this site",
                     "value": {
+                      "license_key": "",
+                      "status": "unregistered",
+                      "variation_id": "",
+                      "variation_title": "",
+                      "expires": "",
+                      "activation_hash": ""
+                    }
+                  },
+                  "verified": {
+                    "summary": "After a verify=1 check that reached the store",
+                    "value": {
+                      "license_key": "XXXX-XXXX-XXXX-XXXX",
                       "status": "valid",
-                      "license_key": "DTPRO-A1B2-C3D4-E5F6",
-                      "expires": "2026-01-15"
+                      "variation_id": "15",
+                      "variation_title": "Agency",
+                      "expires": "2027-01-15",
+                      "activation_hash": "abc123def456",
+                      "renew_url": "https://fluentcart.com/checkout?renew=1",
+                      "is_expired": false
                     }
                   }
                 }
@@ -111,7 +152,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -861,9 +861,8 @@ $data = [
 
 ### Subscription Handling
 
-For subscription renewals, use `SubscriptionService`. There is no
-`SubscriptionRenewal` class. Note the argument order: the transaction data comes
-**first**, the subscription second.
+For subscription renewals, use `SubscriptionService`. Note the argument order: the
+transaction data comes **first**, the subscription second.
 
 ```php
 \FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::recordRenewalPayment(

@@ -1026,7 +1026,7 @@ add_filter('fluent_cart/single_product_page/show_relevant_products', function($s
 Applied inside `ShopResource::getSimilarProducts()`, after the default query arguments are assembled and the ordering (`orderby`/`order`, or the price-ordering `posts_clauses` filter) is resolved, but immediately before `new WP_Query($args)` runs. One code path backs all related-products surfaces, so this filter covers each of them: the `[fluent_cart_related_products]` shortcode, the related products block auto-appended to the single product page, the Related Product Gutenberg block, and the product REST endpoint's similar-products response.
 
 ::: warning Runs after price ordering is applied
-When `config['order_by']` is a price sort, `applyPriceOrdering()` has already attached a `posts_clauses` filter by the time this filter runs. Setting `$args['orderby']`/`$args['order']` in that case will not override price ordering — that custom SQL still wins. This is a known limitation, not a bug.
+When `config['order_by']` is a price sort, the ordering is applied through a `posts_clauses` filter that runs before this one. Setting `$args['orderby']` / `$args['order']` has no effect in that case — the price ordering still wins.
 :::
 
 **Parameters:**

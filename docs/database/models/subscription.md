@@ -237,7 +237,7 @@ Get subscription currency, resolved in this order:
 3. the parent order's `currency`, when the subscription has a `parent_order_id`
 4. the store's base currency
 
-Deliberately not `CurrencySettings::get()` — on a storefront request that returns the
+Do not use `CurrencySettings::get()` for this — on a storefront request it returns the
 visitor's currency, not the subscription's.
 
 * Returns `String` - Uppercase currency code (e.g., `USD`, `EUR`)

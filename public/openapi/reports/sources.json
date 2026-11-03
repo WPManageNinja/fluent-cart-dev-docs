@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSourceReport",
         "summary": "GET Get Source Report",
-        "description": "Retrieve order source/attribution data showing where orders originated from. Supports comparison against a prior period with fluctuation calculations.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns orders and money grouped by UTM tags, and with FluentCart Pro also by product, variation, period or referrer. Amounts are decimal currency units; `net_sales` is the Revenue report's net sales.\n\nOnly orders with the grouped source data count (a `utm_source`, or a referrer for `referrer`), unless `include_none` adds a `(none)` row. UTM values group case-insensitively, with `_`, `-` and spaces treated alike. `totals` come from the order set, not from adding rows. `first_order_net` is the net of first orders (one-time or new subscription); `later_net` is the net of their renewals, any date.\n\nThe groupings `product`, `variation`, `day`, `week`, `month` and `referrer` need FluentCart Pro (the `fluent_cart/report/source_groupings` filter); without it they fall back to `campaign_source_medium`. Pro also applies `filter_type` and `advanced_filters` through the `fluent_cart/report/sources_query` filter.\n\nWith `page`, one page of rows comes back with `pagination`; a period grouping then also returns every period in `chart`. With a comparison, `fluctuations` is keyed by `utm_key` and holds `previous_<field>` and `<field>_fluctuation` (percent) for `orders`, `gross_sales`, `net_sales`, `average_order`, `average_net_order`; a row new in this period reads `100`.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First day of the range, store timezone (`YYYY-MM-DD`).",
             "required": false
           },
           {
@@ -52,27 +52,28 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
+            "description": "Last day of the range, store timezone (`YYYY-MM-DD`).",
             "required": false
           },
           {
-            "name": "params[groupKey]",
+            "name": "params[rangeKey]",
             "in": "query",
             "schema": {
               "type": "string",
               "enum": [
-                "default",
-                "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
               ]
             },
-            "description": "Grouping interval for data aggregation.",
+            "description": "Preset range. Overrides the dates.",
             "required": false
           },
           {
@@ -82,7 +83,7 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code. `__all__` converts every currency to the base currency. Default: base currency.",
             "required": false
           },
           {
@@ -95,11 +96,11 @@
                 "test"
               ]
             },
-            "description": "Payment mode filter.",
+            "description": "Only live or only test orders. Without it, both count.",
             "required": false
           },
           {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,7 +108,7 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
+            "description": "Only orders that contain these variation IDs.",
             "required": false
           },
           {
@@ -123,41 +124,147 @@
                 "custom"
               ]
             },
-            "description": "Comparison period type.",
+            "description": "Comparison period.",
             "required": false
           },
           {
             "name": "params[compareDate]",
             "in": "query",
             "schema": {
+              "type": "string"
+            },
+            "description": "Start of the comparison range when `compareType` is `custom`.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Only these sale types. `renewal` leaves out installment payments.",
+            "required": false
+          },
+          {
+            "name": "params[group_by]",
+            "in": "query",
+            "schema": {
               "type": "string",
-              "example": "2024-01-01"
+              "enum": [
+                "campaign_source_medium",
+                "campaign",
+                "source",
+                "medium",
+                "source_medium",
+                "term",
+                "content",
+                "product",
+                "variation",
+                "day",
+                "week",
+                "month",
+                "referrer"
+              ]
             },
-            "description": "Custom comparison start date. Required when compareType is custom.",
+            "description": "Grouping. Default `campaign_source_medium`. `product`, `variation`, `day`, `week`, `month`, `referrer` need Pro.",
             "required": false
           },
           {
-            "name": "params[paymentStatus]",
+            "name": "params[include_none]",
             "in": "query",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+              "type": "boolean"
             },
-            "description": "Payment status filter.",
+            "description": "Add a `(none)` row for orders without source data.",
             "required": false
           },
           {
-            "name": "params[orderTypes]",
+            "name": "params[page]",
             "in": "query",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+              "type": "integer"
             },
-            "description": "Order type filter (e.g., one-time, subscription).",
+            "description": "Page number. Without it, every row comes back.",
+            "required": false
+          },
+          {
+            "name": "params[per_page]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Rows per page, 10 to 150. Default 50.",
+            "required": false
+          },
+          {
+            "name": "params[search]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter rows by label (with `page`).",
+            "required": false
+          },
+          {
+            "name": "params[sort_by]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "orders",
+                "gross_sales",
+                "net_sales",
+                "refunds",
+                "refund_rate",
+                "average_order",
+                "average_net_order",
+                "first_order_net",
+                "later_net",
+                "lifetime_net"
+              ]
+            },
+            "description": "Sort field (with `page`).",
+            "required": false
+          },
+          {
+            "name": "params[sort_order]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            },
+            "description": "`asc` or `desc` (default).",
+            "required": false
+          },
+          {
+            "name": "params[filter_type]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pro. Advanced filter mode, passed to the `fluent_cart/report/sources_query` filter.",
+            "required": false
+          },
+          {
+            "name": "params[advanced_filters]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pro. Advanced filter conditions (JSON), applied by FluentCart Pro.",
             "required": false
           }
         ],
@@ -168,168 +275,197 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "sourceReportData": {
-                      "type": "object",
-                      "description": "Source attribution data"
-                    },
-                    "fluctuations": {
-                      "type": "object",
-                      "description": "Fluctuation data"
-                    }
-                  },
                   "example": {
-                    "sourceReportData": {
-                      "sources": [
-                        {
-                          "source": "direct",
-                          "orders": 150,
-                          "revenue": 720000,
-                          "percentage": 43.9
-                        },
-                        {
-                          "source": "google",
-                          "orders": 95,
-                          "revenue": 450000,
-                          "percentage": 27.8
-                        },
-                        {
-                          "source": "referral",
-                          "orders": 55,
-                          "revenue": 280000,
-                          "percentage": 16.1
-                        },
-                        {
-                          "source": "social",
-                          "orders": 42,
-                          "revenue": 180000,
-                          "percentage": 12.3
-                        }
-                      ],
-                      "total_orders": 342,
-                      "total_revenue": 1630000
-                    },
-                    "fluctuations": {
-                      "direct": {
-                        "value": 12.5,
-                        "direction": "up"
-                      },
-                      "google": {
-                        "value": 8.2,
-                        "direction": "up"
-                      },
-                      "referral": {
-                        "value": 22.4,
-                        "direction": "up"
-                      },
-                      "social": {
-                        "value": -5.1,
-                        "direction": "down"
+                    "sourceReportData": [
+                      {
+                        "group_key": "spring sale|google|cpc",
+                        "utm_key": "spring sale|google|cpc",
+                        "utm_campaign": "spring_sale",
+                        "utm_source": "google",
+                        "utm_medium": "cpc",
+                        "label": "spring_sale / google / cpc",
+                        "orders": 20,
+                        "refunded_orders": 1,
+                        "gross_sales": 1000.0,
+                        "refunds": 50.0,
+                        "net_sales": 900.0,
+                        "average_order": 50.0,
+                        "average_net_order": 45.0,
+                        "refund_rate": 5.0,
+                        "first_order_net": 900.0,
+                        "later_net": 200.0,
+                        "lifetime_net": 1100.0
                       }
+                    ],
+                    "totals": {
+                      "orders": 30,
+                      "refunded_orders": 1,
+                      "gross_sales": 1500.0,
+                      "refunds": 50.0,
+                      "net_sales": 1350.0,
+                      "average_order": 50.0,
+                      "average_net_order": 45.0,
+                      "refund_rate": 3.33,
+                      "first_order_net": 1350.0,
+                      "later_net": 300.0,
+                      "lifetime_net": 1650.0
+                    },
+                    "group_by": "campaign_source_medium",
+                    "fluctuations": [],
+                    "compare_range": null,
+                    "compare_ranges": {
+                      "previous_period": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_month": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_quarter": {
+                        "start": "2024-10-01 00:00:00",
+                        "end": "2024-10-31 23:59:59"
+                      },
+                      "previous_year": {
+                        "start": "2024-01-01 00:00:00",
+                        "end": "2024-01-31 23:59:59"
+                      }
+                    },
+                    "pagination": {
+                      "total": 12,
+                      "current_page": 1,
+                      "per_page": 50,
+                      "last_page": 1
                     }
                   }
                 },
                 "example": {
-                  "sourceReportData": {
-                    "sources": [
-                      {
-                        "source": "direct",
-                        "orders": 150,
-                        "revenue": 720000,
-                        "percentage": 43.9
-                      },
-                      {
-                        "source": "google",
-                        "orders": 95,
-                        "revenue": 450000,
-                        "percentage": 27.8
-                      },
-                      {
-                        "source": "referral",
-                        "orders": 55,
-                        "revenue": 280000,
-                        "percentage": 16.1
-                      },
-                      {
-                        "source": "social",
-                        "orders": 42,
-                        "revenue": 180000,
-                        "percentage": 12.3
-                      }
-                    ],
-                    "total_orders": 342,
-                    "total_revenue": 1630000
-                  },
-                  "fluctuations": {
-                    "direct": {
-                      "value": 12.5,
-                      "direction": "up"
-                    },
-                    "google": {
-                      "value": 8.2,
-                      "direction": "up"
-                    },
-                    "referral": {
-                      "value": 22.4,
-                      "direction": "up"
-                    },
-                    "social": {
-                      "value": -5.1,
-                      "direction": "down"
+                  "sourceReportData": [
+                    {
+                      "group_key": "spring sale|google|cpc",
+                      "utm_key": "spring sale|google|cpc",
+                      "utm_campaign": "spring_sale",
+                      "utm_source": "google",
+                      "utm_medium": "cpc",
+                      "label": "spring_sale / google / cpc",
+                      "orders": 20,
+                      "refunded_orders": 1,
+                      "gross_sales": 1000.0,
+                      "refunds": 50.0,
+                      "net_sales": 900.0,
+                      "average_order": 50.0,
+                      "average_net_order": 45.0,
+                      "refund_rate": 5.0,
+                      "first_order_net": 900.0,
+                      "later_net": 200.0,
+                      "lifetime_net": 1100.0
                     }
+                  ],
+                  "totals": {
+                    "orders": 30,
+                    "refunded_orders": 1,
+                    "gross_sales": 1500.0,
+                    "refunds": 50.0,
+                    "net_sales": 1350.0,
+                    "average_order": 50.0,
+                    "average_net_order": 45.0,
+                    "refund_rate": 3.33,
+                    "first_order_net": 1350.0,
+                    "later_net": 300.0,
+                    "lifetime_net": 1650.0
+                  },
+                  "group_by": "campaign_source_medium",
+                  "fluctuations": [],
+                  "compare_range": null,
+                  "compare_ranges": {
+                    "previous_period": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_month": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_quarter": {
+                      "start": "2024-10-01 00:00:00",
+                      "end": "2024-10-31 23:59:59"
+                    },
+                    "previous_year": {
+                      "start": "2024-01-01 00:00:00",
+                      "end": "2024-01-31 23:59:59"
+                    }
+                  },
+                  "pagination": {
+                    "total": 12,
+                    "current_page": 1,
+                    "per_page": 50,
+                    "last_page": 1
                   }
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "sourceReportData": {
-                        "sources": [
-                          {
-                            "source": "direct",
-                            "orders": 150,
-                            "revenue": 720000,
-                            "percentage": 43.9
-                          },
-                          {
-                            "source": "google",
-                            "orders": 95,
-                            "revenue": 450000,
-                            "percentage": 27.8
-                          },
-                          {
-                            "source": "referral",
-                            "orders": 55,
-                            "revenue": 280000,
-                            "percentage": 16.1
-                          },
-                          {
-                            "source": "social",
-                            "orders": 42,
-                            "revenue": 180000,
-                            "percentage": 12.3
-                          }
-                        ],
-                        "total_orders": 342,
-                        "total_revenue": 1630000
-                      },
-                      "fluctuations": {
-                        "direct": {
-                          "value": 12.5,
-                          "direction": "up"
-                        },
-                        "google": {
-                          "value": 8.2,
-                          "direction": "up"
-                        },
-                        "referral": {
-                          "value": 22.4,
-                          "direction": "up"
-                        },
-                        "social": {
-                          "value": -5.1,
-                          "direction": "down"
+                      "sourceReportData": [
+                        {
+                          "group_key": "spring sale|google|cpc",
+                          "utm_key": "spring sale|google|cpc",
+                          "utm_campaign": "spring_sale",
+                          "utm_source": "google",
+                          "utm_medium": "cpc",
+                          "label": "spring_sale / google / cpc",
+                          "orders": 20,
+                          "refunded_orders": 1,
+                          "gross_sales": 1000.0,
+                          "refunds": 50.0,
+                          "net_sales": 900.0,
+                          "average_order": 50.0,
+                          "average_net_order": 45.0,
+                          "refund_rate": 5.0,
+                          "first_order_net": 900.0,
+                          "later_net": 200.0,
+                          "lifetime_net": 1100.0
                         }
+                      ],
+                      "totals": {
+                        "orders": 30,
+                        "refunded_orders": 1,
+                        "gross_sales": 1500.0,
+                        "refunds": 50.0,
+                        "net_sales": 1350.0,
+                        "average_order": 50.0,
+                        "average_net_order": 45.0,
+                        "refund_rate": 3.33,
+                        "first_order_net": 1350.0,
+                        "later_net": 300.0,
+                        "lifetime_net": 1650.0
+                      },
+                      "group_by": "campaign_source_medium",
+                      "fluctuations": [],
+                      "compare_range": null,
+                      "compare_ranges": {
+                        "previous_period": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_month": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_quarter": {
+                          "start": "2024-10-01 00:00:00",
+                          "end": "2024-10-31 23:59:59"
+                        },
+                        "previous_year": {
+                          "start": "2024-01-01 00:00:00",
+                          "end": "2024-01-31 23:59:59"
+                        }
+                      },
+                      "pagination": {
+                        "total": 12,
+                        "current_page": 1,
+                        "per_page": 50,
+                        "last_page": 1
                       }
                     }
                   }

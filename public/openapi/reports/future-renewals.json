@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getFutureRenewals",
         "summary": "GET Get Future Renewals",
-        "description": "Retrieve projected future subscription renewal data.\n\n**Access policy:** `ReportPolicy`",
+        "description": "Projects the renewals of live open-ended subscriptions month by month for the next 3, 6 or 12 months, with the store's renewal rates for the last 12 months. Amounts are in cents.\n\nThe date range does not apply; the window starts on the as-of day and ends at the end of the horizon's last month. `by_variation` comes only when FluentCart Pro answers the `fluent_cart/report/future_renewals_by_variation` filter. In `by_interval` and `trial`, the inner key is the renewal's position in the window.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -38,23 +38,48 @@
         ],
         "parameters": [
           {
-            "name": "params[startDate]",
+            "name": "params[currency]",
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-01-01"
+              "example": "USD"
             },
-            "description": "Start date for the report period.",
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` converts every currency to the base currency.",
             "required": false
           },
           {
-            "name": "params[endDate]",
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Product variation IDs to filter by.",
+            "required": false
+          },
+          {
+            "name": "params[horizon]",
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "enum": [
+                "3",
+                "6",
+                "12"
+              ]
             },
-            "description": "End date for the report period.",
+            "description": "Months to project. Default `3`.",
+            "required": false
+          },
+          {
+            "name": "params[as_of]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Start day (Y-m-d). Defaults to today.",
             "required": false
           }
         ],
@@ -65,129 +90,255 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Future renewal projection data for active/trialing subscriptions over the next quarter, grouped by month. Note: the `params[startDate]`/`params[endDate]` query parameters are currently read but not applied \u2014 the window is always \"today\" through \"+3 months\".",
-                  "properties": {
-                    "totalProjected": {
-                      "type": "integer",
-                      "description": "Sum of all projected renewal amounts across the period, in cents"
-                    },
-                    "totalRenewals": {
-                      "type": "integer",
-                      "description": "Total count of projected renewals across the period"
-                    },
-                    "projections": {
-                      "type": "array",
-                      "description": "Renewals and projected revenue grouped by month",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "group": {
-                            "type": "string",
-                            "description": "Month bucket, formatted Y-m"
-                          },
-                          "renewals_count": {
-                            "type": "integer"
-                          },
-                          "projected_amount": {
-                            "type": "integer",
-                            "description": "Projected renewal amount for this month, in cents"
-                          }
-                        }
-                      }
-                    },
-                    "period": {
-                      "type": "array",
-                      "description": "[start, end] datetime strings of the report window",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "groupBy": {
-                      "type": "string",
-                      "description": "Grouping granularity (currently always \"monthly\")"
-                    }
-                  },
                   "example": {
-                    "totalProjected": 148500,
-                    "totalRenewals": 15,
+                    "totalProjected": 1250000,
+                    "totalRenewals": 420,
                     "projections": [
                       {
-                        "group": "2026-08",
-                        "renewals_count": 5,
-                        "projected_amount": 49500
-                      },
-                      {
-                        "group": "2026-09",
-                        "renewals_count": 6,
-                        "projected_amount": 59400
-                      },
-                      {
-                        "group": "2026-10",
-                        "renewals_count": 4,
-                        "projected_amount": 39600
+                        "group": "2025-02",
+                        "renewals_count": 140,
+                        "projected_amount": 420000,
+                        "by_interval": {
+                          "month": {
+                            "1": 400000
+                          }
+                        },
+                        "trial": {
+                          "month": [
+                            20000
+                          ]
+                        }
                       }
                     ],
-                    "period": [
-                      "2026-08-17 00:00:00",
-                      "2026-11-17 23:59:59"
+                    "by_interval": {
+                      "month": {
+                        "1": 400000,
+                        "2": 400000
+                      }
+                    },
+                    "trial": {
+                      "month": [
+                        20000
+                      ]
+                    },
+                    "trial_first": {
+                      "count": 4,
+                      "amount": 20000
+                    },
+                    "rates": {
+                      "month": 92.5,
+                      "year": 80.0
+                    },
+                    "trial_rate": 40.0,
+                    "rate_window": [
+                      "2024-02-01",
+                      "2025-01-31"
                     ],
-                    "groupBy": "monthly"
+                    "overdue": {
+                      "count": 3,
+                      "amount": 9000
+                    },
+                    "retrying": {
+                      "count": 5,
+                      "amount": 15000
+                    },
+                    "wont_renew": {
+                      "count": 6,
+                      "amount": 18000,
+                      "by_month": {
+                        "2025-02": 6000
+                      }
+                    },
+                    "period": [
+                      "2025-02-01 00:00:00",
+                      "2025-04-30 23:59:59"
+                    ],
+                    "groupBy": "monthly",
+                    "horizon": "3",
+                    "by_variation": [
+                      {
+                        "variation_id": 12,
+                        "product_id": 10,
+                        "product_title": "Pro Plan",
+                        "variation_title": "Monthly",
+                        "renewals_count": 300,
+                        "projected_amount": 900000,
+                        "by_interval": {
+                          "month": {
+                            "1": 300000
+                          }
+                        },
+                        "trial": []
+                      }
+                    ]
                   }
                 },
                 "example": {
-                  "totalProjected": 148500,
-                  "totalRenewals": 15,
+                  "totalProjected": 1250000,
+                  "totalRenewals": 420,
                   "projections": [
                     {
-                      "group": "2026-08",
-                      "renewals_count": 5,
-                      "projected_amount": 49500
-                    },
-                    {
-                      "group": "2026-09",
-                      "renewals_count": 6,
-                      "projected_amount": 59400
-                    },
-                    {
-                      "group": "2026-10",
-                      "renewals_count": 4,
-                      "projected_amount": 39600
+                      "group": "2025-02",
+                      "renewals_count": 140,
+                      "projected_amount": 420000,
+                      "by_interval": {
+                        "month": {
+                          "1": 400000
+                        }
+                      },
+                      "trial": {
+                        "month": [
+                          20000
+                        ]
+                      }
                     }
                   ],
-                  "period": [
-                    "2026-08-17 00:00:00",
-                    "2026-11-17 23:59:59"
+                  "by_interval": {
+                    "month": {
+                      "1": 400000,
+                      "2": 400000
+                    }
+                  },
+                  "trial": {
+                    "month": [
+                      20000
+                    ]
+                  },
+                  "trial_first": {
+                    "count": 4,
+                    "amount": 20000
+                  },
+                  "rates": {
+                    "month": 92.5,
+                    "year": 80.0
+                  },
+                  "trial_rate": 40.0,
+                  "rate_window": [
+                    "2024-02-01",
+                    "2025-01-31"
                   ],
-                  "groupBy": "monthly"
+                  "overdue": {
+                    "count": 3,
+                    "amount": 9000
+                  },
+                  "retrying": {
+                    "count": 5,
+                    "amount": 15000
+                  },
+                  "wont_renew": {
+                    "count": 6,
+                    "amount": 18000,
+                    "by_month": {
+                      "2025-02": 6000
+                    }
+                  },
+                  "period": [
+                    "2025-02-01 00:00:00",
+                    "2025-04-30 23:59:59"
+                  ],
+                  "groupBy": "monthly",
+                  "horizon": "3",
+                  "by_variation": [
+                    {
+                      "variation_id": 12,
+                      "product_id": 10,
+                      "product_title": "Pro Plan",
+                      "variation_title": "Monthly",
+                      "renewals_count": 300,
+                      "projected_amount": 900000,
+                      "by_interval": {
+                        "month": {
+                          "1": 300000
+                        }
+                      },
+                      "trial": []
+                    }
+                  ]
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "totalProjected": 148500,
-                      "totalRenewals": 15,
+                      "totalProjected": 1250000,
+                      "totalRenewals": 420,
                       "projections": [
                         {
-                          "group": "2026-08",
-                          "renewals_count": 5,
-                          "projected_amount": 49500
-                        },
-                        {
-                          "group": "2026-09",
-                          "renewals_count": 6,
-                          "projected_amount": 59400
-                        },
-                        {
-                          "group": "2026-10",
-                          "renewals_count": 4,
-                          "projected_amount": 39600
+                          "group": "2025-02",
+                          "renewals_count": 140,
+                          "projected_amount": 420000,
+                          "by_interval": {
+                            "month": {
+                              "1": 400000
+                            }
+                          },
+                          "trial": {
+                            "month": [
+                              20000
+                            ]
+                          }
                         }
                       ],
-                      "period": [
-                        "2026-08-17 00:00:00",
-                        "2026-11-17 23:59:59"
+                      "by_interval": {
+                        "month": {
+                          "1": 400000,
+                          "2": 400000
+                        }
+                      },
+                      "trial": {
+                        "month": [
+                          20000
+                        ]
+                      },
+                      "trial_first": {
+                        "count": 4,
+                        "amount": 20000
+                      },
+                      "rates": {
+                        "month": 92.5,
+                        "year": 80.0
+                      },
+                      "trial_rate": 40.0,
+                      "rate_window": [
+                        "2024-02-01",
+                        "2025-01-31"
                       ],
-                      "groupBy": "monthly"
+                      "overdue": {
+                        "count": 3,
+                        "amount": 9000
+                      },
+                      "retrying": {
+                        "count": 5,
+                        "amount": 15000
+                      },
+                      "wont_renew": {
+                        "count": 6,
+                        "amount": 18000,
+                        "by_month": {
+                          "2025-02": 6000
+                        }
+                      },
+                      "period": [
+                        "2025-02-01 00:00:00",
+                        "2025-04-30 23:59:59"
+                      ],
+                      "groupBy": "monthly",
+                      "horizon": "3",
+                      "by_variation": [
+                        {
+                          "variation_id": 12,
+                          "product_id": 10,
+                          "product_title": "Pro Plan",
+                          "variation_title": "Monthly",
+                          "renewals_count": 300,
+                          "projected_amount": 900000,
+                          "by_interval": {
+                            "month": {
+                              "1": 300000
+                            }
+                          },
+                          "trial": []
+                        }
+                      ]
                     }
                   }
                 }

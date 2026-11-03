@@ -1,6 +1,6 @@
 ---
 title: Get Order Chart
-description: "Retrieve order count and statistics as time-series chart data, with optional comparison against a prior period. Includes summary totals and fluctuation calculations."
+description: "Returns order counts, items and money per day, month or year, with totals and rates. Amounts are decimal currency units."
 outline: false
 aside: false
 ---

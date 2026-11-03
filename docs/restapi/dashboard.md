@@ -93,7 +93,7 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/dashboard" \
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/dashboard/stats`
 
-Retrieve dashboard statistics widgets including total products, orders, net revenue, and refunds for the last 30 days.
+Retrieve the dashboard tiles: total products, and the orders, net sales and refunds of the last 30 store days. The money tiles show the Revenue report's figures for the same days, in all currencies converted to the base currency, so they match the report they link to.
 
 - **Policy:** `DashboardPolicy`
 - **Permission:** `dashboard_stats/view`
@@ -115,13 +115,13 @@ No parameters required.
     },
     {
       "title": "Orders",
-      "current_count": "128",
+      "current_count": 128,
       "icon": "AllOrdersIcon",
       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/orders"
     },
     {
       "title": "Revenue",
-      "current_count": "15420.5000",
+      "current_count": 15420.5,
       "icon": "Currency",
       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
       "has_currency": true,
@@ -130,7 +130,7 @@ No parameters required.
     },
     {
       "title": "Refund",
-      "current_count": "350.0000",
+      "current_count": 350,
       "icon": "Failed",
       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
       "has_currency": true,
@@ -141,24 +141,21 @@ No parameters required.
 }
 ```
 
-`current_count` is always a **string**, because the value is returned straight from the
-database driver.
+The type of `current_count` differs per tile:
 
-Count stats (`Total Products`, `Orders`) come from `COUNT()`, so they are integer
-strings. Money stats (`Revenue`, `Refund`) are a cents column divided by 100 in SQL and
-passed through unrounded, so they arrive with MySQL's division precision — four extra
-decimal places under the default `div_precision_increment`. Treat the trailing zeros as
-an artifact of that division rather than a fixed contract, and format the value for
-display instead of relying on the decimal count.
+| Tile | `current_count` | Source |
+|------|-----------------|--------|
+| Total Products | integer string | `COUNT(*)` of products not in `trash` or `auto-draft` |
+| Orders | integer | Orders with payment status `paid`, `partially-paid`, `refunded` or `partially-refunded`. $0 orders count. |
+| Revenue | number, in major units (decimal) | The Revenue report's `summary.net_sales`: paid − refunds − the tax, shipping and fees the store kept |
+| Refund | number, in major units (decimal) | The Revenue report's `summary.total_refunded_amount` (all refunded money) |
 
-Money stats also carry `currency` and `excluded_orders`, which count stats do not.
+Money tiles also carry `currency` (the base currency) and `excluded_orders`: the number of orders that have no trusted exchange rate. The money tiles leave those orders out; the Orders tile counts them.
 
 ::: info
-- **Orders, Revenue, and Refunds** are calculated for the last 30 days only (from the start of the day 30 days ago to the end of the current day).
-- **Revenue** is net revenue: `total_paid - total_refund - tax_total - shipping_tax`, converted from cents to decimal.
-- Orders with `on_hold` or `failed` status are excluded from the calculations.
-- **Total Products** counts all products excluding those in `trash` or `auto-draft` status.
-- Widgets with `has_currency: true` should be formatted with the store's currency symbol.
+- **Orders, Revenue and Refund** cover the last 30 days in the WordPress site timezone, today included (the Revenue report's `last_30` preset).
+- Widgets with `has_currency: true` should be formatted with the base currency symbol.
+- The whole list passes through the `fluent_cart/dashboard_stats` filter.
 :::
 
 #### Example

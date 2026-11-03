@@ -1,0 +1,443 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/payment-methods": {
+      "get": {
+        "operationId": "getPaymentMethods",
+        "summary": "GET Get Payment Methods",
+        "description": "Returns orders, money, refunds, failures and failing subscriptions per payment gateway, the totals, the previous period's totals and net sales by gateway over time. Amounts are decimal currency units; `net_sales` is the Revenue report's net sales.\n\nA saved-card payment counts under the gateway that charged it. Disputes per gateway and sales by card brand are FluentCart Pro reports (`reports/payment-methods/disputes`, `reports/payment-methods/methods`); this endpoint removes the dispute fields from `rows` and `previous`, and keeps only `totals.dispute_rate`. `failing_subscriptions` and `mrr_at_risk` describe open-ended subscriptions failing or past due now, with no date filter. `success_rate` = orders / (orders + recorded failed charges). `previous` is `null` without a comparison.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[groupKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "default",
+                "daily",
+                "monthly",
+                "yearly"
+              ]
+            },
+            "description": "Chart bucket: `daily`, `monthly`, `yearly`, or `default` (picked from the range length).",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. `__all__` converts every currency to the base currency. Default: base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Only live or only test orders. Without it, both count.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[compareType]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "previous_period",
+                "previous_month",
+                "previous_quarter",
+                "previous_year",
+                "custom"
+              ]
+            },
+            "description": "Comparison period.",
+            "required": false
+          },
+          {
+            "name": "params[compareDate]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Start of the comparison range when `compareType` is `custom`.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Only these sale types. `renewal` leaves out installment payments.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "rows": [
+                      {
+                        "gateway": "stripe",
+                        "label": "Stripe",
+                        "orders": 40,
+                        "refunded_orders": 2,
+                        "gross_sales": 2000.0,
+                        "refunds": 100.0,
+                        "net_sales": 1800.0,
+                        "renewal_net": 600.0,
+                        "refund_rate": 5.0,
+                        "average_order": 50.0,
+                        "failed_orders": 3,
+                        "success_rate": 95.24,
+                        "failed_charges": 2,
+                        "failed_charge_amount": 100.0,
+                        "failing_subscriptions": 1,
+                        "mrr_at_risk": 20.0,
+                        "net_share": 75.0
+                      }
+                    ],
+                    "totals": {
+                      "orders": 55,
+                      "refunded_orders": 3,
+                      "gross_sales": 2650.0,
+                      "refunds": 120.0,
+                      "net_sales": 2400.0,
+                      "renewal_net": 800.0,
+                      "refund_rate": 5.45,
+                      "average_order": 48.18,
+                      "failed_orders": 4,
+                      "success_rate": 96.49,
+                      "failed_charges": 2,
+                      "failed_charge_amount": 100.0,
+                      "failing_subscriptions": 1,
+                      "mrr_at_risk": 20.0,
+                      "net_share": 100,
+                      "dispute_rate": 0
+                    },
+                    "previous": null,
+                    "chart": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01-01",
+                        "gateways": {
+                          "paypal": 30.0,
+                          "stripe": 120.0
+                        }
+                      }
+                    ],
+                    "compare_ranges": {
+                      "previous_period": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_month": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_quarter": {
+                        "start": "2024-10-01 00:00:00",
+                        "end": "2024-10-31 23:59:59"
+                      },
+                      "previous_year": {
+                        "start": "2024-01-01 00:00:00",
+                        "end": "2024-01-31 23:59:59"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "rows": [
+                    {
+                      "gateway": "stripe",
+                      "label": "Stripe",
+                      "orders": 40,
+                      "refunded_orders": 2,
+                      "gross_sales": 2000.0,
+                      "refunds": 100.0,
+                      "net_sales": 1800.0,
+                      "renewal_net": 600.0,
+                      "refund_rate": 5.0,
+                      "average_order": 50.0,
+                      "failed_orders": 3,
+                      "success_rate": 95.24,
+                      "failed_charges": 2,
+                      "failed_charge_amount": 100.0,
+                      "failing_subscriptions": 1,
+                      "mrr_at_risk": 20.0,
+                      "net_share": 75.0
+                    }
+                  ],
+                  "totals": {
+                    "orders": 55,
+                    "refunded_orders": 3,
+                    "gross_sales": 2650.0,
+                    "refunds": 120.0,
+                    "net_sales": 2400.0,
+                    "renewal_net": 800.0,
+                    "refund_rate": 5.45,
+                    "average_order": 48.18,
+                    "failed_orders": 4,
+                    "success_rate": 96.49,
+                    "failed_charges": 2,
+                    "failed_charge_amount": 100.0,
+                    "failing_subscriptions": 1,
+                    "mrr_at_risk": 20.0,
+                    "net_share": 100,
+                    "dispute_rate": 0
+                  },
+                  "previous": null,
+                  "chart": [
+                    {
+                      "year": "2025",
+                      "group": "2025-01-01",
+                      "gateways": {
+                        "paypal": 30.0,
+                        "stripe": 120.0
+                      }
+                    }
+                  ],
+                  "compare_ranges": {
+                    "previous_period": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_month": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_quarter": {
+                      "start": "2024-10-01 00:00:00",
+                      "end": "2024-10-31 23:59:59"
+                    },
+                    "previous_year": {
+                      "start": "2024-01-01 00:00:00",
+                      "end": "2024-01-31 23:59:59"
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "rows": [
+                        {
+                          "gateway": "stripe",
+                          "label": "Stripe",
+                          "orders": 40,
+                          "refunded_orders": 2,
+                          "gross_sales": 2000.0,
+                          "refunds": 100.0,
+                          "net_sales": 1800.0,
+                          "renewal_net": 600.0,
+                          "refund_rate": 5.0,
+                          "average_order": 50.0,
+                          "failed_orders": 3,
+                          "success_rate": 95.24,
+                          "failed_charges": 2,
+                          "failed_charge_amount": 100.0,
+                          "failing_subscriptions": 1,
+                          "mrr_at_risk": 20.0,
+                          "net_share": 75.0
+                        }
+                      ],
+                      "totals": {
+                        "orders": 55,
+                        "refunded_orders": 3,
+                        "gross_sales": 2650.0,
+                        "refunds": 120.0,
+                        "net_sales": 2400.0,
+                        "renewal_net": 800.0,
+                        "refund_rate": 5.45,
+                        "average_order": 48.18,
+                        "failed_orders": 4,
+                        "success_rate": 96.49,
+                        "failed_charges": 2,
+                        "failed_charge_amount": 100.0,
+                        "failing_subscriptions": 1,
+                        "mrr_at_risk": 20.0,
+                        "net_share": 100,
+                        "dispute_rate": 0
+                      },
+                      "previous": null,
+                      "chart": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01-01",
+                          "gateways": {
+                            "paypal": 30.0,
+                            "stripe": 120.0
+                          }
+                        }
+                      ],
+                      "compare_ranges": {
+                        "previous_period": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_month": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_quarter": {
+                          "start": "2024-10-01 00:00:00",
+                          "end": "2024-10-31 23:59:59"
+                        },
+                        "previous_year": {
+                          "start": "2024-01-01 00:00:00",
+                          "end": "2024-01-31 23:59:59"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

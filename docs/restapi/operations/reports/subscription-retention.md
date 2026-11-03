@@ -1,6 +1,6 @@
 ---
 title: Get Subscription Retention
-description: "Retrieve subscription retention data showing the percentage of subscribers who remain active over successive billing periods."
+description: "Returns one row per store month (or year) in the range: new, churned, retained and active subscriptions, MRR, churn reasons and the renewal rate. MRR and `period_gross` are decimals."
 outline: false
 aside: false
 ---

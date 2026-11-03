@@ -1,0 +1,420 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/customer-repeat": {
+      "get": {
+        "operationId": "getCustomerRepeat",
+        "summary": "GET Get Customer Repeat Purchases",
+        "description": "Returns how many purchases and orders each customer made, and the time to a second purchase. No money fields. Only paid orders (`total_paid` > 0) with a customer count.\n\n`purchases` and `orders` cover customers who paid in the range, over their history up to the range end. Purchases leave out renewals, so a customer who paid only renewals is in bucket `0`; `orders` include renewals. `second_purchase` covers customers gained in the 12 months ending with the range's last month: `repeaters` made another non-renewal purchase, and `median_days` is the median days to it.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Live or test orders only. Default: both.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain one of these variation IDs.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "purchases": [
+                      {
+                        "bucket": "0",
+                        "customers": 2
+                      },
+                      {
+                        "bucket": "1",
+                        "customers": 80
+                      },
+                      {
+                        "bucket": "2",
+                        "customers": 15
+                      },
+                      {
+                        "bucket": "3",
+                        "customers": 4
+                      },
+                      {
+                        "bucket": "4",
+                        "customers": 1
+                      },
+                      {
+                        "bucket": "5+",
+                        "customers": 1
+                      }
+                    ],
+                    "orders": [
+                      {
+                        "bucket": "1",
+                        "customers": 70
+                      },
+                      {
+                        "bucket": "2",
+                        "customers": 20
+                      },
+                      {
+                        "bucket": "3",
+                        "customers": 7
+                      },
+                      {
+                        "bucket": "4",
+                        "customers": 3
+                      },
+                      {
+                        "bucket": "5+",
+                        "customers": 3
+                      }
+                    ],
+                    "second_purchase": {
+                      "customers": 500,
+                      "repeaters": 90,
+                      "repeat_rate": 18.0,
+                      "median_days": 45,
+                      "buckets": [
+                        {
+                          "bucket": "0-7",
+                          "customers": 10
+                        },
+                        {
+                          "bucket": "8-30",
+                          "customers": 25
+                        },
+                        {
+                          "bucket": "31-90",
+                          "customers": 30
+                        },
+                        {
+                          "bucket": "91-180",
+                          "customers": 15
+                        },
+                        {
+                          "bucket": "181-365",
+                          "customers": 8
+                        },
+                        {
+                          "bucket": "365+",
+                          "customers": 2
+                        }
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "purchases": [
+                    {
+                      "bucket": "0",
+                      "customers": 2
+                    },
+                    {
+                      "bucket": "1",
+                      "customers": 80
+                    },
+                    {
+                      "bucket": "2",
+                      "customers": 15
+                    },
+                    {
+                      "bucket": "3",
+                      "customers": 4
+                    },
+                    {
+                      "bucket": "4",
+                      "customers": 1
+                    },
+                    {
+                      "bucket": "5+",
+                      "customers": 1
+                    }
+                  ],
+                  "orders": [
+                    {
+                      "bucket": "1",
+                      "customers": 70
+                    },
+                    {
+                      "bucket": "2",
+                      "customers": 20
+                    },
+                    {
+                      "bucket": "3",
+                      "customers": 7
+                    },
+                    {
+                      "bucket": "4",
+                      "customers": 3
+                    },
+                    {
+                      "bucket": "5+",
+                      "customers": 3
+                    }
+                  ],
+                  "second_purchase": {
+                    "customers": 500,
+                    "repeaters": 90,
+                    "repeat_rate": 18.0,
+                    "median_days": 45,
+                    "buckets": [
+                      {
+                        "bucket": "0-7",
+                        "customers": 10
+                      },
+                      {
+                        "bucket": "8-30",
+                        "customers": 25
+                      },
+                      {
+                        "bucket": "31-90",
+                        "customers": 30
+                      },
+                      {
+                        "bucket": "91-180",
+                        "customers": 15
+                      },
+                      {
+                        "bucket": "181-365",
+                        "customers": 8
+                      },
+                      {
+                        "bucket": "365+",
+                        "customers": 2
+                      }
+                    ]
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "purchases": [
+                        {
+                          "bucket": "0",
+                          "customers": 2
+                        },
+                        {
+                          "bucket": "1",
+                          "customers": 80
+                        },
+                        {
+                          "bucket": "2",
+                          "customers": 15
+                        },
+                        {
+                          "bucket": "3",
+                          "customers": 4
+                        },
+                        {
+                          "bucket": "4",
+                          "customers": 1
+                        },
+                        {
+                          "bucket": "5+",
+                          "customers": 1
+                        }
+                      ],
+                      "orders": [
+                        {
+                          "bucket": "1",
+                          "customers": 70
+                        },
+                        {
+                          "bucket": "2",
+                          "customers": 20
+                        },
+                        {
+                          "bucket": "3",
+                          "customers": 7
+                        },
+                        {
+                          "bucket": "4",
+                          "customers": 3
+                        },
+                        {
+                          "bucket": "5+",
+                          "customers": 3
+                        }
+                      ],
+                      "second_purchase": {
+                        "customers": 500,
+                        "repeaters": 90,
+                        "repeat_rate": 18.0,
+                        "median_days": 45,
+                        "buckets": [
+                          {
+                            "bucket": "0-7",
+                            "customers": 10
+                          },
+                          {
+                            "bucket": "8-30",
+                            "customers": 25
+                          },
+                          {
+                            "bucket": "31-90",
+                            "customers": 30
+                          },
+                          {
+                            "bucket": "91-180",
+                            "customers": 15
+                          },
+                          {
+                            "bucket": "181-365",
+                            "customers": 8
+                          },
+                          {
+                            "bucket": "365+",
+                            "customers": 2
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

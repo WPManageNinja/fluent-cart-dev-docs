@@ -1,0 +1,401 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/coupon-overview": {
+      "get": {
+        "operationId": "getCouponOverview",
+        "summary": "GET Get Coupon Overview",
+        "description": "Returns the discount given, how many orders and new customers used a coupon, a chart by period and the previous period's figures. Amounts are integers in cents.\n\n`orders` counts paid orders plus orders a coupon made free. `discount_rate` is the discount as a percent of what the coupon orders would have cost at full price. `new_customers` uses the shared first-purchase rule. `comparison` (new customers won with a coupon vs at full price: average first order net, average lifetime value, repeat and refund rates) is a FluentCart Pro report: it appears only when the `fluent_cart/report/coupon_quality` filter returns true. `previous` is `null` without a comparison.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[groupKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "default",
+                "daily",
+                "monthly",
+                "yearly"
+              ]
+            },
+            "description": "Chart bucket: `daily`, `monthly`, `yearly`, or `default` (picked from the range length).",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. `__all__` converts every currency to the base currency. Default: base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Only live or only test orders. Without it, both count.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[compareType]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "previous_period",
+                "previous_month",
+                "previous_quarter",
+                "previous_year",
+                "custom"
+              ]
+            },
+            "description": "Comparison period.",
+            "required": false
+          },
+          {
+            "name": "params[compareDate]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Start of the comparison range when `compareType` is `custom`.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Only these sale types. `renewal` leaves out installment payments.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "summary": {
+                      "discount": 12500,
+                      "orders": 100,
+                      "coupon_orders": 25,
+                      "coupon_share": 25.0,
+                      "new_customers": 50,
+                      "coupon_new_customers": 15,
+                      "new_share": 30.0,
+                      "discount_rate": 10.2
+                    },
+                    "previous": null,
+                    "comparison": {
+                      "coupon": {
+                        "customers": 15,
+                        "average_first": 4000,
+                        "average_ltv": 9000,
+                        "repeat_rate": 20.0,
+                        "refund_rate": 6.7
+                      },
+                      "full_price": {
+                        "customers": 35,
+                        "average_first": 4500,
+                        "average_ltv": 10000,
+                        "repeat_rate": 25.0,
+                        "refund_rate": 2.9
+                      }
+                    },
+                    "chart": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01-01",
+                        "discount": 500,
+                        "orders": 4,
+                        "coupon_orders": 1
+                      }
+                    ],
+                    "compare_ranges": {
+                      "previous_period": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_month": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_quarter": {
+                        "start": "2024-10-01 00:00:00",
+                        "end": "2024-10-31 23:59:59"
+                      },
+                      "previous_year": {
+                        "start": "2024-01-01 00:00:00",
+                        "end": "2024-01-31 23:59:59"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "summary": {
+                    "discount": 12500,
+                    "orders": 100,
+                    "coupon_orders": 25,
+                    "coupon_share": 25.0,
+                    "new_customers": 50,
+                    "coupon_new_customers": 15,
+                    "new_share": 30.0,
+                    "discount_rate": 10.2
+                  },
+                  "previous": null,
+                  "comparison": {
+                    "coupon": {
+                      "customers": 15,
+                      "average_first": 4000,
+                      "average_ltv": 9000,
+                      "repeat_rate": 20.0,
+                      "refund_rate": 6.7
+                    },
+                    "full_price": {
+                      "customers": 35,
+                      "average_first": 4500,
+                      "average_ltv": 10000,
+                      "repeat_rate": 25.0,
+                      "refund_rate": 2.9
+                    }
+                  },
+                  "chart": [
+                    {
+                      "year": "2025",
+                      "group": "2025-01-01",
+                      "discount": 500,
+                      "orders": 4,
+                      "coupon_orders": 1
+                    }
+                  ],
+                  "compare_ranges": {
+                    "previous_period": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_month": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_quarter": {
+                      "start": "2024-10-01 00:00:00",
+                      "end": "2024-10-31 23:59:59"
+                    },
+                    "previous_year": {
+                      "start": "2024-01-01 00:00:00",
+                      "end": "2024-01-31 23:59:59"
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "summary": {
+                        "discount": 12500,
+                        "orders": 100,
+                        "coupon_orders": 25,
+                        "coupon_share": 25.0,
+                        "new_customers": 50,
+                        "coupon_new_customers": 15,
+                        "new_share": 30.0,
+                        "discount_rate": 10.2
+                      },
+                      "previous": null,
+                      "comparison": {
+                        "coupon": {
+                          "customers": 15,
+                          "average_first": 4000,
+                          "average_ltv": 9000,
+                          "repeat_rate": 20.0,
+                          "refund_rate": 6.7
+                        },
+                        "full_price": {
+                          "customers": 35,
+                          "average_first": 4500,
+                          "average_ltv": 10000,
+                          "repeat_rate": 25.0,
+                          "refund_rate": 2.9
+                        }
+                      },
+                      "chart": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01-01",
+                          "discount": 500,
+                          "orders": 4,
+                          "coupon_orders": 1
+                        }
+                      ],
+                      "compare_ranges": {
+                        "previous_period": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_month": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_quarter": {
+                          "start": "2024-10-01 00:00:00",
+                          "end": "2024-10-31 23:59:59"
+                        },
+                        "previous_year": {
+                          "start": "2024-01-01 00:00:00",
+                          "end": "2024-01-31 23:59:59"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

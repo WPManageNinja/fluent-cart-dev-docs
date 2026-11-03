@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSubscriptionRetention",
         "summary": "GET Get Subscription Retention",
-        "description": "Retrieve subscription retention data showing the percentage of subscribers who remain active over successive billing periods.\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns one row per store month (or year) in the range: new, churned, retained and active subscriptions, MRR, churn reasons and the renewal rate. MRR and `period_gross` are decimals.\n\nOpen-ended plans only. Retained = the starting base still active at period end. `retained_mrr`, `mrr` and `start_mrr` are decimal strings. `intervals` lists the billing intervals that have subscriptions, most first. The range end is clamped to today.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First store day of the range (Y-m-d).",
             "required": false
           },
           {
@@ -52,27 +52,28 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
+            "description": "Last store day of the range (Y-m-d).",
             "required": false
           },
           {
-            "name": "params[groupKey]",
+            "name": "params[rangeKey]",
             "in": "query",
             "schema": {
               "type": "string",
               "enum": [
-                "default",
-                "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
               ]
             },
-            "description": "Grouping interval for data aggregation.",
+            "description": "Preset range relative to today. Overrides the dates.",
             "required": false
           },
           {
@@ -82,24 +83,11 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` converts every currency to the base currency.",
             "required": false
           },
           {
-            "name": "params[filterMode]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "live",
-                "test"
-              ]
-            },
-            "description": "Payment mode filter.",
-            "required": false
-          },
-          {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,33 +95,29 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
+            "description": "Product variation IDs to filter by.",
             "required": false
           },
           {
-            "name": "params[compareType]",
+            "name": "params[period]",
             "in": "query",
             "schema": {
               "type": "string",
               "enum": [
-                "previous_period",
-                "previous_month",
-                "previous_quarter",
-                "previous_year",
-                "custom"
+                "month",
+                "year"
               ]
             },
-            "description": "Comparison period type.",
+            "description": "Row size. `year` gives one row per year; any other value one row per month.",
             "required": false
           },
           {
-            "name": "params[compareDate]",
+            "name": "params[billingInterval]",
             "in": "query",
             "schema": {
-              "type": "string",
-              "example": "2024-01-01"
+              "type": "string"
             },
-            "description": "Custom comparison start date. Required when compareType is custom.",
+            "description": "Only subscriptions with this billing interval, e.g. `month` or `year`.",
             "required": false
           }
         ],
@@ -144,94 +128,93 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "retention_data": {
-                      "type": "array",
-                      "description": "Monthly subscription retention statistics, one entry per calendar month in the requested date range.",
-                      "items": {
-                        "$ref": "#/components/schemas/SubscriptionRetentionPeriod"
-                      }
-                    }
-                  },
                   "example": {
                     "retention_data": [
                       {
-                        "day": "2026-06-30",
-                        "week": "2026-26",
-                        "group": "2026-06",
-                        "year": "2026",
-                        "new_subscriptions": 24,
-                        "new_subscriptions_mrr": 1176,
-                        "churned_subscriptions": 6,
-                        "churned_subscriptions_mrr": 294,
-                        "active_subscriptions": "382",
-                        "active_paid_subscriptions": "382",
-                        "active_free_subscriptions": "0",
-                        "mrr": "41258.75",
-                        "retention_rate": 98.4,
-                        "retention_rate_money": 98.9,
-                        "period_gross": 1176,
-                        "period_subscriptions": 24
-                      },
-                      {
-                        "day": "2026-07-31",
-                        "week": "2026-31",
-                        "group": "2026-07",
-                        "year": "2026",
-                        "new_subscriptions": 31,
-                        "new_subscriptions_mrr": 1519,
-                        "churned_subscriptions": 4,
-                        "churned_subscriptions_mrr": 196,
-                        "active_subscriptions": "409",
-                        "active_paid_subscriptions": "409",
-                        "active_free_subscriptions": "0",
-                        "mrr": "44232.75",
-                        "retention_rate": 99.1,
-                        "retention_rate_money": 99.3,
-                        "period_gross": 1519,
-                        "period_subscriptions": 31
+                        "day": "2025-01-31",
+                        "week": "2025-05",
+                        "group": "2025-01",
+                        "year": "2025",
+                        "is_complete": true,
+                        "is_running": false,
+                        "new_subscriptions": 40,
+                        "new_subscriptions_mrr": 1200.0,
+                        "churned_subscriptions": 10,
+                        "churned_subscriptions_mrr": 300.0,
+                        "churned_new_subscriptions": 2,
+                        "left_by_reason": {
+                          "canceled": 6,
+                          "payment_failed": 2,
+                          "retrying": 1,
+                          "paused": 1,
+                          "completed": 0
+                        },
+                        "renewals_paid": 190,
+                        "renewals_lost": 10,
+                        "renewals_retrying": 3,
+                        "renewal_rate": 95.0,
+                        "retained_subscriptions": 490,
+                        "retained_mrr": "14700.00",
+                        "active_subscriptions": "528",
+                        "active_paid_subscriptions": "520",
+                        "active_free_subscriptions": "8",
+                        "mrr": "15600.00",
+                        "start_subscriptions": 500,
+                        "start_mrr": "15000.00",
+                        "retention_rate": 98.0,
+                        "retention_rate_money": 98.0,
+                        "period_gross": 1200.0,
+                        "period_subscriptions": 40
                       }
+                    ],
+                    "intervals": [
+                      "month",
+                      "year"
                     ]
                   }
                 },
                 "example": {
                   "retention_data": [
                     {
-                      "day": "2026-06-30",
-                      "week": "2026-26",
-                      "group": "2026-06",
-                      "year": "2026",
-                      "new_subscriptions": 24,
-                      "new_subscriptions_mrr": 1176,
-                      "churned_subscriptions": 6,
-                      "churned_subscriptions_mrr": 294,
-                      "active_subscriptions": "382",
-                      "active_paid_subscriptions": "382",
-                      "active_free_subscriptions": "0",
-                      "mrr": "41258.75",
-                      "retention_rate": 98.4,
-                      "retention_rate_money": 98.9,
-                      "period_gross": 1176,
-                      "period_subscriptions": 24
-                    },
-                    {
-                      "day": "2026-07-31",
-                      "week": "2026-31",
-                      "group": "2026-07",
-                      "year": "2026",
-                      "new_subscriptions": 31,
-                      "new_subscriptions_mrr": 1519,
-                      "churned_subscriptions": 4,
-                      "churned_subscriptions_mrr": 196,
-                      "active_subscriptions": "409",
-                      "active_paid_subscriptions": "409",
-                      "active_free_subscriptions": "0",
-                      "mrr": "44232.75",
-                      "retention_rate": 99.1,
-                      "retention_rate_money": 99.3,
-                      "period_gross": 1519,
-                      "period_subscriptions": 31
+                      "day": "2025-01-31",
+                      "week": "2025-05",
+                      "group": "2025-01",
+                      "year": "2025",
+                      "is_complete": true,
+                      "is_running": false,
+                      "new_subscriptions": 40,
+                      "new_subscriptions_mrr": 1200.0,
+                      "churned_subscriptions": 10,
+                      "churned_subscriptions_mrr": 300.0,
+                      "churned_new_subscriptions": 2,
+                      "left_by_reason": {
+                        "canceled": 6,
+                        "payment_failed": 2,
+                        "retrying": 1,
+                        "paused": 1,
+                        "completed": 0
+                      },
+                      "renewals_paid": 190,
+                      "renewals_lost": 10,
+                      "renewals_retrying": 3,
+                      "renewal_rate": 95.0,
+                      "retained_subscriptions": 490,
+                      "retained_mrr": "14700.00",
+                      "active_subscriptions": "528",
+                      "active_paid_subscriptions": "520",
+                      "active_free_subscriptions": "8",
+                      "mrr": "15600.00",
+                      "start_subscriptions": 500,
+                      "start_mrr": "15000.00",
+                      "retention_rate": 98.0,
+                      "retention_rate_money": 98.0,
+                      "period_gross": 1200.0,
+                      "period_subscriptions": 40
                     }
+                  ],
+                  "intervals": [
+                    "month",
+                    "year"
                   ]
                 },
                 "examples": {
@@ -240,41 +223,45 @@
                     "value": {
                       "retention_data": [
                         {
-                          "day": "2026-06-30",
-                          "week": "2026-26",
-                          "group": "2026-06",
-                          "year": "2026",
-                          "new_subscriptions": 24,
-                          "new_subscriptions_mrr": 1176,
-                          "churned_subscriptions": 6,
-                          "churned_subscriptions_mrr": 294,
-                          "active_subscriptions": "382",
-                          "active_paid_subscriptions": "382",
-                          "active_free_subscriptions": "0",
-                          "mrr": "41258.75",
-                          "retention_rate": 98.4,
-                          "retention_rate_money": 98.9,
-                          "period_gross": 1176,
-                          "period_subscriptions": 24
-                        },
-                        {
-                          "day": "2026-07-31",
-                          "week": "2026-31",
-                          "group": "2026-07",
-                          "year": "2026",
-                          "new_subscriptions": 31,
-                          "new_subscriptions_mrr": 1519,
-                          "churned_subscriptions": 4,
-                          "churned_subscriptions_mrr": 196,
-                          "active_subscriptions": "409",
-                          "active_paid_subscriptions": "409",
-                          "active_free_subscriptions": "0",
-                          "mrr": "44232.75",
-                          "retention_rate": 99.1,
-                          "retention_rate_money": 99.3,
-                          "period_gross": 1519,
-                          "period_subscriptions": 31
+                          "day": "2025-01-31",
+                          "week": "2025-05",
+                          "group": "2025-01",
+                          "year": "2025",
+                          "is_complete": true,
+                          "is_running": false,
+                          "new_subscriptions": 40,
+                          "new_subscriptions_mrr": 1200.0,
+                          "churned_subscriptions": 10,
+                          "churned_subscriptions_mrr": 300.0,
+                          "churned_new_subscriptions": 2,
+                          "left_by_reason": {
+                            "canceled": 6,
+                            "payment_failed": 2,
+                            "retrying": 1,
+                            "paused": 1,
+                            "completed": 0
+                          },
+                          "renewals_paid": 190,
+                          "renewals_lost": 10,
+                          "renewals_retrying": 3,
+                          "renewal_rate": 95.0,
+                          "retained_subscriptions": 490,
+                          "retained_mrr": "14700.00",
+                          "active_subscriptions": "528",
+                          "active_paid_subscriptions": "520",
+                          "active_free_subscriptions": "8",
+                          "mrr": "15600.00",
+                          "start_subscriptions": 500,
+                          "start_mrr": "15000.00",
+                          "retention_rate": 98.0,
+                          "retention_rate_money": 98.0,
+                          "period_gross": 1200.0,
+                          "period_subscriptions": 40
                         }
+                      ],
+                      "intervals": [
+                        "month",
+                        "year"
                       ]
                     }
                   }
@@ -315,93 +302,7 @@
     }
   },
   "components": {
-    "schemas": {
-      "SubscriptionRetentionPeriod": {
-        "type": "object",
-        "properties": {
-          "day": {
-            "type": "string",
-            "description": "Last day of the reporting month (Y-m-d)",
-            "example": "2026-06-30"
-          },
-          "week": {
-            "type": "string",
-            "description": "ISO year-week of the `day` value (Y-W)",
-            "example": "2026-26"
-          },
-          "group": {
-            "type": "string",
-            "description": "Year-month bucket for this period (Y-m)",
-            "example": "2026-06"
-          },
-          "year": {
-            "type": "string",
-            "description": "Calendar year of this period",
-            "example": "2026"
-          },
-          "new_subscriptions": {
-            "type": "integer",
-            "description": "Subscriptions created during this period",
-            "example": 24
-          },
-          "new_subscriptions_mrr": {
-            "type": "number",
-            "description": "Normalized monthly recurring revenue added by new subscriptions this period, in major currency units",
-            "example": 1176
-          },
-          "churned_subscriptions": {
-            "type": "integer",
-            "description": "Subscriptions canceled or expired during this period",
-            "example": 6
-          },
-          "churned_subscriptions_mrr": {
-            "type": "number",
-            "description": "Normalized MRR lost to churn during this period, in major currency units",
-            "example": 294
-          },
-          "active_subscriptions": {
-            "type": "string",
-            "description": "Total active subscriptions as of the end of this period",
-            "example": "382"
-          },
-          "active_paid_subscriptions": {
-            "type": "string",
-            "description": "Active subscriptions with a non-zero recurring amount as of the end of this period",
-            "example": "382"
-          },
-          "active_free_subscriptions": {
-            "type": "string",
-            "description": "Active subscriptions with a zero recurring amount as of the end of this period",
-            "example": "0"
-          },
-          "mrr": {
-            "type": "string",
-            "description": "Normalized monthly recurring revenue as of the end of this period, in major currency units",
-            "example": "41258.75"
-          },
-          "retention_rate": {
-            "type": "number",
-            "description": "Subscriber-count retention rate for this period, as a percentage",
-            "example": 98.4
-          },
-          "retention_rate_money": {
-            "type": "number",
-            "description": "MRR-based retention rate for this period, as a percentage",
-            "example": 98.9
-          },
-          "period_gross": {
-            "type": "number",
-            "description": "Normalized recurring revenue billed to subscriptions created in this period, in major currency units",
-            "example": 1176
-          },
-          "period_subscriptions": {
-            "type": "integer",
-            "description": "Same value as `new_subscriptions` for this period",
-            "example": 24
-          }
-        }
-      }
-    },
+    "schemas": {},
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getReportMeta",
         "summary": "GET Get Report Meta",
-        "description": "Retrieve metadata for the reporting interface, including available currencies, the earliest order date, and store mode.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns the data the report filters need: currencies with orders in the range, order counts per currency, the base currency, the earliest order date and the store mode.\n\nWith more than one currency, `currencies` also holds `__all__` (all currencies converted to the base currency), and `converted_excluded_orders` counts orders that cannot convert. Dates are store-timezone strings.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -41,20 +41,18 @@
             "name": "params[startDate]",
             "in": "query",
             "schema": {
-              "type": "string",
-              "example": "2025-01-01"
+              "type": "string"
             },
-            "description": "Start date to scope the currency lookup.",
+            "description": "First store day for the currency lookup (Y-m-d).",
             "required": false
           },
           {
             "name": "params[endDate]",
             "in": "query",
             "schema": {
-              "type": "string",
-              "example": "2025-12-31"
+              "type": "string"
             },
-            "description": "End date to scope the currency lookup.",
+            "description": "Last store day for the currency lookup (Y-m-d).",
             "required": false
           }
         ],
@@ -65,85 +63,60 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "currencies": {
-                      "type": "object",
-                      "description": "Available currencies with codes and signs",
-                      "additionalProperties": true
-                    },
-                    "min_date": {
-                      "type": "string",
-                      "description": "Earliest order date"
-                    },
-                    "storeMode": {
-                      "type": "string",
-                      "description": "Current store mode (live or test)"
-                    },
-                    "first_order_date": {
-                      "type": "string",
-                      "description": "Date of the first order"
-                    }
-                  },
                   "example": {
                     "currencies": {
-                      "USD": {
-                        "code": "USD",
-                        "sign": "$"
-                      },
-                      "EUR": {
-                        "code": "EUR",
-                        "sign": "\u20ac"
-                      },
-                      "GBP": {
-                        "code": "GBP",
-                        "sign": "\u00a3"
-                      }
+                      "USD": "$",
+                      "EUR": "\u20ac",
+                      "__all__": "$"
                     },
-                    "min_date": "2024-01-15 08:30:00",
+                    "currency_order_counts": {
+                      "USD": 120,
+                      "EUR": 30
+                    },
+                    "default_currency": "USD",
+                    "base_currency": "USD",
+                    "converted_excluded_orders": 0,
+                    "min_date": "2025-01-01 00:00:00",
                     "storeMode": "live",
-                    "first_order_date": "2024-01-15 08:30:00"
+                    "first_order_date": "2024-03-15 10:20:00"
                   }
                 },
                 "example": {
                   "currencies": {
-                    "USD": {
-                      "code": "USD",
-                      "sign": "$"
-                    },
-                    "EUR": {
-                      "code": "EUR",
-                      "sign": "\u20ac"
-                    },
-                    "GBP": {
-                      "code": "GBP",
-                      "sign": "\u00a3"
-                    }
+                    "USD": "$",
+                    "EUR": "\u20ac",
+                    "__all__": "$"
                   },
-                  "min_date": "2024-01-15 08:30:00",
+                  "currency_order_counts": {
+                    "USD": 120,
+                    "EUR": 30
+                  },
+                  "default_currency": "USD",
+                  "base_currency": "USD",
+                  "converted_excluded_orders": 0,
+                  "min_date": "2025-01-01 00:00:00",
                   "storeMode": "live",
-                  "first_order_date": "2024-01-15 08:30:00"
+                  "first_order_date": "2024-03-15 10:20:00"
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
                       "currencies": {
-                        "USD": {
-                          "code": "USD",
-                          "sign": "$"
-                        },
-                        "EUR": {
-                          "code": "EUR",
-                          "sign": "\u20ac"
-                        },
-                        "GBP": {
-                          "code": "GBP",
-                          "sign": "\u00a3"
-                        }
+                        "USD": "$",
+                        "EUR": "\u20ac",
+                        "__all__": "$"
                       },
-                      "min_date": "2024-01-15 08:30:00",
+                      "currency_order_counts": {
+                        "USD": 120,
+                        "EUR": 30
+                      },
+                      "default_currency": "USD",
+                      "base_currency": "USD",
+                      "converted_excluded_orders": 0,
+                      "min_date": "2025-01-01 00:00:00",
                       "storeMode": "live",
-                      "first_order_date": "2024-01-15 08:30:00"
+                      "first_order_date": "2024-03-15 10:20:00"
                     }
                   }
                 }

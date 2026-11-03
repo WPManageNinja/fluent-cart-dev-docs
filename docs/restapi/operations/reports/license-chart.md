@@ -1,6 +1,6 @@
 ---
-title: Get License Line Chart
-description: "Retrieve license creation/activation data as time-series chart data, grouped by the specified interval."
+title: Get License Chart
+description: "Returns the number of licenses created per day, month or year in the range."
 outline: false
 aside: false
 ---

@@ -1,0 +1,299 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/payment-methods/disputes": {
+      "get": {
+        "operationId": "getPaymentMethodsDisputes",
+        "summary": "GET Get Payment Method Disputes",
+        "description": "Returns disputes per payment gateway, with totals and the previous period's totals. `dispute_amount` is in decimal currency units (not cents). `dispute_rate` is a percent.\n\n`disputed_orders` counts orders placed in the range whose charge was disputed (failed orders included). `disputes_lost` and `dispute_amount` count lost-dispute transactions dated in the range. `dispute_rate` = disputed orders / (orders + failed disputed orders) x 100. A saved-card payment counts under the gateway that charged it.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Live or test orders only. Default: both.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain one of these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[compareType]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "previous_period",
+                "previous_month",
+                "previous_quarter",
+                "previous_year",
+                "custom"
+              ]
+            },
+            "description": "Comparison period type.",
+            "required": false
+          },
+          {
+            "name": "params[compareDate]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comparison start date (Y-m-d). Needed with `compareType`.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Sale types to include. Default: all.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "rows": [
+                      {
+                        "gateway": "stripe",
+                        "label": "Stripe",
+                        "orders": 400,
+                        "disputed_orders": 4,
+                        "dispute_rate": 1.0,
+                        "disputes_lost": 1,
+                        "dispute_amount": 49.0
+                      }
+                    ],
+                    "totals": {
+                      "orders": 520,
+                      "disputed_orders": 4,
+                      "dispute_rate": 0.77,
+                      "disputes_lost": 1,
+                      "dispute_amount": 49.0
+                    },
+                    "previous": {
+                      "orders": 480,
+                      "disputed_orders": 2,
+                      "dispute_rate": 0.42,
+                      "disputes_lost": 0,
+                      "dispute_amount": 0.0
+                    }
+                  }
+                },
+                "example": {
+                  "rows": [
+                    {
+                      "gateway": "stripe",
+                      "label": "Stripe",
+                      "orders": 400,
+                      "disputed_orders": 4,
+                      "dispute_rate": 1.0,
+                      "disputes_lost": 1,
+                      "dispute_amount": 49.0
+                    }
+                  ],
+                  "totals": {
+                    "orders": 520,
+                    "disputed_orders": 4,
+                    "dispute_rate": 0.77,
+                    "disputes_lost": 1,
+                    "dispute_amount": 49.0
+                  },
+                  "previous": {
+                    "orders": 480,
+                    "disputed_orders": 2,
+                    "dispute_rate": 0.42,
+                    "disputes_lost": 0,
+                    "dispute_amount": 0.0
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "rows": [
+                        {
+                          "gateway": "stripe",
+                          "label": "Stripe",
+                          "orders": 400,
+                          "disputed_orders": 4,
+                          "dispute_rate": 1.0,
+                          "disputes_lost": 1,
+                          "dispute_amount": 49.0
+                        }
+                      ],
+                      "totals": {
+                        "orders": 520,
+                        "disputed_orders": 4,
+                        "dispute_rate": 0.77,
+                        "disputes_lost": 1,
+                        "dispute_amount": 49.0
+                      },
+                      "previous": {
+                        "orders": 480,
+                        "disputed_orders": 2,
+                        "dispute_rate": 0.42,
+                        "disputes_lost": 0,
+                        "dispute_amount": 0.0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

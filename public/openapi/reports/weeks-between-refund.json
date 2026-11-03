@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getWeeksBetweenRefund",
         "summary": "GET Get Weeks Between Refund",
-        "description": "Retrieve analysis data showing the distribution of time (in weeks) between order placement and refund request.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "description": "Counts orders by the weeks from the order to its first refund. The range applies to the date of the first refund, not the order date. A refund on day 0 to 7 is week 1. No money fields.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First day of the range (Y-m-d), store timezone.",
             "required": false
           },
           {
@@ -52,27 +52,28 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
+            "description": "Last day of the range (Y-m-d), store timezone.",
             "required": false
           },
           {
-            "name": "params[groupKey]",
+            "name": "params[rangeKey]",
             "in": "query",
             "schema": {
               "type": "string",
               "enum": [
-                "default",
-                "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
               ]
             },
-            "description": "Grouping interval for data aggregation.",
+            "description": "Preset range. Overrides the dates.",
             "required": false
           },
           {
@@ -82,7 +83,7 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
             "required": false
           },
           {
@@ -95,11 +96,11 @@
                 "test"
               ]
             },
-            "description": "Payment mode filter.",
+            "description": "Live or test orders only. Default: both.",
             "required": false
           },
           {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,57 +108,26 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
+            "description": "Only orders that contain one of these variation IDs.",
             "required": false
           },
           {
-            "name": "params[compareType]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "previous_period",
-                "previous_month",
-                "previous_quarter",
-                "previous_year",
-                "custom"
-              ]
-            },
-            "description": "Comparison period type.",
-            "required": false
-          },
-          {
-            "name": "params[compareDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2024-01-01"
-            },
-            "description": "Custom comparison start date. Required when compareType is custom.",
-            "required": false
-          },
-          {
-            "name": "params[paymentStatus]",
+            "name": "params[orderTypes][]",
             "in": "query",
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
               }
             },
-            "description": "Payment status filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderTypes]",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "description": "Order type filter (e.g., one-time, subscription).",
+            "description": "Sale types to include. Default: all.",
             "required": false
           }
         ],
@@ -168,46 +138,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "Weeks-between-refund distribution data"
-                    }
-                  },
                   "example": {
                     "data": [
                       {
-                        "weeks": "0-1",
-                        "count": 3,
-                        "percentage": 37.5,
-                        "amount": 28000
+                        "occurrence": 8,
+                        "weekBetween": 1
                       },
                       {
-                        "weeks": "1-2",
-                        "count": 2,
-                        "percentage": 25,
-                        "amount": 18000
+                        "occurrence": 3,
+                        "weekBetween": 2
                       },
                       {
-                        "weeks": "2-4",
-                        "count": 1,
-                        "percentage": 12.5,
-                        "amount": 9900
-                      },
-                      {
-                        "weeks": "4-8",
-                        "count": 1,
-                        "percentage": 12.5,
-                        "amount": 4900
-                      },
-                      {
-                        "weeks": "8+",
-                        "count": 1,
-                        "percentage": 12.5,
-                        "amount": 9200
+                        "occurrence": 1,
+                        "weekBetween": 6
                       }
                     ]
                   }
@@ -215,34 +158,16 @@
                 "example": {
                   "data": [
                     {
-                      "weeks": "0-1",
-                      "count": 3,
-                      "percentage": 37.5,
-                      "amount": 28000
+                      "occurrence": 8,
+                      "weekBetween": 1
                     },
                     {
-                      "weeks": "1-2",
-                      "count": 2,
-                      "percentage": 25,
-                      "amount": 18000
+                      "occurrence": 3,
+                      "weekBetween": 2
                     },
                     {
-                      "weeks": "2-4",
-                      "count": 1,
-                      "percentage": 12.5,
-                      "amount": 9900
-                    },
-                    {
-                      "weeks": "4-8",
-                      "count": 1,
-                      "percentage": 12.5,
-                      "amount": 4900
-                    },
-                    {
-                      "weeks": "8+",
-                      "count": 1,
-                      "percentage": 12.5,
-                      "amount": 9200
+                      "occurrence": 1,
+                      "weekBetween": 6
                     }
                   ]
                 },
@@ -252,34 +177,16 @@
                     "value": {
                       "data": [
                         {
-                          "weeks": "0-1",
-                          "count": 3,
-                          "percentage": 37.5,
-                          "amount": 28000
+                          "occurrence": 8,
+                          "weekBetween": 1
                         },
                         {
-                          "weeks": "1-2",
-                          "count": 2,
-                          "percentage": 25,
-                          "amount": 18000
+                          "occurrence": 3,
+                          "weekBetween": 2
                         },
                         {
-                          "weeks": "2-4",
-                          "count": 1,
-                          "percentage": 12.5,
-                          "amount": 9900
-                        },
-                        {
-                          "weeks": "4-8",
-                          "count": 1,
-                          "percentage": 12.5,
-                          "amount": 4900
-                        },
-                        {
-                          "weeks": "8+",
-                          "count": 1,
-                          "percentage": 12.5,
-                          "amount": 9200
+                          "occurrence": 1,
+                          "weekBetween": 6
                         }
                       ]
                     }

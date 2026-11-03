@@ -1,0 +1,200 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/customer-segments": {
+      "get": {
+        "operationId": "getCustomerSegments",
+        "summary": "GET Get Customer Segments",
+        "description": "Places every customer with a paid order in the report currency into one RFM segment, as of now. Amounts are in cents and use the Revenue report's net sales. The date range is ignored.\n\nRecency (days since the last order) and money (lifetime net) score 1-5 by the store's own quintiles (`cuts`, read from at most 20,000 customers). Frequency scores by order count: 1, 2, 3, 4-5, 6+. Segments, in order: `champions`, `loyal`, `new`, `promising`, `at_risk`, `cant_lose`, `hibernating`. Pass `cuts` and `as_of` to [Get Customer Segment Customers](/restapi/operations/reports/customer-segment-customers) so the export reads the same segments.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "customers": 1000,
+                    "net": 9000000,
+                    "segments": [
+                      {
+                        "key": "champions",
+                        "customers": 50,
+                        "net": 2500000,
+                        "share": 27.8,
+                        "average_orders": 6.2,
+                        "average_days": 20,
+                        "average_net": 50000
+                      }
+                    ],
+                    "cuts": {
+                      "days": [
+                        30,
+                        90,
+                        180,
+                        365
+                      ],
+                      "net": [
+                        2000,
+                        5000,
+                        10000,
+                        25000
+                      ]
+                    },
+                    "as_of": "2025-02-01 10:00:00"
+                  }
+                },
+                "example": {
+                  "customers": 1000,
+                  "net": 9000000,
+                  "segments": [
+                    {
+                      "key": "champions",
+                      "customers": 50,
+                      "net": 2500000,
+                      "share": 27.8,
+                      "average_orders": 6.2,
+                      "average_days": 20,
+                      "average_net": 50000
+                    }
+                  ],
+                  "cuts": {
+                    "days": [
+                      30,
+                      90,
+                      180,
+                      365
+                    ],
+                    "net": [
+                      2000,
+                      5000,
+                      10000,
+                      25000
+                    ]
+                  },
+                  "as_of": "2025-02-01 10:00:00"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "customers": 1000,
+                      "net": 9000000,
+                      "segments": [
+                        {
+                          "key": "champions",
+                          "customers": 50,
+                          "net": 2500000,
+                          "share": 27.8,
+                          "average_orders": 6.2,
+                          "average_days": 20,
+                          "average_net": 50000
+                        }
+                      ],
+                      "cuts": {
+                        "days": [
+                          30,
+                          90,
+                          180,
+                          365
+                        ],
+                        "net": [
+                          2000,
+                          5000,
+                          10000,
+                          25000
+                        ]
+                      },
+                      "as_of": "2025-02-01 10:00:00"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

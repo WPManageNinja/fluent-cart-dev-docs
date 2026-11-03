@@ -1,0 +1,233 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/product-comparison-launch": {
+      "get": {
+        "operationId": "getProductComparisonLaunch",
+        "summary": "GET Get Product Comparison Since Launch",
+        "description": "For each compared item, returns net sales and units per store month from its launch month. `net` is in cents and uses the Revenue report's net sales. The date range is ignored.\n\nThe launch month is the first of three months in a row with net sales; a younger item launches with its first month with net sales. Months run to the item's last month with a sale, at most 60. `launched_at` and `months` are empty when the item has no paid sale.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "items[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "p:42",
+                "v:108"
+              ]
+            },
+            "description": "Item keys, top-level: `p:<product_id>` or `v:<variation_id>`. At most 6.",
+            "required": true
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Live or test orders only. Default: both.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Sale types to include. Default: all.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "items": [
+                      {
+                        "key": "p:42",
+                        "type": "product",
+                        "id": 42,
+                        "product_id": 42,
+                        "title": "Pro Plugin",
+                        "subtitle": "",
+                        "launched_at": "2024-03-01 00:00:00",
+                        "months": [
+                          {
+                            "month": "2024-03",
+                            "net": 120000,
+                            "units": 30
+                          },
+                          {
+                            "month": "2024-04",
+                            "net": 95000,
+                            "units": 24
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "items": [
+                    {
+                      "key": "p:42",
+                      "type": "product",
+                      "id": 42,
+                      "product_id": 42,
+                      "title": "Pro Plugin",
+                      "subtitle": "",
+                      "launched_at": "2024-03-01 00:00:00",
+                      "months": [
+                        {
+                          "month": "2024-03",
+                          "net": 120000,
+                          "units": 30
+                        },
+                        {
+                          "month": "2024-04",
+                          "net": 95000,
+                          "units": 24
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "items": [
+                        {
+                          "key": "p:42",
+                          "type": "product",
+                          "id": 42,
+                          "product_id": 42,
+                          "title": "Pro Plugin",
+                          "subtitle": "",
+                          "launched_at": "2024-03-01 00:00:00",
+                          "months": [
+                            {
+                              "month": "2024-03",
+                              "net": 120000,
+                              "units": 30
+                            },
+                            {
+                              "month": "2024-04",
+                              "net": 95000,
+                              "units": 24
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

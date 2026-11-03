@@ -1,0 +1,260 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/subscription-rebuys": {
+      "get": {
+        "operationId": "getSubscriptionRebuys",
+        "summary": "GET Get Subscription Rebuys",
+        "description": "Finds subscriptions whose paid term ended in the range without renewing (canceled or expired) and counts the customers who bought the same product again near that end. `discount_total` and `discount_average` are in decimal currency units (not cents).\n\nA rebuy is a new subscription to the same product, by the same customer, in the same currency, created within `windowDays` before or after the term end. Free trials that never paid and plans changed by an upgrade do not count as ended. `timing` splits rebuys into before the end, within 7 days after, and later. `discounted` counts rebuys that paid less than the old renewal price (same interval, not via a trial); `discount_total` sums the saving. `rebuy_rate` and `discount_average` are `null` when there is nothing to divide.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. Default: the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain one of these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[groupKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "daily",
+                "monthly",
+                "yearly",
+                "default"
+              ]
+            },
+            "description": "Chart bucket size. Default: picked from the range length.",
+            "required": false
+          },
+          {
+            "name": "params[windowDays]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Days before or after the term end that count as a rebuy, 1-365. Default `30`.",
+            "required": false
+          },
+          {
+            "name": "params[billingInterval]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only subscriptions with this billing interval, e.g. `monthly`, `yearly`.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "window_days": 30,
+                    "ended": 40,
+                    "rebought": 6,
+                    "rebuy_rate": 15.0,
+                    "timing": {
+                      "before": 1,
+                      "within_7": 4,
+                      "later": 1
+                    },
+                    "discounted": 3,
+                    "discount_total": 75.0,
+                    "discount_average": 25.0,
+                    "chart": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01",
+                        "ended": 40,
+                        "rebought": 6
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "window_days": 30,
+                  "ended": 40,
+                  "rebought": 6,
+                  "rebuy_rate": 15.0,
+                  "timing": {
+                    "before": 1,
+                    "within_7": 4,
+                    "later": 1
+                  },
+                  "discounted": 3,
+                  "discount_total": 75.0,
+                  "discount_average": 25.0,
+                  "chart": [
+                    {
+                      "year": "2025",
+                      "group": "2025-01",
+                      "ended": 40,
+                      "rebought": 6
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "window_days": 30,
+                      "ended": 40,
+                      "rebought": 6,
+                      "rebuy_rate": 15.0,
+                      "timing": {
+                        "before": 1,
+                        "within_7": 4,
+                        "later": 1
+                      },
+                      "discounted": 3,
+                      "discount_total": 75.0,
+                      "discount_average": 25.0,
+                      "chart": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01",
+                          "ended": 40,
+                          "rebought": 6
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

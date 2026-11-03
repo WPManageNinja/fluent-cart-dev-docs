@@ -1,0 +1,317 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/customer-value": {
+      "get": {
+        "operationId": "getCustomerValue",
+        "summary": "GET Get Customer Value",
+        "description": "Returns customer lifetime value by first-purchase month, value by first product, and revenue concentration. Amounts are in cents and use the Revenue report's net sales. Only paid orders (`total_paid` > 0) with a customer count.\n\n`cohorts` covers the 12 months ending with the range's last month; `values[n]` is the average cumulative net per customer after month n (at most 24 months). A customer is gained in a month when their first non-renewal paid order is there, with no earlier paid purchase in any currency. `first_products` covers customers gained in the range; `repeat_rate` is the percent who made another non-renewal purchase. `concentration.period` is the percent of net sales from the top 1, 5, 10, 20 and 50 percent of customers in the range; customers with net 0 or less are left out. `concentration.lifetime` is `null` unless `span=lifetime` is sent.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "span",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "lifetime"
+              ]
+            },
+            "description": "Top-level. `lifetime` returns only `concentration.lifetime` (all-time concentration).",
+            "required": false
+          },
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "cohorts": [
+                      {
+                        "cohort": "2024-02",
+                        "customers": 40,
+                        "values": [
+                          5000,
+                          6200,
+                          7100
+                        ]
+                      }
+                    ],
+                    "first_products": [
+                      {
+                        "product_id": 42,
+                        "product_title": "Pro Plugin",
+                        "customers": 25,
+                        "average_value": 8900,
+                        "repeat_rate": 32.0
+                      }
+                    ],
+                    "concentration": {
+                      "period": [
+                        {
+                          "top": 1,
+                          "customers": 1,
+                          "share": 12.5
+                        },
+                        {
+                          "top": 5,
+                          "customers": 3,
+                          "share": 30.0
+                        },
+                        {
+                          "top": 10,
+                          "customers": 5,
+                          "share": 42.0
+                        },
+                        {
+                          "top": 20,
+                          "customers": 10,
+                          "share": 60.0
+                        },
+                        {
+                          "top": 50,
+                          "customers": 25,
+                          "share": 85.0
+                        }
+                      ],
+                      "lifetime": null
+                    }
+                  }
+                },
+                "example": {
+                  "cohorts": [
+                    {
+                      "cohort": "2024-02",
+                      "customers": 40,
+                      "values": [
+                        5000,
+                        6200,
+                        7100
+                      ]
+                    }
+                  ],
+                  "first_products": [
+                    {
+                      "product_id": 42,
+                      "product_title": "Pro Plugin",
+                      "customers": 25,
+                      "average_value": 8900,
+                      "repeat_rate": 32.0
+                    }
+                  ],
+                  "concentration": {
+                    "period": [
+                      {
+                        "top": 1,
+                        "customers": 1,
+                        "share": 12.5
+                      },
+                      {
+                        "top": 5,
+                        "customers": 3,
+                        "share": 30.0
+                      },
+                      {
+                        "top": 10,
+                        "customers": 5,
+                        "share": 42.0
+                      },
+                      {
+                        "top": 20,
+                        "customers": 10,
+                        "share": 60.0
+                      },
+                      {
+                        "top": 50,
+                        "customers": 25,
+                        "share": 85.0
+                      }
+                    ],
+                    "lifetime": null
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "cohorts": [
+                        {
+                          "cohort": "2024-02",
+                          "customers": 40,
+                          "values": [
+                            5000,
+                            6200,
+                            7100
+                          ]
+                        }
+                      ],
+                      "first_products": [
+                        {
+                          "product_id": 42,
+                          "product_title": "Pro Plugin",
+                          "customers": 25,
+                          "average_value": 8900,
+                          "repeat_rate": 32.0
+                        }
+                      ],
+                      "concentration": {
+                        "period": [
+                          {
+                            "top": 1,
+                            "customers": 1,
+                            "share": 12.5
+                          },
+                          {
+                            "top": 5,
+                            "customers": 3,
+                            "share": 30.0
+                          },
+                          {
+                            "top": 10,
+                            "customers": 5,
+                            "share": 42.0
+                          },
+                          {
+                            "top": 20,
+                            "customers": 10,
+                            "share": 60.0
+                          },
+                          {
+                            "top": 50,
+                            "customers": 25,
+                            "share": 85.0
+                          }
+                        ],
+                        "lifetime": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

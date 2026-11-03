@@ -1,0 +1,510 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/product-comparison": {
+      "get": {
+        "operationId": "getProductComparison",
+        "summary": "GET Get Product Comparison",
+        "description": "Compares up to 6 products or variations side by side: a summary, a chart per period, subscriptions and customer overlap. Summary and chart money fields are in cents; subscription `mrr` values are in decimal currency units.\n\nEach line takes its share of the order's net sales (the Revenue report's net sales). `new_net` comes from non-renewal orders; `renewal_net` and `installment_net` split renewal orders. A $0 order counts as an order, but `customers` and `new_customers` count paid customers only. `overlap` pairs use item indexes: of `from`'s customers in the range, `both` have ever bought `to`, and `to_first` bought `to` first.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "items[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": [
+                "p:42",
+                "v:108"
+              ]
+            },
+            "description": "Item keys, top-level: `p:<product_id>` for a whole product, `v:<variation_id>` for one variation. At most 6; others are dropped.",
+            "required": true
+          },
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Live or test orders only. Default: both.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain one of these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[compareType]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "previous_period",
+                "previous_month",
+                "previous_quarter",
+                "previous_year",
+                "custom"
+              ]
+            },
+            "description": "Comparison period type.",
+            "required": false
+          },
+          {
+            "name": "params[compareDate]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comparison start date (Y-m-d). Needed with `compareType`.",
+            "required": false
+          },
+          {
+            "name": "params[groupKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "daily",
+                "monthly",
+                "yearly",
+                "default"
+              ]
+            },
+            "description": "Chart bucket size. Default: picked from the range length.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Sale types to include. Default: all.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "items": [
+                      {
+                        "key": "p:42",
+                        "type": "product",
+                        "id": 42,
+                        "product_id": 42,
+                        "title": "Pro Plugin",
+                        "subtitle": "",
+                        "summary": {
+                          "gross": 500000,
+                          "refunds": 20000,
+                          "net": 450000,
+                          "new_net": 300000,
+                          "renewal_net": 150000,
+                          "installment_net": 0,
+                          "units": 100,
+                          "orders": 95,
+                          "customers": 90,
+                          "new_customers": 60,
+                          "refund_rate": 4.0,
+                          "average_order": 4737,
+                          "average_price": 4500
+                        },
+                        "previous": null,
+                        "chart": [
+                          {
+                            "group": "2025-01",
+                            "net": 450000,
+                            "units": 100,
+                            "orders": 95,
+                            "new_customers": 60,
+                            "new_net": 300000,
+                            "renewal_net": 150000,
+                            "installment_net": 0
+                          }
+                        ],
+                        "subscriptions": {
+                          "subscriptions": 40,
+                          "mrr": 1200.0,
+                          "canceling": {
+                            "count": 3,
+                            "mrr": 90.0
+                          },
+                          "failing": {
+                            "count": 2,
+                            "mrr": 60.0
+                          },
+                          "renewals_paid": 25,
+                          "renewals_lost": 5,
+                          "renewal_rate": 83.3
+                        }
+                      }
+                    ],
+                    "buckets": [
+                      "2025-01"
+                    ],
+                    "group_key": "monthly",
+                    "item_limit": 6,
+                    "overlap": [
+                      {
+                        "from": 0,
+                        "to": 1,
+                        "customers": 90,
+                        "both": 12,
+                        "to_first": 4
+                      }
+                    ],
+                    "compare_ranges": {
+                      "previous_period": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_month": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_quarter": {
+                        "start": "2024-10-01 00:00:00",
+                        "end": "2024-10-31 23:59:59"
+                      },
+                      "previous_year": {
+                        "start": "2024-01-01 00:00:00",
+                        "end": "2024-01-31 23:59:59"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "items": [
+                    {
+                      "key": "p:42",
+                      "type": "product",
+                      "id": 42,
+                      "product_id": 42,
+                      "title": "Pro Plugin",
+                      "subtitle": "",
+                      "summary": {
+                        "gross": 500000,
+                        "refunds": 20000,
+                        "net": 450000,
+                        "new_net": 300000,
+                        "renewal_net": 150000,
+                        "installment_net": 0,
+                        "units": 100,
+                        "orders": 95,
+                        "customers": 90,
+                        "new_customers": 60,
+                        "refund_rate": 4.0,
+                        "average_order": 4737,
+                        "average_price": 4500
+                      },
+                      "previous": null,
+                      "chart": [
+                        {
+                          "group": "2025-01",
+                          "net": 450000,
+                          "units": 100,
+                          "orders": 95,
+                          "new_customers": 60,
+                          "new_net": 300000,
+                          "renewal_net": 150000,
+                          "installment_net": 0
+                        }
+                      ],
+                      "subscriptions": {
+                        "subscriptions": 40,
+                        "mrr": 1200.0,
+                        "canceling": {
+                          "count": 3,
+                          "mrr": 90.0
+                        },
+                        "failing": {
+                          "count": 2,
+                          "mrr": 60.0
+                        },
+                        "renewals_paid": 25,
+                        "renewals_lost": 5,
+                        "renewal_rate": 83.3
+                      }
+                    }
+                  ],
+                  "buckets": [
+                    "2025-01"
+                  ],
+                  "group_key": "monthly",
+                  "item_limit": 6,
+                  "overlap": [
+                    {
+                      "from": 0,
+                      "to": 1,
+                      "customers": 90,
+                      "both": 12,
+                      "to_first": 4
+                    }
+                  ],
+                  "compare_ranges": {
+                    "previous_period": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_month": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_quarter": {
+                      "start": "2024-10-01 00:00:00",
+                      "end": "2024-10-31 23:59:59"
+                    },
+                    "previous_year": {
+                      "start": "2024-01-01 00:00:00",
+                      "end": "2024-01-31 23:59:59"
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "items": [
+                        {
+                          "key": "p:42",
+                          "type": "product",
+                          "id": 42,
+                          "product_id": 42,
+                          "title": "Pro Plugin",
+                          "subtitle": "",
+                          "summary": {
+                            "gross": 500000,
+                            "refunds": 20000,
+                            "net": 450000,
+                            "new_net": 300000,
+                            "renewal_net": 150000,
+                            "installment_net": 0,
+                            "units": 100,
+                            "orders": 95,
+                            "customers": 90,
+                            "new_customers": 60,
+                            "refund_rate": 4.0,
+                            "average_order": 4737,
+                            "average_price": 4500
+                          },
+                          "previous": null,
+                          "chart": [
+                            {
+                              "group": "2025-01",
+                              "net": 450000,
+                              "units": 100,
+                              "orders": 95,
+                              "new_customers": 60,
+                              "new_net": 300000,
+                              "renewal_net": 150000,
+                              "installment_net": 0
+                            }
+                          ],
+                          "subscriptions": {
+                            "subscriptions": 40,
+                            "mrr": 1200.0,
+                            "canceling": {
+                              "count": 3,
+                              "mrr": 90.0
+                            },
+                            "failing": {
+                              "count": 2,
+                              "mrr": 60.0
+                            },
+                            "renewals_paid": 25,
+                            "renewals_lost": 5,
+                            "renewal_rate": 83.3
+                          }
+                        }
+                      ],
+                      "buckets": [
+                        "2025-01"
+                      ],
+                      "group_key": "monthly",
+                      "item_limit": 6,
+                      "overlap": [
+                        {
+                          "from": 0,
+                          "to": 1,
+                          "customers": 90,
+                          "both": 12,
+                          "to_first": 4
+                        }
+                      ],
+                      "compare_ranges": {
+                        "previous_period": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_month": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_quarter": {
+                          "start": "2024-10-01 00:00:00",
+                          "end": "2024-10-31 23:59:59"
+                        },
+                        "previous_year": {
+                          "start": "2024-01-01 00:00:00",
+                          "end": "2024-01-31 23:59:59"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/channel-rules": {
+      "post": {
+        "operationId": "saveChannelRules",
+        "summary": "POST Save Channel Rules",
+        "description": "Replaces the store's custom channel rules and own domains, then returns the saved values. Invalid rules, conditions and domains are dropped without an error.\n\nAlso needs the `store/settings` permission; without it the route returns 403. Limits: 20 rules, 5 groups per rule, 5 conditions per group, 20 domains. A rule needs a name (max 60 characters) and one valid condition. `field` is `source`, `medium`, `campaign` or `domain`; `operator` is `is`, `contains` or `starts_with`; `value` is lower-cased, max 100 characters (a pasted URL keeps only its host, without `www.`). Keep a rule's `id` (a-z, 0-9, max 12) to keep its channel history; a missing or repeated id gets a new one. A rule sent as `{name, conditions: [...]}` is read as one group.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rules": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "example": [
+                      {
+                        "id": "a1b2c3d4",
+                        "name": "Partner newsletter",
+                        "groups": [
+                          [
+                            {
+                              "field": "source",
+                              "operator": "is",
+                              "value": "partner"
+                            },
+                            {
+                              "field": "medium",
+                              "operator": "is",
+                              "value": "email"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "description": "Top-level. Rules: `{id?, name, groups: [[{field, operator, value}]]}`."
+                  },
+                  "own_domains": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "shop.example.com"
+                    ],
+                    "description": "Top-level. The store's own domains, e.g. `shop.example.com`."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "rules": [
+                      {
+                        "id": "a1b2c3d4",
+                        "name": "Partner newsletter",
+                        "groups": [
+                          [
+                            {
+                              "field": "source",
+                              "operator": "is",
+                              "value": "partner"
+                            },
+                            {
+                              "field": "medium",
+                              "operator": "is",
+                              "value": "email"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "own_domains": [
+                      "shop.example.com"
+                    ],
+                    "can_edit": true
+                  }
+                },
+                "example": {
+                  "rules": [
+                    {
+                      "id": "a1b2c3d4",
+                      "name": "Partner newsletter",
+                      "groups": [
+                        [
+                          {
+                            "field": "source",
+                            "operator": "is",
+                            "value": "partner"
+                          },
+                          {
+                            "field": "medium",
+                            "operator": "is",
+                            "value": "email"
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  "own_domains": [
+                    "shop.example.com"
+                  ],
+                  "can_edit": true
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "rules": [
+                        {
+                          "id": "a1b2c3d4",
+                          "name": "Partner newsletter",
+                          "groups": [
+                            [
+                              {
+                                "field": "source",
+                                "operator": "is",
+                                "value": "partner"
+                              },
+                              {
+                                "field": "medium",
+                                "operator": "is",
+                                "value": "email"
+                              }
+                            ]
+                          ]
+                        }
+                      ],
+                      "own_domains": [
+                        "shop.example.com"
+                      ],
+                      "can_edit": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getOrderValueDistribution",
         "summary": "GET Get Order Value Distribution",
-        "description": "Retrieve the distribution of orders by their total value, showing how orders are spread across different price ranges.\n\n**Access policy:** `ReportPolicy`",
+        "description": "Counts the orders in the range by order total, in steps of 100 in the report currency. A bucket key such as `100-200` means a total above 100.00 and up to 200.00 (`total_amount`, cents 10001-20000). Every value is an order count.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First day of the range (Y-m-d), store timezone.",
             "required": false
           },
           {
@@ -52,27 +52,28 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
+            "description": "Last day of the range (Y-m-d), store timezone.",
             "required": false
           },
           {
-            "name": "params[groupKey]",
+            "name": "params[rangeKey]",
             "in": "query",
             "schema": {
               "type": "string",
               "enum": [
-                "default",
-                "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
               ]
             },
-            "description": "Grouping interval for data aggregation.",
+            "description": "Preset range. Overrides the dates.",
             "required": false
           },
           {
@@ -82,7 +83,7 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
             "required": false
           },
           {
@@ -95,11 +96,11 @@
                 "test"
               ]
             },
-            "description": "Payment mode filter.",
+            "description": "Live or test orders only. Default: both.",
             "required": false
           },
           {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,57 +108,26 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
+            "description": "Only orders that contain one of these variation IDs.",
             "required": false
           },
           {
-            "name": "params[compareType]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "previous_period",
-                "previous_month",
-                "previous_quarter",
-                "previous_year",
-                "custom"
-              ]
-            },
-            "description": "Comparison period type.",
-            "required": false
-          },
-          {
-            "name": "params[compareDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2024-01-01"
-            },
-            "description": "Custom comparison start date. Required when compareType is custom.",
-            "required": false
-          },
-          {
-            "name": "params[paymentStatus]",
+            "name": "params[orderTypes][]",
             "in": "query",
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
               }
             },
-            "description": "Payment status filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderTypes]",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "description": "Order type filter (e.g., one-time, subscription).",
+            "description": "Sale types to include. Default: all.",
             "required": false
           }
         ],
@@ -168,87 +138,35 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "description": "Order counts bucketed by fixed $100-wide order-value ranges (order total_amount, in dollars).",
-                      "properties": {
-                        "0-100": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $0\u2013$100."
-                        },
-                        "100-200": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $100\u2013$200."
-                        },
-                        "200-300": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $200\u2013$300."
-                        },
-                        "300-400": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $300\u2013$400."
-                        },
-                        "400-500": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $400\u2013$500."
-                        },
-                        "500-600": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $500\u2013$600."
-                        },
-                        "600-700": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $600\u2013$700."
-                        },
-                        "700-800": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $700\u2013$800."
-                        },
-                        "800-900": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $800\u2013$900."
-                        },
-                        "900-1000": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling $900\u2013$1000."
-                        },
-                        "1000+": {
-                          "type": "integer",
-                          "description": "Order count for orders totaling more than $1000."
-                        }
-                      }
-                    }
-                  },
                   "example": {
                     "data": {
-                      "0-100": 28,
-                      "100-200": 82,
-                      "200-300": 45,
-                      "300-400": 30,
-                      "400-500": 22,
-                      "500-600": 15,
-                      "600-700": 10,
-                      "700-800": 6,
-                      "800-900": 4,
-                      "900-1000": 3,
-                      "1000+": 6
+                      "0-100": 42,
+                      "100-200": 18,
+                      "200-300": 7,
+                      "300-400": 3,
+                      "400-500": 1,
+                      "500-600": 0,
+                      "600-700": 0,
+                      "700-800": 0,
+                      "800-900": 0,
+                      "900-1000": 0,
+                      "1000+": 2
                     }
                   }
                 },
                 "example": {
                   "data": {
-                    "0-100": 28,
-                    "100-200": 82,
-                    "200-300": 45,
-                    "300-400": 30,
-                    "400-500": 22,
-                    "500-600": 15,
-                    "600-700": 10,
-                    "700-800": 6,
-                    "800-900": 4,
-                    "900-1000": 3,
-                    "1000+": 6
+                    "0-100": 42,
+                    "100-200": 18,
+                    "200-300": 7,
+                    "300-400": 3,
+                    "400-500": 1,
+                    "500-600": 0,
+                    "600-700": 0,
+                    "700-800": 0,
+                    "800-900": 0,
+                    "900-1000": 0,
+                    "1000+": 2
                   }
                 },
                 "examples": {
@@ -256,17 +174,17 @@
                     "summary": "Successful response",
                     "value": {
                       "data": {
-                        "0-100": 28,
-                        "100-200": 82,
-                        "200-300": 45,
-                        "300-400": 30,
-                        "400-500": 22,
-                        "500-600": 15,
-                        "600-700": 10,
-                        "700-800": 6,
-                        "800-900": 4,
-                        "900-1000": 3,
-                        "1000+": 6
+                        "0-100": 42,
+                        "100-200": 18,
+                        "200-300": 7,
+                        "300-400": 3,
+                        "400-500": 1,
+                        "500-600": 0,
+                        "600-700": 0,
+                        "700-800": 0,
+                        "800-900": 0,
+                        "900-1000": 0,
+                        "1000+": 2
                       }
                     }
                   }

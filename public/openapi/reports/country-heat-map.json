@@ -27,25 +27,13 @@
       "get": {
         "operationId": "getCountryHeatMap",
         "summary": "GET Get Country Heat Map",
-        "description": "Retrieve order counts grouped by billing country for world map / heat map visualization.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns the number of orders per billing country, smallest first. It counts every order with a billing address, of any status, in all currencies, over all time.\n\nThe endpoint reads `params[currency]` but does not apply it. A country code that is not in the store's country list returns `country_code: null` and the name \"Uncategorized\".\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
         "security": [
           {
             "ApplicationPasswords": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "params[currency]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "USD"
-            },
-            "description": "Currency code filter. Defaults to store currency.",
-            "required": false
           }
         ],
         "responses": {
@@ -55,66 +43,17 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "countryHeatMap": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "name": {
-                            "type": "string",
-                            "description": "Country name"
-                          },
-                          "value": {
-                            "type": "integer",
-                            "description": "Order count"
-                          }
-                        }
-                      },
-                      "description": "Order counts by country for heat map visualization"
-                    }
-                  },
                   "example": {
                     "countryHeatMap": [
                       {
-                        "name": "United States",
-                        "value": 120
-                      },
-                      {
+                        "country_code": "GB",
                         "name": "United Kingdom",
-                        "value": 35
+                        "value": 20
                       },
                       {
-                        "name": "Germany",
-                        "value": 22
-                      },
-                      {
-                        "name": "Canada",
-                        "value": 18
-                      },
-                      {
-                        "name": "Australia",
-                        "value": 12
-                      },
-                      {
-                        "name": "France",
-                        "value": 10
-                      },
-                      {
-                        "name": "Netherlands",
-                        "value": 8
-                      },
-                      {
-                        "name": "India",
-                        "value": 7
-                      },
-                      {
-                        "name": "Brazil",
-                        "value": 5
-                      },
-                      {
-                        "name": "Japan",
-                        "value": 4
+                        "country_code": "US",
+                        "name": "United States (US)",
+                        "value": 85
                       }
                     ]
                   }
@@ -122,44 +61,14 @@
                 "example": {
                   "countryHeatMap": [
                     {
-                      "name": "United States",
-                      "value": 120
-                    },
-                    {
+                      "country_code": "GB",
                       "name": "United Kingdom",
-                      "value": 35
+                      "value": 20
                     },
                     {
-                      "name": "Germany",
-                      "value": 22
-                    },
-                    {
-                      "name": "Canada",
-                      "value": 18
-                    },
-                    {
-                      "name": "Australia",
-                      "value": 12
-                    },
-                    {
-                      "name": "France",
-                      "value": 10
-                    },
-                    {
-                      "name": "Netherlands",
-                      "value": 8
-                    },
-                    {
-                      "name": "India",
-                      "value": 7
-                    },
-                    {
-                      "name": "Brazil",
-                      "value": 5
-                    },
-                    {
-                      "name": "Japan",
-                      "value": 4
+                      "country_code": "US",
+                      "name": "United States (US)",
+                      "value": 85
                     }
                   ]
                 },
@@ -169,44 +78,14 @@
                     "value": {
                       "countryHeatMap": [
                         {
-                          "name": "United States",
-                          "value": 120
-                        },
-                        {
+                          "country_code": "GB",
                           "name": "United Kingdom",
-                          "value": 35
+                          "value": 20
                         },
                         {
-                          "name": "Germany",
-                          "value": 22
-                        },
-                        {
-                          "name": "Canada",
-                          "value": 18
-                        },
-                        {
-                          "name": "Australia",
-                          "value": 12
-                        },
-                        {
-                          "name": "France",
-                          "value": 10
-                        },
-                        {
-                          "name": "Netherlands",
-                          "value": 8
-                        },
-                        {
-                          "name": "India",
-                          "value": 7
-                        },
-                        {
-                          "name": "Brazil",
-                          "value": 5
-                        },
-                        {
-                          "name": "Japan",
-                          "value": 4
+                          "country_code": "US",
+                          "name": "United States (US)",
+                          "value": 85
                         }
                       ]
                     }

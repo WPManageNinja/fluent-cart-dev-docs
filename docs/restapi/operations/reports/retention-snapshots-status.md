@@ -1,6 +1,6 @@
 ---
-title: Check Retention Snapshot Status
-description: "Check the status of a previously queued retention snapshot generation job."
+title: Get Retention Snapshot Status
+description: "Returns the state of a snapshot job started by `POST /reports/retention-snapshots/generate`: `running`, `completed` or `failed`."
 outline: false
 aside: false
 ---

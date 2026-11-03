@@ -1,6 +1,6 @@
 ---
 title: Get Dashboard Stats
-description: "Retrieve key dashboard statistics including total orders, paid orders, paid order items, and total paid amounts. Automatically calculates comparison against the equivalent prior period based on the selected date range."
+description: "Returns four order tiles for a date range and for the previous period of the same length: all orders, paid orders, paid order items and paid order value. The paid order value is in cents."
 outline: false
 aside: false
 ---

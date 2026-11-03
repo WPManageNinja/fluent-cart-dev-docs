@@ -1,0 +1,234 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/subscription-health": {
+      "get": {
+        "operationId": "getSubscriptionHealth",
+        "summary": "GET Get Subscription Health",
+        "description": "Returns subscription health now: MRR, live subscriptions, ARPU and the count and MRR of active, discounted, trial, canceling, failing and paused plans. MRR values are decimals.\n\nOpen-ended plans only. The date range does not apply. With `params[cached]=1` the result may come from a 10-minute cache.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` converts every currency to the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Product variation IDs to filter by.",
+            "required": false
+          },
+          {
+            "name": "params[cached]",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "When `1`, the result may come from a 10-minute cache.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "health": {
+                      "mrr": 12000.0,
+                      "subscriptions": 420,
+                      "canceling": {
+                        "count": 10,
+                        "mrr": 300.0
+                      },
+                      "arpu": 28.57,
+                      "active": {
+                        "count": 390,
+                        "mrr": 11400.0
+                      },
+                      "discounted": {
+                        "count": 20,
+                        "mrr": 300.0,
+                        "renewal_mrr": 600.0,
+                        "uplift": 300.0
+                      },
+                      "trial": {
+                        "count": 15,
+                        "renewal_mrr": 450.0
+                      },
+                      "failing": {
+                        "count": 5,
+                        "mrr": 150.0
+                      },
+                      "paused": {
+                        "count": 2,
+                        "mrr": 60.0
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "health": {
+                    "mrr": 12000.0,
+                    "subscriptions": 420,
+                    "canceling": {
+                      "count": 10,
+                      "mrr": 300.0
+                    },
+                    "arpu": 28.57,
+                    "active": {
+                      "count": 390,
+                      "mrr": 11400.0
+                    },
+                    "discounted": {
+                      "count": 20,
+                      "mrr": 300.0,
+                      "renewal_mrr": 600.0,
+                      "uplift": 300.0
+                    },
+                    "trial": {
+                      "count": 15,
+                      "renewal_mrr": 450.0
+                    },
+                    "failing": {
+                      "count": 5,
+                      "mrr": 150.0
+                    },
+                    "paused": {
+                      "count": 2,
+                      "mrr": 60.0
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "health": {
+                        "mrr": 12000.0,
+                        "subscriptions": 420,
+                        "canceling": {
+                          "count": 10,
+                          "mrr": 300.0
+                        },
+                        "arpu": 28.57,
+                        "active": {
+                          "count": 390,
+                          "mrr": 11400.0
+                        },
+                        "discounted": {
+                          "count": 20,
+                          "mrr": 300.0,
+                          "renewal_mrr": 600.0,
+                          "uplift": 300.0
+                        },
+                        "trial": {
+                          "count": 15,
+                          "renewal_mrr": 450.0
+                        },
+                        "failing": {
+                          "count": 5,
+                          "mrr": 150.0
+                        },
+                        "paused": {
+                          "count": 2,
+                          "mrr": 60.0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 ---
 title: Get Revenue Data
-description: "Retrieve detailed revenue data grouped by the specified interval, with optional comparison against a prior period. Includes summary totals, period-over-period fluctuations, and the applied group key."
+description: "Returns gross sales, net revenue, net sales and the sales breakdown per day, month or year, with totals and net sales by order type. Amounts are decimal currency units (cents divided by 100)."
 outline: false
 aside: false
 ---

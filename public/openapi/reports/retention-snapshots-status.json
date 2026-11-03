@@ -26,8 +26,8 @@
     "/reports/retention-snapshots/status": {
       "get": {
         "operationId": "getRetentionSnapshotStatus",
-        "summary": "GET Check Retention Snapshot Status",
-        "description": "Check the status of a previously queued retention snapshot generation job.\n\n**Access policy:** `ReportPolicy`",
+        "summary": "GET Get Retention Snapshot Status",
+        "description": "Returns the state of a snapshot job started by `POST /reports/retention-snapshots/generate`: `running`, `completed` or `failed`.\n\nA missing or unknown job ID returns HTTP 200 with `success: false` and a message. `data` is the stored job record.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -41,10 +41,9 @@
             "name": "params[job_id]",
             "in": "query",
             "schema": {
-              "type": "integer",
-              "example": 1718456789
+              "type": "integer"
             },
-            "description": "The job ID returned from the retention-snapshots/generate endpoint.",
+            "description": "The `job_id` from the generate response.",
             "required": true
           }
         ],
@@ -55,86 +54,81 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "description": "Whether the lookup was successful. `false` when `params[job_id]` is missing or no job is found for that ID \u2014 in that case `status` and `data` are omitted."
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "running",
-                        "completed",
-                        "failed"
-                      ],
-                      "description": "Job status. Only present when a valid job was found (i.e. when `success` is true, or when `success` is false because the job was not found \u2014 see `job_id` in that case)."
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Status message"
-                    },
-                    "job_id": {
-                      "type": "string",
-                      "description": "Echoes back `params[job_id]`. Only present in the 'job not found' error response.",
-                      "example": "1718456789"
-                    },
-                    "stats": {
-                      "type": "object",
-                      "description": "Snapshot generation statistics. Only present once the job has reached `completed` or `failed` status."
-                    },
-                    "data": {
-                      "type": "object",
-                      "description": "Raw job record as stored for this job ID. Present whenever a job was found (running, completed, or failed)."
-                    }
-                  },
                   "example": {
                     "success": true,
-                    "status": "running",
-                    "message": "Job is still running",
+                    "status": "completed",
+                    "message": "Retention snapshots generated successfully",
+                    "stats": {
+                      "total_records": 5000,
+                      "unique_cohorts": 24,
+                      "unique_periods": 36,
+                      "unique_products": 6
+                    },
                     "data": {
-                      "status": "pending",
-                      "started_at": "2025-06-15 14:30:00",
-                      "product_id": 42
+                      "status": "completed",
+                      "started_at": "2025-01-31 10:00:00",
+                      "completed_at": "2025-01-31 10:00:00",
+                      "product_id": null,
+                      "message": "Retention snapshots generated successfully",
+                      "stats": {
+                        "total_records": 5000,
+                        "unique_cohorts": 24,
+                        "unique_periods": 36,
+                        "unique_products": 6
+                      }
                     }
                   }
                 },
                 "example": {
                   "success": true,
-                  "status": "running",
-                  "message": "Job is still running",
+                  "status": "completed",
+                  "message": "Retention snapshots generated successfully",
+                  "stats": {
+                    "total_records": 5000,
+                    "unique_cohorts": 24,
+                    "unique_periods": 36,
+                    "unique_products": 6
+                  },
                   "data": {
-                    "status": "pending",
-                    "started_at": "2025-06-15 14:30:00",
-                    "product_id": 42
+                    "status": "completed",
+                    "started_at": "2025-01-31 10:00:00",
+                    "completed_at": "2025-01-31 10:00:00",
+                    "product_id": null,
+                    "message": "Retention snapshots generated successfully",
+                    "stats": {
+                      "total_records": 5000,
+                      "unique_cohorts": 24,
+                      "unique_periods": 36,
+                      "unique_products": 6
+                    }
                   }
                 },
                 "examples": {
                   "default": {
-                    "summary": "Successful response \u2014 job still running",
+                    "summary": "Successful response",
                     "value": {
                       "success": true,
-                      "status": "running",
-                      "message": "Job is still running",
+                      "status": "completed",
+                      "message": "Retention snapshots generated successfully",
+                      "stats": {
+                        "total_records": 5000,
+                        "unique_cohorts": 24,
+                        "unique_periods": 36,
+                        "unique_products": 6
+                      },
                       "data": {
-                        "status": "pending",
-                        "started_at": "2025-06-15 14:30:00",
-                        "product_id": 42
+                        "status": "completed",
+                        "started_at": "2025-01-31 10:00:00",
+                        "completed_at": "2025-01-31 10:00:00",
+                        "product_id": null,
+                        "message": "Retention snapshots generated successfully",
+                        "stats": {
+                          "total_records": 5000,
+                          "unique_cohorts": 24,
+                          "unique_periods": 36,
+                          "unique_products": 6
+                        }
                       }
-                    }
-                  },
-                  "missingJobId": {
-                    "summary": "params[job_id] not supplied",
-                    "value": {
-                      "success": false,
-                      "message": "Job ID required"
-                    }
-                  },
-                  "jobNotFound": {
-                    "summary": "No job found for the given job_id",
-                    "value": {
-                      "success": false,
-                      "message": "Job not found",
-                      "job_id": "1718456789"
                     }
                   }
                 }

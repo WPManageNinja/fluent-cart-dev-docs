@@ -27,110 +27,13 @@
       "get": {
         "operationId": "getLicenseSummary",
         "summary": "GET Get License Summary",
-        "description": "Retrieve summary statistics for licenses (total, active, inactive, expired, total activated sites, and licensed product count). Note: the date range parameters are accepted but the current counts are not filtered by them.\n\n**Also used by the licensing UI.** Retrieve a summary of license statistics.\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns license counts by current status, total activated sites and the number of licensed products. The date range does not apply.\n\nThis is a core route, but it reads the `fct_licenses` table that the FluentCart Pro licensing module creates. Without that table the query throws a database error.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
         "security": [
           {
             "ApplicationPasswords": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "params[startDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2025-01-01"
-            },
-            "description": "Start date for the report period.",
-            "required": false
-          },
-          {
-            "name": "params[endDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2025-12-31"
-            },
-            "description": "End date for the report period.",
-            "required": false
-          },
-          {
-            "name": "params[paymentStatus]",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Payment status filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderStatus]",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Order status filter.",
-            "required": false
-          },
-          {
-            "name": "params[currency]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "USD"
-            },
-            "description": "Currency code filter.",
-            "required": false
-          },
-          {
-            "name": "params[filterMode]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "live",
-                "test"
-              ]
-            },
-            "description": "Payment mode filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderTypes]",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "description": "Order type filter.",
-            "required": false
-          },
-          {
-            "name": "params",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "object"
-            },
-            "description": "Request parameters object containing filters and date range",
-            "style": "deepObject",
-            "explode": true
-          },
-          {
-            "name": "params[filters]",
-            "in": "query",
-            "schema": {
-              "type": "object"
-            },
-            "description": "Filter criteria",
-            "required": false,
-            "style": "deepObject",
-            "explode": true
           }
         ],
         "responses": {
@@ -140,63 +43,27 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "summaryData": {
-                      "type": "object",
-                      "description": "License summary statistics",
-                      "properties": {
-                        "totalLicense": {
-                          "type": "integer",
-                          "description": "Total number of licenses issued",
-                          "example": 245
-                        },
-                        "totalActiveLicense": {
-                          "type": "integer",
-                          "description": "Number of licenses with status 'active'",
-                          "example": 198
-                        },
-                        "totalInactiveLicense": {
-                          "type": "integer",
-                          "description": "Number of licenses with status 'disabled'",
-                          "example": 12
-                        },
-                        "totalExpiredLicense": {
-                          "type": "integer",
-                          "description": "Number of licenses with status 'expired'",
-                          "example": 32
-                        },
-                        "totalActivatedSites": {
-                          "type": "string",
-                          "description": "Sum of activation_count across all licenses (site activations), returned as a numeric string",
-                          "example": "412"
-                        },
-                        "totalLicensedProducts": {
-                          "type": "integer",
-                          "description": "Number of products that have license settings configured",
-                          "example": 3
-                        }
-                      }
-                    }
-                  },
                   "example": {
                     "summaryData": {
-                      "totalLicense": 245,
-                      "totalActiveLicense": 198,
-                      "totalInactiveLicense": 12,
-                      "totalExpiredLicense": 32,
-                      "totalActivatedSites": "412",
-                      "totalLicensedProducts": 3
+                      "totalLicense": 200,
+                      "totalActiveLicense": 150,
+                      "totalInactiveLicense": 20,
+                      "totalDisabledLicense": 5,
+                      "totalExpiredLicense": 25,
+                      "totalActivatedSites": 310,
+                      "totalLicensedProducts": 4
                     }
                   }
                 },
                 "example": {
                   "summaryData": {
-                    "totalLicense": 245,
-                    "totalActiveLicense": 198,
-                    "totalInactiveLicense": 12,
-                    "totalExpiredLicense": 32,
-                    "totalActivatedSites": "412",
-                    "totalLicensedProducts": 3
+                    "totalLicense": 200,
+                    "totalActiveLicense": 150,
+                    "totalInactiveLicense": 20,
+                    "totalDisabledLicense": 5,
+                    "totalExpiredLicense": 25,
+                    "totalActivatedSites": 310,
+                    "totalLicensedProducts": 4
                   }
                 },
                 "examples": {
@@ -204,12 +71,13 @@
                     "summary": "Successful response",
                     "value": {
                       "summaryData": {
-                        "totalLicense": 245,
-                        "totalActiveLicense": 198,
-                        "totalInactiveLicense": 12,
-                        "totalExpiredLicense": 32,
-                        "totalActivatedSites": "412",
-                        "totalLicensedProducts": 3
+                        "totalLicense": 200,
+                        "totalActiveLicense": 150,
+                        "totalInactiveLicense": 20,
+                        "totalDisabledLicense": 5,
+                        "totalExpiredLicense": 25,
+                        "totalActivatedSites": 310,
+                        "totalLicensedProducts": 4
                       }
                     }
                   }

@@ -1,0 +1,258 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/installments/at-risk": {
+      "get": {
+        "operationId": "getInstallmentsAtRisk",
+        "summary": "GET Get Installments at Risk",
+        "description": "Returns one page of overdue and lapsed installment plans, largest unpaid balance first. Amounts are in cents.\n\n`search`, `bucket`, `page` and `per_page` are top-level query params, not inside `params`. `reactivate_url` is empty when the user cannot reactivate the plan.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` converts every currency to the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Product variation IDs to filter by.",
+            "required": false
+          },
+          {
+            "name": "params[started_from]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only plans whose first paid order is on or after this store day (Y-m-d).",
+            "required": false
+          },
+          {
+            "name": "params[started_to]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only plans whose first paid order is on or before this store day (Y-m-d).",
+            "required": false
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Customer name or email contains this text.",
+            "required": false
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "overdue",
+                "lapsed"
+              ]
+            },
+            "description": "Only one bucket. Both when omitted.",
+            "required": false
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Page number. Default `1`.",
+            "required": false
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Rows per page, 1 to 150. Default `20`.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "data": [
+                      {
+                        "subscription_id": 77,
+                        "customer_id": 42,
+                        "customer_name": "Jane Doe",
+                        "email": "jane@example.com",
+                        "variation_id": 31,
+                        "product_title": "Course",
+                        "variation_title": "3 payments",
+                        "status": "failing",
+                        "bucket": "overdue",
+                        "payments": 1,
+                        "bill_times": 3,
+                        "bill_count": 1,
+                        "installments_left": 2,
+                        "collected": 10000,
+                        "left_amount": 20000,
+                        "next_billing_date": "2025-01-15 00:00:00",
+                        "reactivate_url": ""
+                      }
+                    ],
+                    "total": 6,
+                    "page": 1,
+                    "per_page": 20
+                  }
+                },
+                "example": {
+                  "data": [
+                    {
+                      "subscription_id": 77,
+                      "customer_id": 42,
+                      "customer_name": "Jane Doe",
+                      "email": "jane@example.com",
+                      "variation_id": 31,
+                      "product_title": "Course",
+                      "variation_title": "3 payments",
+                      "status": "failing",
+                      "bucket": "overdue",
+                      "payments": 1,
+                      "bill_times": 3,
+                      "bill_count": 1,
+                      "installments_left": 2,
+                      "collected": 10000,
+                      "left_amount": 20000,
+                      "next_billing_date": "2025-01-15 00:00:00",
+                      "reactivate_url": ""
+                    }
+                  ],
+                  "total": 6,
+                  "page": 1,
+                  "per_page": 20
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "data": [
+                        {
+                          "subscription_id": 77,
+                          "customer_id": 42,
+                          "customer_name": "Jane Doe",
+                          "email": "jane@example.com",
+                          "variation_id": 31,
+                          "product_title": "Course",
+                          "variation_title": "3 payments",
+                          "status": "failing",
+                          "bucket": "overdue",
+                          "payments": 1,
+                          "bill_times": 3,
+                          "bill_count": 1,
+                          "installments_left": 2,
+                          "collected": 10000,
+                          "left_amount": 20000,
+                          "next_billing_date": "2025-01-15 00:00:00",
+                          "reactivate_url": ""
+                        }
+                      ],
+                      "total": 6,
+                      "page": 1,
+                      "per_page": 20
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

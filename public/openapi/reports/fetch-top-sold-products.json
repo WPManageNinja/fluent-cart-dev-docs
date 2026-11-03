@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getTopSoldProducts",
         "summary": "GET Get Top Sold Products",
-        "description": "Retrieve a ranked list of the best-selling products within the specified date range.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns the 20 products with the most units sold in the range. `total_amount` is in decimal currency units: the line totals after order-level discounts, before refunds.\n\nWith `variation_ids`, only the lines of those variations count (other lines on the same order stay out). `media` is the product thumbnail URL or `null`. `product_name` is the title from the latest order line.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First day of the range, store timezone (`YYYY-MM-DD`).",
             "required": false
           },
           {
@@ -52,27 +52,28 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
+            "description": "Last day of the range, store timezone (`YYYY-MM-DD`).",
             "required": false
           },
           {
-            "name": "params[groupKey]",
+            "name": "params[rangeKey]",
             "in": "query",
             "schema": {
               "type": "string",
               "enum": [
-                "default",
-                "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
               ]
             },
-            "description": "Grouping interval for data aggregation.",
+            "description": "Preset range. Overrides the dates.",
             "required": false
           },
           {
@@ -82,7 +83,7 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code. `__all__` converts every currency to the base currency. Default: base currency.",
             "required": false
           },
           {
@@ -95,11 +96,11 @@
                 "test"
               ]
             },
-            "description": "Payment mode filter.",
+            "description": "Only live or only test orders. Without it, both count.",
             "required": false
           },
           {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,57 +108,26 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
+            "description": "Only orders that contain these variation IDs.",
             "required": false
           },
           {
-            "name": "params[compareType]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "previous_period",
-                "previous_month",
-                "previous_quarter",
-                "previous_year",
-                "custom"
-              ]
-            },
-            "description": "Comparison period type.",
-            "required": false
-          },
-          {
-            "name": "params[compareDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2024-01-01"
-            },
-            "description": "Custom comparison start date. Required when compareType is custom.",
-            "required": false
-          },
-          {
-            "name": "params[paymentStatus]",
+            "name": "params[orderTypes][]",
             "in": "query",
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
               }
             },
-            "description": "Payment status filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderTypes]",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "description": "Order type filter (e.g., one-time, subscription).",
+            "description": "Only these sale types. `renewal` leaves out installment payments.",
             "required": false
           }
         ],
@@ -168,44 +138,14 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Ranked product list with sales counts and revenue data",
-                  "additionalProperties": true,
                   "example": {
                     "topSoldProducts": [
                       {
-                        "product_id": 123,
-                        "title": "Developer Toolkit Pro",
-                        "total_sold": 142,
-                        "total_revenue": 680000,
-                        "product_type": "digital"
-                      },
-                      {
-                        "product_id": 125,
-                        "title": "API Testing Suite",
-                        "total_sold": 98,
-                        "total_revenue": 290000,
-                        "product_type": "digital"
-                      },
-                      {
-                        "product_id": 130,
-                        "title": "WordPress starter theme",
-                        "total_sold": 76,
-                        "total_revenue": 152000,
-                        "product_type": "digital"
-                      },
-                      {
-                        "product_id": 128,
-                        "title": "Cloud Hosting Add-on",
-                        "total_sold": 65,
-                        "total_revenue": 97500,
-                        "product_type": "digital"
-                      },
-                      {
-                        "product_id": 135,
-                        "title": "Premium Support Package",
-                        "total_sold": 42,
-                        "total_revenue": 626000,
-                        "product_type": "digital"
+                        "product_id": 10,
+                        "product_name": "Pro Plan",
+                        "quantity_sold": 60,
+                        "total_amount": 1500.0,
+                        "media": "https://example.com/wp-content/uploads/pro-plan.png"
                       }
                     ]
                   }
@@ -213,39 +153,11 @@
                 "example": {
                   "topSoldProducts": [
                     {
-                      "product_id": 123,
-                      "title": "Developer Toolkit Pro",
-                      "total_sold": 142,
-                      "total_revenue": 680000,
-                      "product_type": "digital"
-                    },
-                    {
-                      "product_id": 125,
-                      "title": "API Testing Suite",
-                      "total_sold": 98,
-                      "total_revenue": 290000,
-                      "product_type": "digital"
-                    },
-                    {
-                      "product_id": 130,
-                      "title": "WordPress starter theme",
-                      "total_sold": 76,
-                      "total_revenue": 152000,
-                      "product_type": "digital"
-                    },
-                    {
-                      "product_id": 128,
-                      "title": "Cloud Hosting Add-on",
-                      "total_sold": 65,
-                      "total_revenue": 97500,
-                      "product_type": "digital"
-                    },
-                    {
-                      "product_id": 135,
-                      "title": "Premium Support Package",
-                      "total_sold": 42,
-                      "total_revenue": 626000,
-                      "product_type": "digital"
+                      "product_id": 10,
+                      "product_name": "Pro Plan",
+                      "quantity_sold": 60,
+                      "total_amount": 1500.0,
+                      "media": "https://example.com/wp-content/uploads/pro-plan.png"
                     }
                   ]
                 },
@@ -255,39 +167,11 @@
                     "value": {
                       "topSoldProducts": [
                         {
-                          "product_id": 123,
-                          "title": "Developer Toolkit Pro",
-                          "total_sold": 142,
-                          "total_revenue": 680000,
-                          "product_type": "digital"
-                        },
-                        {
-                          "product_id": 125,
-                          "title": "API Testing Suite",
-                          "total_sold": 98,
-                          "total_revenue": 290000,
-                          "product_type": "digital"
-                        },
-                        {
-                          "product_id": 130,
-                          "title": "WordPress starter theme",
-                          "total_sold": 76,
-                          "total_revenue": 152000,
-                          "product_type": "digital"
-                        },
-                        {
-                          "product_id": 128,
-                          "title": "Cloud Hosting Add-on",
-                          "total_sold": 65,
-                          "total_revenue": 97500,
-                          "product_type": "digital"
-                        },
-                        {
-                          "product_id": 135,
-                          "title": "Premium Support Package",
-                          "total_sold": 42,
-                          "total_revenue": 626000,
-                          "product_type": "digital"
+                          "product_id": 10,
+                          "product_name": "Pro Plan",
+                          "quantity_sold": 60,
+                          "total_amount": 1500.0,
+                          "media": "https://example.com/wp-content/uploads/pro-plan.png"
                         }
                       ]
                     }

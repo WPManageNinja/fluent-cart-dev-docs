@@ -1,6 +1,6 @@
 ---
 title: Get Source Report
-description: "Retrieve order source/attribution data showing where orders originated from. Supports comparison against a prior period with fluctuation calculations."
+description: "Returns orders and money grouped by UTM tags, and with FluentCart Pro also by product, variation, period or referrer. Amounts are decimal currency units; `net_sales` is the Revenue report's net sales."
 outline: false
 aside: false
 ---

@@ -1,6 +1,6 @@
 ---
 title: Get Recent Orders
-description: "Retrieve the 10 most recent orders for the dashboard with basic customer and order information."
+description: "Returns the 10 newest orders of any status, with customer name and item count. `total_amount` is a decimal in the order's currency."
 outline: false
 aside: false
 ---

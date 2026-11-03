@@ -26,8 +26,8 @@
     "/reports/license-chart": {
       "get": {
         "operationId": "getLicenseChart",
-        "summary": "GET Get License Line Chart",
-        "description": "Retrieve license creation/activation data as time-series chart data, grouped by the specified interval.\n\n**Also used by the licensing UI.** Retrieve license data formatted for a line chart visualization.\n\n**Access policy:** `ReportPolicy`",
+        "summary": "GET Get License Chart",
+        "description": "Returns the number of licenses created per day, month or year in the range.\n\nThis is a core route, but it reads the `fct_licenses` table that the FluentCart Pro licensing module creates. Without that table the query fails silently and every bucket is 0. Daily rows have `date`; monthly rows have `year` and `month`; yearly rows have `year`.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First store day of the range (Y-m-d).",
             "required": false
           },
           {
@@ -52,62 +52,9 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
-            "required": false
-          },
-          {
-            "name": "params[paymentStatus]",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Payment status filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderStatus]",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Order status filter.",
-            "required": false
-          },
-          {
-            "name": "params[currency]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "USD"
-            },
-            "description": "Currency code filter.",
-            "required": false
-          },
-          {
-            "name": "params[filterMode]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "live",
-                "test"
-              ]
-            },
-            "description": "Payment mode filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderTypes]",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "description": "Order type filter.",
+            "description": "Last store day of the range (Y-m-d).",
             "required": false
           },
           {
@@ -116,36 +63,14 @@
             "schema": {
               "type": "string",
               "enum": [
+                "default",
                 "daily",
                 "monthly",
                 "yearly"
-              ],
-              "default": "daily"
+              ]
             },
-            "description": "Time grouping interval.",
+            "description": "Bucket size. Default `daily`; `default` picks by range length.",
             "required": false
-          },
-          {
-            "name": "params",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "object"
-            },
-            "description": "Request parameters object containing filters, date range, and grouping",
-            "style": "deepObject",
-            "explode": true
-          },
-          {
-            "name": "params[filters]",
-            "in": "query",
-            "schema": {
-              "type": "object"
-            },
-            "description": "Filter criteria",
-            "required": false,
-            "style": "deepObject",
-            "explode": true
           }
         ],
         "responses": {
@@ -155,46 +80,15 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Time-series license-count data. The shape of each `lineChartData` entry depends on `params[groupKey]`: `daily` (default) yields `{date, license_count}`, `monthly` yields `{year, month, license_count}`, and `yearly` yields `{year, license_count}`. Requires FluentCart Pro's Licensing module.",
-                  "properties": {
-                    "lineChartData": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "date": {
-                            "type": "string",
-                            "description": "Date bucket (Y-m-d), present when groupKey is \"daily\""
-                          },
-                          "year": {
-                            "type": "integer",
-                            "description": "Present when groupKey is \"monthly\" or \"yearly\""
-                          },
-                          "month": {
-                            "type": "integer",
-                            "description": "Present when groupKey is \"monthly\""
-                          },
-                          "license_count": {
-                            "type": "integer",
-                            "description": "Number of licenses created in this bucket"
-                          }
-                        }
-                      }
-                    }
-                  },
                   "example": {
                     "lineChartData": [
                       {
-                        "date": "2026-08-01",
+                        "date": "2025-01-01",
                         "license_count": 4
                       },
                       {
-                        "date": "2026-08-02",
-                        "license_count": 7
-                      },
-                      {
-                        "date": "2026-08-03",
-                        "license_count": 2
+                        "date": "2025-01-02",
+                        "license_count": 0
                       }
                     ]
                   }
@@ -202,16 +96,12 @@
                 "example": {
                   "lineChartData": [
                     {
-                      "date": "2026-08-01",
+                      "date": "2025-01-01",
                       "license_count": 4
                     },
                     {
-                      "date": "2026-08-02",
-                      "license_count": 7
-                    },
-                    {
-                      "date": "2026-08-03",
-                      "license_count": 2
+                      "date": "2025-01-02",
+                      "license_count": 0
                     }
                   ]
                 },
@@ -221,16 +111,12 @@
                     "value": {
                       "lineChartData": [
                         {
-                          "date": "2026-08-01",
+                          "date": "2025-01-01",
                           "license_count": 4
                         },
                         {
-                          "date": "2026-08-02",
-                          "license_count": 7
-                        },
-                        {
-                          "date": "2026-08-03",
-                          "license_count": 2
+                          "date": "2025-01-02",
+                          "license_count": 0
                         }
                       ]
                     }

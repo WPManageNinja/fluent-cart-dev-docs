@@ -1,6 +1,6 @@
 ---
 title: Generate Retention Snapshots
-description: "Trigger generation of retention snapshot data. If Action Scheduler is available, the job runs in the background; otherwise it runs synchronously."
+description: "Rebuilds the retention snapshots table that the cohort report reads. With Action Scheduler the job runs in the background and the response holds a `job_id`; without it the job runs in the request."
 outline: false
 aside: false
 ---

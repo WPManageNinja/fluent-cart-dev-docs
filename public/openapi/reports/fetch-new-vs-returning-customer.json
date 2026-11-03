@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getNewVsReturningCustomer",
         "summary": "GET Get New vs Returning Customers",
-        "description": "Compare orders from new customers versus returning customers over the given period.\n\n**Access policy:** `ReportPolicy`",
+        "description": "Splits the period's orders by customer type: New, Returning, Renewal, Installment payment, Free order and Guest. Amounts are decimal currency units; `net_sales` is the Revenue report's net sales.\n\nEach order gets one type, checked in this order: a renewal (`Installment payment` for an installment plan, else `Renewal`), `Guest` (no customer), `Free order` (nothing paid), `New` (the customer's first paid purchase), else `Returning`. `Installment payment` and `Free order` rows appear only when such orders exist. `customer_count` counts distinct customers inside one row, so a customer can appear in both `New` and `Returning`.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First day of the range, store timezone (`YYYY-MM-DD`).",
             "required": false
           },
           {
@@ -52,27 +52,28 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
+            "description": "Last day of the range, store timezone (`YYYY-MM-DD`).",
             "required": false
           },
           {
-            "name": "params[groupKey]",
+            "name": "params[rangeKey]",
             "in": "query",
             "schema": {
               "type": "string",
               "enum": [
-                "default",
-                "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
               ]
             },
-            "description": "Grouping interval for data aggregation.",
+            "description": "Preset range. Overrides the dates.",
             "required": false
           },
           {
@@ -82,7 +83,7 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code. `__all__` converts every currency to the base currency. Default: base currency.",
             "required": false
           },
           {
@@ -95,11 +96,11 @@
                 "test"
               ]
             },
-            "description": "Payment mode filter.",
+            "description": "Only live or only test orders. Without it, both count.",
             "required": false
           },
           {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,57 +108,26 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
+            "description": "Only orders that contain these variation IDs.",
             "required": false
           },
           {
-            "name": "params[compareType]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "previous_period",
-                "previous_month",
-                "previous_quarter",
-                "previous_year",
-                "custom"
-              ]
-            },
-            "description": "Comparison period type.",
-            "required": false
-          },
-          {
-            "name": "params[compareDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2024-01-01"
-            },
-            "description": "Custom comparison start date. Required when compareType is custom.",
-            "required": false
-          },
-          {
-            "name": "params[paymentStatus]",
+            "name": "params[orderTypes][]",
             "in": "query",
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
               }
             },
-            "description": "Payment status filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderTypes]",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "description": "Order type filter (e.g., one-time, subscription).",
+            "description": "Only these sale types. `renewal` leaves out installment payments.",
             "required": false
           }
         ],
@@ -168,34 +138,43 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "newVsReturning": {
-                      "type": "array",
-                      "description": "Two rows: one for new customers, one for returning customers.",
-                      "items": {
-                        "$ref": "#/components/schemas/NewVsReturningRow"
-                      }
-                    }
-                  },
                   "example": {
                     "newVsReturning": [
                       {
-                        "customer_type": "new",
-                        "customer_count": 32,
-                        "order_count": 38,
-                        "net_sales": 261500,
-                        "average_net": 6882,
-                        "gross_sales": 285000,
-                        "average_gross": 7500
+                        "customer_type": "New",
+                        "customer_count": 20,
+                        "order_count": 20,
+                        "gross_sales": 1000.0,
+                        "net_sales": 900.0,
+                        "average_gross": 50.0,
+                        "average_net": 45.0
                       },
                       {
-                        "customer_type": "returning",
-                        "customer_count": 183,
-                        "order_count": 304,
-                        "net_sales": 889000,
-                        "average_net": 2924,
-                        "gross_sales": 965000,
-                        "average_gross": 3174
+                        "customer_type": "Returning",
+                        "customer_count": 8,
+                        "order_count": 10,
+                        "gross_sales": 500.0,
+                        "net_sales": 450.0,
+                        "average_gross": 50.0,
+                        "average_net": 45.0
+                      },
+                      {
+                        "customer_type": "Renewal",
+                        "customer_count": 15,
+                        "order_count": 15,
+                        "gross_sales": 750.0,
+                        "net_sales": 700.0,
+                        "average_gross": 50.0,
+                        "average_net": 46.67
+                      },
+                      {
+                        "customer_type": "Guest",
+                        "customer_count": 0,
+                        "order_count": 0,
+                        "gross_sales": 0,
+                        "net_sales": 0,
+                        "average_gross": 0,
+                        "average_net": 0
                       }
                     ]
                   }
@@ -203,22 +182,40 @@
                 "example": {
                   "newVsReturning": [
                     {
-                      "customer_type": "new",
-                      "customer_count": 32,
-                      "order_count": 38,
-                      "net_sales": 261500,
-                      "average_net": 6882,
-                      "gross_sales": 285000,
-                      "average_gross": 7500
+                      "customer_type": "New",
+                      "customer_count": 20,
+                      "order_count": 20,
+                      "gross_sales": 1000.0,
+                      "net_sales": 900.0,
+                      "average_gross": 50.0,
+                      "average_net": 45.0
                     },
                     {
-                      "customer_type": "returning",
-                      "customer_count": 183,
-                      "order_count": 304,
-                      "net_sales": 889000,
-                      "average_net": 2924,
-                      "gross_sales": 965000,
-                      "average_gross": 3174
+                      "customer_type": "Returning",
+                      "customer_count": 8,
+                      "order_count": 10,
+                      "gross_sales": 500.0,
+                      "net_sales": 450.0,
+                      "average_gross": 50.0,
+                      "average_net": 45.0
+                    },
+                    {
+                      "customer_type": "Renewal",
+                      "customer_count": 15,
+                      "order_count": 15,
+                      "gross_sales": 750.0,
+                      "net_sales": 700.0,
+                      "average_gross": 50.0,
+                      "average_net": 46.67
+                    },
+                    {
+                      "customer_type": "Guest",
+                      "customer_count": 0,
+                      "order_count": 0,
+                      "gross_sales": 0,
+                      "net_sales": 0,
+                      "average_gross": 0,
+                      "average_net": 0
                     }
                   ]
                 },
@@ -228,22 +225,40 @@
                     "value": {
                       "newVsReturning": [
                         {
-                          "customer_type": "new",
-                          "customer_count": 32,
-                          "order_count": 38,
-                          "net_sales": 261500,
-                          "average_net": 6882,
-                          "gross_sales": 285000,
-                          "average_gross": 7500
+                          "customer_type": "New",
+                          "customer_count": 20,
+                          "order_count": 20,
+                          "gross_sales": 1000.0,
+                          "net_sales": 900.0,
+                          "average_gross": 50.0,
+                          "average_net": 45.0
                         },
                         {
-                          "customer_type": "returning",
-                          "customer_count": 183,
-                          "order_count": 304,
-                          "net_sales": 889000,
-                          "average_net": 2924,
-                          "gross_sales": 965000,
-                          "average_gross": 3174
+                          "customer_type": "Returning",
+                          "customer_count": 8,
+                          "order_count": 10,
+                          "gross_sales": 500.0,
+                          "net_sales": 450.0,
+                          "average_gross": 50.0,
+                          "average_net": 45.0
+                        },
+                        {
+                          "customer_type": "Renewal",
+                          "customer_count": 15,
+                          "order_count": 15,
+                          "gross_sales": 750.0,
+                          "net_sales": 700.0,
+                          "average_gross": 50.0,
+                          "average_net": 46.67
+                        },
+                        {
+                          "customer_type": "Guest",
+                          "customer_count": 0,
+                          "order_count": 0,
+                          "gross_sales": 0,
+                          "net_sales": 0,
+                          "average_gross": 0,
+                          "average_net": 0
                         }
                       ]
                     }
@@ -285,52 +300,7 @@
     }
   },
   "components": {
-    "schemas": {
-      "NewVsReturningRow": {
-        "type": "object",
-        "properties": {
-          "customer_type": {
-            "type": "string",
-            "enum": [
-              "new",
-              "returning"
-            ],
-            "description": "Which segment this row describes",
-            "example": "new"
-          },
-          "customer_count": {
-            "type": "integer",
-            "description": "Number of distinct customers in this segment for the period",
-            "example": 32
-          },
-          "order_count": {
-            "type": "integer",
-            "description": "Number of orders placed by this segment for the period",
-            "example": 38
-          },
-          "net_sales": {
-            "type": "integer",
-            "description": "Net sales in cents (after discounts/refunds, excluding tax) for this segment",
-            "example": 261500
-          },
-          "average_net": {
-            "type": "integer",
-            "description": "Average net sales per order, in cents",
-            "example": 6882
-          },
-          "gross_sales": {
-            "type": "integer",
-            "description": "Gross sales in cents for this segment",
-            "example": 285000
-          },
-          "average_gross": {
-            "type": "integer",
-            "description": "Average gross sales per order, in cents",
-            "example": 7500
-          }
-        }
-      }
-    },
+    "schemas": {},
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",

@@ -112,20 +112,33 @@ const MODULE_ORDER: Record<string, string[]> = {
     'get-digest-settings', 'save-digest-settings', 'send-digest-test', 'send-manual-reminder',
   ],
   reports: [
-    'get-overview', 'report-overview', 'get-dashboard-summary', 'dashboard-stats',
-    'get-revenue', 'revenue-by-group',
-    'order-chart', 'fetch-order-by-group', 'quick-order-stats',
-    'get-recent-orders', 'order-completion-time', 'order-value-distribution', 'item-count-distribution',
-    'sales-report', 'sales-growth', 'sales-growth-chart',
-    'product-report', 'product-performance', 'fetch-top-sold-products', 'fetch-top-sold-variants', 'top-products-sold',
-    'customer-report', 'daily-signups', 'fetch-new-vs-returning-customer', 'search-repeat-customer',
-    'subscription-chart', 'subscription-cohorts', 'subscription-retention', 'future-renewals',
-    'refund-chart', 'refund-data-by-group', 'weeks-between-refund',
-    'retention-chart', 'generate-retention-snapshots', 'retention-snapshots-status',
+    // Overview and dashboard
+    'get-overview', 'fetch-report-meta', 'dashboard-stats', 'sales-growth-chart', 'country-heat-map',
+    'get-recent-orders', 'get-recent-activities',
+    // Revenue and orders
+    'get-revenue', 'order-chart', 'order-mix', 'failed-orders', 'fetch-new-vs-returning-customer',
+    'payment-methods', 'locations',
+    // Order patterns and payment insights (Pro)
+    'order-value-distribution', 'fetch-report-by-day-and-hour', 'item-count-distribution',
+    'order-completion-time', 'weeks-between-refund', 'payment-methods-disputes', 'payment-methods-methods',
+    // Refunds
+    'refunds-overview',
+    // Products
+    'product-sales', 'fetch-top-sold-products', 'product-detail', 'product-comparison', 'product-comparison-launch',
+    // Customers
+    'customer-overview', 'customer-insights', 'customer-value', 'customer-repeat', 'customer-segments',
+    'customer-segment-customers',
+    // Coupons
+    'coupons', 'coupon-overview',
+    // Sources
+    'sources', 'source-channels', 'channel-rules', 'save-channel-rules',
+    // Subscriptions
+    'subscriptions-overview', 'subscription-health', 'subscription-variations', 'future-renewals',
+    'subscription-retention', 'subscription-cohorts', 'subscription-rebuys',
+    'installments', 'installments-at-risk', 'installments-variations',
+    'generate-retention-snapshots', 'retention-snapshots-status',
+    // Licenses
     'license-chart', 'license-pie-chart', 'license-summary',
-    'country-heat-map', 'sources',
-    'fetch-report-by-day-and-hour', 'fetch-report-meta',
-    'get-recent-activities',
   ],
   integration: [
     'list-addons', 'install-addon-plugin',

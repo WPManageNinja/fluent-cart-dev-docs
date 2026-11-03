@@ -136,7 +136,7 @@ const MODULE_ORDER: Record<string, string[]> = {
     'subscriptions-overview', 'subscription-health', 'subscription-variations', 'future-renewals',
     'subscription-retention', 'subscription-cohorts', 'subscription-rebuys',
     'installments', 'installments-at-risk', 'installments-variations',
-    'generate-retention-snapshots', 'retention-snapshots-status',
+    'generate-retention-snapshots', 'retention-snapshots-step',
     // Licenses
     'license-chart', 'license-pie-chart', 'license-summary',
   ],

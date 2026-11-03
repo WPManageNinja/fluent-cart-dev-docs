@@ -3168,7 +3168,7 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/subscription-ret
 
 Returns cohort retention by start month or start year, read from the retention snapshots table. The date range does not apply: the month view shows the last 24 months of cohorts, the year view every year. One currency only. MRR values are decimals.
 
-`metric=mrr`, `billingInterval` and `rebuyAdjusted` need FluentCart Pro (filter `fluent_cart/report/cohort_options`). Without Pro the metric is `subscribers` and `full` is `false`. Build the snapshots with [Generate Retention Snapshots](#generate-retention-snapshots).
+`metric=mrr`, `billingInterval` and `rebuyAdjusted` need FluentCart Pro (filter `fluent_cart/report/cohort_options`). Without Pro the metric is `subscribers` and `full` is `false`. Build the snapshots with [Generate Retention Snapshots](#generate-retention-snapshots), then [Retention Snapshot Step](#retention-snapshot-step).
 
 - **Permission:** `reports/view`
 - **Operation page:** [Get Subscription Cohorts](/restapi/operations/reports/subscription-cohorts)
@@ -3465,29 +3465,51 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/installments/var
 
 ## Retention Snapshots
 
+The cohort report reads the retention snapshots table. A rebuild runs in short requests, not in the background:
+
+1. Call [Generate Retention Snapshots](#generate-retention-snapshots). It starts a build and returns a `token`.
+2. Call [Retention Snapshot Step](#retention-snapshot-step) with that `token`. Repeat until the response has `done: true`.
+
+The current snapshots stay in place until the last step. Only one build runs at a time.
+
+::: warning Changed in the next release
+`GET /reports/retention-snapshots/status` is removed. Action Scheduler is no longer used. `POST /reports/retention-snapshots/generate` now starts a stepped build and returns a `token`, not a `job_id`. It ignores `product_id`. Call `POST /reports/retention-snapshots/step` to run the build.
+:::
+
 ### Generate Retention Snapshots
 
 <badge type="warning">POST</badge> `/fluent-cart/v2/reports/retention-snapshots/generate`
 
-Rebuilds the retention snapshots table that the cohort report reads. The job empties the table first. With Action Scheduler the job runs in the background and the response holds a `job_id`; without it the job runs in the request and returns `mode: "synchronous"` with `success`, `message` and `stats`.
+Starts a rebuild. The request takes a lock, plans the steps and returns `step: 0`, the number of `steps` and a `token`. It does not build any rows. Send the `token` to [Retention Snapshot Step](#retention-snapshot-step).
+
+If another build holds the lock, the response is HTTP 200 with `success: false` and `code: "already_running"`. A lock that nobody steps expires after 5 minutes.
 
 - **Permission:** `reports/view`
 - **Operation page:** [Generate Retention Snapshots](/restapi/operations/reports/generate-retention-snapshots)
 
 #### Parameters
 
-| Parameter | Type | Location | Required | Description |
-|-----------|------|----------|----------|-------------|
-| `product_id` | integer | body | No | Rebuild only this product's snapshots. |
+None. A `product_id` is ignored: every product is rebuilt.
 
 #### Response
 
 ```json
 {
     "success": true,
-    "message": "Snapshot generation queued",
-    "job_id": 1738310400,
-    "mode": "background"
+    "step": 0,
+    "steps": 4,
+    "token": "aB3dE5fG7hJ9kL1mN3pQ"
+}
+```
+
+Another build is running:
+
+```json
+{
+    "success": false,
+    "code": "already_running",
+    "message": "A snapshot rebuild is already running. Try again in a few minutes.",
+    "stats": []
 }
 ```
 
@@ -3500,45 +3522,74 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/reports/retention-snaps
 
 ---
 
-### Get Retention Snapshot Status
+### Retention Snapshot Step
 
-<badge type="tip">GET</badge> `/fluent-cart/v2/reports/retention-snapshots/status`
+<badge type="warning">POST</badge> `/fluent-cart/v2/reports/retention-snapshots/step`
 
-Returns the state of a snapshot job: `running`, `completed` or `failed`. A missing or unknown job ID returns HTTP 200 with `success: false` and a message. `data` is the stored job record.
+Runs the next step of the started build. Each step builds one range of customer IDs into a build table and returns `done: false`. The last step publishes the build in place of the old snapshots, releases the lock and returns `done: true` with `message` and `stats`. A store with no subscriptions has one step.
+
+Errors return HTTP 200 with `success: false` and a `code`:
+
+| `code` | Meaning |
+|--------|---------|
+| `no_build` | No build is running. Call generate again. |
+| `already_running` | The `token` does not match the running build. |
+| `failed` | The step threw an error. The build stops and the lock is released. The old snapshots stay. |
 
 - **Permission:** `reports/view`
-- **Operation page:** [Get Retention Snapshot Status](/restapi/operations/reports/retention-snapshots-status)
+- **Operation page:** [Retention Snapshot Step](/restapi/operations/reports/retention-snapshots-step)
 
 #### Parameters
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
-| `params[job_id]` | integer | query | Yes | The `job_id` from the generate response. |
+| `token` | string | body | Yes | The `token` from the generate response. |
 
 #### Response
+
+More steps to run:
 
 ```json
 {
     "success": true,
-    "status": "completed",
+    "done": false,
+    "step": 1,
+    "steps": 4
+}
+```
+
+Last step:
+
+```json
+{
+    "success": true,
+    "done": true,
+    "step": 4,
+    "steps": 4,
     "message": "Retention snapshots generated successfully",
-    "stats": { "total_records": 5000, "unique_cohorts": 24, "unique_periods": 36, "unique_products": 6 },
-    "data": {
-        "status": "completed",
-        "started_at": "2025-01-31 10:00:00",
-        "completed_at": "2025-01-31 10:00:00",
-        "product_id": null,
-        "message": "Retention snapshots generated successfully",
-        "stats": { "total_records": 5000, "unique_cohorts": 24, "unique_periods": 36, "unique_products": 6 }
-    }
+    "stats": { "total_records": 5000, "unique_cohorts": 24, "unique_periods": 36, "unique_products": 6 }
 }
 ```
 
 #### Example
 
+Start a build, then step it until it is done. The loop needs `jq`.
+
 ```bash
-curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/retention-snapshots/status?params[job_id]=1738310400" \
-  -u "username:app_password"
+SITE="https://example.com/wp-json/fluent-cart/v2/reports/retention-snapshots"
+AUTH="username:app_password"
+
+TOKEN=$(curl -s -X POST "$SITE/generate" -u "$AUTH" | jq -r '.token // empty')
+[ -z "$TOKEN" ] && { echo "Could not start the build"; exit 1; }
+
+while true; do
+  RESPONSE=$(curl -s -X POST "$SITE/step" -u "$AUTH" \
+    -H "Content-Type: application/json" \
+    -d "{\"token\": \"$TOKEN\"}")
+  echo "$RESPONSE"
+  [ "$(echo "$RESPONSE" | jq -r '.success')" != "true" ] && exit 1
+  [ "$(echo "$RESPONSE" | jq -r '.done')" = "true" ] && break
+done
 ```
 
 ---

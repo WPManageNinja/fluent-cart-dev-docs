@@ -27,7 +27,7 @@
       "post": {
         "operationId": "generateRetentionSnapshots",
         "summary": "POST Generate Retention Snapshots",
-        "description": "Rebuilds the retention snapshots table that the cohort report reads. With Action Scheduler the job runs in the background and the response holds a `job_id`; without it the job runs in the request.\n\nThe job empties the snapshots table first. With `product_id`, only that product's pairs are rebuilt. Poll `GET /reports/retention-snapshots/status` with the `job_id`. In synchronous mode the response has `mode: \"synchronous\"`, `success`, `message` and `stats` (`total_records`, `unique_cohorts`, `unique_periods`, `unique_products`).\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "description": "Starts a rebuild of the retention snapshots table that the cohort report reads. The request takes a lock, plans the steps and returns a `token`. It does not build any rows. Call `POST /reports/retention-snapshots/step` with the `token` until the response has `done: true`.\n\nOnly one build runs at a time. If another build holds the lock, the response is HTTP 200 with `success: false` and `code: \"already_running\"`. A lock that nobody steps expires after 5 minutes. The current snapshots stay in place until the last step publishes the new ones.\n\nThe request takes no parameters. A `product_id` is ignored: every product is rebuilt.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -36,22 +36,6 @@
             "ApplicationPasswords": []
           }
         ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "product_id": {
-                    "type": "integer",
-                    "description": "Rebuild only this product's snapshots."
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "Successful response",
@@ -61,25 +45,34 @@
                   "type": "object",
                   "example": {
                     "success": true,
-                    "message": "Snapshot generation queued",
-                    "job_id": 1738310400,
-                    "mode": "background"
+                    "step": 0,
+                    "steps": 4,
+                    "token": "aB3dE5fG7hJ9kL1mN3pQ"
                   }
                 },
                 "example": {
                   "success": true,
-                  "message": "Snapshot generation queued",
-                  "job_id": 1738310400,
-                  "mode": "background"
+                  "step": 0,
+                  "steps": 4,
+                  "token": "aB3dE5fG7hJ9kL1mN3pQ"
                 },
                 "examples": {
                   "default": {
-                    "summary": "Successful response",
+                    "summary": "Build started",
                     "value": {
                       "success": true,
-                      "message": "Snapshot generation queued",
-                      "job_id": 1738310400,
-                      "mode": "background"
+                      "step": 0,
+                      "steps": 4,
+                      "token": "aB3dE5fG7hJ9kL1mN3pQ"
+                    }
+                  },
+                  "already_running": {
+                    "summary": "Another build holds the lock",
+                    "value": {
+                      "success": false,
+                      "code": "already_running",
+                      "message": "A snapshot rebuild is already running. Try again in a few minutes.",
+                      "stats": []
                     }
                   }
                 }

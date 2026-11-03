@@ -323,7 +323,7 @@
     "/openapi/public/reports/product-detail.json",
     "/openapi/public/reports/product-sales.json",
     "/openapi/public/reports/refunds-overview.json",
-    "/openapi/public/reports/retention-snapshots-status.json",
+    "/openapi/public/reports/retention-snapshots-step.json",
     "/openapi/public/reports/sales-growth-chart.json",
     "/openapi/public/reports/save-channel-rules.json",
     "/openapi/public/reports/source-channels.json",
@@ -451,5 +451,5 @@
     "/openapi/public/tax/update-country-status.json",
     "/openapi/public/tax/update-tax-rate.json"
   ],
-  "generated": "2026-11-03T09:43:36.648Z"
+  "generated": "2026-11-03T12:35:59.545Z"
 }

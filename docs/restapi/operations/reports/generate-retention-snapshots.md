@@ -1,6 +1,6 @@
 ---
 title: Generate Retention Snapshots
-description: "Rebuilds the retention snapshots table that the cohort report reads. With Action Scheduler the job runs in the background and the response holds a `job_id`; without it the job runs in the request."
+description: "Starts a stepped rebuild of the retention snapshots table that the cohort report reads. Returns a `token` for `POST /reports/retention-snapshots/step`."
 outline: false
 aside: false
 ---

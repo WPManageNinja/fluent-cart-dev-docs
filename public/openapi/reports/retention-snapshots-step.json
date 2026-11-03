@@ -1,0 +1,175 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/retention-snapshots/step": {
+      "post": {
+        "operationId": "retentionSnapshotStep",
+        "summary": "POST Retention Snapshot Step",
+        "description": "Runs the next step of the build that `POST /reports/retention-snapshots/generate` started. Send the `token` from the generate response. Each step builds one range of customer IDs into a build table and returns `done: false`. The last step publishes the build in place of the old snapshots, releases the lock and returns `done: true` with `message` and `stats` (`total_records`, `unique_cohorts`, `unique_periods`, `unique_products`).\n\nCall this endpoint in a loop until `done` is `true` or `success` is `false`. Errors return HTTP 200 with `success: false` and a `code`:\n\n- `no_build`: no build is running. Call generate again.\n- `already_running`: the `token` does not match the running build.\n- `failed`: the step threw an error. The build stops and the lock is released. The old snapshots stay.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "The `token` from the generate response."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "success": true,
+                    "done": false,
+                    "step": 1,
+                    "steps": 4
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "done": false,
+                  "step": 1,
+                  "steps": 4
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Step done, more to run",
+                    "value": {
+                      "success": true,
+                      "done": false,
+                      "step": 1,
+                      "steps": 4
+                    }
+                  },
+                  "done": {
+                    "summary": "Last step: snapshots published",
+                    "value": {
+                      "success": true,
+                      "done": true,
+                      "step": 4,
+                      "steps": 4,
+                      "message": "Retention snapshots generated successfully",
+                      "stats": {
+                        "total_records": 5000,
+                        "unique_cohorts": 24,
+                        "unique_periods": 36,
+                        "unique_products": 6
+                      }
+                    }
+                  },
+                  "no_build": {
+                    "summary": "No build is running",
+                    "value": {
+                      "success": false,
+                      "code": "no_build",
+                      "message": "No snapshot rebuild is running. Start it again."
+                    }
+                  },
+                  "already_running": {
+                    "summary": "Token does not match the running build",
+                    "value": {
+                      "success": false,
+                      "code": "already_running",
+                      "message": "A snapshot rebuild is already running. Try again in a few minutes."
+                    }
+                  },
+                  "failed": {
+                    "summary": "The step failed and the build stopped",
+                    "value": {
+                      "success": false,
+                      "code": "failed",
+                      "message": "Error: <database error message>"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

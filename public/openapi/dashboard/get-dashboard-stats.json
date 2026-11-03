@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getDashboardStats",
         "summary": "GET Get Dashboard Stats",
-        "description": "Retrieve dashboard statistics widgets including total products, orders, net revenue, and refunds for the last 30 days.\n\n**Required permission:** `dashboard_stats/view`",
+        "description": "Retrieve the dashboard tiles: total products, and the orders, net sales and refunds of the last 30 store days. The money tiles show the Revenue report's figures for the same days (net sales and refunded amount, in major units), in all currencies converted to the base currency.\n\n`current_count` is an integer string for Total Products, an integer for Orders, and a decimal number for Revenue and Refund. Money tiles also carry `currency` (base currency) and `excluded_orders` (orders with no trusted exchange rate, left out of the money tiles).\n\n**Required permission:** `dashboard_stats/view`",
         "tags": [
           "Dashboard"
         ],
@@ -55,7 +55,7 @@
                     "stats": [
                       {
                         "title": "Total Products",
-                        "current_count": 45,
+                        "current_count": "45",
                         "icon": "Frame",
                         "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products?active_view=all"
                       },
@@ -70,14 +70,18 @@
                         "current_count": 15420.5,
                         "icon": "Currency",
                         "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
-                        "has_currency": true
+                        "has_currency": true,
+                        "currency": "USD",
+                        "excluded_orders": 0
                       },
                       {
                         "title": "Refund",
-                        "current_count": 350.0,
+                        "current_count": 350,
                         "icon": "Failed",
                         "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
-                        "has_currency": true
+                        "has_currency": true,
+                        "currency": "USD",
+                        "excluded_orders": 0
                       }
                     ]
                   }
@@ -86,7 +90,7 @@
                   "stats": [
                     {
                       "title": "Total Products",
-                      "current_count": 45,
+                      "current_count": "45",
                       "icon": "Frame",
                       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products?active_view=all"
                     },
@@ -101,14 +105,18 @@
                       "current_count": 15420.5,
                       "icon": "Currency",
                       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
-                      "has_currency": true
+                      "has_currency": true,
+                      "currency": "USD",
+                      "excluded_orders": 0
                     },
                     {
                       "title": "Refund",
-                      "current_count": 350.0,
+                      "current_count": 350,
                       "icon": "Failed",
                       "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
-                      "has_currency": true
+                      "has_currency": true,
+                      "currency": "USD",
+                      "excluded_orders": 0
                     }
                   ]
                 },
@@ -119,7 +127,7 @@
                       "stats": [
                         {
                           "title": "Total Products",
-                          "current_count": 45,
+                          "current_count": "45",
                           "icon": "Frame",
                           "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/products?active_view=all"
                         },
@@ -134,14 +142,18 @@
                           "current_count": 15420.5,
                           "icon": "Currency",
                           "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/revenue",
-                          "has_currency": true
+                          "has_currency": true,
+                          "currency": "USD",
+                          "excluded_orders": 0
                         },
                         {
                           "title": "Refund",
-                          "current_count": 350.0,
+                          "current_count": 350,
                           "icon": "Failed",
                           "url": "https://example.com/wp-admin/admin.php?page=fluent-cart#/reports/refunds",
-                          "has_currency": true
+                          "has_currency": true,
+                          "currency": "USD",
+                          "excluded_orders": 0
                         }
                       ]
                     }

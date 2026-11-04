@@ -206,6 +206,23 @@ Except where noted, each action receives one array. The status actions pass `shi
 | `fluent_cart/order_shipment_status_changed` | The status changed | line 1634 |
 | `fluent_cart/shipping/unconfirmed_purchase_resolved` | An unconfirmed attempt closed. Passes four arguments: `$attemptId`, `$carrierSlug`, `$order`, `$outcome` (`recorded`, `not_found`, `dismissed`, `refused` or `voided`). | line 844 |
 
+## Helpers
+
+| Helper | Purpose |
+| ------ | ------- |
+| `Helper::shopConfig('weight_unit')`, `Helper::shopConfig('dimension_unit')` | The store's units |
+| `Helper::convertWeight($value, $from, $to)` | Converts between `g`, `kg`, `lbs` and `oz` |
+| `Helper::getPackageBySlug($slug)` | A box's dimensions and weights, or the default box |
+| `BoxPacker::pack($lines, $maxParcels)` | Splits lines into parcels by box and weight limit |
+| `Helper::encryptKey($value)`, `Helper::decryptKey($value)` | Encrypt a token for storage, and read it back |
+| `ShipmentService::applyTrackingUpdate($shipment, $status, $meta)` | Applies a tracking event |
+
+## Custom routes
+
+`?fluent-cart={name}` on the site fires `fluent_cart_action_{name}` with the request data as one array, then the request ends. The route is public, so your handler must check permissions and redirect or respond. See [Connecting with OAuth](/guides/shipping-carrier/settings#connecting-with-oauth).
+
+**Source:** `app/Http/Routes/WebRoutes.php` (line 233)
+
 ## REST routes
 
 These routes serve the admin pages. They are under `/wp-json/fluent-cart/v2/`.

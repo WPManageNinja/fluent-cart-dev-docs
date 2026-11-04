@@ -213,6 +213,54 @@ if (!empty($instance->data['lookup_only'])) {
 
 Return the same array as a purchase when you find the label. An error code ending in `_label_not_found` closes the attempt, unless the attempt is less than 5 minutes old or the error data has `purchase_unconfirmed`. Any other error leaves the attempt open. `fluent_cart/shipping/unconfirmed_purchase_resolved` fires when an attempt closes, if you keep your own records for it.
 
+### When the label arrives later
+
+Some carriers accept the order first and send the tracking number and label later. Return the array without them, keeping the `transaction_id` so you can find the shipment again. FluentCart records the shipment with an empty tracking number.
+
+When your carrier sends the details, usually by webhook, save them on the shipment:
+
+```php
+protected function applyLateLabel(array $payload): array
+{
+    $labelId   = sanitize_text_field((string) Arr::get($payload, 'label_id'));
+    $shipments = Shipment::query()
+        ->where('carrier_slug', self::SLUG)
+        ->where('order_id', (int) Arr::get($payload, 'reference'))
+        ->get();
+
+    foreach ($shipments as $shipment) {
+        $meta = (array) $shipment->meta;
+        if ((string) Arr::get($meta, 'transaction_id') !== $labelId) {
+            continue;
+        }
+
+        $meta['label_url']         = esc_url_raw((string) Arr::get($payload, 'label_url'), ['https']);
+        $shipment->meta            = $meta;
+        $shipment->tracking_number = sanitize_text_field((string) Arr::get($payload, 'tracking_number'));
+        $shipment->tracking_url    = $this->getTrackingUrl($shipment->tracking_number);
+        $shipment->save();
+
+        return $this->webhookApplied($shipment, true);
+    }
+
+    return $this->webhookIgnored('unknown_shipment');
+}
+```
+
+Send your carrier the order ID as the reference, so the webhook can find the order. `processWebhook()` then sends this event to the method above:
+
+```php
+if (Arr::get($payload, 'event') === 'label.updated') {
+    return $this->applyLateLabel($payload);
+}
+```
+
+Until the details arrive:
+
+- The refresh action does not appear, because the shipment has no tracking number.
+- `hasLabel()` is true as soon as the shipment has a `transaction_id`. If `getLabelDownloadUrl()` has no link yet, return a `WP_Error` that says the label is not ready. An empty string shows "This shipment has no label to print."
+- If the admin leaves the customer notification on, the shipment email goes out straight away, without the tracking number. The customer's order page shows the number once you save it.
+
 ## Voiding a label
 
 FluentCart calls this when an admin deletes a shipment, and when a label was bought but the shipment could not be recorded.

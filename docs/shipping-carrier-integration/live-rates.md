@@ -195,21 +195,7 @@ The checkout shows this message as HTML, so escape anything you add to it. This 
 
 ## One rate per order
 
-A customer selects one shipping option, and it covers every physical line in the cart. To let your rates stand alone, the merchant turns off the **Manual / Other** carrier, which removes zone methods from checkout.
-
-When a cart holds some items you ship and some the merchant ships, return a rate that includes both. `$items` lets you divide the lines, and the Manual carrier prices any list of lines from the store's zones:
-
-```php
-use FluentCart\App\Modules\Shipping\Carriers\Core\CarrierManager;
-
-$merchantRates = CarrierManager::carrier('manual')->getRates([
-    'country' => $destination['country'],
-    'state'   => $destination['state'],
-    'items'   => $merchantLines,
-]);
-```
-
-This call works whether or not the Manual carrier is turned on, so the merchant can turn it off and customers see only your combined rates. Each returned rate has `id`, `title` and `cost`. The `cost` is in the checkout currency, so add it to your own price only when you price in that currency. Include those lines in `liveRatesCacheItemsKey()`. On the order screen the admin can then create one shipment for each set of items, each with its own carrier.
+A customer selects one shipping option for the whole order, and it covers every physical line in the cart. Return rates that price all the physical lines you receive. To show only your rates, the merchant turns off the **Manual / Other** carrier, which removes zone methods from checkout.
 
 ## Showing slow carriers progressively
 

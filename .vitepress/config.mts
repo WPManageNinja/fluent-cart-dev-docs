@@ -504,6 +504,7 @@ export default defineConfig({
               { text: 'Ghost Product Selling', link: '/modules/ghost-product-selling' },
               { text: 'Custom Payment Gateway', link: '/payment-methods-integration/' },
               { text: '(Payment Gateway) Example', link: '/payment-methods-integration/paddle-example' },
+              { text: 'Custom Shipping Carrier', link: '/shipping-carrier-integration/' },
               { text: 'Subscription Customization', link: '/guides/subscriptions' },
             ]
           },
@@ -737,6 +738,18 @@ export default defineConfig({
             { text: 'Quick Implementation', link: '/payment-methods-integration/quick-implementation' },
             { text: 'Payment Setting Fields', link: '/payment-methods-integration/payment_setting_fields' },
             { text: 'Paddle Example', link: '/payment-methods-integration/paddle-example' }
+          ]
+        }
+      ],
+      '/shipping-carrier-integration/': [
+        {
+          text: 'Shipping Carrier Integration',
+          items: [
+            { text: 'Overview', link: '/shipping-carrier-integration/' },
+            { text: 'Live Rates', link: '/shipping-carrier-integration/live-rates' },
+            { text: 'Labels and Tracking', link: '/shipping-carrier-integration/labels-and-tracking' },
+            { text: 'Carrier Settings', link: '/shipping-carrier-integration/settings' },
+            { text: 'Reference', link: '/shipping-carrier-integration/reference' }
           ]
         }
       ],

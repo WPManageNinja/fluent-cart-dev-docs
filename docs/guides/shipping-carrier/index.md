@@ -229,10 +229,10 @@ The store address must be complete, because `buildOrigin()` reads it for the shi
 
 ## Next steps
 
-- [Live Rates](/shipping-carrier-integration/live-rates) covers caching, failures, currency and how a rate reaches the order.
-- [Labels and Tracking](/shipping-carrier-integration/labels-and-tracking) covers quotes, label purchase, voiding, tracking and webhooks.
-- [Carrier Settings](/shipping-carrier-integration/settings) covers every field type, status actions and setup notices.
-- [Reference](/shipping-carrier-integration/reference) lists the contract methods, hooks and helpers.
+- [Live Rates](/guides/shipping-carrier/live-rates) covers weights and boxes, caching, failures, currency and how a rate reaches the order.
+- [Labels and Tracking](/guides/shipping-carrier/labels-and-tracking) covers quotes, label purchase, labels that arrive later, voiding, tracking and webhooks.
+- [Carrier Settings](/guides/shipping-carrier/settings) covers the settings page, every field type, status actions, OAuth login and setup notices.
+- [Reference](/guides/shipping-carrier/reference) lists the contract methods, hooks and helpers.
 
 ::: tip Going live
 - Keep API keys in `password` fields, so they are never sent back to the browser.

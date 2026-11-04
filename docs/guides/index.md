@@ -27,6 +27,13 @@ This section provides comprehensive guides for developers working with FluentCar
 
 [View Integration Guide →](./integrations)
 
+### Custom Shipping Carrier
+- **Live Rates** - Add a carrier's rates to checkout
+- **Labels and Tracking** - Buy labels, void them and receive tracking webhooks
+- **Carrier Settings** - Build the settings page and connect with an API key or OAuth
+
+[View Custom Shipping Carrier Guide →](./shipping-carrier/)
+
 ## Quick Start
 
 ### Prerequisites

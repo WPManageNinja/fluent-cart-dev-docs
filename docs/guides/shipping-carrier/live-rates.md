@@ -34,7 +34,62 @@ protected function fetchLiveRates(array $destination, array $items, string $curr
 | `other_info.weight`, `other_info.weight_unit` | Weight of **one unit**, without its box. A blank unit means the store's weight unit, `Helper::shopConfig('weight_unit')`. |
 | `other_info.package_slug` | The box. `Helper::getPackageBySlug($slug)` returns its dimensions and empty weight, or the default package. |
 
-To split lines into boxes, pass them to `FluentCart\App\Services\Shipments\BoxPacker::pack()`, which is the same packing used for weight-based zone rates.
+### Weights and boxes
+
+The store's weight and size units come from **Store Settings**, and a product can set its own weight unit. Convert to the unit your API needs with `Helper::convertWeight()`:
+
+```php
+protected function weightInKg(array $info): float
+{
+    return (float) Helper::convertWeight(
+        (float) Arr::get($info, 'weight', 0),
+        (string) Arr::get($info, 'weight_unit') ?: (string) Helper::shopConfig('weight_unit'),
+        'kg'
+    );
+}
+```
+
+The units are `g`, `kg`, `lbs` and `oz`. Change any other spelling first, because an unknown unit counts as grams. A product with no weight gives `0`, and your carrier can then refuse the quote.
+
+To send parcels with boxes, pass the lines to `FluentCart\App\Services\Shipments\BoxPacker::pack()`, which weight-based zone rates also use. Give it weights in one unit:
+
+```php
+protected function checkoutParcels(array $items): array
+{
+    $storeUnit = (string) Helper::shopConfig('weight_unit');
+    $lines     = [];
+
+    foreach ($items as $item) {
+        if (Arr::get($item, 'fulfillment_type') !== 'physical') {
+            continue;
+        }
+
+        $info    = (array) Arr::get($item, 'other_info', []);
+        $package = (array) Helper::getPackageBySlug((string) Arr::get($info, 'package_slug', ''));
+        $boxUnit = (string) Arr::get($package, 'weight_unit') ?: $storeUnit;
+
+        $lines[] = [
+            'content_weight' => Helper::convertWeight((float) Arr::get($info, 'weight', 0), (string) Arr::get($info, 'weight_unit') ?: $storeUnit, $storeUnit),
+            'qty'            => max(1, (int) Arr::get($item, 'quantity', 1)),
+            'box'            => [
+                'key'            => (string) Arr::get($package, 'slug', ''),
+                'length'         => (float) Arr::get($package, 'length', 0),
+                'width'          => (float) Arr::get($package, 'width', 0),
+                'height'         => (float) Arr::get($package, 'height', 0),
+                'dimension_unit' => (string) Arr::get($package, 'dimension_unit', ''),
+                'tare'           => Helper::convertWeight((float) Arr::get($package, 'weight', 0), $boxUnit, $storeUnit),
+                'max_weight'     => Helper::convertWeight((float) Arr::get($package, 'max_weight', 0), $boxUnit, $storeUnit),
+            ],
+        ];
+    }
+
+    return BoxPacker::pack($lines, 100);
+}
+```
+
+Each parcel has `length`, `width`, `height`, `dimension_unit` and `weight`, in the store's weight unit. `weight` includes the empty box. A box's `weight` and `max_weight` share its `weight_unit`. Contents heavier than `max_weight` split across more boxes: 4 kg in a 0.1 kg box with a 3 kg limit gives two parcels of 2.1 kg each. The second argument caps the parcels, because shoppers control the cart quantity. `pack()` returns an empty list when nothing weighs anything.
+
+Add `use FluentCart\App\Services\Shipments\BoxPacker;` to your class.
 
 ## What your carrier returns
 

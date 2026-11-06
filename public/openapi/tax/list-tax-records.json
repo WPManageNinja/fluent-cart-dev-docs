@@ -135,7 +135,10 @@
             "description": "Eager-load relations (e.g., order, tax_rate)",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {

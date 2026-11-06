@@ -141,7 +141,10 @@
             "name": "with",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "description": "Eager-load relations. Supports relation names and {relation}Count for counts.",
             "required": false

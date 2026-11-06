@@ -129,7 +129,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "description": "Eager-load relations. Allowlisted values: `admin_inventory_list` (both relations, variant columns narrowed — used by the admin table), `detail`, and `variants`. Extendable via the `fluent_cart/inventory_allowed_withs` filter."
           }

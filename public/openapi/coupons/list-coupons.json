@@ -134,9 +134,12 @@
             "name": "with",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
-            "description": "Eager-load relations (comma-separated or array)",
+            "description": "Eager-load relations. Send as an array (`with[]=products`); a bare string answers 500.",
             "required": false
           },
           {

@@ -66,10 +66,16 @@ Retrieve a paginated list of coupons with optional filtering, sorting, and searc
 | `active_view` | string | query | No | Tab filter. One of: `active`, `expired` |
 | `filter_type` | string | query | No | Filter mode: `simple` (default) or `advanced` |
 | `advanced_filters` | string (JSON) | query | No | JSON-encoded array of advanced filter groups (requires Pro) |
-| `with` | array/string | query | No | Eager-load relations |
+| `with` | array | query | No | Eager-load relations. Send it as an array — see the note below |
 | `select` | array/string | query | No | Comma-separated list of columns to select |
 | `include_ids` | array/string | query | No | Comma-separated IDs that must always be included in results |
 | `user_tz` | string | query | No | User timezone for date filtering (e.g., `America/New_York`) |
+
+::: danger Send `with` as an array
+`with` must be an array — `?with[]=products`. A bare string (`?with=products`), and an empty
+`?with=`, answer **500** `plugin_exception` instead of a validation error. This applies to every
+filtered list endpoint in the API, not just this one.
+:::
 
 ### Active View Filters
 

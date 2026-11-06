@@ -294,7 +294,7 @@ Reviews add their own `fct-review-*` events (`fct-review-form-mounted`,
 Cart changes go through the WordPress AJAX handler, not a REST route:
 
 ```js
-// What window.fluentCartCart does internally
+// The request window.fluentCartCart sends
 const url = window.fluentCartRestVars.ajaxurl
     + '?action=fluent_cart_checkout_routes&fc_checkout_action=fluent_cart_cart_update';
 ```

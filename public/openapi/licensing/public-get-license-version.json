@@ -146,7 +146,7 @@
                         "valid",
                         "invalid"
                       ],
-                      "description": "Only these two values are returned here: `valid` on the branch that issues download links and `invalid` on the one that does not.",
+                      "description": "Only `valid` or `invalid` is returned here. Download links are present only with `valid`.",
                       "example": "valid"
                     },
                     "license_message": {

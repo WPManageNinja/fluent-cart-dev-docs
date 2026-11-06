@@ -107,7 +107,7 @@ Partial update — only the fields present in the body are changed. Sending `is_
 
 Returns `403` if the authenticated user is not the creator.
 
-An ID that does not exist also returns `403`, not `404`: the policy resolves the record before the controller runs, and a missing record is a failed permission check.
+An ID that does not exist also returns `403`, not `404`.
 
 ---
 

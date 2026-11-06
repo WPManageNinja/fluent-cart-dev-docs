@@ -72,7 +72,7 @@
                       "items": {
                         "type": "object"
                       },
-                      "description": "Related order transactions. Always present, but only populated when `transactions` is requested in the helper's `$with` list \u2014 this route does not request it, so it is always an empty array here."
+                      "description": "Related order transactions. Always present on this route and always an empty array."
                     },
                     "activations": {
                       "type": "array",

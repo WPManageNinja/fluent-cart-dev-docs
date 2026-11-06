@@ -809,29 +809,6 @@ $licenseSites = App::db()->table('fct_license_sites')
     ->get();
 ```
 
-### Webhook Logging Queries
-
-::: warning fct_webhook_logger is not populated
-The table is created by the migrator, but no code in FluentCart or FluentCart Pro reads
-or writes it, so it stays empty and no `status` value is ever stored. The queries below
-are kept for reference and will return no rows on a live store.
-:::
-
-```php
-// Get failed webhook deliveries
-$failedWebhooks = App::db()->table('fct_webhook_logger')
-    ->where('status', 'failed')
-    ->where('created_at', '>=', DateTime::gmtNow()->modify('-1 day')->format('Y-m-d H:i:s'))
-    ->get();
-
-// Get webhook delivery statistics
-$webhookStats = App::db()->table('fct_webhook_logger')
-    ->select('status', App::db()->raw('COUNT(*) as count'))
-    ->where('created_at', '>=', DateTime::gmtNow()->modify('-1 week')->format('Y-m-d H:i:s'))
-    ->groupBy('status')
-    ->get();
-```
-
 ### Complex E-commerce Queries
 
 ```php

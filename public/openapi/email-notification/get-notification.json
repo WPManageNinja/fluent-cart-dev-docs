@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getEmailNotification",
         "summary": "GET Get Single Notification",
-        "description": "Retrieve a single email notification template by its name, along with available shortcodes for the email editor.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
+        "description": "Retrieve a single email notification template by its name, along with available shortcodes for the email editor and the PDF-attachment context for the editor UI.\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Email Notifications"
         ],
@@ -65,6 +65,29 @@
                       "additionalProperties": {
                         "$ref": "#/components/schemas/ShortcodeGroup"
                       }
+                    },
+                    "has_fluent_pdf": {
+                      "type": "boolean",
+                      "description": "Whether the Fluent PDF plugin is active (the `FLUENT_PDF` constant is defined).",
+                      "example": false
+                    },
+                    "fonts_ready": {
+                      "type": "boolean",
+                      "description": "Whether Fluent PDF has every downloadable font in place. Always `false` when `has_fluent_pdf` is `false`.",
+                      "example": false
+                    },
+                    "setup_url": {
+                      "type": "string",
+                      "description": "Admin URL of the Fluent PDF setup screen, or an empty string when Fluent PDF is inactive.",
+                      "example": ""
+                    },
+                    "pdf_templates": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      },
+                      "description": "Receipt PDF templates available for `settings.attach_pdf_template`. Empty when Fluent PDF is inactive.",
+                      "example": []
                     }
                   },
                   "example": {
@@ -224,7 +247,11 @@
                         "{{license.status}}": "Status"
                       }
                     }
-                  }
+                  },
+                  "has_fluent_pdf": false,
+                  "fonts_ready": false,
+                  "setup_url": "",
+                  "pdf_templates": []
                 },
                 "examples": {
                   "default": {
@@ -306,37 +333,11 @@
                             "{{license.status}}": "Status"
                           }
                         }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Notification not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Notification Details not found"
-                    }
-                  },
-                  "example": {
-                    "message": "Notification Details not found"
-                  }
-                },
-                "example": {
-                  "message": "Notification Details not found"
-                },
-                "examples": {
-                  "default": {
-                    "summary": "Error response",
-                    "value": {
-                      "message": "Notification Details not found"
+                      },
+                      "has_fluent_pdf": false,
+                      "fonts_ready": false,
+                      "setup_url": "",
+                      "pdf_templates": []
                     }
                   }
                 }
@@ -372,15 +373,30 @@
             }
           },
           "422": {
-            "description": "Validation failed, or the referenced record does not exist.",
+            "description": "Unknown notification name. The endpoint answers 422, not 404.",
             "content": {
               "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Notification Details not found"
+                    }
+                  },
+                  "example": {
+                    "message": "Notification Details not found"
+                  }
+                },
                 "example": {
-                  "message": "The given data was invalid.",
-                  "errors": {
-                    "field_name": [
-                      "This field is required."
-                    ]
+                  "message": "Notification Details not found"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Error response",
+                    "value": {
+                      "message": "Notification Details not found"
+                    }
                   }
                 }
               }
@@ -480,6 +496,11 @@
               "email_body": {
                 "type": "string",
                 "description": "Custom email body content (HTML). Empty when using default body",
+                "example": ""
+              },
+              "attach_pdf_template": {
+                "type": "string",
+                "description": "Slug of the receipt PDF template to attach, or an empty string for none.",
                 "example": ""
               }
             }

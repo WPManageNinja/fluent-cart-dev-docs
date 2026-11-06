@@ -27,7 +27,7 @@
       "post": {
         "operationId": "sendManualReminder",
         "summary": "POST Send Manual Reminder",
-        "description": "Manually trigger a reminder email for a single entity (for example, a subscription payment reminder) outside of its normal scheduled trigger.\n\n**Access policy:** `StoreSensitivePolicy`\n\n**Access policy:** `StoreSensitivePolicy`",
+        "description": "Send a reminder email now, for one order or subscription, outside its normal schedule.\n\n`event` accepts three values, and `entity_id` means a different record for each:\n\n| `event` | `entity_id` | Sent when |\n| --- | --- | --- |\n| `renewal_reminder_overdue` | Order ID | The order still has an outstanding balance. This event has no per-notification toggle, so only the store-wide reminder switch is checked. |\n| `subscription_renewal_reminder` | Subscription ID | The subscription is active (or on a simulated trial) and has a next billing date. |\n| `subscription_trial_end_reminder` | Subscription ID | The subscription is in a real trial period and has a trial end date. |\n\nReminders must be enabled for the store (`reminders_enabled`), and, for the two subscription events, the matching notification must be active.\n\n**Access policy:** `StoreSensitivePolicy`",
         "tags": [
           "Email Notifications"
         ],
@@ -49,27 +49,34 @@
                 "properties": {
                   "event": {
                     "type": "string",
-                    "description": "The reminder event type to send."
+                    "enum": [
+                      "renewal_reminder_overdue",
+                      "subscription_renewal_reminder",
+                      "subscription_trial_end_reminder"
+                    ],
+                    "description": "The reminder to send. Any other value is rejected with 422; an unrecognised name reports \"This reminder notification is currently disabled.\"",
+                    "example": "subscription_renewal_reminder"
                   },
                   "entity_id": {
                     "type": "integer",
-                    "description": "ID of the entity (e.g. subscription ID) the reminder relates to."
+                    "description": "Order ID for `renewal_reminder_overdue`, Subscription ID for the two subscription events.",
+                    "example": 15
                   }
                 },
                 "example": {
-                  "event": "subscription_payment_reminder",
+                  "event": "subscription_renewal_reminder",
                   "entity_id": 15
                 }
               },
               "example": {
-                "event": "subscription_payment_reminder",
+                "event": "subscription_renewal_reminder",
                 "entity_id": 15
               },
               "examples": {
                 "default": {
                   "summary": "Example request",
                   "value": {
-                    "event": "subscription_payment_reminder",
+                    "event": "subscription_renewal_reminder",
                     "entity_id": 15
                   }
                 }
@@ -90,17 +97,17 @@
                     }
                   },
                   "example": {
-                    "message": "Reminder sent successfully."
+                    "message": "Renewal reminder sent successfully"
                   }
                 },
                 "example": {
-                  "message": "Reminder sent successfully."
+                  "message": "Renewal reminder sent successfully"
                 },
                 "examples": {
                   "default": {
                     "summary": "Successful response",
                     "value": {
-                      "message": "Reminder sent successfully."
+                      "message": "Renewal reminder sent successfully"
                     }
                   }
                 }
@@ -178,22 +185,41 @@
             }
           },
           "422": {
-            "description": "Missing event/entity_id, or the reminder could not be sent for the given entity.",
+            "description": "The reminder was not sent. The body carries the reason in `message`.",
             "content": {
               "application/json": {
                 "example": {
-                  "message": "Event type and entity ID are required"
-                },
-                "schema": {
-                  "example": {
-                    "message": "Event type and entity ID are required"
-                  }
+                  "message": "Subscription is not active"
                 },
                 "examples": {
-                  "default": {
-                    "summary": "Error response",
+                  "missing_params": {
+                    "summary": "event or entity_id missing",
                     "value": {
                       "message": "Event type and entity ID are required"
+                    }
+                  },
+                  "reminders_off": {
+                    "summary": "Store-wide reminders are disabled",
+                    "value": {
+                      "message": "Reminders are disabled for this store."
+                    }
+                  },
+                  "notification_off": {
+                    "summary": "No active notification for this event, including any unrecognised name",
+                    "value": {
+                      "message": "This reminder notification is currently disabled."
+                    }
+                  },
+                  "unknown_event": {
+                    "summary": "An event with an active notification that is not a reminder",
+                    "value": {
+                      "message": "Unknown reminder type"
+                    }
+                  },
+                  "not_eligible": {
+                    "summary": "The record is not eligible",
+                    "value": {
+                      "message": "Subscription is not active"
                     }
                   }
                 }

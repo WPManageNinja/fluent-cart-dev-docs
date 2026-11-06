@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getLicenseDetails",
         "summary": "GET Get License Details",
-        "description": "Retrieve the full details of a single license including the associated order, activations, product information, downloads, labels, and previous orders.\n\n**Permission:** `licenses/view` · **Policy:** `LicensePolicy`",
+        "description": "Retrieve the full details of a single license including the associated order, activations, product information, downloads, labels, and previous orders.\n\n**Permission:** `licenses/view` \u00b7 **Policy:** `LicensePolicy`",
         "tags": [
           "Licensing"
         ],
@@ -72,7 +72,7 @@
                       "items": {
                         "type": "object"
                       },
-                      "description": "Related order transactions. Always present, but only populated when `transactions` is requested in the helper's `$with` list — this route does not request it, so it is always an empty array here."
+                      "description": "Related order transactions. Always present, but only populated when `transactions` is requested in the helper's `$with` list \u2014 this route does not request it, so it is always an empty array here."
                     },
                     "activations": {
                       "type": "array",
@@ -265,9 +265,9 @@
                     "expiration_date": "2026-01-15 00:00:00",
                     "subscription_id": 3,
                     "config": {
-                      "activation_limit": 5,
-                      "validity_days": 365,
-                      "auto_renew": true
+                      "prev_order_ids": [
+                        38
+                      ]
                     },
                     "customer": {
                       "id": 7,
@@ -277,8 +277,8 @@
                     },
                     "product_variant": {
                       "id": 15,
-                      "title": "Personal License",
-                      "price": 4900,
+                      "variation_title": "Personal License",
+                      "item_price": 4900,
                       "product_id": 10
                     },
                     "labels": [
@@ -292,7 +292,12 @@
                         "title": "Enterprise",
                         "color": "#10b981"
                       }
-                    ]
+                    ],
+                    "parent_id": null,
+                    "last_reminder_sent": null,
+                    "last_reminder_type": null,
+                    "created_at": "2025-01-15 10:30:00",
+                    "updated_at": "2025-06-15 10:35:00"
                   },
                   "downloads": [
                     {
@@ -355,18 +360,18 @@
                     "variants": [
                       {
                         "id": 15,
-                        "title": "Personal License",
-                        "price": 4900
+                        "variation_title": "Personal License",
+                        "item_price": 4900
                       },
                       {
                         "id": 16,
-                        "title": "Business License",
-                        "price": 9900
+                        "variation_title": "Business License",
+                        "item_price": 9900
                       },
                       {
                         "id": 17,
-                        "title": "Unlimited License",
-                        "price": 19900
+                        "variation_title": "Unlimited License",
+                        "item_price": 19900
                       }
                     ]
                   },
@@ -408,9 +413,9 @@
                         "expiration_date": "2026-01-15 00:00:00",
                         "subscription_id": 3,
                         "config": {
-                          "activation_limit": 5,
-                          "validity_days": 365,
-                          "auto_renew": true
+                          "prev_order_ids": [
+                            38
+                          ]
                         },
                         "customer": {
                           "id": 7,
@@ -420,8 +425,8 @@
                         },
                         "product_variant": {
                           "id": 15,
-                          "title": "Personal License",
-                          "price": 4900,
+                          "variation_title": "Personal License",
+                          "item_price": 4900,
                           "product_id": 10
                         },
                         "labels": [
@@ -435,7 +440,12 @@
                             "title": "Enterprise",
                             "color": "#10b981"
                           }
-                        ]
+                        ],
+                        "parent_id": null,
+                        "last_reminder_sent": null,
+                        "last_reminder_type": null,
+                        "created_at": "2025-01-15 10:30:00",
+                        "updated_at": "2025-06-15 10:35:00"
                       },
                       "downloads": [
                         {
@@ -498,18 +508,18 @@
                         "variants": [
                           {
                             "id": 15,
-                            "title": "Personal License",
-                            "price": 4900
+                            "variation_title": "Personal License",
+                            "item_price": 4900
                           },
                           {
                             "id": 16,
-                            "title": "Business License",
-                            "price": 9900
+                            "variation_title": "Business License",
+                            "item_price": 9900
                           },
                           {
                             "id": 17,
-                            "title": "Unlimited License",
-                            "price": 19900
+                            "variation_title": "Unlimited License",
+                            "item_price": 19900
                           }
                         ]
                       },
@@ -608,7 +618,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

@@ -41,7 +41,7 @@ Retrieve a paginated list of order tax rate records with optional filtering, sor
 | `active_view` | string | query | No | Tab filter. One of: `filed` (records with `filed_at` set), `not_filed` (records without `filed_at`) |
 | `filter_type` | string | query | No | Filter mode: `simple` (default) or `advanced` |
 | `advanced_filters` | string (JSON) | query | No | JSON-encoded array of advanced filter groups. Supports filtering by country, region, tax name, and filed status |
-| `with` | array/string | query | No | Eager-load relations (e.g., `order`, `tax_rate`) |
+| `with` | array | query | No | Eager-load relations (e.g., `order`, `tax_rate`). Must be an array — a bare string fails with `500`. |
 | `select` | array/string | query | No | Comma-separated list of columns to select |
 | `include_ids` | array/string | query | No | Comma-separated IDs that must always be included in results |
 | `user_tz` | string | query | No | User timezone for date filtering (e.g., `America/New_York`) |

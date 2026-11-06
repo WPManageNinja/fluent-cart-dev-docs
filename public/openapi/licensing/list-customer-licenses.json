@@ -23,7 +23,7 @@
     }
   ],
   "paths": {
-    "/customer-profile/licenses/": {
+    "/customer-profile/licenses": {
       "get": {
         "operationId": "listCustomerLicenses",
         "summary": "GET List Customer Licenses",
@@ -241,7 +241,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "Authorization",
-        "description": "WordPress Application Passwords — use Basic auth with your WordPress username and an application password in the format: username:application_password"
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
       }
     }
   }

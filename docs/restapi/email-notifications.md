@@ -46,7 +46,8 @@ No parameters required.
         "active": "yes",
         "subject": "New Sales On {{settings.store_name}}",
         "is_default_body": "yes",
-        "email_body": ""
+        "email_body": "",
+        "attach_pdf_template": ""
       }
     },
     "order_paid_customer": {
@@ -64,7 +65,8 @@ No parameters required.
         "active": "yes",
         "subject": "Purchase Receipt #{{order.invoice_no}}",
         "is_default_body": "yes",
-        "email_body": ""
+        "email_body": "",
+        "attach_pdf_template": ""
       }
     }
   }
@@ -73,40 +75,83 @@ No parameters required.
 
 ### Available Notifications
 
-The following notification keys are returned, organized by group:
+Thirty-five notification keys are registered. `group` is the machine key and `group_label` the
+label the admin screen shows.
 
-**Order Actions (`order` group)**
+::: tip Review notifications
+The three `review_*` keys are only offered while the **Reviews** module is active. With the module
+off, the list returns 32 keys and the stored settings of the review notifications are kept by name.
+:::
 
-| Key | Event | Recipient | Description |
-|-----|-------|-----------|-------------|
-| `order_paid_admin` | `order_paid_done` | `admin` | New order paid notification to admin |
-| `order_paid_customer` | `order_paid` | `customer` | Purchase receipt to customer |
-| `order_refunded_admin` | `order_refunded` | `admin` | Refund notification to admin |
-| `order_refunded_customer` | `order_refunded` | `customer` | Refund confirmation to customer |
-| `order_shipped_customer` | `shipping_status_changed_to_shipped` | `customer` | Shipping notification to customer |
-| `order_delivered_customer` | `shipping_status_changed_to_delivered` | `customer` | Delivery notification to customer |
-| `order_placed_admin` | `order_placed_offline` | `admin` | Offline payment order to admin |
-| `order_placed_customer` | `order_placed_offline` | `customer` | Offline payment confirmation to customer |
+**Order Actions** — `group: order`
 
-**Subscription Actions (`subscription` group)**
+| Key | Event | Recipient |
+|-----|-------|-----------|
+| `order_paid_admin` | `order_paid_done` | `admin` |
+| `order_paid_customer` | `order_paid` | `customer` |
+| `order_refunded_admin` | `order_refunded` | `admin` |
+| `order_refunded_customer` | `order_refunded` | `customer` |
+| `order_shipped_customer` | `shipping_status_changed_to_shipped` | `customer` |
+| `order_delivered_customer` | `shipping_status_changed_to_delivered` | `customer` |
+| `order_placed_admin` | `order_placed_offline` | `admin` |
+| `order_placed_customer` | `order_placed_offline` | `customer` |
 
-| Key | Event | Recipient | Description |
-|-----|-------|-----------|-------------|
-| `subscription_renewal_customer` | `subscription_renewed` | `customer` | Renewal confirmation to customer |
-| `subscription_renewal_admin` | `subscription_renewed` | `admin` | Renewal notification to admin |
-| `subscription_canceled_customer` | `subscription_canceled` | `customer` | Cancellation notice to customer |
-| `subscription_canceled_admin` | `subscription_canceled` | `admin` | Cancellation notice to admin |
+**Subscription Actions** — `group: subscription`
 
-**Scheduler / Reminder Actions (`scheduler` group)**
+| Key | Event | Recipient |
+|-----|-------|-----------|
+| `subscription_renewal_customer` | `subscription_renewed` | `customer` |
+| `subscription_renewal_admin` | `subscription_renewed` | `admin` |
+| `subscription_renewal_failed_customer` | `subscription_renewal_failed` | `customer` |
+| `subscription_renewal_failed_admin` | `subscription_renewal_failed` | `admin` |
+| `subscription_canceled_customer` | `subscription_canceled` | `customer` |
+| `subscription_canceled_admin` | `subscription_canceled` | `admin` |
+| `subscription_period_skipped_customer` | `subscription_period_skipped` | `customer` |
+| `subscription_past_due_customer` | `subscription_past_due` | `customer` |
+| `subscription_past_due_admin` | `subscription_past_due` | `admin` |
 
-| Key | Event | Recipient | Description |
-|-----|-------|-----------|-------------|
-| `invoice_reminder_overdue_customer` | `invoice_reminder_overdue` | `customer` | Payment reminder to customer |
-| `invoice_reminder_overdue_admin` | `invoice_reminder_overdue` | `admin` | Payment reminder copy to admin |
-| `subscription_renewal_reminder_customer` | `subscription_renewal_reminder` | `customer` | Upcoming renewal reminder to customer |
-| `subscription_renewal_reminder_admin` | `subscription_renewal_reminder` | `admin` | Upcoming renewal reminder copy to admin |
-| `subscription_trial_end_reminder_customer` | `subscription_trial_end_reminder` | `customer` | Trial ending soon reminder to customer |
-| `subscription_trial_end_reminder_admin` | `subscription_trial_end_reminder` | `admin` | Trial ending soon reminder copy to admin |
+**Store-Managed Renewals** — `group: manual_subscription`
+
+| Key | Event | Recipient |
+|-----|-------|-----------|
+| `renewal_created_admin` | `renewal_created` | `admin` |
+| `renewal_created_customer` | `renewal_created` | `customer` |
+| `renewal_reminder_due_admin` | `renewal_reminder_due` | `admin` |
+| `renewal_reminder_due_customer` | `renewal_reminder_due` | `customer` |
+
+**Store-Managed Renewals · Auto-Charge** — `group: system_subscription`
+
+| Key | Event | Recipient |
+|-----|-------|-----------|
+| `system_upcoming_charge_customer` | `system_upcoming_charge` | `customer` |
+| `system_charge_failed_customer` | `system_charge_failed` | `customer` |
+| `system_charge_failed_admin` | `system_charge_failed` | `admin` |
+
+**Scheduler / Reminder Actions** — `group: scheduler`
+
+| Key | Event | Recipient |
+|-----|-------|-----------|
+| `renewal_reminder_overdue_customer` | `renewal_reminder_overdue` | `customer` |
+| `renewal_overdue_first_customer` | `renewal_overdue_first` | `customer` |
+| `renewal_overdue_followup_customer` | `renewal_overdue_followup` | `customer` |
+| `renewal_overdue_final_customer` | `renewal_overdue_final` | `customer` |
+| `subscription_renewal_reminder_customer` | `subscription_renewal_reminder` | `customer` |
+| `subscription_renewal_reminder_admin` | `subscription_renewal_reminder` | `admin` |
+| `subscription_trial_end_reminder_customer` | `subscription_trial_end_reminder` | `customer` |
+| `subscription_trial_end_reminder_admin` | `subscription_trial_end_reminder` | `admin` |
+
+**Review Actions** — `group: review`
+
+| Key | Event | Recipient |
+|-----|-------|-----------|
+| `review_submitted_admin` | `review_created` | `admin` |
+| `review_approved_customer` | `review_approved_done` | `customer` |
+| `review_replied_customer` | `review_replied_done` | `customer` |
+
+::: tip pre_header
+`pre_header` carries the preview text shown next to the subject in an inbox. It is set on the
+`admin`-recipient notifications and on the three review notifications; on the rest it is absent.
+:::
 
 ### Example
 
@@ -121,7 +166,8 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/email-notification" \
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/email-notification/{notification}`
 
-Retrieve a single email notification template by its name, along with available shortcodes for the email editor.
+Retrieve a single email notification template by its name, along with available shortcodes for the
+email editor and the PDF-attachment context the editor needs.
 
 ### Parameters
 
@@ -148,7 +194,8 @@ Retrieve a single email notification template by its name, along with available 
       "active": "yes",
       "subject": "Purchase Receipt #{{order.invoice_no}}",
       "is_default_body": "yes",
-      "email_body": ""
+      "email_body": "",
+      "attach_pdf_template": ""
     }
   },
   "shortcodes": {
@@ -205,13 +252,32 @@ Retrieve a single email notification template by its name, along with available 
         "{{license.status}}": "Status"
       }
     }
-  }
+  },
+  "has_fluent_pdf": false,
+  "fonts_ready": false,
+  "setup_url": "",
+  "pdf_templates": []
 }
 ```
 
+### PDF attachment context
+
+Four keys sit beside `data` and `shortcodes`. They describe the state of the
+[Fluent PDF](https://fluentpdf.com/) plugin so the editor can offer, or withhold, a PDF attachment.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `has_fluent_pdf` | boolean | `true` when Fluent PDF is active (its `FLUENT_PDF` constant is defined) |
+| `fonts_ready` | boolean | `true` when Fluent PDF has every downloadable font in place. Always `false` while `has_fluent_pdf` is `false` |
+| `setup_url` | string | Admin URL of the Fluent PDF setup screen, or an empty string while Fluent PDF is inactive |
+| `pdf_templates` | array | Receipt templates selectable in `settings.attach_pdf_template`. Empty while Fluent PDF is inactive |
+
+The notification payload passes through the `fluent_cart/email_notification_data` filter before it is
+returned, so an add-on can add its own editor fields to `data`.
+
 ### Error Response
 
-Returned when the notification key is not found:
+An unknown notification key answers **422**, not 404:
 
 ```json
 {
@@ -577,7 +643,13 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/email-notification/save
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/email-notification/reminders`
 
-Retrieve reminder/scheduling settings for automated email notifications such as payment reminders, renewal reminders, and trial-end reminders. Returns both the current settings and the form field definitions for the reminders tab.
+Retrieve the store's reminder settings together with the field definitions that render the
+**Reminder Emails** settings tab.
+
+The payload comes back unwrapped: `settings` and `fields` are at the top level, with no `data`
+envelope. `settings` is the **complete** store settings object -- the reminder keys documented below
+are the subset this endpoint reads and writes, and every other store setting is returned alongside
+them. `fields.reminders` holds the settings-schema section for the tab.
 
 ### Parameters
 
@@ -588,26 +660,35 @@ No parameters required.
 ```json
 {
   "settings": {
-    "reminders_enabled": "yes",
-    "invoice_reminders_enabled": "yes",
-    "invoice_reminder_due_days": 3,
-    "invoice_reminder_overdue_days": "1,3,7",
+    "reminders_enabled": "no",
     "yearly_renewal_reminders_enabled": "yes",
-    "yearly_renewal_reminder_days": 30,
+    "yearly_renewal_reminder_days": "30",
     "trial_end_reminders_enabled": "yes",
-    "trial_end_reminder_days": 3,
+    "trial_end_reminder_days": "3",
     "monthly_renewal_reminders_enabled": "no",
-    "monthly_renewal_reminder_days": 7,
+    "monthly_renewal_reminder_days": "7",
     "quarterly_renewal_reminders_enabled": "no",
-    "quarterly_renewal_reminder_days": 14,
+    "quarterly_renewal_reminder_days": "14",
     "half_yearly_renewal_reminders_enabled": "no",
-    "half_yearly_renewal_reminder_days": 14
+    "half_yearly_renewal_reminder_days": "21",
+    "renewal_reminders_enabled": "no",
+    "renewal_reminder_overdue_days": "1,3,7"
   },
   "fields": {
-    "reminders": { }
+    "reminders": {
+      "title": "Reminder Emails",
+      "show_title": false,
+      "type": "section",
+      "columns": { "default": 1, "md": 1 },
+      "disable_nesting": true,
+      "schema": { }
+    }
   }
 }
 ```
+
+The values above are the defaults. They are stored as strings, so a days field reads back as `"30"`
+rather than `30`.
 
 ### Example
 
@@ -622,39 +703,46 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/email-notification/remin
 
 <badge type="warning">POST</badge> `/fluent-cart/v2/email-notification/reminders`
 
-Update reminder/scheduling settings for automated email notifications. Each reminder type has an enable toggle and a days configuration that controls how many days before the event the reminder is sent.
+Update the store's reminder settings. Each scheduled cycle has an enable toggle and a days value
+that sets how many days before the event its reminder goes out. Overdue renewal reminders take a
+comma-separated list of day offsets instead.
+
+Submitted keys are merged into the existing store settings, so a key left out of the body keeps its
+current value. The response returns the merged settings in full.
 
 ### Parameters
 
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
-| `reminders_enabled` | string | body | No | Master toggle for all reminders: `yes` or `no` |
-| `invoice_reminders_enabled` | string | body | No | Enable invoice payment reminders: `yes` or `no` |
-| `invoice_reminder_due_days` | integer | body | No | Days before due date to send invoice reminder (0-365). Required when `invoice_reminders_enabled` is `yes` |
-| `invoice_reminder_overdue_days` | string | body | No | Comma-separated day intervals for overdue reminders (e.g., `1,3,7`) |
-| `yearly_renewal_reminders_enabled` | string | body | No | Enable yearly subscription renewal reminders: `yes` or `no` |
-| `yearly_renewal_reminder_days` | integer | body | No | Days before renewal to send reminder (7-90). Required when `yearly_renewal_reminders_enabled` is `yes` |
-| `trial_end_reminders_enabled` | string | body | No | Enable trial ending reminders: `yes` or `no` |
-| `trial_end_reminder_days` | integer | body | No | Days before trial ends to send reminder (1-14). Required when `trial_end_reminders_enabled` is `yes` |
-| `monthly_renewal_reminders_enabled` | string | body | No | Enable monthly renewal reminders: `yes` or `no` |
-| `monthly_renewal_reminder_days` | integer | body | No | Days before renewal to send reminder (3-28). Required when `monthly_renewal_reminders_enabled` is `yes` |
-| `quarterly_renewal_reminders_enabled` | string | body | No | Enable quarterly renewal reminders: `yes` or `no` |
-| `quarterly_renewal_reminder_days` | integer | body | No | Days before renewal to send reminder (7-60). Required when `quarterly_renewal_reminders_enabled` is `yes` |
-| `half_yearly_renewal_reminders_enabled` | string | body | No | Enable half-yearly renewal reminders: `yes` or `no` |
-| `half_yearly_renewal_reminder_days` | integer | body | No | Days before renewal to send reminder (7-60). Required when `half_yearly_renewal_reminders_enabled` is `yes` |
+| `reminders_enabled` | string | body | No | Master toggle for all reminders: `yes` or `no`. Default `no` |
+| `yearly_renewal_reminders_enabled` | string | body | No | Enable yearly subscription renewal reminders: `yes` or `no`. Default `yes` |
+| `yearly_renewal_reminder_days` | integer | body | No | Days before renewal to send the reminder (7-90). Default `30` |
+| `trial_end_reminders_enabled` | string | body | No | Enable trial ending reminders: `yes` or `no`. Default `yes` |
+| `trial_end_reminder_days` | integer | body | No | Days before the trial ends to send the reminder (1-14). Default `3` |
+| `monthly_renewal_reminders_enabled` | string | body | No | Enable monthly renewal reminders: `yes` or `no`. Default `no` |
+| `monthly_renewal_reminder_days` | integer | body | No | Days before renewal to send the reminder (3-28). Default `7` |
+| `quarterly_renewal_reminders_enabled` | string | body | No | Enable quarterly renewal reminders: `yes` or `no`. Default `no` |
+| `quarterly_renewal_reminder_days` | integer | body | No | Days before renewal to send the reminder (7-60). Default `14` |
+| `half_yearly_renewal_reminders_enabled` | string | body | No | Enable half-yearly renewal reminders: `yes` or `no`. Default `no` |
+| `half_yearly_renewal_reminder_days` | integer | body | No | Days before renewal to send the reminder (7-60). Default `21` |
+| `renewal_reminders_enabled` | string | body | No | Enable overdue payment reminders for store-managed renewal orders: `yes` or `no`. Default `no` |
+| `renewal_reminder_overdue_days` | string | body | No | Comma-separated day offsets after the due date at which overdue reminders are sent, for example `1,3,7` |
 
 ### Validation Rules
 
-Validation for the days fields is conditional -- rules are only enforced when the corresponding toggle is set to `yes`:
+Validation of the days fields is conditional -- a range is enforced only while its toggle is set to
+`yes`:
 
 | Toggle Field | Days Field | Rules (when enabled) |
 |--------------|------------|----------------------|
-| `invoice_reminders_enabled` | `invoice_reminder_due_days` | Integer, min: 0, max: 365 |
 | `yearly_renewal_reminders_enabled` | `yearly_renewal_reminder_days` | Integer, min: 7, max: 90 |
 | `trial_end_reminders_enabled` | `trial_end_reminder_days` | Integer, min: 1, max: 14 |
 | `monthly_renewal_reminders_enabled` | `monthly_renewal_reminder_days` | Integer, min: 3, max: 28 |
 | `quarterly_renewal_reminders_enabled` | `quarterly_renewal_reminder_days` | Integer, min: 7, max: 60 |
 | `half_yearly_renewal_reminders_enabled` | `half_yearly_renewal_reminder_days` | Integer, min: 7, max: 60 |
+
+`renewal_reminder_overdue_days` is a free-text list and carries no range rule, so the overdue
+offsets are not validated against each other.
 
 ### Response
 
@@ -665,7 +753,11 @@ Validation for the days fields is conditional -- rules are only enforced when th
 }
 ```
 
+`data` is the merged store settings, in the same shape the GET returns.
+
 ### Error Response
+
+A save that throws answers **423**:
 
 ```json
 {
@@ -681,20 +773,236 @@ curl -X POST "https://example.com/wp-json/fluent-cart/v2/email-notification/remi
   -H "Content-Type: application/json" \
   -d '{
     "reminders_enabled": "yes",
-    "invoice_reminders_enabled": "yes",
-    "invoice_reminder_due_days": 3,
-    "invoice_reminder_overdue_days": "1,3,7",
     "yearly_renewal_reminders_enabled": "yes",
     "yearly_renewal_reminder_days": 30,
     "trial_end_reminders_enabled": "yes",
     "trial_end_reminder_days": 3,
-    "monthly_renewal_reminders_enabled": "no",
-    "monthly_renewal_reminder_days": 7,
-    "quarterly_renewal_reminders_enabled": "no",
-    "quarterly_renewal_reminder_days": 14,
-    "half_yearly_renewal_reminders_enabled": "no",
-    "half_yearly_renewal_reminder_days": 14
+    "renewal_reminders_enabled": "yes",
+    "renewal_reminder_overdue_days": "1,3,7"
   }'
+```
+
+---
+
+## Send Manual Reminder
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/email-notification/send-manual-reminder`
+
+Send one reminder email now, outside its normal schedule.
+
+### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `event` | string | body | Yes | Which reminder to send. See the table below |
+| `entity_id` | integer | body | Yes | The record the reminder is about. Which record depends on `event` |
+
+`event` accepts three values:
+
+| `event` | `entity_id` is | Sent when |
+|---------|----------------|-----------|
+| `renewal_reminder_overdue` | an Order ID | The order's payment status is reminder-eligible and it still has an outstanding balance |
+| `subscription_renewal_reminder` | a Subscription ID | The subscription is active, or on a simulated trial, and has a next billing date |
+| `subscription_trial_end_reminder` | a Subscription ID | The subscription is in a real trial period and has a trial end date |
+
+Reminders must be enabled store-wide (`reminders_enabled`). The two subscription events also require
+their notification to be active; `renewal_reminder_overdue` is on-demand and has no per-notification
+toggle, so only the store-wide switch is checked for it.
+
+Sending a manual renewal or trial reminder marks that cycle's queued reminder stages as sent, so the
+scheduled reminder for the same cycle does not follow it.
+
+### Response
+
+```json
+{
+  "message": "Renewal reminder sent successfully"
+}
+```
+
+### Error Response
+
+Every failure answers **422** with the reason in `message`:
+
+| Message | Cause |
+|---------|-------|
+| `Event type and entity ID are required` | `event` or `entity_id` is missing or zero |
+| `Reminders are disabled for this store.` | `reminders_enabled` is not `yes` |
+| `This reminder notification is currently disabled.` | No active notification is registered for `event`. An unrecognised `event` lands here too |
+| `Unknown reminder type` | `event` names a registered, active notification that is not one of the three reminders above |
+| `Order or customer not found` / `Subscription or customer not found` | No such record, or it has no customer |
+| `Order is not eligible for payment reminder` | The order's payment status is not reminder-eligible |
+| `No outstanding amount on this order` | The order is already paid in full |
+| `Subscription is not active` | The subscription is neither active nor on a simulated trial |
+| `Subscription is not in a trial period` | A trial reminder was asked for a subscription that is not in a real trial |
+| `No next billing date set` / `No trial end date set` | The date the reminder counts from is missing |
+| `An unexpected error occurred while sending the reminder.` | The send threw; the detail is in the error log |
+
+### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/email-notification/send-manual-reminder" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "subscription_renewal_reminder",
+    "entity_id": 15
+  }'
+```
+
+---
+
+## Get Digest Settings
+
+<badge type="tip">GET</badge> `/fluent-cart/v2/email-notification/digest-settings`
+
+Retrieve the store digest settings. The digest is a periodic activity summary emailed to the store's
+recipients. It keeps its own settings store, separate from the notification config above.
+
+### Parameters
+
+No parameters required.
+
+### Response
+
+```json
+{
+  "data": {
+    "enabled": "yes",
+    "recipients": "{{wp.admin_email}}",
+    "send_when_empty": "no",
+    "daily": {
+      "enabled": "no",
+      "send_hour": 8
+    },
+    "weekly": {
+      "enabled": "yes",
+      "send_hour": 8,
+      "send_dow": 1
+    },
+    "monthly": {
+      "enabled": "no",
+      "send_hour": 8
+    }
+  }
+}
+```
+
+Those are the defaults: the weekly digest is on, at 08:00 on Monday, to the WordPress admin email.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `enabled` | string | Master flag, **derived on save**: `yes` when any cadence is enabled. It cannot be set directly |
+| `recipients` | string | Comma-separated recipient list, shared by every cadence. Shortcodes are allowed |
+| `send_when_empty` | string | `yes` sends the digest for periods with no activity; `no` skips them |
+| `daily`, `weekly`, `monthly` | object | Per-cadence settings |
+| `<cadence>.enabled` | string | `yes` or `no` |
+| `<cadence>.send_hour` | integer | Site-local hour to send, clamped to 0-23 |
+| `weekly.send_dow` | integer | Day of week, clamped to 1-7 (Monday to Sunday). Weekly only |
+
+The monthly digest is always sent on the 1st, so it has no day field.
+
+### Example
+
+```bash
+curl -X GET "https://example.com/wp-json/fluent-cart/v2/email-notification/digest-settings" \
+  -u "username:app_password"
+```
+
+---
+
+## Save Digest Settings
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/email-notification/digest-settings`
+
+Replace the store digest settings.
+
+::: danger Send the whole object
+This endpoint rebuilds the stored settings from the body rather than merging into them. Any field
+left out falls back to its default, so posting only `{"daily": {"enabled": "yes"}}` also resets
+`recipients` and turns the weekly digest off. Read the current settings, change what you need, and
+post the whole object back.
+:::
+
+### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `recipients` | string | body | No | Comma-separated recipient list. Defaults to `{{wp.admin_email}}` |
+| `send_when_empty` | string | body | No | `yes` to send digests for empty periods. Anything other than `yes` stores `no` |
+| `daily` | object | body | No | Keys `enabled` (`yes` or `no`) and `send_hour` (0-23) |
+| `weekly` | object | body | No | Keys `enabled` (`yes` or `no`), `send_hour` (0-23) and `send_dow` (1-7) |
+| `monthly` | object | body | No | Keys `enabled` (`yes` or `no`) and `send_hour` (0-23) |
+
+Out-of-range hours and days are clamped rather than rejected, and `enabled` is derived from the
+cadences, so this endpoint has no validation errors of its own.
+
+### Response
+
+```json
+{
+  "data": { },
+  "message": "Store digest settings saved successfully"
+}
+```
+
+`data` is the settings as stored, after sanitising and after `enabled` is derived.
+
+### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/email-notification/digest-settings" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipients": "owner@example.com,manager@example.com",
+    "send_when_empty": "no",
+    "daily": { "enabled": "no", "send_hour": 8 },
+    "weekly": { "enabled": "yes", "send_hour": 9, "send_dow": 1 },
+    "monthly": { "enabled": "no", "send_hour": 8 }
+  }'
+```
+
+---
+
+## Send Test Digest
+
+<badge type="warning">POST</badge> `/fluent-cart/v2/email-notification/digest-settings/send-test`
+
+Send a digest immediately to the configured recipients, to check the template and the mail setup.
+
+### Parameters
+
+| Parameter | Type | Location | Required | Description |
+|-----------|------|----------|----------|-------------|
+| `frequency` | string | body | No | Which digest to build: `daily`, `weekly` or `monthly`. Any other value, or none, falls back to `daily` |
+
+The test goes to the saved `recipients`, or to the WordPress admin email when that is empty. The
+cadence's own `enabled` flag is not consulted, so a disabled cadence can still be test-sent.
+
+### Response
+
+```json
+{
+  "message": "Test digest email sent."
+}
+```
+
+### Error Response
+
+```json
+{
+  "message": "Could not send the test email. Please check your mailing settings and recipients."
+}
+```
+
+### Example
+
+```bash
+curl -X POST "https://example.com/wp-json/fluent-cart/v2/email-notification/digest-settings/send-test" \
+  -u "username:app_password" \
+  -H "Content-Type: application/json" \
+  -d '{"frequency": "weekly"}'
 ```
 
 ---
@@ -829,7 +1137,7 @@ Each notification object contains the following properties:
 |----------|------|-------------|
 | `name` | string | Unique notification key identifier |
 | `event` | string | The event hook that triggers this notification |
-| `group` | string | Grouping category: `order`, `subscription`, or `scheduler` |
+| `group` | string | Grouping category: `order`, `subscription`, `manual_subscription`, `system_subscription`, `scheduler` or `review` |
 | `group_label` | string | Human-readable group label |
 | `title` | string | Descriptive title of the notification |
 | `description` | string | Explanation of when this notification is sent |
@@ -837,8 +1145,9 @@ Each notification object contains the following properties:
 | `smartcode_groups` | array | Additional shortcode groups (extensible via filters) |
 | `template_path` | string | Dot-notation path to the default PHP email template |
 | `is_async` | boolean | Whether the email is sent asynchronously |
-| `pre_header` | string | Email pre-header text (admin notifications only) |
-| `manage_toggle` | string | If set to `no`, the notification cannot be toggled off (e.g., offline payment confirmations) |
+| `pre_header` | string | Inbox preview text. Present on the `admin`-recipient notifications and the three review notifications |
+| `manage_toggle` | string | `no` on a notification the store cannot toggle off: `order_placed_admin`, `order_placed_customer` and `renewal_reminder_overdue_customer`. Absent on the rest |
+| `toggle_label` | string | Label shown in place of the toggle when `manage_toggle` is `no` |
 | `settings` | object | Notification settings (see below) |
 
 ### Notification Settings Object
@@ -849,5 +1158,6 @@ Each notification object contains the following properties:
 | `subject` | string | Email subject line. Supports shortcodes |
 | `is_default_body` | string | Whether to use the built-in PHP template: `yes` or `no` |
 | `email_body` | string | Custom email body content (HTML). Empty when using default body |
+| `attach_pdf_template` | string | Slug of the receipt PDF template to attach, or an empty string for none |
 
 </div>

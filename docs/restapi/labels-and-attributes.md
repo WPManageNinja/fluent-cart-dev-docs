@@ -539,7 +539,7 @@ Retrieve a paginated list of terms for a specific attribute group.
 | Parameter | Type | Location | Required | Description |
 |-----------|------|----------|----------|-------------|
 | `group_id` | integer | path | Yes | The attribute group ID |
-| `search` | object | query | No | Search criteria. Each key is a column name with `column`, `operator`, and `value` fields. Searchable columns: `title`, `slug`. |
+| `search` | string | query | No | Matches against the term's id, title or slug |
 | `filters` | object | query | No | Filter criteria. Same format as `search`. Filterable columns: `group_id`, `serial`, `title`, `slug`, `description`, `settings`. |
 | `order_by` | string | query | No | Column to sort by: `id`, `title`, `slug`, `serial`, `created_at` (default: `serial`) |
 | `order_type` | string | query | No | Sort direction: `ASC` or `DESC` (default: `ASC`) |

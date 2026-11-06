@@ -133,7 +133,10 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             "description": "Eager-load relations. Supports relation names and `{relation}Count` for counts"
           },

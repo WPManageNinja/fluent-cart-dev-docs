@@ -35,7 +35,7 @@ Retrieve a paginated list of orders with optional filtering, sorting, and search
 | `active_view` | string | query | No | Tab filter. One of: `on-hold`, `paid`, `completed`, `processing`, `renewal`, `subscription`, `onetime`, `refunded`, `partially_refunded`, `upgraded_to`, `upgraded_from` |
 | `filter_type` | string | query | No | Filter mode: `simple` (default) or `advanced` |
 | `advanced_filters` | string (JSON) | query | No | JSON-encoded array of advanced filter groups (requires Pro). Supports filtering by order properties, customer properties, transaction properties, license properties, and UTM properties |
-| `with` | array/string | query | No | Eager-load relations. Supports relation names and `{relation}Count` for counts |
+| `with` | array | query | No | Eager-load relations. Supports relation names and `{relation}Count` for counts. Send it as an array — see the note below |
 | `select` | array/string | query | No | Comma-separated list of columns to select |
 | `scopes` | array | query | No | Model scopes to apply |
 | `include_ids` | array/string | query | No | Comma-separated IDs that must always be included in results |
@@ -45,6 +45,13 @@ Retrieve a paginated list of orders with optional filtering, sorting, and search
 | `payment_statuses` | array | query | No | Filter by payment statuses |
 | `order_statuses` | array | query | No | Filter by order statuses |
 | `shipping_statuses` | array | query | No | Filter by shipping statuses |
+
+::: danger Send `with` and `scopes` as arrays
+Both must be arrays — `?with[]=customer`, `?scopes[]=<scope>`. A bare string (`?with=customer`,
+`?scopes=<scope>`), and an empty `?with=`, answer **500** `plugin_exception` instead of a validation
+error. `select` and `include_ids` do accept a comma-separated string. This applies to every filtered
+list endpoint in the API, not just this one.
+:::
 
 ### Searchable Fields (Operator Syntax)
 

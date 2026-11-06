@@ -40,13 +40,20 @@ Retrieve a paginated list of subscriptions with optional filtering, sorting, and
 | `active_view` | string | query | No | Tab filter. One of: `active`, `pending`, `intended`, `paused`, `trialing`, `canceled`, `failing`, `expiring`, `expired` |
 | `filter_type` | string | query | No | Filter mode: `simple` (default) or `advanced` |
 | `advanced_filters` | string (JSON) | query | No | JSON-encoded array of advanced filter groups (requires Pro). Supports filtering by subscription, transaction, product, and license properties |
-| `with` | array/string | query | No | Eager-load relations. Supports relation names and `{relation}Count` for counts |
+| `with` | array | query | No | Eager-load relations. Supports relation names and `{relation}Count` for counts. Send it as an array — see the note below |
 | `select` | array/string | query | No | Comma-separated list of columns to select |
 | `scopes` | array | query | No | Model scopes to apply |
 | `include_ids` | array/string | query | No | Comma-separated IDs that must always be included in results |
 | `limit` | integer | query | No | Limit number of records (used with non-paginated queries) |
 | `offset` | integer | query | No | Offset for records |
 | `user_tz` | string | query | No | User timezone for date filtering (e.g., `America/New_York`) |
+
+::: danger Send `with` and `scopes` as arrays
+Both must be arrays — `?with[]=customer`, `?scopes[]=<scope>`. A bare string (`?with=customer`,
+`?scopes=<scope>`), and an empty `?with=`, answer **500** `plugin_exception` instead of a validation
+error. `select` and `include_ids` do accept a comma-separated string. This applies to every filtered
+list endpoint in the API, not just this one.
+:::
 
 #### Search Behavior
 

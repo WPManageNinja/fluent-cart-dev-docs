@@ -1,0 +1,152 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/subscription-variations": {
+      "get": {
+        "operationId": "getSubscriptionVariations",
+        "summary": "GET Get Subscription Variations",
+        "description": "Returns the products and variations that have a started open-ended subscription, grouped by product. The subscription report pages use it for the product picker.\n\nA deleted variation keeps its ID and shows under \"Deleted product\" with `product_id: 0`.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "products": [
+                      {
+                        "product_id": 10,
+                        "product_title": "Pro Plan",
+                        "variations": [
+                          {
+                            "id": 12,
+                            "title": "Monthly"
+                          },
+                          {
+                            "id": 13,
+                            "title": "Yearly"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "products": [
+                    {
+                      "product_id": 10,
+                      "product_title": "Pro Plan",
+                      "variations": [
+                        {
+                          "id": 12,
+                          "title": "Monthly"
+                        },
+                        {
+                          "id": 13,
+                          "title": "Yearly"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "products": [
+                        {
+                          "product_id": 10,
+                          "product_title": "Pro Plan",
+                          "variations": [
+                            {
+                              "id": 12,
+                              "title": "Monthly"
+                            },
+                            {
+                              "id": 13,
+                              "title": "Yearly"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

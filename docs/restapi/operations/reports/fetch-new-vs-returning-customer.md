@@ -1,6 +1,6 @@
 ---
 title: Get New vs Returning Customers
-description: "Compare the ratio of orders from new customers versus returning customers over the given period."
+description: "Splits the period's orders by customer type: New, Returning, Renewal, Installment payment, Free order and Guest. Amounts are decimal currency units; `net_sales` is the Revenue report's net sales."
 outline: false
 aside: false
 ---

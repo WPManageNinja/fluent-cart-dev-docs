@@ -1,0 +1,340 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/coupons": {
+      "get": {
+        "operationId": "getCoupons",
+        "summary": "GET Get Coupons",
+        "description": "Returns one row per coupon used in the range with orders, customers, sales, discount and refunds, plus totals and the discount given without a coupon row. Amounts are decimal currency units; `net_sales` is the Revenue report's net sales.\n\nAn order with several coupons shares its money by each coupon's discount. A renamed coupon stays one row under its current code; `used_as` lists the other codes it was used under. A deleted coupon keeps its rows under its code (`coupon_id` `null`). Rows sort by orders. `no_code` covers orders with a coupon discount in the header but no coupon row (for example imported renewals).\n\nWithout FluentCart Pro the rows and totals leave out `won_ltv`, `first_order_net`, `later_net`, `lifetime_net` and `refund_rate`. Pro adds them through the `fluent_cart/report/coupon_quality` filter.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. `__all__` converts every currency to the base currency. Default: base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Only live or only test orders. Without it, both count.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Only these sale types. `renewal` leaves out installment payments.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "rows": [
+                      {
+                        "coupon_key": "3",
+                        "coupon_id": 3,
+                        "code": "SAVE10",
+                        "used_as": [],
+                        "title": "Save 10%",
+                        "orders": 20,
+                        "customers": 18,
+                        "new_orders": 12,
+                        "returning_orders": 8,
+                        "guest_orders": 0,
+                        "gross_sales": 900.0,
+                        "discount": 100.0,
+                        "refunds": 30.0,
+                        "net_sales": 820.0,
+                        "first_order_net": 820.0,
+                        "later_net": 300.0,
+                        "lifetime_net": 1120.0,
+                        "discount_rate": 10.0,
+                        "refund_rate": 5.0,
+                        "won_ltv": 95.0,
+                        "average_order": 45.0
+                      }
+                    ],
+                    "totals": {
+                      "orders": 25,
+                      "customers": 22,
+                      "new_orders": 15,
+                      "returning_orders": 10,
+                      "guest_orders": 0,
+                      "gross_sales": 1100.0,
+                      "discount": 125.0,
+                      "refunds": 30.0,
+                      "net_sales": 1010.0,
+                      "first_order_net": 1010.0,
+                      "later_net": 300.0,
+                      "lifetime_net": 1310.0,
+                      "discount_rate": 10.2,
+                      "refund_rate": 4.0,
+                      "won_ltv": 90.0,
+                      "average_order": 44.0
+                    },
+                    "no_code": {
+                      "orders": 2,
+                      "discount": 10.0
+                    }
+                  }
+                },
+                "example": {
+                  "rows": [
+                    {
+                      "coupon_key": "3",
+                      "coupon_id": 3,
+                      "code": "SAVE10",
+                      "used_as": [],
+                      "title": "Save 10%",
+                      "orders": 20,
+                      "customers": 18,
+                      "new_orders": 12,
+                      "returning_orders": 8,
+                      "guest_orders": 0,
+                      "gross_sales": 900.0,
+                      "discount": 100.0,
+                      "refunds": 30.0,
+                      "net_sales": 820.0,
+                      "first_order_net": 820.0,
+                      "later_net": 300.0,
+                      "lifetime_net": 1120.0,
+                      "discount_rate": 10.0,
+                      "refund_rate": 5.0,
+                      "won_ltv": 95.0,
+                      "average_order": 45.0
+                    }
+                  ],
+                  "totals": {
+                    "orders": 25,
+                    "customers": 22,
+                    "new_orders": 15,
+                    "returning_orders": 10,
+                    "guest_orders": 0,
+                    "gross_sales": 1100.0,
+                    "discount": 125.0,
+                    "refunds": 30.0,
+                    "net_sales": 1010.0,
+                    "first_order_net": 1010.0,
+                    "later_net": 300.0,
+                    "lifetime_net": 1310.0,
+                    "discount_rate": 10.2,
+                    "refund_rate": 4.0,
+                    "won_ltv": 90.0,
+                    "average_order": 44.0
+                  },
+                  "no_code": {
+                    "orders": 2,
+                    "discount": 10.0
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "rows": [
+                        {
+                          "coupon_key": "3",
+                          "coupon_id": 3,
+                          "code": "SAVE10",
+                          "used_as": [],
+                          "title": "Save 10%",
+                          "orders": 20,
+                          "customers": 18,
+                          "new_orders": 12,
+                          "returning_orders": 8,
+                          "guest_orders": 0,
+                          "gross_sales": 900.0,
+                          "discount": 100.0,
+                          "refunds": 30.0,
+                          "net_sales": 820.0,
+                          "first_order_net": 820.0,
+                          "later_net": 300.0,
+                          "lifetime_net": 1120.0,
+                          "discount_rate": 10.0,
+                          "refund_rate": 5.0,
+                          "won_ltv": 95.0,
+                          "average_order": 45.0
+                        }
+                      ],
+                      "totals": {
+                        "orders": 25,
+                        "customers": 22,
+                        "new_orders": 15,
+                        "returning_orders": 10,
+                        "guest_orders": 0,
+                        "gross_sales": 1100.0,
+                        "discount": 125.0,
+                        "refunds": 30.0,
+                        "net_sales": 1010.0,
+                        "first_order_net": 1010.0,
+                        "later_net": 300.0,
+                        "lifetime_net": 1310.0,
+                        "discount_rate": 10.2,
+                        "refund_rate": 4.0,
+                        "won_ltv": 90.0,
+                        "average_order": 44.0
+                      },
+                      "no_code": {
+                        "orders": 2,
+                        "discount": 10.0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

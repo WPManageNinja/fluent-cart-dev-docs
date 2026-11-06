@@ -1,0 +1,219 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/customer-segment-customers": {
+      "get": {
+        "operationId": "getCustomerSegmentCustomers",
+        "summary": "GET Get Customer Segment Customers",
+        "description": "Lists the customers of one RFM segment for a CSV export, highest lifetime net first. `net` is in cents and uses the Revenue report's net sales.\n\nAlso needs the `customers/export` permission; without it the route returns 403. An unknown `segment` returns `{\"total\": 0, \"data\": []}`.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "segment",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "champions",
+                "loyal",
+                "new",
+                "promising",
+                "at_risk",
+                "cant_lose",
+                "hibernating"
+              ]
+            },
+            "description": "Top-level. Segment key.",
+            "required": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Top-level. Page number. Default `1`.",
+            "required": false
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Top-level. Rows per page, 1-1000. Default `1000`.",
+            "required": false
+          },
+          {
+            "name": "cuts[days][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Top-level. Four recency cut points from Get Customer Segments. Ignored unless both `cuts[days]` and `cuts[net]` hold four values.",
+            "required": false
+          },
+          {
+            "name": "cuts[net][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Top-level. Four money cut points (cents) from Get Customer Segments.",
+            "required": false
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-02-01 10:00:00"
+            },
+            "description": "Top-level. UTC time `Y-m-d H:i:s` from Get Customer Segments. Default: now.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "total": 50,
+                    "data": [
+                      {
+                        "customer_id": 7,
+                        "name": "Jane Doe",
+                        "email": "jane@example.com",
+                        "orders": 6,
+                        "net": 60000,
+                        "last_order": "2025-01-20 14:00:00"
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "total": 50,
+                  "data": [
+                    {
+                      "customer_id": 7,
+                      "name": "Jane Doe",
+                      "email": "jane@example.com",
+                      "orders": 6,
+                      "net": 60000,
+                      "last_order": "2025-01-20 14:00:00"
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "total": 50,
+                      "data": [
+                        {
+                          "customer_id": 7,
+                          "name": "Jane Doe",
+                          "email": "jane@example.com",
+                          "orders": 6,
+                          "net": 60000,
+                          "last_order": "2025-01-20 14:00:00"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

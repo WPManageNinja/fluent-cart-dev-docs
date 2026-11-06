@@ -1,6 +1,6 @@
 ---
 title: Get Report Meta
-description: "Retrieve metadata for the reporting interface, including available currencies, the earliest order date, and store mode."
+description: "Returns the data the report filters need: currencies with orders in the range, order counts per currency, the base currency, the earliest order date and the store mode."
 outline: false
 aside: false
 ---

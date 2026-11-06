@@ -1,0 +1,253 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/payment-methods/methods": {
+      "get": {
+        "operationId": "getPaymentMethodsMethods",
+        "summary": "GET Get Payment Method Types",
+        "description": "Returns net sales by the card brand or payment method type that each order's charge recorded (Visa, PayPal, SEPA Direct Debit, ...). `net_sales` is in decimal currency units (not cents) and uses the Revenue report's net sales.\n\nOrders with no recognised brand or method are left out of `rows`. `orders` is the number of orders that had one, and `coverage` is that number as a percent of all report orders in the range. `net_share` is a percent of the net sales in `rows`.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range (Y-m-d), store timezone.",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Live or test orders only. Default: both.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain one of these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Sale types to include. Default: all.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "rows": [
+                      {
+                        "method": "visa",
+                        "label": "Visa",
+                        "orders": 210,
+                        "net_share": 62.5,
+                        "net_sales": 12500.0
+                      },
+                      {
+                        "method": "paypal",
+                        "label": "PayPal",
+                        "orders": 90,
+                        "net_share": 37.5,
+                        "net_sales": 7500.0
+                      }
+                    ],
+                    "orders": 300,
+                    "coverage": 75.0
+                  }
+                },
+                "example": {
+                  "rows": [
+                    {
+                      "method": "visa",
+                      "label": "Visa",
+                      "orders": 210,
+                      "net_share": 62.5,
+                      "net_sales": 12500.0
+                    },
+                    {
+                      "method": "paypal",
+                      "label": "PayPal",
+                      "orders": 90,
+                      "net_share": 37.5,
+                      "net_sales": 7500.0
+                    }
+                  ],
+                  "orders": 300,
+                  "coverage": 75.0
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "rows": [
+                        {
+                          "method": "visa",
+                          "label": "Visa",
+                          "orders": 210,
+                          "net_share": 62.5,
+                          "net_sales": 12500.0
+                        },
+                        {
+                          "method": "paypal",
+                          "label": "PayPal",
+                          "orders": 90,
+                          "net_share": 37.5,
+                          "net_sales": 7500.0
+                        }
+                      ],
+                      "orders": 300,
+                      "coverage": 75.0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

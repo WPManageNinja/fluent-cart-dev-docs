@@ -1,0 +1,461 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/subscriptions-overview": {
+      "get": {
+        "operationId": "getSubscriptionsOverview",
+        "summary": "GET Get Subscriptions Overview",
+        "description": "Returns subscription movement in the range: new, churned, churn rate, MRR movement, renewals paid and failed, and a movement chart. MRR and amounts are decimals; `renewal_amount` is the net sales of paid renewal orders.\n\nOpen-ended plans only; installment plans are left out. `mrr_by_plan`, `mrr_by_interval` and `trials` come only when FluentCart Pro answers the `fluent_cart/report/mrr_breakdown` filter and `params[summary_only]` is not set. `compare_range` and `compare_ranges` are always present; `compare_range` is null without a comparison.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First store day of the range (Y-m-d).",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last store day of the range (Y-m-d).",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range relative to today. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[groupKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "default",
+                "daily",
+                "monthly",
+                "yearly"
+              ]
+            },
+            "description": "Chart bucket. `default` picks daily (up to 91 days), monthly (up to 365 days) or yearly.",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` converts every currency to the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Count only live or only test orders. Both when omitted.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Product variation IDs to filter by.",
+            "required": false
+          },
+          {
+            "name": "params[compareType]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "previous_period",
+                "previous_month",
+                "previous_quarter",
+                "previous_year",
+                "custom"
+              ]
+            },
+            "description": "Comparison period.",
+            "required": false
+          },
+          {
+            "name": "params[compareDate]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "First day of the custom comparison period (Y-m-d). Used with `compareType=custom`.",
+            "required": false
+          },
+          {
+            "name": "params[summary_only]",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "When `1`, leave out the Pro MRR breakdown and trial conversion.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "period": {
+                      "new": 40,
+                      "churned": 10,
+                      "churned_new": 2,
+                      "active_at_start": 500,
+                      "churn_rate": 1.6,
+                      "net_change": 30,
+                      "new_mrr": 1200.0,
+                      "churned_mrr": 300.0,
+                      "expansion_mrr": 50.0,
+                      "contraction_mrr": 20.0,
+                      "net_mrr": 930.0,
+                      "renewals": 200,
+                      "renewal_amount": 5800.0,
+                      "failed_renewals": 5,
+                      "failed_amount": 150.0
+                    },
+                    "chart": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01-01",
+                        "new": 2,
+                        "churned": 1,
+                        "new_mrr": 60.0,
+                        "churned_mrr": 30.0,
+                        "expansion_mrr": 0,
+                        "contraction_mrr": 0
+                      }
+                    ],
+                    "mrr_by_plan": [
+                      {
+                        "key": "12",
+                        "label": "Pro Plan",
+                        "variation": "Monthly",
+                        "subscriptions": 300,
+                        "mrr": 9000.0
+                      }
+                    ],
+                    "mrr_by_interval": [
+                      {
+                        "key": "month",
+                        "label": "month",
+                        "variation": "",
+                        "subscriptions": 400,
+                        "mrr": 12000.0
+                      }
+                    ],
+                    "trials": {
+                      "started": 20,
+                      "converted": 8,
+                      "lost": 4,
+                      "in_trial": 8,
+                      "conversion_rate": 66.67
+                    },
+                    "previousPeriod": null,
+                    "previousChart": [],
+                    "fluctuations": [],
+                    "compare_range": null,
+                    "compare_ranges": {
+                      "previous_period": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_month": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_quarter": {
+                        "start": "2024-10-01 00:00:00",
+                        "end": "2024-10-31 23:59:59"
+                      },
+                      "previous_year": {
+                        "start": "2024-01-01 00:00:00",
+                        "end": "2024-01-31 23:59:59"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "period": {
+                    "new": 40,
+                    "churned": 10,
+                    "churned_new": 2,
+                    "active_at_start": 500,
+                    "churn_rate": 1.6,
+                    "net_change": 30,
+                    "new_mrr": 1200.0,
+                    "churned_mrr": 300.0,
+                    "expansion_mrr": 50.0,
+                    "contraction_mrr": 20.0,
+                    "net_mrr": 930.0,
+                    "renewals": 200,
+                    "renewal_amount": 5800.0,
+                    "failed_renewals": 5,
+                    "failed_amount": 150.0
+                  },
+                  "chart": [
+                    {
+                      "year": "2025",
+                      "group": "2025-01-01",
+                      "new": 2,
+                      "churned": 1,
+                      "new_mrr": 60.0,
+                      "churned_mrr": 30.0,
+                      "expansion_mrr": 0,
+                      "contraction_mrr": 0
+                    }
+                  ],
+                  "mrr_by_plan": [
+                    {
+                      "key": "12",
+                      "label": "Pro Plan",
+                      "variation": "Monthly",
+                      "subscriptions": 300,
+                      "mrr": 9000.0
+                    }
+                  ],
+                  "mrr_by_interval": [
+                    {
+                      "key": "month",
+                      "label": "month",
+                      "variation": "",
+                      "subscriptions": 400,
+                      "mrr": 12000.0
+                    }
+                  ],
+                  "trials": {
+                    "started": 20,
+                    "converted": 8,
+                    "lost": 4,
+                    "in_trial": 8,
+                    "conversion_rate": 66.67
+                  },
+                  "previousPeriod": null,
+                  "previousChart": [],
+                  "fluctuations": [],
+                  "compare_range": null,
+                  "compare_ranges": {
+                    "previous_period": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_month": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_quarter": {
+                      "start": "2024-10-01 00:00:00",
+                      "end": "2024-10-31 23:59:59"
+                    },
+                    "previous_year": {
+                      "start": "2024-01-01 00:00:00",
+                      "end": "2024-01-31 23:59:59"
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "period": {
+                        "new": 40,
+                        "churned": 10,
+                        "churned_new": 2,
+                        "active_at_start": 500,
+                        "churn_rate": 1.6,
+                        "net_change": 30,
+                        "new_mrr": 1200.0,
+                        "churned_mrr": 300.0,
+                        "expansion_mrr": 50.0,
+                        "contraction_mrr": 20.0,
+                        "net_mrr": 930.0,
+                        "renewals": 200,
+                        "renewal_amount": 5800.0,
+                        "failed_renewals": 5,
+                        "failed_amount": 150.0
+                      },
+                      "chart": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01-01",
+                          "new": 2,
+                          "churned": 1,
+                          "new_mrr": 60.0,
+                          "churned_mrr": 30.0,
+                          "expansion_mrr": 0,
+                          "contraction_mrr": 0
+                        }
+                      ],
+                      "mrr_by_plan": [
+                        {
+                          "key": "12",
+                          "label": "Pro Plan",
+                          "variation": "Monthly",
+                          "subscriptions": 300,
+                          "mrr": 9000.0
+                        }
+                      ],
+                      "mrr_by_interval": [
+                        {
+                          "key": "month",
+                          "label": "month",
+                          "variation": "",
+                          "subscriptions": 400,
+                          "mrr": 12000.0
+                        }
+                      ],
+                      "trials": {
+                        "started": 20,
+                        "converted": 8,
+                        "lost": 4,
+                        "in_trial": 8,
+                        "conversion_rate": 66.67
+                      },
+                      "previousPeriod": null,
+                      "previousChart": [],
+                      "fluctuations": [],
+                      "compare_range": null,
+                      "compare_ranges": {
+                        "previous_period": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_month": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_quarter": {
+                          "start": "2024-10-01 00:00:00",
+                          "end": "2024-10-31 23:59:59"
+                        },
+                        "previous_year": {
+                          "start": "2024-01-01 00:00:00",
+                          "end": "2024-01-31 23:59:59"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSubscriptionCohorts",
         "summary": "GET Get Subscription Cohorts",
-        "description": "Retrieve cohort analysis data for subscriptions. Groups subscribers by their signup period and tracks retention over subsequent periods. Uses pre-generated retention snapshots for efficient querying.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns subscription cohort retention from the retention snapshots table, by start month or start year. MRR values are decimals.\n\nThe date range does not apply: month view shows the last 24 months of cohorts, year view every year. One currency only (`__all__` is read as the base currency). `metric=mrr`, `billingInterval` and `rebuyAdjusted` need FluentCart Pro (`fluent_cart/report/cohort_options`); without it the metric is `subscribers` and `full` is false. Build the snapshots with `POST /reports/retention-snapshots/generate`.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -38,68 +38,17 @@
         ],
         "parameters": [
           {
-            "name": "params[startDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2025-01-01"
-            },
-            "description": "Start date for the report period.",
-            "required": false
-          },
-          {
-            "name": "params[endDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2025-12-31"
-            },
-            "description": "End date for the report period.",
-            "required": false
-          },
-          {
-            "name": "params[groupKey]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "default",
-                "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
-              ]
-            },
-            "description": "Grouping interval for data aggregation.",
-            "required": false
-          },
-          {
             "name": "params[currency]",
             "in": "query",
             "schema": {
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` is read as the base currency.",
             "required": false
           },
           {
-            "name": "params[filterMode]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "live",
-                "test"
-              ]
-            },
-            "description": "Payment mode filter.",
-            "required": false
-          },
-          {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,33 +56,7 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
-            "required": false
-          },
-          {
-            "name": "params[compareType]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "previous_period",
-                "previous_month",
-                "previous_quarter",
-                "previous_year",
-                "custom"
-              ]
-            },
-            "description": "Comparison period type.",
-            "required": false
-          },
-          {
-            "name": "params[compareDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2024-01-01"
-            },
-            "description": "Custom comparison start date. Required when compareType is custom.",
+            "description": "Product variation IDs to filter by.",
             "required": false
           },
           {
@@ -144,10 +67,9 @@
               "enum": [
                 "month",
                 "year"
-              ],
-              "default": "year"
+              ]
             },
-            "description": "Cohort grouping interval.",
+            "description": "Cohort size. Default `year`.",
             "required": false
           },
           {
@@ -155,9 +77,30 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "default": "subscribers"
+              "enum": [
+                "subscribers",
+                "mrr"
+              ]
             },
-            "description": "Metric to track (e.g., subscribers).",
+            "description": "Metric to show (Pro). Default `subscribers`.",
+            "required": false
+          },
+          {
+            "name": "params[billingInterval]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only cohorts of this billing interval (Pro).",
+            "required": false
+          },
+          {
+            "name": "params[rebuyAdjusted]",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Count a cancel-and-rebuy as retained (Pro).",
             "required": false
           }
         ],
@@ -168,144 +111,104 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Cohort matrix data for subscription retention analysis",
-                  "additionalProperties": true,
                   "example": {
                     "cohorts": [
                       {
-                        "month": "2025-01",
-                        "initial": 12,
-                        "month_1": 11,
-                        "month_2": 10,
-                        "month_3": 10,
-                        "month_4": 9,
-                        "month_5": 9,
-                        "month_6": 9,
-                        "retention_rate": 75
-                      },
-                      {
-                        "month": "2025-02",
-                        "initial": 15,
-                        "month_1": 14,
-                        "month_2": 13,
-                        "month_3": 12,
-                        "month_4": 12,
-                        "month_5": 11,
-                        "retention_rate": 73.3
-                      },
-                      {
-                        "month": "2025-03",
-                        "initial": 18,
-                        "month_1": 17,
-                        "month_2": 16,
-                        "month_3": 15,
-                        "month_4": 15,
-                        "retention_rate": 83.3
-                      },
-                      {
-                        "month": "2025-04",
-                        "initial": 14,
-                        "month_1": 13,
-                        "month_2": 12,
-                        "month_3": 12,
-                        "retention_rate": 85.7
-                      },
-                      {
-                        "month": "2025-05",
-                        "initial": 22,
-                        "month_1": 21,
-                        "month_2": 20,
-                        "retention_rate": 90.9
-                      },
-                      {
-                        "month": "2025-06",
-                        "initial": 19,
-                        "month_1": 18,
-                        "retention_rate": 94.7
-                      },
-                      {
-                        "month": "2025-07",
-                        "initial": 25,
-                        "retention_rate": 100
+                        "cohort": "2024",
+                        "start_mrr": 3000.0,
+                        "start_count": 100,
+                        "periods": [
+                          {
+                            "offset": 1,
+                            "retained_mrr": 2400.0,
+                            "retained_count": 80,
+                            "churned_mrr": 600.0,
+                            "churned_count": 20,
+                            "retention_rate_mrr": 80.0,
+                            "retention_rate_count": 80.0,
+                            "retention_rate_previous_mrr": 80.0,
+                            "retention_rate_previous_count": 80.0,
+                            "churn_rate_total_mrr": 20.0,
+                            "churn_rate_total_count": 20.0,
+                            "base_mrr": 3000.0,
+                            "base_count": 100,
+                            "partial": false,
+                            "matured_cohorts": 12,
+                            "total_cohorts": 12
+                          }
+                        ]
                       }
                     ],
-                    "average_retention": {
-                      "month_1": 94.5,
-                      "month_2": 91.2,
-                      "month_3": 87.8,
-                      "month_4": 85,
-                      "month_5": 82.5,
-                      "month_6": 75
-                    }
+                    "weighted_averages": [
+                      {
+                        "offset": 1,
+                        "weighted_avg_mrr": 80.0,
+                        "weighted_avg_count": 80.0,
+                        "weighted_avg_prev_mrr": 80.0,
+                        "weighted_avg_prev_count": 80.0,
+                        "weighted_avg_churn_mrr": 20.0,
+                        "weighted_avg_churn_count": 20.0
+                      }
+                    ],
+                    "group_by": "year",
+                    "metric": "subscribers",
+                    "max_periods": 8,
+                    "generated_at": "2025-01-31 10:00:00",
+                    "intervals": [
+                      "month",
+                      "year"
+                    ],
+                    "full": true
                   }
                 },
                 "example": {
                   "cohorts": [
                     {
-                      "month": "2025-01",
-                      "initial": 12,
-                      "month_1": 11,
-                      "month_2": 10,
-                      "month_3": 10,
-                      "month_4": 9,
-                      "month_5": 9,
-                      "month_6": 9,
-                      "retention_rate": 75
-                    },
-                    {
-                      "month": "2025-02",
-                      "initial": 15,
-                      "month_1": 14,
-                      "month_2": 13,
-                      "month_3": 12,
-                      "month_4": 12,
-                      "month_5": 11,
-                      "retention_rate": 73.3
-                    },
-                    {
-                      "month": "2025-03",
-                      "initial": 18,
-                      "month_1": 17,
-                      "month_2": 16,
-                      "month_3": 15,
-                      "month_4": 15,
-                      "retention_rate": 83.3
-                    },
-                    {
-                      "month": "2025-04",
-                      "initial": 14,
-                      "month_1": 13,
-                      "month_2": 12,
-                      "month_3": 12,
-                      "retention_rate": 85.7
-                    },
-                    {
-                      "month": "2025-05",
-                      "initial": 22,
-                      "month_1": 21,
-                      "month_2": 20,
-                      "retention_rate": 90.9
-                    },
-                    {
-                      "month": "2025-06",
-                      "initial": 19,
-                      "month_1": 18,
-                      "retention_rate": 94.7
-                    },
-                    {
-                      "month": "2025-07",
-                      "initial": 25,
-                      "retention_rate": 100
+                      "cohort": "2024",
+                      "start_mrr": 3000.0,
+                      "start_count": 100,
+                      "periods": [
+                        {
+                          "offset": 1,
+                          "retained_mrr": 2400.0,
+                          "retained_count": 80,
+                          "churned_mrr": 600.0,
+                          "churned_count": 20,
+                          "retention_rate_mrr": 80.0,
+                          "retention_rate_count": 80.0,
+                          "retention_rate_previous_mrr": 80.0,
+                          "retention_rate_previous_count": 80.0,
+                          "churn_rate_total_mrr": 20.0,
+                          "churn_rate_total_count": 20.0,
+                          "base_mrr": 3000.0,
+                          "base_count": 100,
+                          "partial": false,
+                          "matured_cohorts": 12,
+                          "total_cohorts": 12
+                        }
+                      ]
                     }
                   ],
-                  "average_retention": {
-                    "month_1": 94.5,
-                    "month_2": 91.2,
-                    "month_3": 87.8,
-                    "month_4": 85,
-                    "month_5": 82.5,
-                    "month_6": 75
-                  }
+                  "weighted_averages": [
+                    {
+                      "offset": 1,
+                      "weighted_avg_mrr": 80.0,
+                      "weighted_avg_count": 80.0,
+                      "weighted_avg_prev_mrr": 80.0,
+                      "weighted_avg_prev_count": 80.0,
+                      "weighted_avg_churn_mrr": 20.0,
+                      "weighted_avg_churn_count": 20.0
+                    }
+                  ],
+                  "group_by": "year",
+                  "metric": "subscribers",
+                  "max_periods": 8,
+                  "generated_at": "2025-01-31 10:00:00",
+                  "intervals": [
+                    "month",
+                    "year"
+                  ],
+                  "full": true
                 },
                 "examples": {
                   "default": {
@@ -313,70 +216,51 @@
                     "value": {
                       "cohorts": [
                         {
-                          "month": "2025-01",
-                          "initial": 12,
-                          "month_1": 11,
-                          "month_2": 10,
-                          "month_3": 10,
-                          "month_4": 9,
-                          "month_5": 9,
-                          "month_6": 9,
-                          "retention_rate": 75
-                        },
-                        {
-                          "month": "2025-02",
-                          "initial": 15,
-                          "month_1": 14,
-                          "month_2": 13,
-                          "month_3": 12,
-                          "month_4": 12,
-                          "month_5": 11,
-                          "retention_rate": 73.3
-                        },
-                        {
-                          "month": "2025-03",
-                          "initial": 18,
-                          "month_1": 17,
-                          "month_2": 16,
-                          "month_3": 15,
-                          "month_4": 15,
-                          "retention_rate": 83.3
-                        },
-                        {
-                          "month": "2025-04",
-                          "initial": 14,
-                          "month_1": 13,
-                          "month_2": 12,
-                          "month_3": 12,
-                          "retention_rate": 85.7
-                        },
-                        {
-                          "month": "2025-05",
-                          "initial": 22,
-                          "month_1": 21,
-                          "month_2": 20,
-                          "retention_rate": 90.9
-                        },
-                        {
-                          "month": "2025-06",
-                          "initial": 19,
-                          "month_1": 18,
-                          "retention_rate": 94.7
-                        },
-                        {
-                          "month": "2025-07",
-                          "initial": 25,
-                          "retention_rate": 100
+                          "cohort": "2024",
+                          "start_mrr": 3000.0,
+                          "start_count": 100,
+                          "periods": [
+                            {
+                              "offset": 1,
+                              "retained_mrr": 2400.0,
+                              "retained_count": 80,
+                              "churned_mrr": 600.0,
+                              "churned_count": 20,
+                              "retention_rate_mrr": 80.0,
+                              "retention_rate_count": 80.0,
+                              "retention_rate_previous_mrr": 80.0,
+                              "retention_rate_previous_count": 80.0,
+                              "churn_rate_total_mrr": 20.0,
+                              "churn_rate_total_count": 20.0,
+                              "base_mrr": 3000.0,
+                              "base_count": 100,
+                              "partial": false,
+                              "matured_cohorts": 12,
+                              "total_cohorts": 12
+                            }
+                          ]
                         }
                       ],
-                      "average_retention": {
-                        "month_1": 94.5,
-                        "month_2": 91.2,
-                        "month_3": 87.8,
-                        "month_4": 85,
-                        "month_5": 82.5,
-                        "month_6": 75
-                      }
+                      "weighted_averages": [
+                        {
+                          "offset": 1,
+                          "weighted_avg_mrr": 80.0,
+                          "weighted_avg_count": 80.0,
+                          "weighted_avg_prev_mrr": 80.0,
+                          "weighted_avg_prev_count": 80.0,
+                          "weighted_avg_churn_mrr": 20.0,
+                          "weighted_avg_churn_count": 20.0
+                        }
+                      ],
+                      "group_by": "year",
+                      "metric": "subscribers",
+                      "max_periods": 8,
+                      "generated_at": "2025-01-31 10:00:00",
+                      "intervals": [
+                        "month",
+                        "year"
+                      ],
+                      "full": true
                     }
                   }
                 }

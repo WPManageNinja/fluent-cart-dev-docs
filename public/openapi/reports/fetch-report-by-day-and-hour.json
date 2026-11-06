@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getReportByDayAndHour",
         "summary": "GET Get Report by Day and Hour",
-        "description": "Retrieve a heatmap-style report showing order distribution by day of the week and hour of the day.\n\n**Access policy:** `ReportPolicy`",
+        "description": "Groups the orders in the range by weekday and hour of the store's local time. `gross_sale` is the sum of `total_paid` in decimal currency units (not cents), before refunds.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First day of the range (Y-m-d), store timezone.",
             "required": false
           },
           {
@@ -52,27 +52,28 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
+            "description": "Last day of the range (Y-m-d), store timezone.",
             "required": false
           },
           {
-            "name": "params[groupKey]",
+            "name": "params[rangeKey]",
             "in": "query",
             "schema": {
               "type": "string",
               "enum": [
-                "default",
-                "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
               ]
             },
-            "description": "Grouping interval for data aggregation.",
+            "description": "Preset range. Overrides the dates.",
             "required": false
           },
           {
@@ -82,7 +83,7 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code, or `__all__` for all currencies converted to the base currency. Default: the base currency.",
             "required": false
           },
           {
@@ -95,11 +96,11 @@
                 "test"
               ]
             },
-            "description": "Payment mode filter.",
+            "description": "Live or test orders only. Default: both.",
             "required": false
           },
           {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,57 +108,26 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
+            "description": "Only orders that contain one of these variation IDs.",
             "required": false
           },
           {
-            "name": "params[compareType]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "previous_period",
-                "previous_month",
-                "previous_quarter",
-                "previous_year",
-                "custom"
-              ]
-            },
-            "description": "Comparison period type.",
-            "required": false
-          },
-          {
-            "name": "params[compareDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2024-01-01"
-            },
-            "description": "Custom comparison start date. Required when compareType is custom.",
-            "required": false
-          },
-          {
-            "name": "params[paymentStatus]",
+            "name": "params[orderTypes][]",
             "in": "query",
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
               }
             },
-            "description": "Payment status filter.",
-            "required": false
-          },
-          {
-            "name": "params[orderTypes]",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "description": "Order type filter (e.g., one-time, subscription).",
+            "description": "Sale types to include. Default: all.",
             "required": false
           }
         ],
@@ -168,148 +138,36 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "description": "Order distribution and gross sales broken down by day of week and hour of day.",
-                  "properties": {
-                    "orderByDayAndHour": {
-                      "type": "array",
-                      "description": "One row per hour of the day (24 rows), with an order count per day of the week.",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "hour": {
-                            "type": "string",
-                            "description": "Hour label, e.g. `9 AM`."
-                          },
-                          "Sunday": {
-                            "type": "integer"
-                          },
-                          "Monday": {
-                            "type": "integer"
-                          },
-                          "Tuesday": {
-                            "type": "integer"
-                          },
-                          "Wednesday": {
-                            "type": "integer"
-                          },
-                          "Thursday": {
-                            "type": "integer"
-                          },
-                          "Friday": {
-                            "type": "integer"
-                          },
-                          "Saturday": {
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    },
-                    "grossSaleByDay": {
-                      "type": "array",
-                      "description": "One row per day of the week (1=Sunday ... 7=Saturday) with gross sale totals.",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "day": {
-                            "type": "integer",
-                            "description": "Day of week, 1=Sunday through 7=Saturday."
-                          },
-                          "gross_sale": {
-                            "type": "number",
-                            "description": "Gross sale total for the day, in major currency units (e.g. dollars)."
-                          },
-                          "order_count": {
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    },
-                    "grossSaleByHour": {
-                      "type": "array",
-                      "description": "One row per hour of the day (24 rows) with gross sale totals.",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "hour": {
-                            "type": "string",
-                            "description": "Hour label, e.g. `9 AM`."
-                          },
-                          "gross_sale": {
-                            "type": "number",
-                            "description": "Gross sale total for the hour, in major currency units (e.g. dollars)."
-                          },
-                          "order_count": {
-                            "type": "integer"
-                          }
-                        }
-                      }
-                    }
-                  },
                   "example": {
                     "orderByDayAndHour": [
                       {
-                        "hour": "9 AM",
+                        "hour": "12 AM",
                         "Sunday": 0,
-                        "Monday": 18,
-                        "Tuesday": 12,
-                        "Wednesday": 15,
-                        "Thursday": 0,
-                        "Friday": 0,
-                        "Saturday": 0
-                      },
-                      {
-                        "hour": "10 AM",
-                        "Sunday": 0,
-                        "Monday": 24,
-                        "Tuesday": 28,
+                        "Monday": 2,
+                        "Tuesday": 1,
                         "Wednesday": 0,
-                        "Thursday": 25,
-                        "Friday": 0,
-                        "Saturday": 0
-                      },
-                      {
-                        "hour": "2 PM",
-                        "Sunday": 0,
-                        "Monday": 22,
-                        "Tuesday": 0,
-                        "Wednesday": 19,
-                        "Thursday": 0,
-                        "Friday": 0,
+                        "Thursday": 3,
+                        "Friday": 1,
                         "Saturday": 0
                       }
                     ],
                     "grossSaleByDay": [
                       {
                         "day": 1,
-                        "gross_sale": 542.0,
-                        "order_count": 8
+                        "gross_sale": 450.0,
+                        "order_count": 5
                       },
                       {
-                        "day": 2,
-                        "gross_sale": 1284.5,
-                        "order_count": 21
-                      },
-                      {
-                        "day": 3,
-                        "gross_sale": 998.0,
-                        "order_count": 16
+                        "day": 0,
+                        "gross_sale": 0,
+                        "order_count": 0
                       }
                     ],
                     "grossSaleByHour": [
                       {
-                        "hour": "9 AM",
+                        "hour": "12 AM",
                         "gross_sale": 320.0,
-                        "order_count": 5
-                      },
-                      {
-                        "hour": "10 AM",
-                        "gross_sale": 610.0,
-                        "order_count": 9
-                      },
-                      {
-                        "hour": "2 PM",
-                        "gross_sale": 415.0,
-                        "order_count": 6
+                        "order_count": 7
                       }
                     ]
                   }
@@ -317,68 +175,33 @@
                 "example": {
                   "orderByDayAndHour": [
                     {
-                      "hour": "9 AM",
+                      "hour": "12 AM",
                       "Sunday": 0,
-                      "Monday": 18,
-                      "Tuesday": 12,
-                      "Wednesday": 15,
-                      "Thursday": 0,
-                      "Friday": 0,
-                      "Saturday": 0
-                    },
-                    {
-                      "hour": "10 AM",
-                      "Sunday": 0,
-                      "Monday": 24,
-                      "Tuesday": 28,
+                      "Monday": 2,
+                      "Tuesday": 1,
                       "Wednesday": 0,
-                      "Thursday": 25,
-                      "Friday": 0,
-                      "Saturday": 0
-                    },
-                    {
-                      "hour": "2 PM",
-                      "Sunday": 0,
-                      "Monday": 22,
-                      "Tuesday": 0,
-                      "Wednesday": 19,
-                      "Thursday": 0,
-                      "Friday": 0,
+                      "Thursday": 3,
+                      "Friday": 1,
                       "Saturday": 0
                     }
                   ],
                   "grossSaleByDay": [
                     {
                       "day": 1,
-                      "gross_sale": 542.0,
-                      "order_count": 8
+                      "gross_sale": 450.0,
+                      "order_count": 5
                     },
                     {
-                      "day": 2,
-                      "gross_sale": 1284.5,
-                      "order_count": 21
-                    },
-                    {
-                      "day": 3,
-                      "gross_sale": 998.0,
-                      "order_count": 16
+                      "day": 0,
+                      "gross_sale": 0,
+                      "order_count": 0
                     }
                   ],
                   "grossSaleByHour": [
                     {
-                      "hour": "9 AM",
+                      "hour": "12 AM",
                       "gross_sale": 320.0,
-                      "order_count": 5
-                    },
-                    {
-                      "hour": "10 AM",
-                      "gross_sale": 610.0,
-                      "order_count": 9
-                    },
-                    {
-                      "hour": "2 PM",
-                      "gross_sale": 415.0,
-                      "order_count": 6
+                      "order_count": 7
                     }
                   ]
                 },
@@ -388,68 +211,33 @@
                     "value": {
                       "orderByDayAndHour": [
                         {
-                          "hour": "9 AM",
+                          "hour": "12 AM",
                           "Sunday": 0,
-                          "Monday": 18,
-                          "Tuesday": 12,
-                          "Wednesday": 15,
-                          "Thursday": 0,
-                          "Friday": 0,
-                          "Saturday": 0
-                        },
-                        {
-                          "hour": "10 AM",
-                          "Sunday": 0,
-                          "Monday": 24,
-                          "Tuesday": 28,
+                          "Monday": 2,
+                          "Tuesday": 1,
                           "Wednesday": 0,
-                          "Thursday": 25,
-                          "Friday": 0,
-                          "Saturday": 0
-                        },
-                        {
-                          "hour": "2 PM",
-                          "Sunday": 0,
-                          "Monday": 22,
-                          "Tuesday": 0,
-                          "Wednesday": 19,
-                          "Thursday": 0,
-                          "Friday": 0,
+                          "Thursday": 3,
+                          "Friday": 1,
                           "Saturday": 0
                         }
                       ],
                       "grossSaleByDay": [
                         {
                           "day": 1,
-                          "gross_sale": 542.0,
-                          "order_count": 8
+                          "gross_sale": 450.0,
+                          "order_count": 5
                         },
                         {
-                          "day": 2,
-                          "gross_sale": 1284.5,
-                          "order_count": 21
-                        },
-                        {
-                          "day": 3,
-                          "gross_sale": 998.0,
-                          "order_count": 16
+                          "day": 0,
+                          "gross_sale": 0,
+                          "order_count": 0
                         }
                       ],
                       "grossSaleByHour": [
                         {
-                          "hour": "9 AM",
+                          "hour": "12 AM",
                           "gross_sale": 320.0,
-                          "order_count": 5
-                        },
-                        {
-                          "hour": "10 AM",
-                          "gross_sale": 610.0,
-                          "order_count": 9
-                        },
-                        {
-                          "hour": "2 PM",
-                          "gross_sale": 415.0,
-                          "order_count": 6
+                          "order_count": 7
                         }
                       ]
                     }

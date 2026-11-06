@@ -2195,26 +2195,28 @@ add_filter('fluent_cart/store_digest/pro_url', function ($proUrl) {
 
 ## Reports
 
+These filters run inside the core report controllers and services. Most of them are switches: core asks the filter whether to include a section, and skips that query when the answer is `false`. FluentCart Pro answers them (in `fluent-cart-pro/app/Modules/Reports/Reports.php`). Without Pro, the filters return their default and the matching response fields are left out. Several MCP report tools ask the same filters, so they return the same data as the REST API.
+
 ### <code> report/sanitize_params_rules </code>
 <details>
 <summary><code>fluent_cart/report/sanitize_params_rules</code> &mdash; Filter the sanitization rules applied to report request parameters</summary>
 
 **When it runs:**
-This filter is applied inside `ReportHelper` before sanitizing incoming report parameters (date ranges, filters, group-by, etc.), letting you add or adjust rules for custom parameters your integration adds to a report request.
+This filter is applied inside `ReportHelper::sanitizeParams()`, before every report request's `params` are sanitized. Add a rule for a custom parameter your integration sends. A key with no rule is left untouched (for example `advanced_filters`, whose consumer sanitizes it).
 
 **Parameters:**
 
-- `$rules` (array): Sanitization rules, keyed like `$params`
+- `$rules` (array): Sanitization rules, keyed like `$params` (for example `'startDate' => 'sanitize_text_field'`, `'variation_ids.*' => 'intval'`)
 - `$params` (array): The raw, unsanitized report request parameters
 
-**Returns:** `array` — The modified sanitization rules
+**Returns:** `array` — The modified sanitization rules. A non-array return means no rules.
 
-**Source:** `app/Services/Report/ReportHelper.php:202`
+**Source:** `app/Services/Report/ReportHelper.php:658`
 
 **Usage:**
 ```php
 add_filter('fluent_cart/report/sanitize_params_rules', function ($rules, $params) {
-    $rules['channel'] = 'sanitizeText';
+    $rules['channel'] = 'sanitize_text_field';
     return $rules;
 }, 10, 2);
 ```
@@ -2222,26 +2224,239 @@ add_filter('fluent_cart/report/sanitize_params_rules', function ($rules, $params
 
 ### <code> report/sources_query </code>
 <details>
-<summary><code>fluent_cart/report/sources_query</code> &mdash; Filter the query builder behind the UTM/sources report</summary>
+<summary><code>fluent_cart/report/sources_query</code> &mdash; Filter the query builder behind the Order Sources report</summary>
 
 **When it runs:**
-This filter is applied after the base query for the sources (UTM) report is built, letting you add extra where clauses or joins. If the returned value is not a query builder instance, the unmodified query is used instead — a misbehaving listener can't fatal the report.
+This filter is applied after the base query for the Order Sources report is built. The query reads orders as `o`, with `fct_order_operations` joined as `oo`. It is not grouped yet. Every row, the totals and the "(none)" row come from it. Core does not parse `advanced_filters`; FluentCart Pro uses this filter to apply them. If the returned value is not a query builder, core uses the unmodified query.
 
 **Parameters:**
 
 - `$query` (`\FluentCart\Framework\Database\Query\Builder`): The report's query builder
-- `$params` (array): Processed report parameters (date range, filters, etc.)
+- `$params` (array): Processed report parameters (date range, currency, `filter_type`, raw `advanced_filters`)
 
-**Returns:** `\FluentCart\Framework\Database\Query\Builder` — The modified query builder (any non-Builder return is ignored)
+**Returns:** `\FluentCart\Framework\Database\Query\Builder` — The modified query builder (any other return is ignored)
 
-**Source:** `app/Services/Report/SourceReportService.php:49`
+**Source:** `app/Services/Report/SourceReportService.php:119`
 
 **Usage:**
 ```php
 add_filter('fluent_cart/report/sources_query', function ($query, $params) {
-    // Exclude a known bot/internal UTM source from the report
-    return $query->where('utm_source', '!=', 'internal-qa');
+    // Exclude a known internal UTM source from the report
+    return $query->where('oo.utm_source', '!=', 'internal-qa');
 }, 10, 2);
+```
+</details>
+
+### <code> report/channel_rules </code>
+<details>
+<summary><code>fluent_cart/report/channel_rules</code> &mdash; Filter the custom channel rules used by the Sources channels report</summary>
+
+**When it runs:**
+This filter is applied when `GET /reports/source-channels` assigns each new customer's first order to a channel. Custom rules are checked in order, before the built-in channels (email, paid, social, ai, search, referral, campaign, direct). Core passes the result through `ChannelRules::sanitize()`. FluentCart Pro returns the rules saved with `POST /reports/channel-rules`.
+
+**Parameters:**
+
+- `$rules` (array): Default `['rules' => [], 'own_domains' => []]`
+    ```php
+    $rules = [
+        'rules' => [
+            [
+                'id'     => 'abc123',          // a-z0-9, at most 12 characters
+                'name'   => 'Partners',        // at most 60 characters
+                'groups' => [                  // a rule matches when any group matches
+                    [                          // a group matches when all its conditions match
+                        ['field' => 'source', 'operator' => 'is', 'value' => 'partner'],
+                    ],
+                ],
+            ],
+        ],
+        'own_domains' => ['example.com'],      // referrers from these domains count as direct
+    ];
+    ```
+    Fields: `source`, `medium`, `campaign`, `domain`. Operators: `is`, `contains`, `starts_with`. Limits: 20 rules, 5 groups per rule, 5 conditions per group, 20 domains.
+
+**Returns:** `array` — The rules and own domains to apply
+
+**Source:** `app/Services/Report/SourceReportService.php:425`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/channel_rules', function ($rules) {
+    $rules['own_domains'][] = 'shop.example.com';
+    return $rules;
+});
+```
+</details>
+
+### <code> report/locations </code>
+<details>
+<summary><code>fluent_cart/report/locations</code> &mdash; Replace the Locations report with a full report</summary>
+
+**When it runs:**
+This filter is applied in `GET /reports/locations` before core builds its own report. Return an array to replace the report. Return anything else (the default `null`) and core builds the country-only report. FluentCart Pro returns the full report: states and cities, lifetime value and repeat rate per place, and the biggest movers. The response carries `full: true` in that case.
+
+**Parameters:**
+
+- `$report` (null): Default `null`
+- `$params` (array): Processed report parameters, plus `level`, `country`, `state`, `address_type` and `with_summary` from the request
+
+**Returns:** `array|null` — The report to send, or `null` to let core build it. Core adds `compare_ranges` to an array return.
+
+**Source:** `app/Http/Controllers/Reports/RevenueReportController.php:81`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/locations', function ($report, $params) {
+    // Leave the report to core (or to FluentCart Pro) unless you build the whole response
+    return $report;
+}, 10, 2);
+```
+</details>
+
+### <code> report/cohort_options </code>
+<details>
+<summary><code>fluent_cart/report/cohort_options</code> &mdash; Allow the advanced options of the subscription cohorts report</summary>
+
+**When it runs:**
+This filter is applied in `GET /reports/subscription-cohorts`. When it returns `true`, the report reads the `metric`, `billingInterval` and `rebuyAdjusted` params (MRR cohorts, billing-interval filter, rebuys counted as retained). When it returns `false`, the metric is always `subscribers` and the other two options are ignored. The response carries `full` with the answer. FluentCart Pro returns `true`.
+
+**Parameters:**
+
+- `$enabled` (bool): Default `false`
+
+**Returns:** `bool`
+
+**Source:** `app/Http/Controllers/Reports/SubscriptionReportController.php:154`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/cohort_options', '__return_true');
+```
+</details>
+
+### <code> report/future_renewals_by_variation </code>
+<details>
+<summary><code>fluent_cart/report/future_renewals_by_variation</code> &mdash; Include renewals by variation in the future renewals report</summary>
+
+**When it runs:**
+This filter is applied in `GET /reports/future-renewals`. When it returns `false`, core skips the per-variation query and removes `by_variation` from the response. FluentCart Pro returns `true`.
+
+**Parameters:**
+
+- `$enabled` (bool): Default `false`
+
+**Returns:** `bool`
+
+**Source:** `app/Http/Controllers/Reports/SubscriptionReportController.php:27`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/future_renewals_by_variation', '__return_true');
+```
+</details>
+
+### <code> report/installment_forecast </code>
+<details>
+<summary><code>fluent_cart/report/installment_forecast</code> &mdash; Include the installment schedule, starts and collection rate</summary>
+
+**When it runs:**
+This filter is applied in `GET /reports/installments`. When it returns `false`, core removes `schedule`, `starts` and `summary.collection_rate` from the response. FluentCart Pro returns `true`.
+
+**Parameters:**
+
+- `$enabled` (bool): Default `false`
+
+**Returns:** `bool`
+
+**Source:** `app/Http/Controllers/Reports/SubscriptionReportController.php:50`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/installment_forecast', '__return_true');
+```
+</details>
+
+### <code> report/mrr_breakdown </code>
+<details>
+<summary><code>fluent_cart/report/mrr_breakdown</code> &mdash; Include MRR by plan and interval and trial conversion in the subscriptions overview</summary>
+
+**When it runs:**
+This filter is applied in `GET /reports/subscriptions-overview`. When it returns `true`, the service also builds MRR by plan and by billing interval and the trial conversion figures. A request with `params[summary_only]` never gets the breakdown. FluentCart Pro returns `true`.
+
+**Parameters:**
+
+- `$enabled` (bool): Default `false`
+
+**Returns:** `bool`
+
+**Source:** `app/Http/Controllers/Reports/SubscriptionReportController.php:96`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/mrr_breakdown', '__return_true');
+```
+</details>
+
+### <code> report/source_groupings </code>
+<details>
+<summary><code>fluent_cart/report/source_groupings</code> &mdash; Allow the non-UTM groupings of the Order Sources report</summary>
+
+**When it runs:**
+This filter is applied in `GET /reports/sources` when `params[group_by]` is `product`, `variation`, `day`, `week`, `month` or `referrer`. When it returns `false`, core falls back to the default grouping (`campaign_source_medium`). The UTM groupings are always allowed. FluentCart Pro returns `true`.
+
+**Parameters:**
+
+- `$enabled` (bool): Default `false`
+
+**Returns:** `bool`
+
+**Source:** `app/Http/Controllers/Reports/SourceReportController.php:38`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/source_groupings', '__return_true');
+```
+</details>
+
+### <code> report/coupon_quality </code>
+<details>
+<summary><code>fluent_cart/report/coupon_quality</code> &mdash; Include coupon quality figures in the coupon reports</summary>
+
+**When it runs:**
+This filter is applied in `GET /reports/coupons` and `GET /reports/coupon-overview`. When it returns `false`, core removes `won_ltv`, `first_order_net`, `later_net`, `lifetime_net` and `refund_rate` from each coupon row and from the totals, and removes `comparison` (coupon orders against full-price orders) from the overview. FluentCart Pro returns `true`.
+
+**Parameters:**
+
+- `$enabled` (bool): Default `false`
+
+**Returns:** `bool`
+
+**Source:** `app/Http/Controllers/Reports/CouponReportController.php:48`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/coupon_quality', '__return_true');
+```
+</details>
+
+### <code> report/refund_products </code>
+<details>
+<summary><code>fluent_cart/report/refund_products</code> &mdash; Include the most refunded products in the refunds overview</summary>
+
+**When it runs:**
+This filter is applied in `GET /reports/refunds-overview`. When it returns `false`, core skips the per-product query and removes `by_product` from the response. FluentCart Pro returns `true`.
+
+**Parameters:**
+
+- `$enabled` (bool): Default `false`
+
+**Returns:** `bool`
+
+**Source:** `app/Http/Controllers/Reports/RefundReportController.php:23`
+
+**Usage:**
+```php
+add_filter('fluent_cart/report/refund_products', '__return_true');
 ```
 </details>
 

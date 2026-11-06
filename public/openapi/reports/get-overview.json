@@ -26,8 +26,8 @@
     "/reports/overview": {
       "get": {
         "operationId": "getReportsOverview",
-        "summary": "GET Get Revenue Overview",
-        "description": "Retrieve a comprehensive year-over-year revenue overview comparing the last 12 months against the same months in the prior year. Includes monthly breakdowns, quarterly aggregations, and top revenue-generating countries.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "summary": "GET Get Reports Overview",
+        "description": "Returns year-over-year gross and net revenue for the last 12 store months, the last 4 quarters and the top 5 billing countries, plus 24 months of net sales. The revenue series are in cents; `net_sales_months` is a decimal.\n\nThis endpoint does not use the date range. `net_revenue` is paid \u2212 refunds \u2212 unrefunded tax (shipping and fees stay in). `net_sales_months` is the Revenue report's net sales. Only `net_sales_months` accepts `__all__`; the other series use one currency. With `params[net_sales_only]=1` only `net_sales_months` is returned.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,33 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by. Defaults to store currency.",
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` converts every currency to the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[net_sales_only]",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "When `1`, return only `net_sales_months`.",
+            "required": false
+          },
+          {
+            "name": "params[cached]",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            "description": "With `net_sales_only`, when `1` the result may come from a 10-minute cache.",
             "required": false
           }
         ],
@@ -55,155 +81,76 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "description": "Revenue overview data with gross/net revenue, quarterly breakdowns, and top countries",
-                      "additionalProperties": true
-                    }
-                  },
                   "example": {
                     "data": {
                       "gross_revenue": {
                         "2025-01": {
-                          "current": 420000,
-                          "prev": 350000,
-                          "yoy_growth": "20.00"
-                        },
-                        "2025-02": {
-                          "current": 480000,
-                          "prev": 380000,
-                          "yoy_growth": "26.32"
-                        },
-                        "2025-03": {
-                          "current": 510000,
-                          "prev": 410000,
-                          "yoy_growth": "24.39"
-                        },
-                        "2025-04": {
-                          "current": 390000,
-                          "prev": 360000,
-                          "yoy_growth": "8.33"
-                        },
-                        "2025-05": {
-                          "current": 550000,
-                          "prev": 420000,
-                          "yoy_growth": "30.95"
-                        },
-                        "2025-06": {
-                          "current": 620000,
-                          "prev": 480000,
-                          "yoy_growth": "29.17"
+                          "current": 500000,
+                          "prev": 400000,
+                          "yoy_growth": "25.00"
                         }
                       },
                       "gross_revenue_quarterly": {
                         "Q1-2025": {
-                          "current": 1410000,
-                          "prev_year": 1140000,
-                          "yy_growth": "23.68"
-                        },
-                        "Q2-2025": {
-                          "current": 1560000,
-                          "prev_year": 1260000,
-                          "yy_growth": "23.81"
+                          "current": 1500000,
+                          "prev_year": 1200000,
+                          "yy_growth": "25.00"
                         }
                       },
                       "net_revenue": {
                         "2025-01": {
-                          "current": 378000,
-                          "prev": 315000,
-                          "yoy_growth": "20.00"
-                        },
-                        "2025-02": {
-                          "current": 432000,
-                          "prev": 342000,
-                          "yoy_growth": "26.32"
-                        },
-                        "2025-03": {
-                          "current": 459000,
-                          "prev": 369000,
-                          "yoy_growth": "24.39"
-                        },
-                        "2025-04": {
-                          "current": 351000,
-                          "prev": 324000,
-                          "yoy_growth": "8.33"
-                        },
-                        "2025-05": {
-                          "current": 495000,
-                          "prev": 378000,
-                          "yoy_growth": "30.95"
-                        },
-                        "2025-06": {
-                          "current": 558000,
-                          "prev": 432000,
-                          "yoy_growth": "29.17"
+                          "current": 450000,
+                          "prev": 360000,
+                          "yoy_growth": "25.00"
                         }
                       },
                       "net_revenue_quarterly": {
                         "Q1-2025": {
-                          "current": 1269000,
-                          "prev_year": 1026000,
-                          "yy_growth": "23.68"
-                        },
-                        "Q2-2025": {
-                          "current": 1404000,
-                          "prev_year": 1134000,
-                          "yy_growth": "23.81"
+                          "current": 1350000,
+                          "prev_year": 1080000,
+                          "yy_growth": "25.00"
                         }
                       },
                       "gross_summary": {
-                        "total": 2970000,
-                        "total_prev": 2400000,
-                        "yoy_growth": "23.75"
+                        "total": 6000000,
+                        "total_prev": 4800000,
+                        "yoy_growth": "25.00"
                       },
                       "net_summary": {
-                        "total": 2673000,
-                        "total_prev": 2160000,
-                        "yoy_growth": "23.75"
+                        "total": 5400000,
+                        "total_prev": 4320000,
+                        "yoy_growth": "25.00"
                       },
                       "top_country_net": {
                         "by_month": {
                           "2025-01": {
-                            "US": 210000,
-                            "GB": 85000,
-                            "DE": 42000
-                          },
-                          "2025-02": {
-                            "US": 240000,
-                            "GB": 95000,
-                            "DE": 48000
+                            "US": 300000,
+                            "GB": 100000
                           }
                         },
                         "by_countries": {
-                          "US": 1500000,
-                          "GB": 580000,
-                          "DE": 310000,
-                          "CA": 180000,
-                          "AU": 103000
+                          "US": 3600000,
+                          "GB": 1200000
                         }
                       },
                       "top_country_gross": {
                         "by_month": {
                           "2025-01": {
-                            "US": 233000,
-                            "GB": 94000,
-                            "DE": 47000
-                          },
-                          "2025-02": {
-                            "US": 267000,
-                            "GB": 106000,
-                            "DE": 53000
+                            "US": 330000,
+                            "GB": 110000
                           }
                         },
                         "by_countries": {
-                          "US": 1667000,
-                          "GB": 644000,
-                          "DE": 344000,
-                          "CA": 200000,
-                          "AU": 115000
+                          "US": 3960000,
+                          "GB": 1320000
                         }
-                      }
+                      },
+                      "net_sales_months": [
+                        {
+                          "group": "2025-01",
+                          "net_sales": 4100.0
+                        }
+                      ]
                     }
                   }
                 },
@@ -211,144 +158,72 @@
                   "data": {
                     "gross_revenue": {
                       "2025-01": {
-                        "current": 420000,
-                        "prev": 350000,
-                        "yoy_growth": "20.00"
-                      },
-                      "2025-02": {
-                        "current": 480000,
-                        "prev": 380000,
-                        "yoy_growth": "26.32"
-                      },
-                      "2025-03": {
-                        "current": 510000,
-                        "prev": 410000,
-                        "yoy_growth": "24.39"
-                      },
-                      "2025-04": {
-                        "current": 390000,
-                        "prev": 360000,
-                        "yoy_growth": "8.33"
-                      },
-                      "2025-05": {
-                        "current": 550000,
-                        "prev": 420000,
-                        "yoy_growth": "30.95"
-                      },
-                      "2025-06": {
-                        "current": 620000,
-                        "prev": 480000,
-                        "yoy_growth": "29.17"
+                        "current": 500000,
+                        "prev": 400000,
+                        "yoy_growth": "25.00"
                       }
                     },
                     "gross_revenue_quarterly": {
                       "Q1-2025": {
-                        "current": 1410000,
-                        "prev_year": 1140000,
-                        "yy_growth": "23.68"
-                      },
-                      "Q2-2025": {
-                        "current": 1560000,
-                        "prev_year": 1260000,
-                        "yy_growth": "23.81"
+                        "current": 1500000,
+                        "prev_year": 1200000,
+                        "yy_growth": "25.00"
                       }
                     },
                     "net_revenue": {
                       "2025-01": {
-                        "current": 378000,
-                        "prev": 315000,
-                        "yoy_growth": "20.00"
-                      },
-                      "2025-02": {
-                        "current": 432000,
-                        "prev": 342000,
-                        "yoy_growth": "26.32"
-                      },
-                      "2025-03": {
-                        "current": 459000,
-                        "prev": 369000,
-                        "yoy_growth": "24.39"
-                      },
-                      "2025-04": {
-                        "current": 351000,
-                        "prev": 324000,
-                        "yoy_growth": "8.33"
-                      },
-                      "2025-05": {
-                        "current": 495000,
-                        "prev": 378000,
-                        "yoy_growth": "30.95"
-                      },
-                      "2025-06": {
-                        "current": 558000,
-                        "prev": 432000,
-                        "yoy_growth": "29.17"
+                        "current": 450000,
+                        "prev": 360000,
+                        "yoy_growth": "25.00"
                       }
                     },
                     "net_revenue_quarterly": {
                       "Q1-2025": {
-                        "current": 1269000,
-                        "prev_year": 1026000,
-                        "yy_growth": "23.68"
-                      },
-                      "Q2-2025": {
-                        "current": 1404000,
-                        "prev_year": 1134000,
-                        "yy_growth": "23.81"
+                        "current": 1350000,
+                        "prev_year": 1080000,
+                        "yy_growth": "25.00"
                       }
                     },
                     "gross_summary": {
-                      "total": 2970000,
-                      "total_prev": 2400000,
-                      "yoy_growth": "23.75"
+                      "total": 6000000,
+                      "total_prev": 4800000,
+                      "yoy_growth": "25.00"
                     },
                     "net_summary": {
-                      "total": 2673000,
-                      "total_prev": 2160000,
-                      "yoy_growth": "23.75"
+                      "total": 5400000,
+                      "total_prev": 4320000,
+                      "yoy_growth": "25.00"
                     },
                     "top_country_net": {
                       "by_month": {
                         "2025-01": {
-                          "US": 210000,
-                          "GB": 85000,
-                          "DE": 42000
-                        },
-                        "2025-02": {
-                          "US": 240000,
-                          "GB": 95000,
-                          "DE": 48000
+                          "US": 300000,
+                          "GB": 100000
                         }
                       },
                       "by_countries": {
-                        "US": 1500000,
-                        "GB": 580000,
-                        "DE": 310000,
-                        "CA": 180000,
-                        "AU": 103000
+                        "US": 3600000,
+                        "GB": 1200000
                       }
                     },
                     "top_country_gross": {
                       "by_month": {
                         "2025-01": {
-                          "US": 233000,
-                          "GB": 94000,
-                          "DE": 47000
-                        },
-                        "2025-02": {
-                          "US": 267000,
-                          "GB": 106000,
-                          "DE": 53000
+                          "US": 330000,
+                          "GB": 110000
                         }
                       },
                       "by_countries": {
-                        "US": 1667000,
-                        "GB": 644000,
-                        "DE": 344000,
-                        "CA": 200000,
-                        "AU": 115000
+                        "US": 3960000,
+                        "GB": 1320000
                       }
-                    }
+                    },
+                    "net_sales_months": [
+                      {
+                        "group": "2025-01",
+                        "net_sales": 4100.0
+                      }
+                    ]
                   }
                 },
                 "examples": {
@@ -358,144 +233,72 @@
                       "data": {
                         "gross_revenue": {
                           "2025-01": {
-                            "current": 420000,
-                            "prev": 350000,
-                            "yoy_growth": "20.00"
-                          },
-                          "2025-02": {
-                            "current": 480000,
-                            "prev": 380000,
-                            "yoy_growth": "26.32"
-                          },
-                          "2025-03": {
-                            "current": 510000,
-                            "prev": 410000,
-                            "yoy_growth": "24.39"
-                          },
-                          "2025-04": {
-                            "current": 390000,
-                            "prev": 360000,
-                            "yoy_growth": "8.33"
-                          },
-                          "2025-05": {
-                            "current": 550000,
-                            "prev": 420000,
-                            "yoy_growth": "30.95"
-                          },
-                          "2025-06": {
-                            "current": 620000,
-                            "prev": 480000,
-                            "yoy_growth": "29.17"
+                            "current": 500000,
+                            "prev": 400000,
+                            "yoy_growth": "25.00"
                           }
                         },
                         "gross_revenue_quarterly": {
                           "Q1-2025": {
-                            "current": 1410000,
-                            "prev_year": 1140000,
-                            "yy_growth": "23.68"
-                          },
-                          "Q2-2025": {
-                            "current": 1560000,
-                            "prev_year": 1260000,
-                            "yy_growth": "23.81"
+                            "current": 1500000,
+                            "prev_year": 1200000,
+                            "yy_growth": "25.00"
                           }
                         },
                         "net_revenue": {
                           "2025-01": {
-                            "current": 378000,
-                            "prev": 315000,
-                            "yoy_growth": "20.00"
-                          },
-                          "2025-02": {
-                            "current": 432000,
-                            "prev": 342000,
-                            "yoy_growth": "26.32"
-                          },
-                          "2025-03": {
-                            "current": 459000,
-                            "prev": 369000,
-                            "yoy_growth": "24.39"
-                          },
-                          "2025-04": {
-                            "current": 351000,
-                            "prev": 324000,
-                            "yoy_growth": "8.33"
-                          },
-                          "2025-05": {
-                            "current": 495000,
-                            "prev": 378000,
-                            "yoy_growth": "30.95"
-                          },
-                          "2025-06": {
-                            "current": 558000,
-                            "prev": 432000,
-                            "yoy_growth": "29.17"
+                            "current": 450000,
+                            "prev": 360000,
+                            "yoy_growth": "25.00"
                           }
                         },
                         "net_revenue_quarterly": {
                           "Q1-2025": {
-                            "current": 1269000,
-                            "prev_year": 1026000,
-                            "yy_growth": "23.68"
-                          },
-                          "Q2-2025": {
-                            "current": 1404000,
-                            "prev_year": 1134000,
-                            "yy_growth": "23.81"
+                            "current": 1350000,
+                            "prev_year": 1080000,
+                            "yy_growth": "25.00"
                           }
                         },
                         "gross_summary": {
-                          "total": 2970000,
-                          "total_prev": 2400000,
-                          "yoy_growth": "23.75"
+                          "total": 6000000,
+                          "total_prev": 4800000,
+                          "yoy_growth": "25.00"
                         },
                         "net_summary": {
-                          "total": 2673000,
-                          "total_prev": 2160000,
-                          "yoy_growth": "23.75"
+                          "total": 5400000,
+                          "total_prev": 4320000,
+                          "yoy_growth": "25.00"
                         },
                         "top_country_net": {
                           "by_month": {
                             "2025-01": {
-                              "US": 210000,
-                              "GB": 85000,
-                              "DE": 42000
-                            },
-                            "2025-02": {
-                              "US": 240000,
-                              "GB": 95000,
-                              "DE": 48000
+                              "US": 300000,
+                              "GB": 100000
                             }
                           },
                           "by_countries": {
-                            "US": 1500000,
-                            "GB": 580000,
-                            "DE": 310000,
-                            "CA": 180000,
-                            "AU": 103000
+                            "US": 3600000,
+                            "GB": 1200000
                           }
                         },
                         "top_country_gross": {
                           "by_month": {
                             "2025-01": {
-                              "US": 233000,
-                              "GB": 94000,
-                              "DE": 47000
-                            },
-                            "2025-02": {
-                              "US": 267000,
-                              "GB": 106000,
-                              "DE": 53000
+                              "US": 330000,
+                              "GB": 110000
                             }
                           },
                           "by_countries": {
-                            "US": 1667000,
-                            "GB": 644000,
-                            "DE": 344000,
-                            "CA": 200000,
-                            "AU": 115000
+                            "US": 3960000,
+                            "GB": 1320000
                           }
-                        }
+                        },
+                        "net_sales_months": [
+                          {
+                            "group": "2025-01",
+                            "net_sales": 4100.0
+                          }
+                        ]
                       }
                     }
                   }
@@ -536,28 +339,7 @@
     }
   },
   "components": {
-    "schemas": {
-      "RevenuePeriod": {
-        "type": "object",
-        "properties": {
-          "current": {
-            "type": "integer",
-            "description": "Current period revenue in cents",
-            "example": 500000
-          },
-          "prev": {
-            "type": "integer",
-            "description": "Previous period revenue in cents",
-            "example": 350000
-          },
-          "yoy_growth": {
-            "type": "string",
-            "description": "Year-over-year growth percentage",
-            "example": "42.86"
-          }
-        }
-      }
-    },
+    "schemas": {},
     "securitySchemes": {
       "ApplicationPasswords": {
         "type": "apiKey",

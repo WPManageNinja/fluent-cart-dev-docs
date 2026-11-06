@@ -1,0 +1,365 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/installments": {
+      "get": {
+        "operationId": "getInstallments",
+        "summary": "GET Get Installments",
+        "description": "Returns installment-plan health over all time: plans started, money collected and still owed, plans by status bucket, payments due in the next 30 days and the product picker options. Amounts are in cents.\n\nInstallment plans are subscriptions with a fixed number of payments. The date range does not apply; `started_from` and `started_to` filter by the plan's first paid order. `schedule`, `starts` and `summary.collection_rate` come only when FluentCart Pro answers the `fluent_cart/report/installment_forecast` filter.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` converts every currency to the base currency.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Product variation IDs to filter by.",
+            "required": false
+          },
+          {
+            "name": "params[started_from]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only plans whose first paid order is on or after this store day (Y-m-d).",
+            "required": false
+          },
+          {
+            "name": "params[started_to]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only plans whose first paid order is on or before this store day (Y-m-d).",
+            "required": false
+          },
+          {
+            "name": "params[as_of]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Day to measure from (Y-m-d). Defaults to today.",
+            "required": false
+          },
+          {
+            "name": "params[at_risk_limit]",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of at-risk rows to include, 0 to 500. Default `0` (none).",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "as_of": "2025-02-01",
+                    "currency": "USD",
+                    "started_from": null,
+                    "started_to": null,
+                    "summary": {
+                      "plans_started": 50,
+                      "payments": 180,
+                      "collected": 900000,
+                      "scheduled": 300000,
+                      "overdue": 20000,
+                      "lapsed_unpaid": 40000,
+                      "completion_rate": 85.0,
+                      "collection_rate": 92.5,
+                      "completed_count": 30,
+                      "running_count": 12,
+                      "overdue_count": 2,
+                      "paused_count": 0,
+                      "upgraded_count": 1,
+                      "lapsed_count": 4,
+                      "refunded_count": 1
+                    },
+                    "schedule": [
+                      {
+                        "month": "2025-02",
+                        "payments": 14,
+                        "amount": 70000,
+                        "scheduled": 60000,
+                        "overdue": 10000
+                      }
+                    ],
+                    "due_soon": {
+                      "count": 14,
+                      "amount": 70000,
+                      "overdue": {
+                        "count": 2,
+                        "amount": 10000
+                      }
+                    },
+                    "starts": [
+                      {
+                        "month": "2024-06",
+                        "plans_started": 5,
+                        "collected": 100000,
+                        "completed_count": 3,
+                        "running_count": 2,
+                        "overdue_count": 0,
+                        "paused_count": 0,
+                        "upgraded_count": 0,
+                        "lapsed_count": 0,
+                        "refunded_count": 0
+                      }
+                    ],
+                    "at_risk": [],
+                    "filter_options": [
+                      {
+                        "product_id": 20,
+                        "product_title": "Course",
+                        "variations": [
+                          {
+                            "id": 31,
+                            "title": "3 payments"
+                          }
+                        ]
+                      }
+                    ],
+                    "at_risk_count": 6,
+                    "at_risk_amount": 60000
+                  }
+                },
+                "example": {
+                  "as_of": "2025-02-01",
+                  "currency": "USD",
+                  "started_from": null,
+                  "started_to": null,
+                  "summary": {
+                    "plans_started": 50,
+                    "payments": 180,
+                    "collected": 900000,
+                    "scheduled": 300000,
+                    "overdue": 20000,
+                    "lapsed_unpaid": 40000,
+                    "completion_rate": 85.0,
+                    "collection_rate": 92.5,
+                    "completed_count": 30,
+                    "running_count": 12,
+                    "overdue_count": 2,
+                    "paused_count": 0,
+                    "upgraded_count": 1,
+                    "lapsed_count": 4,
+                    "refunded_count": 1
+                  },
+                  "schedule": [
+                    {
+                      "month": "2025-02",
+                      "payments": 14,
+                      "amount": 70000,
+                      "scheduled": 60000,
+                      "overdue": 10000
+                    }
+                  ],
+                  "due_soon": {
+                    "count": 14,
+                    "amount": 70000,
+                    "overdue": {
+                      "count": 2,
+                      "amount": 10000
+                    }
+                  },
+                  "starts": [
+                    {
+                      "month": "2024-06",
+                      "plans_started": 5,
+                      "collected": 100000,
+                      "completed_count": 3,
+                      "running_count": 2,
+                      "overdue_count": 0,
+                      "paused_count": 0,
+                      "upgraded_count": 0,
+                      "lapsed_count": 0,
+                      "refunded_count": 0
+                    }
+                  ],
+                  "at_risk": [],
+                  "filter_options": [
+                    {
+                      "product_id": 20,
+                      "product_title": "Course",
+                      "variations": [
+                        {
+                          "id": 31,
+                          "title": "3 payments"
+                        }
+                      ]
+                    }
+                  ],
+                  "at_risk_count": 6,
+                  "at_risk_amount": 60000
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "as_of": "2025-02-01",
+                      "currency": "USD",
+                      "started_from": null,
+                      "started_to": null,
+                      "summary": {
+                        "plans_started": 50,
+                        "payments": 180,
+                        "collected": 900000,
+                        "scheduled": 300000,
+                        "overdue": 20000,
+                        "lapsed_unpaid": 40000,
+                        "completion_rate": 85.0,
+                        "collection_rate": 92.5,
+                        "completed_count": 30,
+                        "running_count": 12,
+                        "overdue_count": 2,
+                        "paused_count": 0,
+                        "upgraded_count": 1,
+                        "lapsed_count": 4,
+                        "refunded_count": 1
+                      },
+                      "schedule": [
+                        {
+                          "month": "2025-02",
+                          "payments": 14,
+                          "amount": 70000,
+                          "scheduled": 60000,
+                          "overdue": 10000
+                        }
+                      ],
+                      "due_soon": {
+                        "count": 14,
+                        "amount": 70000,
+                        "overdue": {
+                          "count": 2,
+                          "amount": 10000
+                        }
+                      },
+                      "starts": [
+                        {
+                          "month": "2024-06",
+                          "plans_started": 5,
+                          "collected": 100000,
+                          "completed_count": 3,
+                          "running_count": 2,
+                          "overdue_count": 0,
+                          "paused_count": 0,
+                          "upgraded_count": 0,
+                          "lapsed_count": 0,
+                          "refunded_count": 0
+                        }
+                      ],
+                      "at_risk": [],
+                      "filter_options": [
+                        {
+                          "product_id": 20,
+                          "product_title": "Course",
+                          "variations": [
+                            {
+                              "id": 31,
+                              "title": "3 payments"
+                            }
+                          ]
+                        }
+                      ],
+                      "at_risk_count": 6,
+                      "at_risk_amount": 60000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

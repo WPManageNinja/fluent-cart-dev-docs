@@ -1,0 +1,358 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/source-channels": {
+      "get": {
+        "operationId": "getSourceChannels",
+        "summary": "GET Get Source Channels",
+        "description": "Returns the new customers won per marketing channel (email, paid, social, AI, search, referral, campaign, direct) with first-order net, lifetime value, repeat and refund rates, tracking coverage and a chart. Amounts are integers in cents; net figures are the Revenue report's net sales.\n\nA new customer is one whose first paid purchase falls in the range. The channel comes from the store's own rules first, then the UTM tags, then the referrer. Custom channel rules come from FluentCart Pro (the `fluent_cart/report/channel_rules` filter); custom channels come first, with their `label`; built-in channels have `label` `null`. Pro's `filter_type` and `advanced_filters` apply here too. `coverage.tracked` is customers not in `direct`. `chart[]` holds new customers per channel key per bucket.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[groupKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "default",
+                "daily",
+                "monthly",
+                "yearly"
+              ]
+            },
+            "description": "Chart bucket: `daily`, `monthly`, `yearly`, or `default` (picked from the range length).",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. `__all__` converts every currency to the base currency. Default: base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Only live or only test orders. Without it, both count.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[orderTypes][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "payment",
+                  "subscription",
+                  "renewal",
+                  "installment",
+                  "installment_payment"
+                ]
+              }
+            },
+            "description": "Only these sale types. `renewal` leaves out installment payments.",
+            "required": false
+          },
+          {
+            "name": "params[filter_type]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pro. Advanced filter mode, passed to the `fluent_cart/report/sources_query` filter.",
+            "required": false
+          },
+          {
+            "name": "params[advanced_filters]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pro. Advanced filter conditions (JSON), applied by FluentCart Pro.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "coverage": {
+                      "customers": 50,
+                      "tracked": 30,
+                      "share": 60.0,
+                      "revenue_share": 58.5
+                    },
+                    "channels": [
+                      {
+                        "key": "email",
+                        "label": null,
+                        "customers": 10,
+                        "share": 20.0,
+                        "first_net": 40000,
+                        "average_ltv": 9000,
+                        "repeat_rate": 30.0,
+                        "refund_rate": 0.0
+                      },
+                      {
+                        "key": "direct",
+                        "label": null,
+                        "customers": 20,
+                        "share": 40.0,
+                        "first_net": 85000,
+                        "average_ltv": 7000,
+                        "repeat_rate": 15.0,
+                        "refund_rate": 5.0
+                      }
+                    ],
+                    "chart": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01-01",
+                        "email": 1,
+                        "paid": 0,
+                        "social": 0,
+                        "ai": 0,
+                        "search": 0,
+                        "referral": 0,
+                        "campaign": 0,
+                        "direct": 1
+                      }
+                    ]
+                  }
+                },
+                "example": {
+                  "coverage": {
+                    "customers": 50,
+                    "tracked": 30,
+                    "share": 60.0,
+                    "revenue_share": 58.5
+                  },
+                  "channels": [
+                    {
+                      "key": "email",
+                      "label": null,
+                      "customers": 10,
+                      "share": 20.0,
+                      "first_net": 40000,
+                      "average_ltv": 9000,
+                      "repeat_rate": 30.0,
+                      "refund_rate": 0.0
+                    },
+                    {
+                      "key": "direct",
+                      "label": null,
+                      "customers": 20,
+                      "share": 40.0,
+                      "first_net": 85000,
+                      "average_ltv": 7000,
+                      "repeat_rate": 15.0,
+                      "refund_rate": 5.0
+                    }
+                  ],
+                  "chart": [
+                    {
+                      "year": "2025",
+                      "group": "2025-01-01",
+                      "email": 1,
+                      "paid": 0,
+                      "social": 0,
+                      "ai": 0,
+                      "search": 0,
+                      "referral": 0,
+                      "campaign": 0,
+                      "direct": 1
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "coverage": {
+                        "customers": 50,
+                        "tracked": 30,
+                        "share": 60.0,
+                        "revenue_share": 58.5
+                      },
+                      "channels": [
+                        {
+                          "key": "email",
+                          "label": null,
+                          "customers": 10,
+                          "share": 20.0,
+                          "first_net": 40000,
+                          "average_ltv": 9000,
+                          "repeat_rate": 30.0,
+                          "refund_rate": 0.0
+                        },
+                        {
+                          "key": "direct",
+                          "label": null,
+                          "customers": 20,
+                          "share": 40.0,
+                          "first_net": 85000,
+                          "average_ltv": 7000,
+                          "repeat_rate": 15.0,
+                          "refund_rate": 5.0
+                        }
+                      ],
+                      "chart": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01-01",
+                          "email": 1,
+                          "paid": 0,
+                          "social": 0,
+                          "ai": 0,
+                          "search": 0,
+                          "referral": 0,
+                          "campaign": 0,
+                          "direct": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 ---
 title: Get License Pie Chart
-description: "Retrieve license distribution data suitable for pie/donut chart visualization (e.g., active vs expired vs revoked)."
+description: "Returns active licenses per product with each product's share of all active licenses. The date range does not apply."
 outline: false
 aside: false
 ---

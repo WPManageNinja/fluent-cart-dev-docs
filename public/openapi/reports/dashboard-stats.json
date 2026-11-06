@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getDashboardStats",
         "summary": "GET Get Dashboard Stats",
-        "description": "Retrieve key dashboard statistics including total orders, paid orders, paid order items, and total paid amounts. Automatically calculates comparison against the equivalent prior period based on the selected date range.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns four order tiles for a date range and for the previous period of the same length: all orders, paid orders, paid order items and paid order value. The paid order value is in cents.\n\n\"Paid\" means the report statuses: paid, partially paid, refunded and partially refunded. The order value is `SUM(total_paid)`, not net sales. With no dates the range runs from the first order to today. One currency only: the base currency when `params[currency]` is empty. The admin Orders page stat bar reads this endpoint; the Dashboard page tiles come from `GET /dashboard/stats`.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date. If omitted, defaults to the earliest order date.",
+            "description": "First store day of the range (Y-m-d).",
             "required": false
           },
           {
@@ -52,9 +52,9 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-06-30"
+              "example": "2025-01-31"
             },
-            "description": "End date. If omitted, defaults to today.",
+            "description": "Last store day of the range (Y-m-d).",
             "required": false
           },
           {
@@ -64,16 +64,7 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code filter. Defaults to store currency.",
-            "required": false
-          },
-          {
-            "name": "params[paymentStatus]",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Payment status filter. Set to all to include all statuses.",
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` is not supported.",
             "required": false
           }
         ],
@@ -84,38 +75,31 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "dashBoardStats": {
-                      "type": "object",
-                      "description": "Dashboard statistics with current and comparison counts",
-                      "additionalProperties": true
-                    }
-                  },
                   "example": {
                     "dashBoardStats": {
                       "total_orders": {
                         "title": "All Orders",
                         "icon": "AllOrdersIcon",
-                        "current_count": 342,
-                        "compare_count": 289
+                        "current_count": 150,
+                        "compare_count": 120
                       },
                       "paid_orders": {
                         "title": "Paid Orders",
                         "icon": "Money",
-                        "current_count": 328,
-                        "compare_count": 275
+                        "current_count": 140,
+                        "compare_count": 110
                       },
                       "total_paid_order_items": {
                         "title": "Paid Order Items",
                         "icon": "OrderItemsIcon",
-                        "current_count": 856,
-                        "compare_count": 720
+                        "current_count": 210,
+                        "compare_count": 180
                       },
                       "total_paid_amounts": {
                         "title": "Order Value (Paid)",
                         "icon": "OrderValueIcon",
                         "current_count": 1250000,
-                        "compare_count": 1050000,
+                        "compare_count": 1000000,
                         "is_cents": true
                       }
                     }
@@ -126,26 +110,26 @@
                     "total_orders": {
                       "title": "All Orders",
                       "icon": "AllOrdersIcon",
-                      "current_count": 342,
-                      "compare_count": 289
+                      "current_count": 150,
+                      "compare_count": 120
                     },
                     "paid_orders": {
                       "title": "Paid Orders",
                       "icon": "Money",
-                      "current_count": 328,
-                      "compare_count": 275
+                      "current_count": 140,
+                      "compare_count": 110
                     },
                     "total_paid_order_items": {
                       "title": "Paid Order Items",
                       "icon": "OrderItemsIcon",
-                      "current_count": 856,
-                      "compare_count": 720
+                      "current_count": 210,
+                      "compare_count": 180
                     },
                     "total_paid_amounts": {
                       "title": "Order Value (Paid)",
                       "icon": "OrderValueIcon",
                       "current_count": 1250000,
-                      "compare_count": 1050000,
+                      "compare_count": 1000000,
                       "is_cents": true
                     }
                   }
@@ -158,26 +142,26 @@
                         "total_orders": {
                           "title": "All Orders",
                           "icon": "AllOrdersIcon",
-                          "current_count": 342,
-                          "compare_count": 289
+                          "current_count": 150,
+                          "compare_count": 120
                         },
                         "paid_orders": {
                           "title": "Paid Orders",
                           "icon": "Money",
-                          "current_count": 328,
-                          "compare_count": 275
+                          "current_count": 140,
+                          "compare_count": 110
                         },
                         "total_paid_order_items": {
                           "title": "Paid Order Items",
                           "icon": "OrderItemsIcon",
-                          "current_count": 856,
-                          "compare_count": 720
+                          "current_count": 210,
+                          "compare_count": 180
                         },
                         "total_paid_amounts": {
                           "title": "Order Value (Paid)",
                           "icon": "OrderValueIcon",
                           "current_count": 1250000,
-                          "compare_count": 1050000,
+                          "compare_count": 1000000,
                           "is_cents": true
                         }
                       }

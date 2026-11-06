@@ -27,7 +27,7 @@
       "get": {
         "operationId": "getSalesGrowthChart",
         "summary": "GET Get Sales Growth Chart",
-        "description": "Retrieve time-series chart data for sales growth on the dashboard, showing order counts and net revenue grouped by the specified interval.\n\n**Access policy:** `ReportPolicy`\n\n**Access policy:** `ReportPolicy`",
+        "description": "Returns orders and net sales per day, month or year in the range. `net_revenue` is the Revenue report's net sales, as a decimal.\n\nCounts orders in the report payment statuses. On-hold and failed orders are left out by default. The range end is clamped to today.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
         "tags": [
           "Reports"
         ],
@@ -44,7 +44,7 @@
               "type": "string",
               "example": "2025-01-01"
             },
-            "description": "Start date for the report period.",
+            "description": "First store day of the range (Y-m-d).",
             "required": false
           },
           {
@@ -52,9 +52,28 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "example": "2025-12-31"
+              "example": "2025-01-31"
             },
-            "description": "End date for the report period.",
+            "description": "Last store day of the range (Y-m-d).",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range relative to today. Overrides the dates.",
             "required": false
           },
           {
@@ -64,15 +83,12 @@
               "type": "string",
               "enum": [
                 "default",
+                "daily",
                 "monthly",
-                "yearly",
-                "billing_country",
-                "shipping_country",
-                "payment_method",
-                "payment_status"
+                "yearly"
               ]
             },
-            "description": "Grouping interval for data aggregation.",
+            "description": "Chart bucket. `default` picks daily (up to 91 days), monthly (up to 365 days) or yearly.",
             "required": false
           },
           {
@@ -82,7 +98,7 @@
               "type": "string",
               "example": "USD"
             },
-            "description": "Currency code to filter by.",
+            "description": "3-letter currency code. Defaults to the base currency. `__all__` converts every currency to the base currency.",
             "required": false
           },
           {
@@ -95,11 +111,11 @@
                 "test"
               ]
             },
-            "description": "Payment mode filter.",
+            "description": "Count only live or only test orders. Both when omitted.",
             "required": false
           },
           {
-            "name": "params[variation_ids]",
+            "name": "params[variation_ids][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -107,37 +123,11 @@
                 "type": "integer"
               }
             },
-            "description": "Array of product variation IDs to filter by.",
+            "description": "Product variation IDs to filter by.",
             "required": false
           },
           {
-            "name": "params[compareType]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "previous_period",
-                "previous_month",
-                "previous_quarter",
-                "previous_year",
-                "custom"
-              ]
-            },
-            "description": "Comparison period type.",
-            "required": false
-          },
-          {
-            "name": "params[compareDate]",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "example": "2024-01-01"
-            },
-            "description": "Custom comparison start date. Required when compareType is custom.",
-            "required": false
-          },
-          {
-            "name": "params[orderStatus]",
+            "name": "params[orderStatus][]",
             "in": "query",
             "schema": {
               "type": "array",
@@ -145,7 +135,7 @@
                 "type": "string"
               }
             },
-            "description": "Order status filter.",
+            "description": "Order statuses to leave out. Defaults to `on-hold` and `failed`; `all` also gives that default.",
             "required": false
           }
         ],
@@ -156,70 +146,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {
-                    "salesGrowthChart": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      },
-                      "description": "Time-series sales growth data. Note: net_revenue values are in decimal (dollars), not cents."
-                    }
-                  },
                   "example": {
                     "salesGrowthChart": [
                       {
                         "year": "2025",
-                        "group": "2025-01",
-                        "orders": 45,
-                        "net_revenue": 3780
+                        "group": "2025-01-01",
+                        "orders": 12,
+                        "net_revenue": 840.5
                       },
                       {
                         "year": "2025",
-                        "group": "2025-02",
-                        "orders": 52,
-                        "net_revenue": 4320
-                      },
-                      {
-                        "year": "2025",
-                        "group": "2025-03",
-                        "orders": 48,
-                        "net_revenue": 4590
-                      },
-                      {
-                        "year": "2025",
-                        "group": "2025-04",
-                        "orders": 40,
-                        "net_revenue": 3510
-                      },
-                      {
-                        "year": "2025",
-                        "group": "2025-05",
-                        "orders": 58,
-                        "net_revenue": 4950
-                      },
-                      {
-                        "year": "2025",
-                        "group": "2025-06",
-                        "orders": 65,
-                        "net_revenue": 5580
-                      },
-                      {
-                        "year": "2025",
-                        "group": "2025-07",
-                        "orders": 55,
-                        "net_revenue": 4800
-                      },
-                      {
-                        "year": "2025",
-                        "group": "2025-08",
-                        "orders": 62,
-                        "net_revenue": 5250
-                      },
-                      {
-                        "year": "2025",
-                        "group": "2025-09",
-                        "orders": 48,
-                        "net_revenue": 4200
+                        "group": "2025-01-02",
+                        "orders": 0,
+                        "net_revenue": 0
                       }
                     ]
                   }
@@ -228,57 +167,15 @@
                   "salesGrowthChart": [
                     {
                       "year": "2025",
-                      "group": "2025-01",
-                      "orders": 45,
-                      "net_revenue": 3780
+                      "group": "2025-01-01",
+                      "orders": 12,
+                      "net_revenue": 840.5
                     },
                     {
                       "year": "2025",
-                      "group": "2025-02",
-                      "orders": 52,
-                      "net_revenue": 4320
-                    },
-                    {
-                      "year": "2025",
-                      "group": "2025-03",
-                      "orders": 48,
-                      "net_revenue": 4590
-                    },
-                    {
-                      "year": "2025",
-                      "group": "2025-04",
-                      "orders": 40,
-                      "net_revenue": 3510
-                    },
-                    {
-                      "year": "2025",
-                      "group": "2025-05",
-                      "orders": 58,
-                      "net_revenue": 4950
-                    },
-                    {
-                      "year": "2025",
-                      "group": "2025-06",
-                      "orders": 65,
-                      "net_revenue": 5580
-                    },
-                    {
-                      "year": "2025",
-                      "group": "2025-07",
-                      "orders": 55,
-                      "net_revenue": 4800
-                    },
-                    {
-                      "year": "2025",
-                      "group": "2025-08",
-                      "orders": 62,
-                      "net_revenue": 5250
-                    },
-                    {
-                      "year": "2025",
-                      "group": "2025-09",
-                      "orders": 48,
-                      "net_revenue": 4200
+                      "group": "2025-01-02",
+                      "orders": 0,
+                      "net_revenue": 0
                     }
                   ]
                 },
@@ -289,57 +186,15 @@
                       "salesGrowthChart": [
                         {
                           "year": "2025",
-                          "group": "2025-01",
-                          "orders": 45,
-                          "net_revenue": 3780
+                          "group": "2025-01-01",
+                          "orders": 12,
+                          "net_revenue": 840.5
                         },
                         {
                           "year": "2025",
-                          "group": "2025-02",
-                          "orders": 52,
-                          "net_revenue": 4320
-                        },
-                        {
-                          "year": "2025",
-                          "group": "2025-03",
-                          "orders": 48,
-                          "net_revenue": 4590
-                        },
-                        {
-                          "year": "2025",
-                          "group": "2025-04",
-                          "orders": 40,
-                          "net_revenue": 3510
-                        },
-                        {
-                          "year": "2025",
-                          "group": "2025-05",
-                          "orders": 58,
-                          "net_revenue": 4950
-                        },
-                        {
-                          "year": "2025",
-                          "group": "2025-06",
-                          "orders": 65,
-                          "net_revenue": 5580
-                        },
-                        {
-                          "year": "2025",
-                          "group": "2025-07",
-                          "orders": 55,
-                          "net_revenue": 4800
-                        },
-                        {
-                          "year": "2025",
-                          "group": "2025-08",
-                          "orders": 62,
-                          "net_revenue": 5250
-                        },
-                        {
-                          "year": "2025",
-                          "group": "2025-09",
-                          "orders": 48,
-                          "net_revenue": 4200
+                          "group": "2025-01-02",
+                          "orders": 0,
+                          "net_revenue": 0
                         }
                       ]
                     }

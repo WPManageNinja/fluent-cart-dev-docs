@@ -1,6 +1,6 @@
 ---
 title: Get Dashboard Stats
-description: "Retrieve dashboard statistics widgets including total products, orders, net revenue, and refunds for the last 30 days."
+description: "Retrieve the dashboard tiles: total products, and the orders, net sales and refunds of the last 30 store days."
 outline: false
 aside: false
 ---

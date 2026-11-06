@@ -1,6 +1,6 @@
 ---
 title: Get License Summary
-description: "Retrieve summary statistics for licenses (total issued, active, expired, revoked, etc.) within the specified date range."
+description: "Returns license counts by current status, total activated sites and the number of licensed products. The date range does not apply."
 outline: false
 aside: false
 ---

@@ -1,0 +1,349 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/customer-overview": {
+      "get": {
+        "operationId": "getCustomerOverview",
+        "summary": "GET Get Customer Overview",
+        "description": "Returns the customers who paid in the period, split into new, returning and renewing, with their net sales, the repeat purchase rate, average lifetime value and a chart. Amounts are integers in cents; net figures are the Revenue report's net sales.\n\nOnly orders with a customer and a paid amount above 0 count. Each customer gets one kind: new (first purchase in the range) before returning (bought again, not a renewal) before renewing (renewals only). `repeat_rate` is the share with two or more purchases (renewals are not purchases) and `average_ltv` the average lifetime net, both over each customer's history up to the range end. `previous` (comparison period) has the same keys without `repeat_rate` and `average_ltv`; it is `null` without a comparison.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "params[startDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-01"
+            },
+            "description": "First day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[endDate]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "2025-01-31"
+            },
+            "description": "Last day of the range, store timezone (`YYYY-MM-DD`).",
+            "required": false
+          },
+          {
+            "name": "params[rangeKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "today",
+                "last_7",
+                "last_30",
+                "this_month",
+                "last_month",
+                "last_12_months",
+                "year_to_date",
+                "all_time"
+              ]
+            },
+            "description": "Preset range. Overrides the dates.",
+            "required": false
+          },
+          {
+            "name": "params[groupKey]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "default",
+                "daily",
+                "monthly",
+                "yearly"
+              ]
+            },
+            "description": "Chart bucket: `daily`, `monthly`, `yearly`, or `default` (picked from the range length).",
+            "required": false
+          },
+          {
+            "name": "params[currency]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "USD"
+            },
+            "description": "3-letter currency code. `__all__` converts every currency to the base currency. Default: base currency.",
+            "required": false
+          },
+          {
+            "name": "params[filterMode]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "live",
+                "test"
+              ]
+            },
+            "description": "Only live or only test orders. Without it, both count.",
+            "required": false
+          },
+          {
+            "name": "params[variation_ids][]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "description": "Only orders that contain these variation IDs.",
+            "required": false
+          },
+          {
+            "name": "params[compareType]",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "previous_period",
+                "previous_month",
+                "previous_quarter",
+                "previous_year",
+                "custom"
+              ]
+            },
+            "description": "Comparison period.",
+            "required": false
+          },
+          {
+            "name": "params[compareDate]",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Start of the comparison range when `compareType` is `custom`.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "summary": {
+                      "customers": 80,
+                      "new_customers": 50,
+                      "returning_customers": 10,
+                      "renewing_customers": 20,
+                      "new_net": 150000,
+                      "returning_net": 30000,
+                      "renewal_net": 40000,
+                      "net": 220000,
+                      "repeat_rate": 22.5,
+                      "average_ltv": 4500
+                    },
+                    "previous": null,
+                    "chart": [
+                      {
+                        "year": "2025",
+                        "group": "2025-01-01",
+                        "new_customers": 2,
+                        "returning_customers": 1,
+                        "renewing_customers": 1,
+                        "new_net": 6000,
+                        "returning_net": 2000,
+                        "renewal_net": 1500
+                      }
+                    ],
+                    "compare_ranges": {
+                      "previous_period": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_month": {
+                        "start": "2024-12-01 00:00:00",
+                        "end": "2024-12-31 23:59:59"
+                      },
+                      "previous_quarter": {
+                        "start": "2024-10-01 00:00:00",
+                        "end": "2024-10-31 23:59:59"
+                      },
+                      "previous_year": {
+                        "start": "2024-01-01 00:00:00",
+                        "end": "2024-01-31 23:59:59"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "summary": {
+                    "customers": 80,
+                    "new_customers": 50,
+                    "returning_customers": 10,
+                    "renewing_customers": 20,
+                    "new_net": 150000,
+                    "returning_net": 30000,
+                    "renewal_net": 40000,
+                    "net": 220000,
+                    "repeat_rate": 22.5,
+                    "average_ltv": 4500
+                  },
+                  "previous": null,
+                  "chart": [
+                    {
+                      "year": "2025",
+                      "group": "2025-01-01",
+                      "new_customers": 2,
+                      "returning_customers": 1,
+                      "renewing_customers": 1,
+                      "new_net": 6000,
+                      "returning_net": 2000,
+                      "renewal_net": 1500
+                    }
+                  ],
+                  "compare_ranges": {
+                    "previous_period": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_month": {
+                      "start": "2024-12-01 00:00:00",
+                      "end": "2024-12-31 23:59:59"
+                    },
+                    "previous_quarter": {
+                      "start": "2024-10-01 00:00:00",
+                      "end": "2024-10-31 23:59:59"
+                    },
+                    "previous_year": {
+                      "start": "2024-01-01 00:00:00",
+                      "end": "2024-01-31 23:59:59"
+                    }
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "summary": {
+                        "customers": 80,
+                        "new_customers": 50,
+                        "returning_customers": 10,
+                        "renewing_customers": 20,
+                        "new_net": 150000,
+                        "returning_net": 30000,
+                        "renewal_net": 40000,
+                        "net": 220000,
+                        "repeat_rate": 22.5,
+                        "average_ltv": 4500
+                      },
+                      "previous": null,
+                      "chart": [
+                        {
+                          "year": "2025",
+                          "group": "2025-01-01",
+                          "new_customers": 2,
+                          "returning_customers": 1,
+                          "renewing_customers": 1,
+                          "new_net": 6000,
+                          "returning_net": 2000,
+                          "renewal_net": 1500
+                        }
+                      ],
+                      "compare_ranges": {
+                        "previous_period": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_month": {
+                          "start": "2024-12-01 00:00:00",
+                          "end": "2024-12-31 23:59:59"
+                        },
+                        "previous_quarter": {
+                          "start": "2024-10-01 00:00:00",
+                          "end": "2024-10-31 23:59:59"
+                        },
+                        "previous_year": {
+                          "start": "2024-01-01 00:00:00",
+                          "end": "2024-01-31 23:59:59"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "FluentCart API",
+    "description": "Complete REST API documentation for FluentCart e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://{website}/wp-json/fluent-cart/v2",
+      "description": "Your WordPress website",
+      "variables": {
+        "website": {
+          "default": "YourWebsite.com",
+          "description": "Your WordPress website domain (without https://)"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "ApplicationPasswords": []
+    }
+  ],
+  "paths": {
+    "/reports/channel-rules": {
+      "get": {
+        "operationId": "getChannelRules",
+        "summary": "GET Get Channel Rules",
+        "description": "Returns the store's custom channel rules for the Sources report, its own domains, and whether the current user may change them. No money fields.\n\nA rule matches when any of its groups matches; a group matches when all its conditions match. Rules are checked in order, before the built-in channels. A referrer on one of `own_domains` (or a subdomain) counts as direct. `can_edit` is true when the user has the `store/settings` permission.\n\n**Requires FluentCart Pro.** Without Pro this route is not registered and returns 404.\n\n**Permission:** `reports/view` \u00b7 **Policy:** `ReportPolicy`",
+        "tags": [
+          "Reports"
+        ],
+        "security": [
+          {
+            "ApplicationPasswords": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "example": {
+                    "rules": [
+                      {
+                        "id": "a1b2c3d4",
+                        "name": "Partner newsletter",
+                        "groups": [
+                          [
+                            {
+                              "field": "source",
+                              "operator": "is",
+                              "value": "partner"
+                            },
+                            {
+                              "field": "medium",
+                              "operator": "is",
+                              "value": "email"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "own_domains": [
+                      "shop.example.com"
+                    ],
+                    "can_edit": true
+                  }
+                },
+                "example": {
+                  "rules": [
+                    {
+                      "id": "a1b2c3d4",
+                      "name": "Partner newsletter",
+                      "groups": [
+                        [
+                          {
+                            "field": "source",
+                            "operator": "is",
+                            "value": "partner"
+                          },
+                          {
+                            "field": "medium",
+                            "operator": "is",
+                            "value": "email"
+                          }
+                        ]
+                      ]
+                    }
+                  ],
+                  "own_domains": [
+                    "shop.example.com"
+                  ],
+                  "can_edit": true
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Successful response",
+                    "value": {
+                      "rules": [
+                        {
+                          "id": "a1b2c3d4",
+                          "name": "Partner newsletter",
+                          "groups": [
+                            [
+                              {
+                                "field": "source",
+                                "operator": "is",
+                                "value": "partner"
+                              },
+                              {
+                                "field": "medium",
+                                "operator": "is",
+                                "value": "email"
+                              }
+                            ]
+                          ]
+                        }
+                      ],
+                      "own_domains": [
+                        "shop.example.com"
+                      ],
+                      "can_edit": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated. The request carried no valid WordPress credentials.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 401
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated, but the user lacks the required capability.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "rest_forbidden",
+                  "message": "Sorry, you are not allowed to do that.",
+                  "data": {
+                    "status": 403
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApplicationPasswords": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "WordPress Application Passwords \u2014 use Basic auth with your WordPress username and an application password in the format: username:application_password"
+      }
+    }
+  }
+}

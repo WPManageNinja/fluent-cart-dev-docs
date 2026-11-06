@@ -1,6 +1,6 @@
 ---
 title: Get Country Heat Map
-description: "Retrieve order counts grouped by billing country for world map / heat map visualization."
+description: "Returns the number of orders per billing country, smallest first. It counts every order with a billing address, of any status, in all currencies, over all time."
 outline: false
 aside: false
 ---

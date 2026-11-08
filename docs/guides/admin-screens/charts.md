@@ -11,6 +11,10 @@ FluentCart draws its report charts with [Apache ECharts](https://echarts.apache.
 The build config maps `echarts` to `@fluent-cart/echarts`, as in [Build a Screen](./#_2-the-build-config). FluentCart **X.Y.Z** or later for `ChartTab` in `@fluent-cart/ui`.
 :::
 
+::: tip Imports
+Write `import {init} from 'echarts'`. The build config maps `echarts` to `@fluent-cart/echarts`, so your chart uses FluentCart's copy. See [How the imports resolve](./#how-the-imports-resolve).
+:::
+
 ## What you get
 
 | From | Name | Use |
@@ -54,6 +58,7 @@ This component draws a revenue chart in cents, as bars or a line. It is the char
 
 ```vue [SalesChart.vue]
 <script setup>
+// 'vue' and 'echarts' resolve to FluentCart's own copies through the build config.
 import {ref, watch, onMounted, onBeforeUnmount} from 'vue';
 import {init} from 'echarts';
 import {Theme, chartAxisPointer, chartTooltipAmount, chartTooltipPosition, getXAxisConfig, translate} from '@fluent-cart/ui';

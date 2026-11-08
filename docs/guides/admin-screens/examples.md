@@ -31,6 +31,10 @@ gift-wrap-for-fluent-cart/
 
 Run `npm install` and `npm run build` in the plugin folder. The build writes `assets/admin-modules/`, which the PHP file enqueues. Then activate the plugin. FluentCart shows **Gift Wrap** in its menu.
 
+::: tip Imports
+The screens import `vue` and `echarts` by their usual names. The build config below maps them to FluentCart's own copies, so nothing is bundled twice. See [How the imports resolve](./#how-the-imports-resolve).
+:::
+
 ## The plugin file
 
 It loads the screens into FluentCart and adds the REST routes the screens call. Every route checks the same FluentCart permission as the menu item and the screens.
@@ -349,6 +353,7 @@ The papers list can be reordered by dragging a row or with the arrow keys on its
 
 ```vue [Papers.vue]
 <script setup>
+// 'vue' resolves to FluentCart's own copy through the build config.
 import {ref, onMounted} from 'vue';
 import {Page, Section, SortableList, ListItem, EmptyState, Badge, CurrencyFormatter, Rest, Notify, translate} from '@fluent-cart/ui';
 
@@ -439,6 +444,7 @@ The settings page uses each `SettingRow` layout and shows the server's error und
 
 ```vue [Settings.vue]
 <script setup>
+// 'vue' resolves to FluentCart's own copy through the build config.
 import {ref, onMounted} from 'vue';
 import {Page, Section, SettingRow, Rest, Notify, translate} from '@fluent-cart/ui';
 
@@ -543,6 +549,7 @@ A detail page with the main content on the left and facts in a sidebar.
 
 ```vue [PaperDetail.vue]
 <script setup>
+// 'vue' resolves to FluentCart's own copy through the build config.
 import {ref, watch} from 'vue';
 import {Page, DetailLayout, Section, KeyValueList, KeyValue, EmptyState, Badge, CurrencyFormatter, Rest, translate} from '@fluent-cart/ui';
 
@@ -627,6 +634,7 @@ A report with summary numbers, a period switch and a revenue chart that switches
 
 ```vue [Report.vue]
 <script setup>
+// 'vue' resolves to FluentCart's own copy through the build config.
 import {ref, computed, watch} from 'vue';
 import {Page, Section, StatGrid, StatTile, EmptyState, FluidTab, ChartTab, CurrencyFormatter, Rest, Notify, translate} from '@fluent-cart/ui';
 import SalesChart from './SalesChart.vue';
@@ -682,6 +690,7 @@ watch(days, (value) => {
 
 ```vue [SalesChart.vue]
 <script setup>
+// 'vue' and 'echarts' resolve to FluentCart's own copies through the build config.
 import {ref, watch, onMounted, onBeforeUnmount} from 'vue';
 import {init} from 'echarts';
 import {Theme, chartAxisPointer, chartTooltipAmount, chartTooltipPosition, getXAxisConfig, translate} from '@fluent-cart/ui';

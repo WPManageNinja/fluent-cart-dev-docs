@@ -138,6 +138,20 @@ A second copy of Vue cannot see FluentCart's app. Every `<el-*>` component and e
 
 Install `vite`, `@vitejs/plugin-vue` and `vue` as dev dependencies, on the same major versions as FluentCart. `vue` is needed to compile your `.vue` files; it never ends up in the bundle.
 
+#### How the imports resolve
+
+In your source code, import Vue and ECharts by their usual names. The build config rewrites them to FluentCart's names, and FluentCart's import map points those names at its own files.
+
+| Your code writes | The built file imports | The browser loads |
+| ---------------- | ---------------------- | ----------------- |
+| `import {ref} from 'vue'` | `from "@fluent-cart/vue"` | FluentCart's Vue |
+| `import {init} from 'echarts'` | `from "@fluent-cart/echarts"` | FluentCart's ECharts |
+| `import dayjs from 'dayjs'` | `from "@fluent-cart/dayjs"` | FluentCart's Day.js |
+| `import {Page} from '@fluent-cart/ui'` | `from "@fluent-cart/ui"` | FluentCart's components and helpers |
+
+- **Why `'vue'` and not `'@fluent-cart/vue'`:** the Vue compiler writes `import … from 'vue'` into every compiled `.vue` template. The build config must map `'vue'` anyway, and your editor gets types and completion for `'vue'` from the dev dependency. `@fluent-cart/vue` exists only in the browser.
+- **Check your build:** search the files in `assets/admin-modules/` for `from"`. You should see only `@fluent-cart/…` names and your own chunks. If Vue's code is in your bundle, `CORE_MODULES` is missing from the config.
+
 ### 3. The entry file
 
 ```js

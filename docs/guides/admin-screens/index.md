@@ -97,6 +97,53 @@ add_action('plugins_loaded', function () {
 - **The permission** must be an existing FluentCart permission. Use the same one on the menu item, the route and your REST routes. You cannot add new permissions.
 - **Your REST routes** live in your own namespace. `Rest` from `@fluent-cart/ui` calls them when you pass their base URL (step 4).
 
+### When FluentCart is too old
+
+A store can update your add-on before FluentCart. Never load your screens there: one missing import stops the whole bundle. Tell the admin what to do instead.
+
+- **Your add-on needs API 5:** an older FluentCart has no shared card. Show an admin notice, as the plugin file above does.
+- **Your add-on needs a later API:** FluentCart 5 and later has `CoreUpdateCard`. Keep your menu item, and on a too-old FluentCart load a small fallback bundle instead of your screens. The fallback registers the same routes and shows the card:
+
+```vue
+<!-- resources/admin-modules/fallback/UpdateScreen.vue -->
+<script setup>
+import {CoreUpdateCard, Page, translate} from '@fluent-cart/ui';
+</script>
+
+<template>
+  <Page :title="translate('Gift Wrap')">
+    <CoreUpdateCard
+        :title="translate('Update FluentCart to manage gift wraps')"
+        :text="translate('This version of Gift Wrap needs a newer FluentCart.')"
+    />
+  </Page>
+</template>
+```
+
+```js
+// resources/admin-modules/fallback/entry.js: the same route, a different screen.
+import {translate} from '@fluent-cart/ui';
+import UpdateScreen from './UpdateScreen.vue';
+
+window.fluent_cart_admin.hooks.addFilter('fluent_cart_routes', 'gift_wrap', (routes) => {
+    routes.gift_wrap = {
+        name: 'gift_wrap',
+        path: '/gift-wrap',
+        component: UpdateScreen,
+        meta: {active_menu: 'gift_wrap', title: translate('Gift Wrap'), permission: 'store/settings'},
+    };
+    return routes;
+});
+```
+
+```php
+// In the plugin file: enqueue one bundle or the other.
+$bundle = FLUENTCART_MODULE_API >= 6 ? 'gift-wrap' : 'fallback';
+wp_enqueue_script('gift_wrap_admin', $url . $bundle . '.js', [], GIFT_WRAP_VERSION, true);
+```
+
+Register every route your add-on has, so no link leads to an empty page. Build the fallback as its own entry, and import only what the oldest FluentCart you support exports. If a FluentCart before API 5 must see a card too, copy the card into your add-on and build it from the names FluentCart 2.2.0 exports. FluentCart Pro does this for licensing.
+
 ### 2. The build config
 
 Build with Vite. Every `@fluent-cart/*` import must stay external, so the browser loads core's copy.

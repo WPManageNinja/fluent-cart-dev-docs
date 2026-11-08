@@ -258,6 +258,29 @@ A switch between a few views, for example Day, Week and Month on a chart.
 - Give the selected item the `active` class when the screen loads.
 - Each item is a button. Screen readers hear which one is selected.
 
+## CoreUpdateCard
+
+The card your screen shows when FluentCart is older than your add-on needs. It shows your title and reason, the installed FluentCart version, an **Update FluentCart** button for site administrators (it opens the Plugins page, filtered to FluentCart), and "Ask a site administrator to update FluentCart." for other users.
+
+```vue
+<Page :title="translate('Gift Wrap')">
+  <CoreUpdateCard
+      :title="translate('Update FluentCart to manage gift wraps')"
+      :text="translate('This version of Gift Wrap needs a newer FluentCart.')"
+      :note="translate('Checkout keeps offering gift wrap in the meantime.')"
+  />
+</Page>
+```
+
+| Prop | Type | Default | Notes |
+| ---- | ---- | ------- | ----- |
+| `title` | String | required | What the user cannot do until they update. |
+| `text` | String | required | Why, in your add-on's words. |
+| `note` | String | `''` | What keeps working meanwhile. Leave it out when nothing does. |
+
+- Use it in a small fallback bundle, not in your main screens. See [When FluentCart is too old](./#when-fluentcart-is-too-old).
+- It exists from module API 5. An add-on that needs only API 5 cannot use it on an older FluentCart: show an admin notice there instead.
+
 ## Charts
 
 For charts, see [Charts](./charts): the shared ECharts module, the report colors and the chart helpers.

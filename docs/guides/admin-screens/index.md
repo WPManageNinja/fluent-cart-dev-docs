@@ -10,6 +10,7 @@ Your plugin can add screens to the FluentCart admin. They load inside FluentCart
 - **The same Vue, router and Element Plus.** Your screens use `<el-button>`, `<el-input>` and the router as FluentCart's screens do.
 - **The layout components.** `Page`, `Section`, `SettingRow`, `List` and the others make your screen look like a FluentCart screen. See [Layout Components](./components).
 - **Helpers.** `translate`, `Rest`, `Notify`, `UserCan` and more.
+- **Charts.** The same ECharts that FluentCart's reports use, with its colors and tooltip helpers. See [Charts](./charts).
 
 Your plugin ships only its own screens. It never ships Vue or Element Plus.
 
@@ -212,6 +213,8 @@ const save = () => {
 ```
 
 The screen has one `h1` from `Page`, an `h2` for each `Section`, a label connected to each control, and FluentCart's spacing and dark mode. You wrote no CSS.
+
+For complete screens with saving, validation, a list you can rearrange and a chart, see [Examples](./examples).
 
 ## Strings
 

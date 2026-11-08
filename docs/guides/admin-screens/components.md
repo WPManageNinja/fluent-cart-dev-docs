@@ -187,7 +187,7 @@ Read-only label and value pairs, for example an order summary.
 
 - `KeyValueList` renders a `<dl>`. Prop `layout`: `'row'` (label left, value right, the default) or `'stacked'`.
 - `KeyValue` props `label` and `value`. Slots `label` and default for rich content. An empty value (`null`, `''`) shows "—"; `0` shows as `0`.
-- Format money yourself: `CurrencyFormatter.formatNumber(amountInCents)` from `@fluent-cart/ui`. FluentCart stores amounts in cents.
+- Format money yourself: `CurrencyFormatter.formatFixed(amountInCents)` from `@fluent-cart/ui` (always shows the decimals, for example "$2.00"). FluentCart stores amounts in cents.
 
 ## StatGrid and StatTile
 
@@ -195,7 +195,7 @@ Summary numbers at the top of a report or dashboard.
 
 ```vue
 <StatGrid :columns="3">
-  <StatTile :label="translate('Gross sales')" :value="CurrencyFormatter.formatNumber(totalInCents)" :loading="loading"/>
+  <StatTile :label="translate('Gross sales')" :value="CurrencyFormatter.formatFixed(totalInCents)" :loading="loading"/>
   <StatTile :label="translate('Orders')" :value="count"/>
 </StatGrid>
 ```
@@ -257,6 +257,10 @@ A switch between a few views, for example Day, Week and Month on a chart.
 
 - Give the selected item the `active` class when the screen loads.
 - Each item is a button. Screen readers hear which one is selected.
+
+## Charts
+
+For charts, see [Charts](./charts): the shared ECharts module, the report colors and the chart helpers.
 
 ## Design tokens
 

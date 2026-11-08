@@ -747,7 +747,9 @@ export default defineConfig({
           text: 'Admin Screens',
           items: [
             { text: 'Build a Screen', link: '/guides/admin-screens/' },
-            { text: 'Layout Components', link: '/guides/admin-screens/components' }
+            { text: 'Layout Components', link: '/guides/admin-screens/components' },
+            { text: 'Charts', link: '/guides/admin-screens/charts' },
+            { text: 'Examples', link: '/guides/admin-screens/examples' }
           ]
         }
       ],

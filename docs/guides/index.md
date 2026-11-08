@@ -34,6 +34,13 @@ This section provides comprehensive guides for developers working with FluentCar
 
 [View Custom Shipping Carrier Guide →](./shipping-carrier/)
 
+### Admin Screens
+- **Your own screens** - Add Vue screens to the FluentCart admin with core's Vue, router and Element Plus
+- **Layout components** - Page, Section, SettingRow, List and more, so your screen looks like FluentCart's
+- **Accessible by default** - Headings, labels and keyboard reordering are built in
+
+[View Admin Screens Guide →](./admin-screens/)
+
 ## Quick Start
 
 ### Prerequisites

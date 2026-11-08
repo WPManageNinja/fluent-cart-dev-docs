@@ -505,6 +505,7 @@ export default defineConfig({
               { text: 'Custom Payment Gateway', link: '/payment-methods-integration/' },
               { text: '(Payment Gateway) Example', link: '/payment-methods-integration/paddle-example' },
               { text: 'Custom Shipping Carrier', link: '/guides/shipping-carrier/' },
+              { text: 'Admin Screens', link: '/guides/admin-screens/' },
               { text: 'Subscription Customization', link: '/guides/subscriptions' },
             ]
           },
@@ -738,6 +739,15 @@ export default defineConfig({
             { text: 'Quick Implementation', link: '/payment-methods-integration/quick-implementation' },
             { text: 'Payment Setting Fields', link: '/payment-methods-integration/payment_setting_fields' },
             { text: 'Paddle Example', link: '/payment-methods-integration/paddle-example' }
+          ]
+        }
+      ],
+      '/guides/admin-screens/': [
+        {
+          text: 'Admin Screens',
+          items: [
+            { text: 'Build a Screen', link: '/guides/admin-screens/' },
+            { text: 'Layout Components', link: '/guides/admin-screens/components' }
           ]
         }
       ],

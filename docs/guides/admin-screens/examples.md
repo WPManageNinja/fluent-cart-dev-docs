@@ -57,7 +57,8 @@ define('GIFT_WRAP_VERSION', '1.0.0');
 use FluentCart\App\Services\Permission\PermissionManager;
 
 add_action('plugins_loaded', function () {
-    if (!defined('FLUENTCART_MODULE_API') || FLUENTCART_MODULE_API < 1) {
+    // 5: FluentCart has the layout components these screens import.
+    if (!defined('FLUENTCART_MODULE_API') || FLUENTCART_MODULE_API < 5) {
         return;
     }
 

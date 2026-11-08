@@ -15,7 +15,7 @@ Your plugin can add screens to the FluentCart admin. They load inside FluentCart
 Your plugin ships only its own screens. It never ships Vue or Element Plus.
 
 ::: info Requirements
-FluentCart **X.Y.Z** or later for the layout components. Screens themselves work from `FLUENTCART_MODULE_API` 1. Pro is not needed.
+FluentCart **X.Y.Z** or later, which sets `FLUENTCART_MODULE_API` to **5**. Check that number before you load any screen that imports the layout components (step 1). Pro is not needed.
 :::
 
 ## How it fits together
@@ -58,8 +58,8 @@ defined('ABSPATH') || exit;
 define('GIFT_WRAP_VERSION', '1.0.0');
 
 add_action('plugins_loaded', function () {
-    // Older FluentCart has no import map: register nothing and say why.
-    if (!defined('FLUENTCART_MODULE_API') || FLUENTCART_MODULE_API < 1) {
+    // FluentCart before API 5 lacks the layout components: register nothing and say why.
+    if (!defined('FLUENTCART_MODULE_API') || FLUENTCART_MODULE_API < 5) {
         add_action('admin_notices', function () {
             if (current_user_can('update_plugins')) {
                 echo '<div class="notice notice-warning"><p>' . esc_html__('Gift Wrap needs a newer FluentCart.', 'gift-wrap-for-fluent-cart') . '</p></div>';
@@ -92,6 +92,7 @@ add_action('plugins_loaded', function () {
 });
 ```
 
+- **The API check** matters: a screen that imports a name FluentCart does not have fails to load as a whole. API 5 means the layout components exist.
 - **`type="module"`** lets the browser resolve `@fluent-cart/*` through the import map. Add it only to your own handle.
 - **The permission** must be an existing FluentCart permission. Use the same one on the menu item, the route and your REST routes. You cannot add new permissions.
 - **Your REST routes** live in your own namespace. `Rest` from `@fluent-cart/ui` calls them when you pass their base URL (step 4).

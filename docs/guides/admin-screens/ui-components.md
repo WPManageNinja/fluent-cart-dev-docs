@@ -35,7 +35,7 @@ A FluentCart before API 3 does not know these tags. The small fallback bundle yo
 
 ## Rules for every component
 
-- **Only declared props reach the component.** Each component passes on the props listed on this page, plus `class` and `style`. Other attributes are ignored. This keeps your screen independent of Element Plus.
+- **Only declared props reach the component.** Each component passes on the props listed on this page, plus `class` and `style` (and `data-*` attributes on `fct-button` and `fct-input`). Other attributes are ignored. This keeps your screen independent of Element Plus.
 - **Write props in kebab-case** in templates: `active-value`, `field-key`, `confirm-button-text`.
 - **`size`** takes `small` on every control that has a size. Buttons, inputs, selects and date pickers also take `x-small`.
 - **`aria-label`** is a declared prop on the controls that need it. Use it when a control has no visible label.

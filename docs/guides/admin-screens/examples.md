@@ -5,7 +5,7 @@ description: "Four complete FluentCart admin screens for one add-on, with all th
 
 # Examples
 
-These four screens belong to one example plugin, **Gift Wrap for FluentCart**. The code on this page is the complete plugin. We built it, installed it next to FluentCart **X.Y.Z** and checked every screen in the browser before we published this page.
+These four screens belong to one example plugin, **Gift Wrap for FluentCart**. The code on this page is the complete plugin. It needs FluentCart **X.Y.Z** or later.
 
 | Screen | Shows |
 | ------ | ----- |

@@ -58,7 +58,7 @@ use FluentCart\App\Services\Permission\PermissionManager;
 
 add_action('plugins_loaded', function () {
     // 5: FluentCart has the layout components these screens import.
-    if (!defined('FLUENTCART_MODULE_API') || FLUENTCART_MODULE_API < 5) {
+    if (!defined('FLUENTCART_MODULE_API') || FLUENTCART_MODULE_API < 3) {
         return;
     }
 

@@ -279,7 +279,7 @@ The card your screen shows when FluentCart is older than your add-on needs. It s
 | `note` | String | `''` | What keeps working meanwhile. Leave it out when nothing does. |
 
 - Use it in a small fallback bundle, not in your main screens. See [When FluentCart is too old](./#when-fluentcart-is-too-old).
-- It exists from module API 5. An add-on that needs only API 5 cannot use it on an older FluentCart: show an admin notice there instead.
+- It exists from module API 3. An add-on that needs only API 3 cannot use it on an older FluentCart: show an admin notice there instead.
 
 ## Charts
 

@@ -15,7 +15,7 @@ Your plugin can add screens to the FluentCart admin. They load inside FluentCart
 Your plugin ships only its own screens. It never ships Vue or Element Plus.
 
 ::: info Requirements
-FluentCart **X.Y.Z** or later, which sets `FLUENTCART_MODULE_API` to **5**. Check that number before you load any screen that imports the layout components (step 1). Pro is not needed.
+FluentCart **X.Y.Z** or later, which sets `FLUENTCART_MODULE_API` to **3**. Check that number before you load any screen that imports the layout components (step 1). Pro is not needed.
 :::
 
 ## How it fits together
@@ -58,8 +58,8 @@ defined('ABSPATH') || exit;
 define('GIFT_WRAP_VERSION', '1.0.0');
 
 add_action('plugins_loaded', function () {
-    // FluentCart before API 5 lacks the layout components: register nothing and say why.
-    if (!defined('FLUENTCART_MODULE_API') || FLUENTCART_MODULE_API < 5) {
+    // FluentCart before API 3 lacks the layout components: register nothing and say why.
+    if (!defined('FLUENTCART_MODULE_API') || FLUENTCART_MODULE_API < 3) {
         add_action('admin_notices', function () {
             if (current_user_can('update_plugins')) {
                 echo '<div class="notice notice-warning"><p>' . esc_html__('Gift Wrap needs a newer FluentCart.', 'gift-wrap-for-fluent-cart') . '</p></div>';
@@ -92,7 +92,7 @@ add_action('plugins_loaded', function () {
 });
 ```
 
-- **The API check** matters: a screen that imports a name FluentCart does not have fails to load as a whole. API 5 means the layout components exist.
+- **The API check** matters: a screen that imports a name FluentCart does not have fails to load as a whole. API 3 means the layout components exist.
 - **`type="module"`** lets the browser resolve `@fluent-cart/*` through the import map. Add it only to your own handle.
 - **The permission** must be an existing FluentCart permission. Use the same one on the menu item, the route and your REST routes. You cannot add new permissions.
 - **Your REST routes** live in your own namespace. `Rest` from `@fluent-cart/ui` calls them when you pass their base URL (step 4).
@@ -101,7 +101,7 @@ add_action('plugins_loaded', function () {
 
 A store can update your add-on before FluentCart. Never load your screens there: one missing import stops the whole bundle. Tell the admin what to do instead.
 
-- **Your add-on needs API 5:** an older FluentCart has no shared card. Show an admin notice, as the plugin file above does.
+- **Your add-on needs API 3:** an older FluentCart has no shared card. Show an admin notice, as the plugin file above does.
 - **Your add-on needs a later API:** FluentCart 5 and later has `CoreUpdateCard`. Keep your menu item, and on a too-old FluentCart load a small fallback bundle instead of your screens. The fallback registers the same routes and shows the card:
 
 ```vue
@@ -138,11 +138,11 @@ window.fluent_cart_admin.hooks.addFilter('fluent_cart_routes', 'gift_wrap', (rou
 
 ```php
 // In the plugin file: enqueue one bundle or the other.
-$bundle = FLUENTCART_MODULE_API >= 6 ? 'gift-wrap' : 'fallback';
+$bundle = FLUENTCART_MODULE_API >= 4 ? 'gift-wrap' : 'fallback';
 wp_enqueue_script('gift_wrap_admin', $url . $bundle . '.js', [], GIFT_WRAP_VERSION, true);
 ```
 
-Register every route your add-on has, so no link leads to an empty page. Build the fallback as its own entry, and import only what the oldest FluentCart you support exports. If a FluentCart before API 5 must see a card too, copy the card into your add-on and build it from the names FluentCart 2.2.0 exports. FluentCart Pro does this for licensing.
+Register every route your add-on has, so no link leads to an empty page. Build the fallback as its own entry, and import only what the oldest FluentCart you support exports. If a FluentCart before API 3 must see a card too, copy the card into your add-on and build it from the names FluentCart 2.2.0 exports. FluentCart Pro does this for licensing.
 
 ### 2. The build config
 

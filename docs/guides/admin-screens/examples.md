@@ -403,12 +403,12 @@ onMounted(load);
 <template>
   <Page :title="translate('Wrapping Papers')" class="gift-wrap-papers">
     <template #actions>
-      <el-button @click="$router.push({name: 'gift_wrap_report'})">{{ translate('Report') }}</el-button>
-      <el-button type="primary" @click="$router.push({name: 'gift_wrap_settings'})">{{ translate('Settings') }}</el-button>
+      <fct-button :to="{name: 'gift_wrap_report'}">{{ translate('Report') }}</fct-button>
+      <fct-button type="primary" :to="{name: 'gift_wrap_settings'}">{{ translate('Settings') }}</fct-button>
     </template>
 
     <Section :title="translate('Papers')" :description="translate('Checkout shows the papers in this order. Drag a row, or use the arrow keys on its handle.')" flush divided>
-      <el-skeleton v-if="loading" class="gift-wrap-skeleton" :rows="4" animated/>
+      <fct-skeleton v-if="loading" class="gift-wrap-skeleton" :rows="4" animated/>
 
       <SortableList
           v-else-if="papers.length"
@@ -486,11 +486,11 @@ const save = () => {
 <template>
   <Page :title="translate('Gift Wrap Settings')" :breadcrumbs="[{label: translate('Wrapping Papers'), to: {name: 'gift_wrap_papers'}}]">
     <template #actions>
-      <el-button type="primary" :loading="saving" :disabled="!settings" @click="save">{{ translate('Save') }}</el-button>
+      <fct-button type="primary" :loading="saving" :disabled="!settings" @click="save">{{ translate('Save') }}</fct-button>
     </template>
 
     <Section v-if="!settings">
-      <el-skeleton :rows="5" animated/>
+      <fct-skeleton :rows="5" animated/>
     </Section>
 
     <template v-else>
@@ -498,7 +498,7 @@ const save = () => {
         <SettingRow layout="toggle" :label="translate('Offer gift wrap')"
                     :description="settings.enabled === 'yes' ? translate('Customers can add gift wrap at checkout.') : translate('Checkout does not show gift wrap.')"
                     v-slot="{id}">
-          <el-switch :id="id" v-model="settings.enabled" active-value="yes" inactive-value="no"/>
+          <fct-switch :id="id" v-model="settings.enabled" active-value="yes" inactive-value="no"/>
         </SettingRow>
       </Section>
 
@@ -506,31 +506,31 @@ const save = () => {
         <!-- The fee is stored in cents; the field shows it in the store currency. -->
         <SettingRow layout="inline" :label="translate('Fee per order')" :description="translate('Added once, however many items are wrapped.')"
                     :error="errors.fee" v-slot="{id}">
-          <el-input-number :id="id" :model-value="settings.fee / 100" :min="0" :step="0.5" :precision="2"
-                           @update:model-value="value => settings.fee = Math.round((value || 0) * 100)"/>
+          <fct-input type="number" :id="id" :model-value="settings.fee / 100" :min="0" :step="0.5" :precision="2"
+                     @update:model-value="value => settings.fee = Math.round((value || 0) * 100)"/>
         </SettingRow>
 
         <SettingRow group :label="translate('Paper style')" :description="translate('The style customers see first.')" :error="errors.style">
-          <el-radio-group v-model="settings.style" class="gift-wrap-styles">
-            <el-radio v-for="style in styles" :key="style.value" :value="style.value">
+          <fct-choice type="radio" v-model="settings.style" :options="styles" class="gift-wrap-styles">
+            <template #option="{option}">
               <span class="gift-wrap-style">
-                <strong>{{ style.label }}</strong>
-                <span>{{ style.text }}</span>
+                <strong>{{ option.label }}</strong>
+                <span>{{ option.text }}</span>
               </span>
-            </el-radio>
-          </el-radio-group>
+            </template>
+          </fct-choice>
         </SettingRow>
       </Section>
 
       <Section :title="translate('Gift message')" divided>
         <SettingRow layout="inline" :label="translate('Message length')" :description="translate('The most characters a customer can write, from 20 to 500.')"
                     :error="errors.message_limit" v-slot="{id}">
-          <el-input-number :id="id" v-model="settings.message_limit" :step="10"/>
+          <fct-input type="number" :id="id" v-model="settings.message_limit" :step="10"/>
         </SettingRow>
 
         <SettingRow :label="translate('Note at checkout')" :description="translate('Shown under the gift message field.')" v-slot="{id, describedBy}">
-          <el-input :id="id" :aria-describedby="describedBy" v-model="settings.note" type="textarea" :rows="2"
-                    :placeholder="translate('We hand-write every message.')"/>
+          <fct-input :id="id" :aria-describedby="describedBy" v-model="settings.note" type="textarea" :rows="2"
+                     :placeholder="translate('We hand-write every message.')"/>
         </SettingRow>
       </Section>
     </template>
@@ -540,7 +540,7 @@ const save = () => {
 
 - **`layout="toggle"`** puts the on/off switch before its label. The line under it says what the store does now.
 - **`layout="inline"`** puts a lone number field on the right edge.
-- **`group`** labels the radio group as a whole, so screen readers read "Paper style" before the options.
+- **`group`** labels the radio group as a whole, so screen readers read "Paper style" before the options. The `option` slot of `fct-choice` gives each radio a title and a line of text.
 - **`:error`** shows the server's message under the field and connects it to the control. Clear the errors before each save.
 - **The fee is stored in cents.** The number field shows it in the store currency and converts back on change.
 
@@ -587,12 +587,12 @@ watch(() => props.id, (id) => {
       <Badge size="small" :status="paper.active ? 'active' : 'disabled'" :text="paper.active ? translate('Active') : translate('Hidden')" :hide-icon="true"/>
     </template>
 
-    <Section v-if="loading"><el-skeleton :rows="6" animated/></Section>
+    <Section v-if="loading"><fct-skeleton :rows="6" animated/></Section>
 
     <Section v-else-if="missing">
       <EmptyState :title="translate('Paper not found')" :text="translate('It may have been deleted.')">
         <template #actions>
-          <el-button @click="$router.push({name: 'gift_wrap_papers'})">{{ translate('Back to papers') }}</el-button>
+          <fct-button :to="{name: 'gift_wrap_papers'}">{{ translate('Back to papers') }}</fct-button>
         </template>
       </EmptyState>
     </Section>
@@ -681,7 +681,7 @@ watch(days, (value) => {
         <ChartTab :active-type="chartType" :types="{bar: 'BarChart', line: 'LineChart'}" @change="type => chartType = type"/>
       </template>
 
-      <el-skeleton v-if="loading" :rows="6" animated/>
+      <fct-skeleton v-if="loading" :rows="6" animated/>
       <SalesChart v-else-if="points.length" :points="points" :type="chartType"/>
       <EmptyState v-else size="sm" :title="translate('No gift wrap sold yet')"/>
     </Section>

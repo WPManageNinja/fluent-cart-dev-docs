@@ -1,13 +1,13 @@
 ---
 title: Admin Screens
-description: Add your plugin's own screens to the FluentCart admin with core's Vue, Element Plus and layout components.
+description: Add your plugin's own screens to the FluentCart admin with core's Vue, fct-* controls and layout components.
 ---
 
 # Admin Screens
 
 Your plugin can add screens to the FluentCart admin. They load inside FluentCart's own admin app, so they get:
 
-- **The same Vue, router and Element Plus.** Your screens use `<el-button>`, `<el-input>` and the router as FluentCart's screens do.
+- **The same Vue, router and controls.** Your screens use `<fct-button>`, `<fct-input>` and the router as FluentCart's screens do, with no import. See [UI Components](./ui-components).
 - **The layout components.** `Page`, `Section`, `SettingRow`, `List` and the others make your screen look like a FluentCart screen. See [Layout Components](./components).
 - **Helpers.** `translate`, `Rest`, `Notify`, `UserCan` and more.
 - **Charts.** The same ECharts that FluentCart's reports use, with its colors and tooltip helpers. See [Charts](./charts).
@@ -15,7 +15,7 @@ Your plugin can add screens to the FluentCart admin. They load inside FluentCart
 Your plugin ships only its own screens. It never ships Vue or Element Plus.
 
 ::: info Requirements
-FluentCart **X.Y.Z** or later, which sets `FLUENTCART_MODULE_API` to **3**. Check that number before you load any screen that imports the layout components (step 1). Pro is not needed.
+FluentCart **X.Y.Z** or later, which sets `FLUENTCART_MODULE_API` to **3**. Check that number before you load any screen that imports the layout components or uses the `fct-*` controls (step 1). Pro is not needed.
 :::
 
 ## How it fits together
@@ -92,7 +92,7 @@ add_action('plugins_loaded', function () {
 });
 ```
 
-- **The API check** matters: a screen that imports a name FluentCart does not have fails to load as a whole. API 3 means the layout components exist.
+- **The API check** matters: a screen that imports a name FluentCart does not have fails to load as a whole. API 3 means the layout components and the `fct-*` controls exist.
 - **`type="module"`** lets the browser resolve `@fluent-cart/*` through the import map. Add it only to your own handle.
 - **The permission** must be an existing FluentCart permission. Use the same one on the menu item, the route and your REST routes. You cannot add new permissions.
 - **Your REST routes** live in your own namespace. `Rest` from `@fluent-cart/ui` calls them when you pass their base URL (step 4).
@@ -142,7 +142,7 @@ $bundle = FLUENTCART_MODULE_API >= 4 ? 'gift-wrap' : 'fallback';
 wp_enqueue_script('gift_wrap_admin', $url . $bundle . '.js', [], GIFT_WRAP_VERSION, true);
 ```
 
-Register every route your add-on has, so no link leads to an empty page. Build the fallback as its own entry, and import only what the oldest FluentCart you support exports. If a FluentCart before API 3 must see a card too, copy the card into your add-on and build it from the names FluentCart 2.2.0 exports. FluentCart Pro does this for licensing.
+Register every route your add-on has, so no link leads to an empty page. Build the fallback as its own entry, and import only what the oldest FluentCart you support exports. Do not use `<fct-*>` tags in it: a FluentCart before API 3 does not know them. If a FluentCart before API 3 must see a card too, copy the card into your add-on and build it from the names FluentCart 2.2.0 exports. FluentCart Pro does this for licensing.
 
 ### 2. The build config
 
@@ -181,7 +181,7 @@ export default defineConfig({
 ```
 
 ::: danger Never bundle Vue or Element Plus
-A second copy of Vue cannot see FluentCart's app. Every `<el-*>` component and every router link in your screen stops working. Do not alias `vue` and do not import `element-plus`; FluentCart registers both on its app.
+A second copy of Vue cannot see FluentCart's app. Every `<fct-*>` component and every router link in your screen stops working. Do not alias `vue` and do not import `element-plus`; FluentCart registers both on its app.
 :::
 
 Install `vite`, `@vitejs/plugin-vue` and `vue` as dev dependencies, on the same major versions as FluentCart. `vue` is needed to compile your `.vue` files; it never ends up in the bundle.
@@ -251,16 +251,16 @@ const save = () => {
 <template>
   <Page :title="translate('Gift Wrap')" class="gift-wrap-page">
     <template #actions>
-      <el-button type="primary" :loading="saving" @click="save">{{ translate('Save') }}</el-button>
+      <fct-button type="primary" :loading="saving" @click="save">{{ translate('Save') }}</fct-button>
     </template>
 
     <Section :title="translate('Settings')" divided>
       <SettingRow layout="toggle" :label="translate('Offer gift wrap at checkout')"
                   :description="translate('Customers can add gift wrap to their order.')" v-slot="{id}">
-        <el-switch :id="id" v-model="settings.enabled" active-value="yes" inactive-value="no"/>
+        <fct-switch :id="id" v-model="settings.enabled" active-value="yes" inactive-value="no"/>
       </SettingRow>
       <SettingRow :label="translate('Fee')" :description="translate('Added once per order.')" v-slot="{id}">
-        <el-input-number :id="id" v-model="settings.fee" :min="0"/>
+        <fct-input type="number" :id="id" v-model="settings.fee" :min="0"/>
       </SettingRow>
     </Section>
 

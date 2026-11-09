@@ -7,6 +7,8 @@ description: Page, Section, SettingRow, List, SortableList and the other layout 
 
 Import these from `@fluent-cart/ui` in a screen that FluentCart loads (see [Admin Screens](./)). FluentCart's own screens use the same components, so your screen matches them in spacing, headings, dark mode and right-to-left layouts.
 
+For buttons, inputs, tables and dialogs, use the `fct-*` controls. See [UI Components](./ui-components).
+
 ```js
 import {Page, Section, Title, SettingRow, List, ListItem, SortableList, KeyValueList, KeyValue,
     StatGrid, StatTile, EmptyState, DetailLayout, Alert, FluidTab} from '@fluent-cart/ui';
@@ -30,7 +32,7 @@ The screen wrapper: header, then content.
 ```vue
 <Page :title="translate('Gift Wrap')" :breadcrumbs="[{label: translate('Settings'), to: {name: 'settings'}}]">
   <template #status><Badge status="active" :text="translate('Active')"/></template>
-  <template #actions><el-button type="primary">{{ translate('Save') }}</el-button></template>
+  <template #actions><fct-button type="primary">{{ translate('Save') }}</fct-button></template>
   <Section :title="translate('Settings')">…</Section>
 </Page>
 ```
@@ -56,7 +58,7 @@ The default content block. A top-level section is a card. A section inside anoth
 
 ```vue
 <Section :title="translate('Shipping')" :description="translate('Where you ship')" divided>
-  <template #actions><el-button size="small">{{ translate('Add zone') }}</el-button></template>
+  <template #actions><fct-button size="small">{{ translate('Add zone') }}</fct-button></template>
   …
   <Section :title="translate('Defaults')">…</Section>
 </Section>
@@ -89,7 +91,7 @@ One setting: label and help text on the left, control on the right. The row conn
 
 ```vue
 <SettingRow :label="translate('API key')" :description="translate('From your carrier dashboard')" v-slot="{id, describedBy}">
-  <el-input :id="id" :aria-describedby="describedBy" v-model="apiKey"/>
+  <fct-input :id="id" :aria-describedby="describedBy" v-model="apiKey"/>
 </SettingRow>
 ```
 
@@ -106,7 +108,8 @@ One setting: label and help text on the left, control on the right. The row conn
 | default | The control. It receives `{id, describedBy}`. |
 | `label`, `description` | Rich versions of the props. The description can hold links and buttons. |
 
-- **Switches:** `el-switch` takes the `id`, but it does not pass `aria-describedby` to its input. The label still names the switch.
+- **Do not set the control's own `label`.** The row draws the label. Pass the row's `id` instead (see [Field props](./ui-components#field-props)).
+- **Switches:** `fct-switch` takes the `id`, but it has no `aria-describedby`. The label still names the switch.
 - **Required fields:** put `<LabelHint :title="…" :required="true"/>` in the `label` slot.
 - Rows are separated by a divider, except the last one.
 
@@ -119,7 +122,7 @@ Rows with an icon or logo, a title, a line of text and actions.
   <ListItem v-for="method in methods" :key="method.id" :title="method.name" :meta="method.description">
     <template #media><img :src="method.logo" alt=""/></template>
     <template #badges><Badge :status="method.active ? 'active' : 'disabled'" :text="method.status_label"/></template>
-    <template #actions><el-button size="small">{{ translate('Manage') }}</el-button></template>
+    <template #actions><fct-button size="small">{{ translate('Manage') }}</fct-button></template>
   </ListItem>
 </List>
 ```
@@ -209,7 +212,7 @@ What a screen or section shows when it has no data.
 
 ```vue
 <EmptyState :title="translate('No packages yet')" :text="translate('Add a box size to get accurate rates.')">
-  <template #actions><el-button type="primary">{{ translate('Add package') }}</el-button></template>
+  <template #actions><fct-button type="primary">{{ translate('Add package') }}</fct-button></template>
 </EmptyState>
 ```
 

@@ -258,14 +258,16 @@ add_action('fluent_cart/shipping_status_changed', function ($data) {
 
 ## Refunds
 
-Fired during the refund flow after transaction records have been created. The generic `order_refunded` hook fires on every refund, followed by either `order_fully_refunded` or `order_partially_refunded` depending on the refund type. Refund data includes the [Order](/database/models/order), [OrderItem](/database/models/order-item), [OrderTransaction](/database/models/order-transaction), and [Customer](/database/models/customer) models.
+Fired during the refund flow after transaction records have been created. The generic `order_refunded` hook fires on every refund, followed by either `order_fully_refunded` or `order_partially_refunded` depending on the refund type. Refund data carries the [Order](/database/models/order), [OrderTransaction](/database/models/order-transaction) and [Customer](/database/models/customer) models, plus the refunded [order items](/database/models/order-item) as plain arrays.
 
 ### <code> order_refunded </code>
 <details>
 <summary><code>fluent_cart/order_refunded</code> &mdash; Fires after any refund (full or partial)</summary>
 
 **When it runs:**
-Fires inside `OrderRefund::afterDispatch()` after a refund transaction is recorded and the refund amount is calculated. This hook fires for both full and partial refunds. It fires before the type-specific hooks below.
+Fires inside `OrderRefund::afterDispatch()` after a refund transaction is recorded and the refund amount is calculated. This hook fires for both full and partial refunds, before the type-specific hooks below.
+
+Nothing fires when the refund does not increase the order's refunded total. The event sums the order's refunded transactions and subtracts the order's existing `total_refund`; when that difference is zero, the hooks and their listeners are skipped.
 
 **Parameters:**
 
@@ -273,7 +275,7 @@ Fires inside `OrderRefund::afterDispatch()` after a refund transaction is record
     ```php
     $data = [
         'order'              => $order,          // \FluentCart\App\Models\Order
-        'refunded_items'     => [],              // Array of OrderItem models (looked up from refundedItemIds)
+        'refunded_items'     => [],              // Order item rows as plain arrays, looked up from the refunded item IDs
         'new_refunded_items' => [],              // Raw refunded items array with restore_quantity info
         'refunded_amount'    => 5000,            // Newly refunded amount in cents
         'manage_stock'       => true,            // Whether stock should be restored
@@ -283,7 +285,7 @@ Fires inside `OrderRefund::afterDispatch()` after a refund transaction is record
     ];
     ```
 
-**Source:** `app/Events/Order/OrderRefund.php` (line 141)
+**Source:** `app/Events/Order/OrderRefund.php` (line 142)
 
 **Usage:**
 ```php
@@ -305,7 +307,7 @@ add_action('fluent_cart/order_refunded', function ($data) {
 <summary><code>fluent_cart/order_fully_refunded</code> &mdash; Fires only when an order is fully refunded</summary>
 
 **When it runs:**
-Fires inside `OrderRefund::afterDispatch()` immediately after the generic `order_refunded` hook, but only when the total refunded amount meets or exceeds the order's total paid amount (i.e. full refund).
+Fires inside `OrderRefund::afterDispatch()` immediately after the generic `order_refunded` hook, but only when the order's refunded transactions total at least its net paid amount — `total_paid` less any Merchant-of-Record VAT.
 
 **Parameters:**
 
@@ -323,7 +325,7 @@ Fires inside `OrderRefund::afterDispatch()` immediately after the generic `order
     ];
     ```
 
-**Source:** `app/Events/Order/OrderRefund.php` (line 144)
+**Source:** `app/Events/Order/OrderRefund.php` (line 145)
 
 **Usage:**
 ```php
@@ -340,7 +342,7 @@ add_action('fluent_cart/order_fully_refunded', function ($data) {
 <summary><code>fluent_cart/order_partially_refunded</code> &mdash; Fires only when an order is partially refunded</summary>
 
 **When it runs:**
-Fires inside `OrderRefund::afterDispatch()` immediately after the generic `order_refunded` hook, but only when the total refunded amount is less than the order's total paid amount (i.e. partial refund).
+Fires inside `OrderRefund::afterDispatch()` immediately after the generic `order_refunded` hook, but only when the order's refunded transactions total less than its net paid amount — `total_paid` less any Merchant-of-Record VAT.
 
 **Parameters:**
 
@@ -358,7 +360,7 @@ Fires inside `OrderRefund::afterDispatch()` immediately after the generic `order
     ];
     ```
 
-**Source:** `app/Events/Order/OrderRefund.php` (line 146)
+**Source:** `app/Events/Order/OrderRefund.php` (line 147)
 
 **Usage:**
 ```php
@@ -613,10 +615,12 @@ add_action('fluent_cart/order_paid_done', function ($data) {
 
 ### <code> order/receipt_viewed </code>
 <details>
-<summary><code>fluent_cart/order/receipt_viewed</code> &mdash; Fires the first time a customer views their order receipt</summary>
+<summary><code>fluent_cart/order/receipt_viewed</code> &mdash; Fires the first time a paid order's receipt is viewed</summary>
 
 **When it runs:**
-Fires at the end of receipt rendering (both the `ReceiptRenderer` class and the `receipt_slip.php` view template) when the `$is_first_time` flag is true. This means it only fires once per order, the very first time the receipt page is loaded. Subsequent views do not trigger this hook. The data includes both the [Order](/database/models/order) and [OrderOperation](/database/models/order-operation) models.
+Fires at the end of receipt rendering, the first time a **paid** order's sales are recorded. The receipt handler arms this only when the order's [OrderOperation](/database/models/order-operation) row still has `sales_recorded` unset **and** the order's payment status is `paid`; it writes `sales_recorded` in the same pass, so later views of the same receipt do not fire the hook again.
+
+Because the flag is not armed for an unpaid order, an order that is paid after its receipt was first opened fires this hook on the first view *after* payment — not necessarily on the first view of the page. The data includes both the [Order](/database/models/order) and [OrderOperation](/database/models/order-operation) models.
 
 **Parameters:**
 
@@ -628,7 +632,7 @@ Fires at the end of receipt rendering (both the `ReceiptRenderer` class and the 
     ];
     ```
 
-**Source:** `app/Services/Renderer/Receipt/ReceiptRenderer.php` (line 162), `app/Views/invoice/receipt_slip.php` (line 482)
+**Source:** `app/Services/Renderer/Receipt/ReceiptRenderer.php` (line 204)
 
 **Usage:**
 ```php

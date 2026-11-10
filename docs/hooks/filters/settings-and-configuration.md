@@ -992,33 +992,6 @@ add_filter('fluent_cart/dummy_product_info', function ($dummyProduct) {
 ```
 </details>
 
-### <code> generatable_pages </code>
-<details>
-<summary><code>fluent_cart/generatable_pages</code> &mdash; Filter the pages FluentCart can auto-generate</summary>
-
-**When it runs:**
-This filter is applied when building the list of `key => [title, content]` pages (Shop, Checkout, Customer Profile, etc.) that the Pages Setup screen's "+" create button and the onboarding wizard can create for the store. Add-ons that need their own dedicated page (e.g. a custom portal page) register it here.
-
-**Parameters:**
-
-- `$pages` (array): Array of generatable pages keyed by page slug, each with a title and default content
-
-**Returns:** `array` — The modified generatable pages array
-
-**Source:** `app/CPT/Pages.php:42`
-
-**Usage:**
-```php
-add_filter('fluent_cart/generatable_pages', function ($pages) {
-    $pages['loyalty_dashboard'] = [
-        'title'   => 'Loyalty Dashboard',
-        'content' => '[fluent_cart_loyalty_dashboard]',
-    ];
-    return $pages;
-});
-```
-</details>
-
 ### <code> pro_upgrade_base_url </code>
 <details>
 <summary><code>fluent_cart/pro_upgrade_base_url</code> &mdash; Filter the base URL used for "Upgrade to Pro" links</summary>
@@ -1212,7 +1185,7 @@ This filter is applied when building the list of pages FluentCart can auto-gener
 
 **Parameters:**
 
-- `$pages` (array): Core generatable pages, keyed by page key (default: the 5 core pages &mdash; `checkout`, `cart`, `receipt`, `shop`, `customer_profile`)
+- `$pages` (array): Core generatable pages, keyed by page key (default: the 6 core pages &mdash; `checkout`, `cart`, `receipt`, `order_review`, `shop`, `customer_profile`)
     ```php
     $pages = [
         'checkout' => [
@@ -1225,7 +1198,7 @@ This filter is applied when building the list of pages FluentCart can auto-gener
 
 **Returns:** `array` &mdash; The modified pages array. Each entry needs a `title` and a `content` (the block/shortcode content FluentCart uses when it creates the WP page).
 
-**Source:** `app/CPT/Pages.php:19`
+**Source:** `app/CPT/Pages.php:20`
 
 **Usage:**
 ```php
@@ -1281,6 +1254,32 @@ add_filter('fluent_cart/dashboard/page_setup_redirect_url', function ($url, $con
 </details>
 
 ---
+
+### <code> admin/footer/show_text </code>
+<details>
+<summary><code>fluent_cart/admin/footer/show_text</code> &mdash; Keep the default WordPress admin footer text instead of FluentCart's</summary>
+
+**When it runs:**
+Applied on FluentCart admin screens only, while replacing the left-hand WordPress admin footer text ("Thank you for creating with WordPress.") with FluentCart's own feedback line. Return a falsy value to leave the WordPress text in place.
+
+This governs only the left-hand text. The right-hand version label is set through WordPress's own `update_footer` filter and has no FluentCart filter of its own.
+
+**Parameters:**
+
+- `$show` (bool): Whether to replace the footer text. Default `true`.
+
+**Returns:** `bool` &mdash; `false` to keep the WordPress default.
+
+**Source:** `app/Modules/AdminFooter/AdminFooter.php:27`
+
+**Usage:**
+```php
+add_filter('fluent_cart/admin/footer/show_text', function ($show) {
+    // Leave the WordPress footer alone for everyone but shop managers
+    return current_user_can('fluent_cart_admin');
+});
+```
+</details>
 
 ## Admin Tables
 

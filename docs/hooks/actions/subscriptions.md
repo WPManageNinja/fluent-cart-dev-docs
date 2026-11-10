@@ -1247,4 +1247,46 @@ add_action('fluent_cart/order/upgraded', function ($data) {
 ```
 </details>
 
+### <code> plan_changed </code>
+<details>
+<summary><code>fluent_cart/plan_changed</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a plan upgrade changes the customer's plan</summary>
+
+**When it runs:**
+This action fires when a plan upgrade completes, right after `fluent_cart/order/upgraded`. Core defines the event (`FluentCart\App\Events\PlanChanged`), and FluentCart Pro fires it when it finishes the upgrade. It does not fire if Pro cannot find the old or the new variation.
+
+Unlike `fluent_cart/order/upgraded`, the payload gives both variations, so you do not need to read the upgrade cart. The models arrive as arrays.
+
+With a gateway that can confirm the same payment twice at the same time (a webhook and a redirect), the action can fire twice for one upgrade. Make your listener safe to run twice.
+
+**Parameters:**
+
+- `$data` (array): Plan change data
+    ```php
+    $data = [
+        'order'         => [...], // array — the new upgrade order (Order::toArray())
+        'customer'      => [...], // array — the customer, or [] if none
+        'new_variation' => [...], // array — the variation the customer upgraded to
+        'old_variation' => [...], // array — the variation the customer upgraded from
+        'other_info'    => [
+            'from_order_id'        => 120, // int — the original order
+            'from_subscription_id' => 45,  // int — the old subscription, 0 if none
+            'subscription_id'      => 46,  // int — the new subscription, 0 if none
+        ],
+    ];
+    ```
+
+**Source:** `fluent-cart-pro/app/Hooks/Handlers/UpgradeHandler.php:417` (dispatch), `app/Events/PlanChanged.php` (event)
+
+**Usage:**
+```php
+add_action('fluent_cart/plan_changed', function ($data) {
+    $customerEmail = $data['customer']['email'] ?? '';
+    $fromVariation = $data['old_variation']['id'];
+    $toVariation   = $data['new_variation']['id'];
+
+    my_plugin_move_member($customerEmail, $fromVariation, $toVariation);
+}, 10, 1);
+```
+</details>
+
 ---

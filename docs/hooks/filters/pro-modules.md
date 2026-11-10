@@ -332,7 +332,7 @@ This is the reverse of the usual arrangement, so read it carefully before assumi
 
 **Pro supplies the implementation**, registering a listener at `fluent-cart-pro/app/Hooks/actions.php:89` that turns the block markup into HTML.
 
-The consequence: on a **free-only install nothing implements the filter**, so the default `''` survives and a block-based email body renders **empty**. That is not a bug in the caller — it is the renderer being absent. Either install Pro or register your own listener.
+The consequence: on a **free-only install nothing implements the filter**, so the default `''` survives and a block-based email body renders **empty**. Either install Pro or register your own listener.
 :::
 
 **When it runs:**

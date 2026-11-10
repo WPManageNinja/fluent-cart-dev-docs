@@ -48,11 +48,9 @@ Retrieve a paginated list of subscriptions with optional filtering, sorting, and
 | `offset` | integer | query | No | Offset for records |
 | `user_tz` | string | query | No | User timezone for date filtering (e.g., `America/New_York`) |
 
-::: danger Send `with` and `scopes` as arrays
-Both must be arrays — `?with[]=customer`, `?scopes[]=<scope>`. A bare string (`?with=customer`,
-`?scopes=<scope>`), and an empty `?with=`, answer **500** `plugin_exception` instead of a validation
-error. `select` and `include_ids` do accept a comma-separated string. This applies to every filtered
-list endpoint in the API, not just this one.
+::: tip Send `with` and `scopes` as arrays
+Both must be arrays — `?with[]=customer`, `?scopes[]=<scope>`. `select` and `include_ids` do accept
+a comma-separated string. This applies to every filtered list endpoint in the API, not just this one.
 :::
 
 #### Search Behavior

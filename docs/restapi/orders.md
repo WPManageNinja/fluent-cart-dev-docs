@@ -46,11 +46,9 @@ Retrieve a paginated list of orders with optional filtering, sorting, and search
 | `order_statuses` | array | query | No | Filter by order statuses |
 | `shipping_statuses` | array | query | No | Filter by shipping statuses |
 
-::: danger Send `with` and `scopes` as arrays
-Both must be arrays — `?with[]=customer`, `?scopes[]=<scope>`. A bare string (`?with=customer`,
-`?scopes=<scope>`), and an empty `?with=`, answer **500** `plugin_exception` instead of a validation
-error. `select` and `include_ids` do accept a comma-separated string. This applies to every filtered
-list endpoint in the API, not just this one.
+::: tip Send `with` and `scopes` as arrays
+Both must be arrays — `?with[]=customer`, `?scopes[]=<scope>`. `select` and `include_ids` do accept
+a comma-separated string. This applies to every filtered list endpoint in the API, not just this one.
 :::
 
 ### Searchable Fields (Operator Syntax)

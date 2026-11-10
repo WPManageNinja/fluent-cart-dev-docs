@@ -79,8 +79,8 @@ Paginated list of stock-managed products with their variants. A product appears 
 | `advanced_filters` | string (JSON) | query | No | JSON-encoded advanced filter groups. |
 | `with` | array | query | No | Eager-load relations. See below. |
 
-::: danger Send `with` as an array
-`with` must be an array — `?with[]=detail`. A bare string (`?with=detail`) answers `500 plugin_exception` instead of a validation error. This applies to every filtered list endpoint in the API, not just this one.
+::: tip Send `with` as an array
+`with` must be an array — `?with[]=detail`. This applies to every filtered list endpoint in the API, not just this one.
 :::
 
 The `with` parameter is **allowlisted** — arbitrary relation names are rejected rather than passed through:

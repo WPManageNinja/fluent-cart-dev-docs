@@ -502,6 +502,19 @@ add_action('fluent_cart/subscription_trial_end_reminder', function ($data) {
 <details>
 <summary><code>fluent_cart/renewal_reminder_overdue</code> &mdash; Fires when an overdue renewal reminder is triggered</summary>
 
+::: warning Deprecated in 1.6.3 for scheduled reminders
+`RenewalReminderService` now dispatches staged events instead, and forwards this name
+through `do_action_deprecated()`, which logs a deprecation notice and will stop firing
+in a future release. Listen to the staged events instead:
+`fluent_cart/renewal_overdue_first`, `fluent_cart/renewal_overdue_followup` or
+`fluent_cart/renewal_overdue_final` — which one fires depends on the stage's position in
+the configured `renewal_reminder_overdue_days` list, not on a fixed day threshold.
+
+The deprecation covers the **scheduled** path only. A manual send still dispatches this
+name directly, and those direct dispatches carry no `staged_email_dispatched` flag, so
+the core mailer still delivers for them. See [Deprecated Hooks](/hooks/deprecated).
+:::
+
 **When it runs:**
 This action fires on a scheduled basis when a renewal [Order](/database/models/order) with an outstanding balance has passed its due date by a configured number of days. The stage name indicates how many days overdue (e.g., `overdue_1`, `overdue_3`, `overdue_7`). The overdue offsets are configurable via the `renewal_reminder_overdue_days` store setting (defaults to `1,3,7`) and the `fluent_cart/reminders/renewal_overdue_days` filter. Reminders as a whole are gated by the `renewal_reminders_enabled` setting.
 

@@ -86,7 +86,7 @@ Signature verification is gated by [`fluent_cart/licensing/enable_signed_release
 <summary><code>fluent_cart/licensing/license_reactivated</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a subscription renewal revives a license</summary>
 
 **When it runs:**
-Fires when a license is brought back to active status because its backing subscription was reactivated. Note this uses the `fluent_cart/licensing/` prefix rather than `fluent_cart_sl/`.
+Fires when a license is brought back to active status: its backing subscription was reactivated, a paid renewal restored a disabled or expired license, or a billing-date update revived an expired one. Note this uses the `fluent_cart/licensing/` prefix rather than `fluent_cart_sl/`.
 
 **Parameters:**
 
@@ -94,7 +94,7 @@ Fires when a license is brought back to active status because its backing subscr
     - `license` ([`\FluentCart\App\Models\License`](/database/models/license)) — The reactivated license
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)) — The subscription that triggered it
 
-**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:417`
+**Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:295`, `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:475`
 
 **Usage:**
 ```php

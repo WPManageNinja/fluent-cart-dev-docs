@@ -564,7 +564,7 @@ add_filter('fluent_cart/invoice_prefix', function ($prefix) {
 <summary><code>fluent_cart/order_refund_manually</code> &mdash; Intercept manual refund processing</summary>
 
 **When it runs:**
-Applied during the refund process before the payment gateway refund method is called. Allows you to handle refunds through a custom mechanism instead of the gateway.
+Applied during the refund process before the payment gateway refund method is called. Allows you to handle refunds through a custom mechanism instead of the gateway. Not applied when the admin records the refund locally only (`force_local`), because no money moves through FluentCart then.
 
 **Parameters:**
 - `$manualRefund` (array): Manual refund status

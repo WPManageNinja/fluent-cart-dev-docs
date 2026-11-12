@@ -249,7 +249,12 @@ add_action('fluent_cart/module/deactivated/stock_management', function ($moduleD
 <summary><code>fluent_cart/module/activated/{$moduleKey}</code> &mdash; Module activated (dynamic)</summary>
 
 **When it runs:**
-Fires inside `ModuleSettingsController::saveSettings()` when a module's `active` status transitions from `'no'` to `'yes'`. The `{$moduleKey}` portion is replaced dynamically with the module identifier.
+Fires inside `ModuleSettingsController::saveSettings()` on **two** paths:
+
+1. The module's `active` status transitions from `'no'` to `'yes'`.
+2. The module was **already** `'yes'` and any of its child settings changed in this save.
+
+The second path means this is not an "activated once" signal — it fires again every time an active module's settings are edited. Compare `$moduleData` with `$prevModuleData` if you need to tell a genuine activation from a settings edit. The `{$moduleKey}` portion is replaced dynamically with the module identifier.
 
 **Available dynamic variants:** `stock_management`, `subscriptions`, `shipping`, `tax`, `coupon`, `license`, `digital_downloads`, and any other registered module key.
 
@@ -265,18 +270,29 @@ Fires inside `ModuleSettingsController::saveSettings()` when a module's `active`
 - `$prevModuleData` (array): The previous settings for this module before the save
     ```php
     $prevModuleData = [
-        'active' => 'no',
+        'active' => 'no',  // 'yes' when this is a settings change, not an activation
         // ... previous module-specific settings
     ];
     ```
 
-**Source:** `app/Http/Controllers/ModuleSettingsController.php` (line 61)
+**Source:** `app/Http/Controllers/ModuleSettingsController.php` (lines 58 and 63)
 
 **Usage:**
 ```php
 add_action('fluent_cart/module/activated/subscriptions', function ($moduleData, $prevModuleData) {
-    // Run database migrations when the subscriptions module is first activated
-    \FluentCart\Database\DBMigrator::run('subscription_tables');
+    // Guard on the transition: this hook also fires on every settings edit of
+    // an already-active module, so one-time setup must not run again.
+    if (($prevModuleData['active'] ?? 'no') === 'yes') {
+        return;
+    }
+
+    update_option('my_addon_subscriptions_ready', 'yes', 'no');
+
+    fluent_cart_add_log(
+        'Subscriptions module activated',
+        'Ran one-time setup for the subscriptions module.',
+        'info'
+    );
 }, 10, 2);
 ```
 </details>

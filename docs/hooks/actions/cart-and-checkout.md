@@ -494,6 +494,44 @@ add_action('fluent_cart/tax/reverse_charge_removed', function ($data) {
 
 ---
 
+### <code> order_bump_succeed </code>
+<details>
+<summary><code>fluent_cart/order_bump_succeed</code> &mdash; A checkout variation upgrade was accepted and the order was paid</summary>
+
+**When it runs:**
+Not a literal `do_action` name at the call site. When a checkout request arrives with `is_upgraded=yes`, FluentCart records the upgrade in the cart's `checkout_data.order_bump` (as `upgraded_from` / `upgraded_to` variation IDs) and appends this hook's name to `checkout_data.__on_success_actions__`. Everything on that list is dispatched once the order reaches a paid state. Submitting the checkout again without `is_upgraded=yes` removes the name, so a cart that no longer has the upgrade does not fire it.
+
+It is dispatched from the standard order-status path and, for Mollie, from the Pro gateway's confirmation handler. Each dispatch is guarded by `has_action()`, so the hook runs only when something is listening; core registers its own listener.
+
+**Parameters:**
+
+- `$data` (array): Cart, order and payment context
+    ```php
+    $data = [
+        'cart'        => $cart,        // \FluentCart\App\Models\Cart — the completed cart
+        'order'       => $order,       // \FluentCart\App\Models\Order
+        'transaction' => $transaction, // \FluentCart\App\Models\OrderTransaction, or null
+    ];
+    ```
+
+**Source:** registered in `app/Hooks/Cart/WebCheckoutHandler.php:1129`; dispatched from `app/Helpers/StatusHelper.php:288` and `fluent-cart-pro/app/Modules/PaymentMethods/MollieGateway/Confirmations.php:516`
+
+**Usage:**
+```php
+add_action('fluent_cart/order_bump_succeed', function ($data) {
+    $bump = \FluentCart\Framework\Support\Arr::get($data['cart']->checkout_data, 'order_bump', []);
+
+    fluent_cart_add_log(
+        'Upgrade accepted',
+        sprintf('Order #%d upgraded variation %s to %s', $data['order']->id,
+            $bump['upgraded_from'] ?? '?', $bump['upgraded_to'] ?? '?'),
+        'info',
+        ['module_name' => 'order', 'module_id' => $data['order']->id]
+    );
+}, 10, 1);
+```
+</details>
+
 ## Checkout Page Rendering
 
 All hooks in this section fire during server-side HTML rendering of the checkout page. They use output buffering, so you should **echo** (not return) any custom HTML you want to inject.
@@ -1703,7 +1741,7 @@ add_action('fluent_cart/receipt/thank_you/after_footer_buttons', function ($conf
 <summary><code>fluent_cart/after_receipt</code> &mdash; After the entire receipt/thank-you page</summary>
 
 **When it runs:**
-This action fires after the complete thank-you page has been rendered, including the footer. It fires on every receipt view (both first-time and returning visits). This hook is also present in the legacy `thank_you.php` view template.
+This action fires after the complete thank-you page has been rendered, including the footer. It fires on every receipt view, first-time or returning.
 
 **Parameters:**
 
@@ -1716,7 +1754,7 @@ This action fires after the complete thank-you page has been rendered, including
     ];
     ```
 
-**Source:** `app/Services/Renderer/Receipt/ThankYouRender.php`, `app/Views/invoice/thank_you.php`
+**Source:** `app/Services/Renderer/Receipt/ThankYouRender.php:109`
 
 **Usage:**
 ```php
@@ -1737,7 +1775,9 @@ add_action('fluent_cart/after_receipt', function ($data) {
 <summary><code>fluent_cart/after_receipt_first_time</code> &mdash; Only on the first receipt view (for conversion tracking)</summary>
 
 **When it runs:**
-This action fires only on the first time a customer views the receipt page after a purchase. It does not fire on subsequent visits to the same receipt URL. This is the ideal hook for firing conversion tracking pixels, analytics events, or affiliate postback URLs.
+This action fires once, the first time a **paid** order's receipt is rendered. It is gated on the same flag as [`order/receipt_viewed`](/hooks/actions/orders#order-receipt-viewed): the order operation's `sales_recorded` is written on that first render, so later visits to the same receipt URL do not fire it.
+
+Because the flag is only set when the order's payment status is already `paid`, an order paid *after* its receipt was first opened fires this on the first view following payment — not on the first view of the page. That is the behaviour you want for conversion pixels, analytics events and affiliate postbacks, which is what this hook is for.
 
 **Parameters:**
 
@@ -1749,7 +1789,7 @@ This action fires only on the first time a customer views the receipt page after
     ];
     ```
 
-**Source:** `app/Services/Renderer/Receipt/ThankYouRender.php`, `app/Views/invoice/thank_you.php`
+**Source:** `app/Services/Renderer/Receipt/ThankYouRender.php:116`
 
 **Usage:**
 ```php

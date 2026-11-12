@@ -182,6 +182,8 @@ This action fires immediately before the price wrapper `<div>` is rendered on a 
         'current_price' => 5000,          // (int) Price in cents
         'scope'         => 'price_range', // (string) 'price_range' for simple products,
                                           //          'product_variant_price' for variant pricing
+        'source'        => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name'   => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -215,6 +217,8 @@ This action fires inline immediately after a price value is echoed, while still 
                                                   //   'price_range'          - simple product or min/max range
                                                   //   'product_variant_price' - individual variant price
                                                   //   'product_card'         - product card on archive/group pages
+        'source'        => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name'   => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -252,6 +256,8 @@ This action fires immediately after the closing `</div>` of the price block on a
         'current_price' => 5000,          // (int) Price in cents
         'scope'         => 'price_range', // (string) 'price_range' for simple products,
                                           //          'product_variant_price' for variant pricing
+        'source'        => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name'   => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -282,6 +288,8 @@ This action fires before the min-max price range `<div>` is rendered on multi-va
         'product'       => $product,      // (Product model) The current product
         'current_price' => 2000,          // (int) Minimum price in cents
         'scope'         => 'price_range',
+        'source'        => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name'   => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -310,6 +318,8 @@ This action fires after the closing `</div>` of the min-max price range block on
         'product'       => $product,      // (Product model) The current product
         'current_price' => 2000,          // (int) Minimum price in cents
         'scope'         => 'price_range',
+        'source'        => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name'   => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -330,6 +340,8 @@ add_action('fluent_cart/product/single/after_price_range_block', function($data)
 **When it runs:**
 This action fires before each individual [ProductVariation](/database/models/product-variation) option is rendered in the variant selection list. It fires once per variant, inside the `foreach` loop that iterates over sorted variants. It fires in both the standard variant list and the tabbed (subscription/onetime) variant layout.
 
+The advanced variation renderer fires the same hook once per **attribute group** instead of once per variant, with a different payload — see [Two payload shapes](#two-payload-shapes) below.
+
 **Parameters:**
 
 - `$data` (array): Variant item context
@@ -338,10 +350,12 @@ This action fires before each individual [ProductVariation](/database/models/pro
         'product' => $product,               // (Product model) The current product
         'variant' => $variant,               // (ProductVariant model) The current variant being rendered
         'scope'   => 'product_variant_item',
+        'source'  => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name' => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
-**Source:** `app/Services/Renderer/ProductRenderer.php`
+**Source:** `app/Services/Renderer/ProductRenderer.php:1149, 1155, 2098, 2106` (variant shape); `app/Services/Renderer/AdvancedVariationRenderer.php:232, 248` (attribute-group shape)
 
 **Usage:**
 ```php
@@ -363,6 +377,8 @@ add_action('fluent_cart/product/single/before_variant_item', function($data) {
 **When it runs:**
 This action fires after each individual variant option is rendered in the variant selection list. It fires once per variant, immediately after `renderVariationItem()` completes. It fires in both the standard variant list and the tabbed variant layout.
 
+The advanced variation renderer fires the same hook once per **attribute group** instead of once per variant, with a different payload — see [Two payload shapes](#two-payload-shapes) below.
+
 **Parameters:**
 
 - `$data` (array): Variant item context
@@ -371,10 +387,12 @@ This action fires after each individual variant option is rendered in the varian
         'product' => $product,               // (Product model) The current product
         'variant' => $variant,               // (ProductVariant model) The current variant being rendered
         'scope'   => 'product_variant_item',
+        'source'  => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name' => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
-**Source:** `app/Services/Renderer/ProductRenderer.php`
+**Source:** `app/Services/Renderer/ProductRenderer.php:1149, 1155, 2098, 2106` (variant shape); `app/Services/Renderer/AdvancedVariationRenderer.php:232, 248` (attribute-group shape)
 
 **Usage:**
 ```php
@@ -388,6 +406,37 @@ add_action('fluent_cart/product/single/after_variant_item', function($data) {
 }, 10, 1);
 ```
 </details>
+
+#### Two payload shapes
+
+`before_variant_item` and `after_variant_item` fire from two different renderers, and the payload is not the same.
+
+| Fired by | `scope` | Carries | Has `source` / `source_name` |
+|---|---|---|---|
+| `ProductRenderer` — the variant list and the tabbed layout | `product_variant_item` | `product`, `variant` | Yes |
+| `AdvancedVariationRenderer` — attribute selectors (swatches, dropdowns) | `attribute_selector_group` | `product`, `group` | No |
+
+The second shape fires once per **attribute group**, not once per variant, and carries an `AttributeGroup` model under `group` with no `variant` key at all. It is not passed through the render-source decorator, so `source` and `source_name` are absent there.
+
+```php
+$data = [
+    'product' => $product,  // \FluentCart\App\Models\Product
+    'group'   => $group,    // AttributeGroup model — the attribute group being drawn
+    'scope'   => 'attribute_selector_group',
+];
+```
+
+Branch on `scope` before reading either key, so a listener written for one shape does not run against the other:
+
+```php
+add_action('fluent_cart/product/single/before_variant_item', function ($data) {
+    if ($data['scope'] !== 'product_variant_item') {
+        return; // attribute-selector pass: no 'variant' here
+    }
+    $variant = $data['variant'];
+    // ...
+}, 10, 1);
+```
 
 ### <code> before_quantity_block </code>
 <details>
@@ -403,6 +452,8 @@ This action fires immediately before the quantity input container is rendered on
     $data = [
         'product' => $product,                   // (Product model) The current product
         'scope'   => 'product_quantity_block',
+        'source'  => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name' => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -430,6 +481,8 @@ This action fires immediately after the quantity input container is rendered on 
     $data = [
         'product' => $product,                   // (Product model) The current product
         'scope'   => 'product_quantity_block',
+        'source'  => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name' => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -466,6 +519,8 @@ This action fires before the product card image link and `<img>` tag are rendere
     $data = [
         'product' => $product,        // (Product model) The current product
         'scope'   => 'product_card',
+        'source'  => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name' => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -498,6 +553,8 @@ This action fires immediately after the product card image link closes, before t
     $data = [
         'product' => $product,        // (Product model) The current product
         'scope'   => 'product_card',
+        'source'  => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name' => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -527,6 +584,8 @@ This action fires before the price wrapper `<div class="fct-product-card-prices"
         'product'       => $product,       // (Product model) The current product
         'current_price' => 2000,           // (int) Minimum price in cents
         'scope'         => 'product_card',
+        'source'        => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name'   => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -556,6 +615,8 @@ This action fires immediately after the closing `</div>` of the product card pri
         'product'       => $product,       // (Product model) The current product
         'current_price' => 2000,           // (int) Minimum price in cents
         'scope'         => 'product_card',
+        'source'        => 'gutenberg', // (string) Which builder drew this: gutenberg | shortcode | bricks | divi | unknown
+        'source_name'   => 'fluent-cart/products', // (string) Block name for Gutenberg, declared name for shortcodes, '' when unknown
     ];
     ```
 
@@ -581,7 +642,7 @@ add_action('fluent_cart/product/group/after_price_block', function($data) {
 
 ## Product Card & Single-Page Render Hooks
 
-Positional markers wrapping the card and single-product-page blocks (title, excerpt, purchase actions), plus a data hook that fires after a batch of variants is saved. Unlike the `$data`-array hooks above, these pass a `$gateContext` array built by `RenderGate::context()` / `RenderContext::decorate()` -- at minimum `'product'` (the current [Product](/database/models/product) model) and `'scope'` (a `RenderGate::SCOPE_*` constant, `'card'` or `'single'`). All rendering hooks here use **output buffering** -- your callback should `echo` HTML directly rather than return a value.
+Positional markers wrapping the card and single-product-page blocks (title, excerpt, purchase actions), plus a data hook that fires after a batch of variants is saved. Unlike the `$data`-array hooks above, these pass a `$gateContext` array built by `RenderGate::context()` / `RenderContext::decorate()` -- at minimum `'product'` (the current [Product](/database/models/product) model), `'scope'` (a `RenderGate::SCOPE_*` constant, `'card'` or `'single'`), and the two render-source keys `'source'` and `'source_name'` described below. All rendering hooks here use **output buffering** -- your callback should `echo` HTML directly rather than return a value.
 
 ### <code> product/group/before_card </code>
 <details>

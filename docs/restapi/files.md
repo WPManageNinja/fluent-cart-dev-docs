@@ -149,7 +149,7 @@ The list can be customized via the `fluent_cart/local_file_blocked_extensions` f
 }
 ```
 
-**Rejected file type (500)** — the local driver returns a `WP_Error`, which surfaces as a server error rather than a validation error. Two distinct codes:
+**Rejected file type (500)** — two distinct codes:
 
 ```json
 {

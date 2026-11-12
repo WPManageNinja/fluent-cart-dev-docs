@@ -371,21 +371,32 @@ add_action('fluent_cart/payments/paypal/webhook_subscription_payment_received', 
 
 ### <code> paypal/webhook_payment_capture_completed </code>
 <details>
-<summary><code>fluent_cart/payments/paypal/webhook_payment_capture_completed</code> &mdash; Fires when a PayPal one-time payment capture completes</summary>
+<summary><code>fluent_cart/payments/paypal/webhook_payment_capture_completed</code> &mdash; Fires when a PayPal payment capture completes</summary>
 
 **When it runs:**
-This action fires when a PayPal `PAYMENT.SALE.COMPLETED` webhook arrives without a billing agreement ID (one-time payment), or when a `PAYMENT.CAPTURE.COMPLETED` event is received. Both indicate a successful one-time payment capture.
+This action fires from three paths:
+
+| PayPal event | Condition | Extra payload |
+|---|---|---|
+| `PAYMENT.SALE.COMPLETED` | No billing agreement ID — a one-time payment | — |
+| `PAYMENT.CAPTURE.COMPLETED` | Always | — |
+| `PAYMENT.SALE.COMPLETED` | Has a billing agreement ID **and** the matching subscription is still `intended` — the first payment of a new subscription | `vendor_subscription_id` |
+
+The third path is uncommon but it is not a one-time payment, so do not assume this hook only ever means a one-off purchase. A `PAYMENT.SALE.COMPLETED` that carries a billing agreement ID for an already-active subscription fires [`webhook_subscription_payment_received`](#paypal-webhook-subscription-payment-received) instead.
 
 **Parameters:**
 
 - `$data` (array): The charge resource from PayPal
     ```php
     $data = [
-        'charge' => $resource, // PayPal capture/sale resource object (array)
+        'charge'                 => $resource, // PayPal capture/sale resource object (array)
+        'vendor_subscription_id' => 'I-BW452GLLEP1G', // (string) Present ONLY on the first-subscription-payment path
     ];
     ```
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/IPN.php`
+    Check with `isset($data['vendor_subscription_id'])` — the two one-time paths pass `charge` alone.
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/IPN.php:86, 99, 113`
 
 **Usage:**
 ```php
@@ -519,12 +530,15 @@ This dynamic action fires as a catch-all for PayPal webhook events that are not 
     ```php
     $data = [
         'paypal_subscription' => $resource, // PayPal subscription resource object (array)
+        'webhook_event_id'    => 'WH-6TQ...', // (string) The PayPal event's own id, '' when absent
     ];
     ```
 
-**Source:** `app/Modules/PaymentMethods/PayPalGateway/IPN.php`
+    `webhook_event_id` is unique to this catch-all path — use it to make a listener idempotent, since PayPal can redeliver the same event.
 
-**Dynamic variants:**
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/IPN.php:131`
+
+**Dynamic variants:** any event type that is not a payment, refund or dispute reaches this branch. The names below are the ones the source calls out, not a closed list:
 - `fluent_cart/payments/paypal/webhook_billing_subscription_activated`
 - `fluent_cart/payments/paypal/webhook_billing_subscription_created`
 - `fluent_cart/payments/paypal/webhook_billing_subscription_cancelled`

@@ -51,9 +51,9 @@
             "name": "search",
             "in": "query",
             "required": false,
-            "description": "Search criteria. Each key is a column name with `column`, `operator`, and `value` fields. Searchable columns: `title`, `slug`.",
+            "description": "Matches against the term's id, title or slug.",
             "schema": {
-              "type": "object"
+              "type": "string"
             }
           },
           {

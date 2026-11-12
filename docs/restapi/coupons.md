@@ -71,10 +71,9 @@ Retrieve a paginated list of coupons with optional filtering, sorting, and searc
 | `include_ids` | array/string | query | No | Comma-separated IDs that must always be included in results |
 | `user_tz` | string | query | No | User timezone for date filtering (e.g., `America/New_York`) |
 
-::: danger Send `with` as an array
-`with` must be an array — `?with[]=products`. A bare string (`?with=products`), and an empty
-`?with=`, answer **500** `plugin_exception` instead of a validation error. This applies to every
-filtered list endpoint in the API, not just this one.
+::: tip Send `with` as an array
+`with` must be an array — `?with[]=products`. This applies to every filtered list endpoint in the
+API, not just this one.
 :::
 
 ### Active View Filters

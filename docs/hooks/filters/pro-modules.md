@@ -330,9 +330,9 @@ This is the reverse of the usual arrangement, so read it carefully before assumi
 
 **The free plugin fires this filter** — when sending a notification (`EmailNotificationMailer.php:317`) and from WP-CLI (`Commands.php:1354`). Pro fires it too, for the admin preview. So the filter runs on every install and you can hook it without Pro.
 
-**Pro supplies the implementation**, registering a listener at `fluent-cart-pro/app/Hooks/actions.php:89` that turns the block markup into HTML.
+**Pro supplies the implementation**, registering a listener at `fluent-cart-pro/app/Hooks/actions.php:88` that turns the block markup into HTML.
 
-The consequence: on a **free-only install nothing implements the filter**, so the default `''` survives and a block-based email body renders **empty**. That is not a bug in the caller — it is the renderer being absent. Either install Pro or register your own listener.
+The consequence: on a **free-only install nothing implements the filter**, so the default `''` survives and a block-based email body renders **empty**. Either install Pro or register your own listener.
 :::
 
 **When it runs:**
@@ -354,7 +354,7 @@ add_filter('fluent_cart/render_block_email_template', function ($rendered, $cont
 }, 10, 2);
 ```
 
-**Source:** fired at `fluent-cart/app/Services/Email/EmailNotificationMailer.php:317`, `fluent-cart/app/Hooks/CLI/Commands.php:1354` and `fluent-cart-pro/app/Http/Controllers/EmailNotificationProController.php:45`; implemented at `fluent-cart-pro/app/Hooks/actions.php:89`
+**Source:** fired at `fluent-cart/app/Services/Email/EmailNotificationMailer.php:317`, `fluent-cart/app/Hooks/CLI/Commands.php:1354` and `fluent-cart-pro/app/Http/Controllers/EmailNotificationProController.php:45`; implemented at `fluent-cart-pro/app/Hooks/actions.php:88`
 </details>
 
 ### <code> disable_pro_email_templates </code>

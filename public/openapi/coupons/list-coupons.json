@@ -139,7 +139,7 @@
                 "type": "string"
               }
             },
-            "description": "Eager-load relations. Send as an array (`with[]=products`); a bare string answers 500.",
+            "description": "Eager-load relations. Send as an array (`with[]=products`).",
             "required": false
           },
           {

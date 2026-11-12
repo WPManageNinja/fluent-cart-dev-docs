@@ -564,7 +564,7 @@ add_filter('fluent_cart/invoice_prefix', function ($prefix) {
 <summary><code>fluent_cart/order_refund_manually</code> &mdash; Intercept manual refund processing</summary>
 
 **When it runs:**
-Applied during the refund process before the payment gateway refund method is called. Allows you to handle refunds through a custom mechanism instead of the gateway.
+Applied during the refund process before the payment gateway refund method is called. Allows you to handle refunds through a custom mechanism instead of the gateway. Not applied when the admin records the refund locally only (`force_local`), because no money moves through FluentCart then.
 
 **Parameters:**
 - `$manualRefund` (array): Manual refund status
@@ -1164,7 +1164,7 @@ Applied when creating a Stripe payment intent for a one-time (non-subscription) 
 
 **Returns:** `array` — The modified metadata array (max 50 keys per Stripe limits)
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:221`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:643`, `app/Modules/PaymentMethods/StripeGateway/Processor.php:807`, `app/Modules/PaymentMethods/StripeGateway/Stripe.php:264`
 
 **Usage:**
 ```php
@@ -1248,7 +1248,7 @@ Applied when creating a Stripe Checkout session for one-time (non-subscription) 
 
 **Returns:** `array` — The modified Checkout session arguments
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:356`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/Processor.php:735, 985, 1022`
 
 **Usage:**
 ```php
@@ -1561,12 +1561,14 @@ Without step 2 the font is loaded but unused; without step 1 the `fontFamily` fa
 Applied when checking and enforcing the rate limit for Stripe SetupIntent creation (used for subscription card updates). Prevents card testing fraud.
 
 **Parameters:**
-- `$limit` (int): Maximum number of SetupIntent attempts per customer per day (default `3`)
+- `$limit` (int): Maximum number of SetupIntent attempts per customer per day. The default depends on the call site: `5` for subscription card updates in core, `3` for saved-card additions in Pro.
 - `$customerId` (string): The Stripe customer ID
 
 **Returns:** `int` — The modified daily rate limit
 
-**Source:** `app/Modules/PaymentMethods/StripeGateway/SubscriptionsManager.php:92,108`
+**Source:** `app/Modules/PaymentMethods/StripeGateway/SubscriptionsManager.php:92, 108` (default `5`); `fluent-cart-pro/app/Modules/SavedPaymentMethods/AddCardService.php:135, 143` (default `3`)
+
+The same filter name governs both, so a listener that returns a flat number overrides both limits. Branch on the current value, or read `$customerId`, if you only mean to change one.
 
 **Usage:**
 ```php
@@ -1830,6 +1832,42 @@ add_filter('fluent_cart/payments/paypal_vault_rejection_issues', function ($vaul
 
 ---
 
+### <code> paypal/brand_name </code>
+<details>
+<summary><code>fluent_cart/paypal/brand_name</code> &mdash; Filter the brand name shown on PayPal's pages</summary>
+
+**When it runs:**
+Applied whenever the PayPal brand name is resolved, for one-time orders, subscription plans and the JS SDK button config. The starting value is the gateway's `brand_name` setting. After filtering, the result is stripped of HTML, trimmed and truncated to **127 characters** — PayPal's own limit — so a longer string is cut rather than rejected.
+
+**Parameters:**
+- `$brandName` (string): The configured brand name, already trimmed. Empty when the setting is blank.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order'        => Order,             // The order being paid
+        'subscription' => Subscription|null, // The subscription, on subscription payments only
+    ];
+    ```
+
+**Returns:** `string` — The brand name to send to PayPal
+
+**Source:** `app/Modules/PaymentMethods/PayPalGateway/PayPalSettingsBase.php:167`
+
+**Usage:**
+```php
+add_filter('fluent_cart/paypal/brand_name', function ($brandName, $context) {
+    // Show a per-product brand on the PayPal approval page
+    if (!empty($context['subscription'])) {
+        return 'Example Memberships';
+    }
+
+    return $brandName;
+}, 10, 2);
+```
+</details>
+
+---
+
 ## Tax
 
 ### <code> tax/country_tax_titles </code>
@@ -1896,6 +1934,53 @@ add_filter('fluent_cart/tax_summary_should_render', function ($shouldRender, $or
 
     return $shouldRender;
 }, 10, 2);
+```
+</details>
+
+---
+
+### <code> tax/country_business_id_labels </code>
+<details>
+<summary><code>fluent_cart/tax/country_business_id_labels</code> &mdash; Filter the seller ID label formats per country</summary>
+
+**When it runs:**
+Applied when resolving the labels for the store's seller ID lines — the registration, tax and VAT numbers printed on receipts, the thank-you page, order emails and the <code v-pre>{{order.store_*_display}}</code> smart codes. Keys are country codes; each value maps a seller ID field to a `sprintf` format whose `%1$s` is the ID itself. A country with no entry, or a field left unset within one, falls back to the generic label (`Reg. ID: %1$s`, `Tax ID: %1$s`, `VAT ID: %1$s`).
+
+**Parameters:**
+- `$countries` (array): Country code => `[field => sprintf format]`. Three fields are recognised: `legal_registration_id`, `seller_tax_id`, `seller_vat_id`.
+    ```php
+    $countries = [
+        'SK' => [
+            'legal_registration_id' => 'IČO: %1$s',
+            'seller_tax_id'         => 'DIČ: %1$s',
+            'seller_vat_id'         => 'IČ DPH: %1$s',
+        ],
+        'CZ' => [
+            'legal_registration_id' => 'IČO: %1$s',
+            'seller_tax_id'         => 'DIČ: %1$s',
+        ],
+        'DE' => [
+            'seller_tax_id' => 'St.-Nr.: %1$s',
+            'seller_vat_id' => 'USt-IdNr.: %1$s',
+        ],
+    ];
+    ```
+
+**Returns:** `array` — The country-to-label map
+
+**Source:** `app/Modules/Tax/TaxModule.php:1932`
+
+**Usage:**
+```php
+add_filter('fluent_cart/tax/country_business_id_labels', function ($countries) {
+    // Austrian stores: use the local names for the two seller IDs
+    $countries['AT'] = [
+        'seller_tax_id' => 'StNr.: %1$s',
+        'seller_vat_id' => 'UID: %1$s',
+    ];
+
+    return $countries;
+});
 ```
 </details>
 
@@ -1969,7 +2054,8 @@ Applied before building the Mollie payment request. Return `true` to include ind
 
 **Parameters:**
 - `$passLineItems` (bool): Whether to include line items (default `false`)
-- `$context` (array): Array containing `[$order, $transaction]`
+- `$order` ([Order](/database/models/order)): The order being paid
+- `$transaction` ([OrderTransaction](/database/models/order-transaction)): The transaction being created
 
 **Returns:** `bool` — Whether to pass line item details to Mollie
 
@@ -1977,10 +2063,10 @@ Applied before building the Mollie payment request. Return `true` to include ind
 
 **Usage:**
 ```php
-add_filter('fluent_cart/mollie/pass_line_items_details', function ($passLineItems, $context) {
+add_filter('fluent_cart/mollie/pass_line_items_details', function ($passLineItems, $order, $transaction) {
     // Enable line items for Klarna support
     return true;
-}, 10, 2);
+}, 10, 3);
 ```
 </details>
 
@@ -2085,16 +2171,23 @@ Applied when resolving the Paddle price ID for a one-time payment product.
 
 **Parameters:**
 - `$priceId` (string): The Paddle price ID
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'variation' => ProductVariation, // The variation being priced
+        'product'   => Product,          // Its parent product
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle price ID
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Price.php:43`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_onetime_price_id', function ($priceId) {
+add_filter('fluent_cart/paddle_onetime_price_id', function ($priceId, $context) {
     return $priceId;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2107,16 +2200,24 @@ Applied when resolving the Paddle price ID for a recurring subscription product.
 
 **Parameters:**
 - `$priceId` (string): The Paddle recurring price ID
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'plan_data' => [...],            // The resolved plan/price payload
+        'variation' => ProductVariation, // The variation being priced
+        'product'   => Product,          // Its parent product
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle recurring price ID
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Price.php:140`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_recurring_price_id', function ($priceId) {
+add_filter('fluent_cart/paddle_recurring_price_id', function ($priceId, $context) {
     return $priceId;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2129,16 +2230,23 @@ Applied when resolving the Paddle discount ID to apply during checkout.
 
 **Parameters:**
 - `$discountId` (string): The Paddle discount ID
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order'           => Order, // The order the discount applies to
+        'discount_amount' => 500,   // Discount amount in cents
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle discount ID
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Price.php:261`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_discount_id', function ($discountId) {
+add_filter('fluent_cart/paddle_discount_id', function ($discountId, $context) {
     return $discountId;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2157,7 +2265,7 @@ Not applied when a discount is used at checkout — flat Paddle discounts are cu
 
 **Returns:** `bool` — `true` to pin the checkout to the order currency, `false` to let Paddle localize it
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:618`
 
 **Usage:**
 ```php
@@ -2177,16 +2285,22 @@ Applied when determining the Paddle product type for subscription items.
 
 **Parameters:**
 - `$productType` (string): The Paddle product type
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'subscription' => Subscription, // The subscription being charged
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle product type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:159`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_subscription_product_type', function ($productType) {
+add_filter('fluent_cart/paddle_subscription_product_type', function ($productType, $context) {
     return $productType;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2199,16 +2313,22 @@ Applied when determining the Paddle price type for subscription items.
 
 **Parameters:**
 - `$priceType` (string): The Paddle price type
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'subscription' => Subscription, // The subscription being charged
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle price type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:175`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_subscription_price_type', function ($priceType) {
+add_filter('fluent_cart/paddle_subscription_price_type', function ($priceType, $context) {
     return $priceType;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2221,16 +2341,22 @@ Applied when determining the Paddle price type for subscription signup fees.
 
 **Parameters:**
 - `$priceType` (string): The Paddle signup fee price type
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'subscription' => Subscription, // The subscription being charged
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle signup fee price type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:239`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_signup_fee_price_type', function ($priceType) {
+add_filter('fluent_cart/paddle_signup_fee_price_type', function ($priceType, $context) {
     return $priceType;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2243,16 +2369,22 @@ Applied when resolving the Paddle product ID for one-time payment items.
 
 **Parameters:**
 - `$productId` (string): The Paddle product ID
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'variation' => ProductVariation, // The variation being purchased
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle product ID
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:365`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_product_id', function ($productId) {
+add_filter('fluent_cart/paddle_product_id', function ($productId, $context) {
     return $productId;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2265,16 +2397,22 @@ Applied when determining the Paddle product type for one-time payment items.
 
 **Parameters:**
 - `$productType` (string): The Paddle product type
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'variation' => ProductVariation, // The variation being purchased
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle product type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:369`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_onetime_product_type', function ($productType) {
+add_filter('fluent_cart/paddle_onetime_product_type', function ($productType, $context) {
     return $productType;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2287,16 +2425,22 @@ Applied when determining the Paddle price type for one-time payment items.
 
 **Parameters:**
 - `$priceType` (string): The Paddle price type
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'variation' => ProductVariation, // The variation being purchased
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle price type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:391`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_onetime_price_type', function ($priceType) {
+add_filter('fluent_cart/paddle_onetime_price_type', function ($priceType, $context) {
     return $priceType;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2309,16 +2453,22 @@ Applied when determining the Paddle product type for add-on items.
 
 **Parameters:**
 - `$productType` (string): The Paddle add-on product type
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order' => Order, // The order the add-on (e.g. shipping fee) belongs to
+    ];
+    ```
 
 **Returns:** `string` — The modified Paddle add-on product type
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:421`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_addon_product_type', function ($productType) {
+add_filter('fluent_cart/paddle_addon_product_type', function ($productType, $context) {
     return $productType;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2327,20 +2477,27 @@ add_filter('fluent_cart/paddle_addon_product_type', function ($productType) {
 <summary><code>fluent_cart/paddle_discount_mode</code> <Badge type="warning" text="Pro" /> &mdash; Filter Paddle discount mode</summary>
 
 **When it runs:**
-Applied when determining how discounts are applied in Paddle transactions.
+Applied when determining how discounts are applied in Paddle transactions. It has two call sites on two different paths: a subscription's first-cycle discount (`Processor.php:287`) and an order's total discount (`Processor.php:484`).
 
 **Parameters:**
 - `$discountMode` (string): The discount mode
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order'           => Order, // The order being discounted
+        'discount_amount' => 500,   // Discount amount in cents
+    ];
+    ```
 
 **Returns:** `string` — The modified discount mode
 
-**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/`
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Processor.php:287, 484`
 
 **Usage:**
 ```php
-add_filter('fluent_cart/paddle_discount_mode', function ($discountMode) {
+add_filter('fluent_cart/paddle_discount_mode', function ($discountMode, $context) {
     return $discountMode;
-}, 10, 1);
+}, 10, 2);
 ```
 </details>
 
@@ -2460,19 +2617,46 @@ This filter is applied before each automatic email notification is sent for an o
     ```
 
 **Available `mail_name` values:**
-- `order_paid_customer` — Purchase receipt to customer
-- `order_paid_admin` — New order alert to admin
-- `order_refunded_customer` — Refund confirmation to customer
-- `order_refunded_admin` — Refund alert to admin
-- `subscription_renewed_customer` — Renewal receipt to customer
-- `subscription_renewed_admin` — Renewal alert to admin
-- `subscription_canceled_customer` — Cancellation notice to customer
-- `subscription_canceled_admin` — Cancellation alert to admin
-- `order_placed_customer` — Order confirmation to customer (offline payment)
-- `order_placed_admin` — Order placed alert to admin (offline payment)
+
+`mail_name` is a key of the notification registry. All 35 are listed below; the filter receives whichever one is about to send.
+
+*Orders*
+- `order_placed_customer`, `order_placed_admin` — order confirmation (offline payment)
+- `order_paid_customer`, `order_paid_admin` — purchase receipt / new order alert
+- `order_refunded_customer`, `order_refunded_admin` — refund confirmation
+- `order_shipped_customer`, `order_delivered_customer` — shipping status reached shipped/delivered
+
+*Subscriptions*
+- `subscription_renewal_customer`, `subscription_renewal_admin` — renewal receipt
+- `subscription_renewal_reminder_customer`, `subscription_renewal_reminder_admin` — upcoming renewal
+- `subscription_renewal_failed_customer`, `subscription_renewal_failed_admin` — renewal payment failed
+- `subscription_canceled_customer`, `subscription_canceled_admin` — cancellation notice
+- `subscription_past_due_customer`, `subscription_past_due_admin` — subscription past due
+- `subscription_trial_end_reminder_customer`, `subscription_trial_end_reminder_admin` — trial ending
+- `subscription_period_skipped_customer` — a billing period was skipped
+
+*Store-managed renewals and dunning*
+- `renewal_created_customer`, `renewal_created_admin` — renewal order created
+- `renewal_reminder_due_customer`, `renewal_reminder_due_admin` — renewal due
+- `renewal_reminder_overdue_customer` — renewal overdue
+- `renewal_overdue_first_customer`, `renewal_overdue_followup_customer`, `renewal_overdue_final_customer` — the dunning sequence
+
+*System auto-charge*
+- `system_upcoming_charge_customer` — upcoming automatic charge
+- `system_charge_failed_customer`, `system_charge_failed_admin` — automatic charge failed
+
+*Reviews*
+- `review_submitted_admin` — a review was submitted
+- `review_approved_customer`, `review_replied_customer` — review approved / replied to
+
+::: tip
+These are notification names, not event names. A notification's triggering event is often spelled differently — `order_shipped_customer` listens to the `shipping_status_changed_to_shipped` event. Match on `mail_name` for a specific email and on `event` for everything a single occurrence sends.
+:::
 
 **Returns:**
 - `$should` (bool): Whether the email notification should be sent
+
+**Source:** `app/Services/Email/EmailNotificationMailer.php:409`
 
 **Usage:**
 ```php
@@ -2521,6 +2705,8 @@ This filter is applied right before an email notification is actually sent — a
 **Returns:**
 - `$mailer` (`Mailer`): The mailer to send. Return the same instance (mutated via its fluent methods) or a different one. Any return value that is not a `Mailer` instance is ignored and the originally prepared mailer is sent instead — a misbehaving listener can never block delivery.
 
+**Source:** `app/Services/Email/EmailNotificationMailer.php:508`
+
 **Usage:**
 ```php
 // BCC every purchase receipt to a review-collection service, and only that notification
@@ -2559,33 +2745,35 @@ This filter is applied when determining whether to send an automatic email notif
     ```php
     // Default allowed emails
     $allowedEmails = [
-        'order_paid_customer',  // Order confirmation to customer
-        'order_paid_admin',     // New order alert to admin
+        'order_paid_customer',                    // Purchase receipt to customer
+        'order_paid_admin',                       // New order alert to admin
+        'subscription_renewal_customer',          // Renewal receipt to customer
+        'subscription_renewal_admin',             // Renewal alert to admin
+        'subscription_renewal_reminder_customer', // Upcoming renewal to customer
+        'subscription_renewal_reminder_admin',    // Upcoming renewal to admin
+        'subscription_canceled_customer',         // Cancellation notice to customer
+        'subscription_canceled_admin',            // Cancellation alert to admin
+        'order_refunded_customer',                // Refund confirmation to customer
+        'order_refunded_admin',                   // Refund alert to admin
     ];
     ```
 
 **Returns:**
 - `$allowedEmails` (array): The modified list of allowed notification identifiers
 
+**Source:** `fluent-cart-pro/app/Modules/PaymentMethods/PaddleGateway/Paddle.php:95`
+
 **Usage:**
 ```php
 // Allow shipping notifications for Paddle orders
 add_filter('fluent_cart/paddle_allowed_email_notifications', function($allowedEmails) {
-    $allowedEmails[] = 'shipping_status_changed_to_shipped_customer';
-    $allowedEmails[] = 'shipping_status_changed_to_delivered_customer';
+    $allowedEmails[] = 'order_shipped_customer';
+    $allowedEmails[] = 'order_delivered_customer';
     return $allowedEmails;
 });
 ```
 
-**Available notification identifiers:**
-- `order_paid_customer` — Purchase receipt / order confirmation to customer (allowed by default)
-- `order_paid_admin` — New order alert to admin (allowed by default)
-- `order_refunded_customer` — Refund confirmation to customer
-- `order_refunded_admin` — Refund alert to admin
-- `subscription_renewed_customer` — Renewal receipt to customer
-- `subscription_renewed_admin` — Renewal alert to admin
-- `subscription_canceled_customer` — Cancellation notice to customer
-- `subscription_canceled_admin` — Cancellation alert to admin
+The values are notification names, not event names. The notification sent when an order is marked shipped is `order_shipped_customer`; `shipping_status_changed_to_shipped` is the *event* it listens to, and passing that here matches nothing. See [`should_send_email_notification`](#should-send-email-notification) for every available name.
 
 **Note:** This filter is specific to Paddle orders. For general email notification control across all payment gateways, use the `fluent_cart/should_send_email_notification` filter instead.
 </details>

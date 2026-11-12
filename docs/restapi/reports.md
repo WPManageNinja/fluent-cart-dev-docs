@@ -3641,7 +3641,7 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/license-chart?pa
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/reports/license-pie-chart`
 
-Returns active licenses per product, with each product's share of all active licenses. The date range does not apply. This is a core route, but it reads the `fct_licenses` table that the FluentCart Pro licensing module creates; without that table the request fails with a database error.
+Returns active licenses per product, with each product's share of all active licenses. The date range does not apply. This is a core route, but it reads the `fct_licenses` table that the FluentCart Pro licensing module creates, so it requires FluentCart Pro.
 
 - **Permission:** `reports/view`
 - **Operation page:** [Get License Pie Chart](/restapi/operations/reports/license-pie-chart)
@@ -3674,7 +3674,7 @@ curl -X GET "https://example.com/wp-json/fluent-cart/v2/reports/license-pie-char
 
 <badge type="tip">GET</badge> `/fluent-cart/v2/reports/license-summary`
 
-Returns license counts by current status, the total number of activated sites and the number of licensed products. The date range does not apply. This is a core route, but it reads the `fct_licenses` table that the FluentCart Pro licensing module creates; without that table the request fails with a database error.
+Returns license counts by current status, the total number of activated sites and the number of licensed products. The date range does not apply. This is a core route, but it reads the `fct_licenses` table that the FluentCart Pro licensing module creates, so it requires FluentCart Pro.
 
 - **Permission:** `reports/view`
 - **Operation page:** [Get License Summary](/restapi/operations/reports/license-summary)

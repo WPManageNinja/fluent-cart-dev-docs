@@ -19,8 +19,8 @@ A **saved view** is a named, reusable filter configuration attached to one admin
 
 Every endpoint in this group is scoped to a single admin table, identified by `object_type`. This is the most important thing to know about these routes:
 
-::: warning `object_type` is read by the policy, not just the controller
-`SavedViewsPolicy::verifyRequest()` inspects `object_type` **before the controller runs**. If it is missing or unrecognised, the request is rejected with `403 rest_forbidden` — not a `422` validation error, and not an empty list. A bare `GET /saved-views` with no query string always returns `403`.
+::: warning `object_type` is required on every request
+`object_type` is checked before the request is handled. If it is missing or unrecognised, the request is rejected with `403 rest_forbidden` — not a `422` validation error, and not an empty list. A bare `GET /saved-views` with no query string always returns `403`.
 :::
 
 Each value maps to a different capability, so access is inherited from the underlying table rather than being a permission of its own:

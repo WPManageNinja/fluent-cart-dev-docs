@@ -110,10 +110,9 @@ status is already `expired` or `disabled`. The override applies to the response 
 status is unchanged, so a later write still sees `active`.
 :::
 
-::: danger Send `with` as an array
-`with` must be an array — `?with[]=customer&with[]=order`. A bare string (`?with=customer`)
-answers **500** `plugin_exception` instead of a validation error. This applies to every filtered
-list endpoint in the API, not just this one.
+::: tip Send `with` as an array
+`with` must be an array — `?with[]=customer&with[]=order`. This applies to every filtered list
+endpoint in the API, not just this one.
 :::
 
 #### Example

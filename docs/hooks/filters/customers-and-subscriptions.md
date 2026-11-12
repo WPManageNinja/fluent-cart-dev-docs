@@ -173,6 +173,68 @@ add_filter('fluent_cart/global_customer_menu_items', function($menuItems, $conte
 ```
 </details>
 
+### <code> customer_portal/routes </code> (JavaScript)
+<details>
+<summary><code>fluent_cart/customer_portal/routes</code> &mdash; Add pages to the customer portal app (JS filter)</summary>
+
+**When it runs:**
+This is a JavaScript filter on `wp.hooks`. The customer portal applies it to its vue-router route table once, before it creates the router. Use it to add your own page to the portal app.
+
+The portal script loads as a deferred module. Enqueue your script on the `fluent_cart/customer_dashboard/enqueue_assets` action as a classic script that depends on `wp-hooks`. It then runs before the portal script, so your filter is in place in time.
+
+**Parameters:**
+
+- `routes` (Array): vue-router route records
+- `context` (Object): `{ vue }`, the portal's own Vue (read-only). Use `vue.h` and `vue.defineComponent` to build components, so they use the same Vue instance as the portal.
+
+**Returns:**
+- `routes` (Array): The route table. If the value is not an array, the portal uses its own routes.
+
+**Source:** `resources/public/customer-profile/Start.js:147`
+
+**Usage:**
+
+Enqueue the script:
+```php
+add_action('fluent_cart/customer_dashboard/enqueue_assets', function () {
+    wp_enqueue_script('my-portal-pages', plugins_url('js/portal-pages.js', __FILE__), ['wp-hooks'], '1.0.0', true);
+});
+```
+
+Add the route (`js/portal-pages.js`):
+```js
+wp.hooks.addFilter('fluent_cart/customer_portal/routes', 'my-plugin', function (routes, context) {
+    const { h, defineComponent } = context.vue;
+
+    return routes.concat([{
+        path: '/memberships',
+        name: 'my_memberships',
+        component: defineComponent({
+            render: () => h('div', { class: 'my-memberships' }, 'Your memberships')
+        }),
+        meta: {
+            active_menu: 'memberships', // the menu item key to highlight
+            title: 'Memberships'
+        }
+    }]);
+});
+```
+
+Add the menu item. The `fct_route` class makes the link open the route in the app, without a page reload:
+```php
+add_filter('fluent_cart/global_customer_menu_items', function ($menuItems, $context) {
+    $menuItems['memberships'] = [
+        'label'     => __('Memberships', 'my-plugin'),
+        'css_class' => 'fct_route',
+        'link'      => $context['base_url'] . 'memberships',
+    ];
+    return $menuItems;
+}, 10, 2);
+```
+
+A direct visit to the URL (for example `/my-account/memberships`) also opens the page, because the portal page catches every path below it.
+</details>
+
 ### <code> fct_allowed_svg_tags </code>
 <details>
 <summary><code>fct_allowed_svg_tags</code> &mdash; Allow-list the SVG tags/attributes for a customer nav menu icon</summary>
@@ -599,6 +661,54 @@ add_filter('fluent_cart/subscription/view', function($subscription, $context) {
     // Add external gateway link
     $subscription['external_url'] = 'https://dashboard.stripe.com/subscriptions/' . $subscription['vendor_subscription_id'];
     return $subscription;
+}, 10, 2);
+```
+</details>
+
+### <code> widgets/single_subscription_page </code>
+<details>
+<summary><code>fluent_cart/widgets/single_subscription_page</code> &mdash; Add widgets to the admin subscription page</summary>
+
+**When it runs:**
+This filter is applied when the admin opens a single subscription. The page loads its widget area from the `widgets` REST endpoint, and the cards show in the right sidebar, under Labels. The area reloads when the admin opens another subscription.
+
+The request needs the `subscriptions/view` permission, plus `customers/view` or `orders/view`. If the subscription does not exist, the endpoint returns an error and the filter does not run.
+
+**Parameters:**
+
+- `$widgets` (array): Widget definitions (default: `[]`)
+- `$data` (array): The request data, with the resolved subscription
+    ```php
+    $data = [
+        'subscription_id' => 42,
+        'subscription'    => $subscription, // \FluentCart\App\Models\Subscription
+    ];
+    ```
+
+**Returns:**
+- `$widgets` (array): Widget definitions. Each widget is an HTML card:
+    ```php
+    [
+        'type'    => 'html',
+        'title'   => 'Membership',
+        'content' => '<p>...</p>', // HTML, escape your own values
+    ]
+    ```
+
+**Source:** `app/Http/Controllers/WidgetsController.php:49`
+
+**Usage:**
+```php
+add_filter('fluent_cart/widgets/single_subscription_page', function ($widgets, $data) {
+    $subscription = $data['subscription'];
+
+    $widgets[] = [
+        'type'    => 'html',
+        'title'   => __('Membership', 'my-plugin'),
+        'content' => '<p>' . esc_html(sprintf('Plan: %s', $subscription->item_name)) . '</p>',
+    ];
+
+    return $widgets;
 }, 10, 2);
 ```
 </details>

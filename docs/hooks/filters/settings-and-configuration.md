@@ -842,6 +842,7 @@ This filter is applied when rendering the product action menu in the admin produ
         ],
     ];
     ```
+    Each item has a `label`, a `link` and an optional `icon`. The `icon` is an inline SVG string. The tab prints it as given, before the label, at 14px. Use `fill="currentColor"` or `stroke="currentColor"` so the icon follows the tab color.
 - `$context` (array): Context data with product info
     ```php
     $context = [
@@ -852,7 +853,7 @@ This filter is applied when rendering the product action menu in the admin produ
 
 **Returns:** `array` — The modified menu items array
 
-**Source:** `app/Helpers/AdminHelper.php:30`
+**Source:** `app/Helpers/AdminHelper.php:39`
 
 **Usage:**
 ```php
@@ -863,6 +864,7 @@ add_filter('fluent_cart/product_admin_items', function ($menuItems, $context) {
     $menuItems['product_analytics'] = [
         'label' => 'Analytics',
         'link'  => $baseUrl . 'products/' . $productId . '/analytics',
+        'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M3 17h14v-2H3v2zm2-4h2V7H5v6zm4 0h2V3H9v10zm4 0h2V9h-2v4z"/></svg>',
     ];
     return $menuItems;
 }, 10, 2);
@@ -988,33 +990,6 @@ add_filter('fluent_cart/dummy_product_info', function ($dummyProduct) {
         'price' => 2999, // in cents
         'type'  => 'digital',
     ];
-});
-```
-</details>
-
-### <code> generatable_pages </code>
-<details>
-<summary><code>fluent_cart/generatable_pages</code> &mdash; Filter the pages FluentCart can auto-generate</summary>
-
-**When it runs:**
-This filter is applied when building the list of `key => [title, content]` pages (Shop, Checkout, Customer Profile, etc.) that the Pages Setup screen's "+" create button and the onboarding wizard can create for the store. Add-ons that need their own dedicated page (e.g. a custom portal page) register it here.
-
-**Parameters:**
-
-- `$pages` (array): Array of generatable pages keyed by page slug, each with a title and default content
-
-**Returns:** `array` — The modified generatable pages array
-
-**Source:** `app/CPT/Pages.php:42`
-
-**Usage:**
-```php
-add_filter('fluent_cart/generatable_pages', function ($pages) {
-    $pages['loyalty_dashboard'] = [
-        'title'   => 'Loyalty Dashboard',
-        'content' => '[fluent_cart_loyalty_dashboard]',
-    ];
-    return $pages;
 });
 ```
 </details>
@@ -1212,7 +1187,7 @@ This filter is applied when building the list of pages FluentCart can auto-gener
 
 **Parameters:**
 
-- `$pages` (array): Core generatable pages, keyed by page key (default: the 5 core pages &mdash; `checkout`, `cart`, `receipt`, `shop`, `customer_profile`)
+- `$pages` (array): Core generatable pages, keyed by page key (default: the 6 core pages &mdash; `checkout`, `cart`, `receipt`, `order_review`, `shop`, `customer_profile`)
     ```php
     $pages = [
         'checkout' => [
@@ -1225,7 +1200,7 @@ This filter is applied when building the list of pages FluentCart can auto-gener
 
 **Returns:** `array` &mdash; The modified pages array. Each entry needs a `title` and a `content` (the block/shortcode content FluentCart uses when it creates the WP page).
 
-**Source:** `app/CPT/Pages.php:19`
+**Source:** `app/CPT/Pages.php:20`
 
 **Usage:**
 ```php
@@ -1281,6 +1256,32 @@ add_filter('fluent_cart/dashboard/page_setup_redirect_url', function ($url, $con
 </details>
 
 ---
+
+### <code> admin/footer/show_text </code>
+<details>
+<summary><code>fluent_cart/admin/footer/show_text</code> &mdash; Keep the default WordPress admin footer text instead of FluentCart's</summary>
+
+**When it runs:**
+Applied on FluentCart admin screens only, while replacing the left-hand WordPress admin footer text ("Thank you for creating with WordPress.") with FluentCart's own feedback line. Return a falsy value to leave the WordPress text in place.
+
+This governs only the left-hand text. The right-hand version label is set through WordPress's own `update_footer` filter and has no FluentCart filter of its own.
+
+**Parameters:**
+
+- `$show` (bool): Whether to replace the footer text. Default `true`.
+
+**Returns:** `bool` &mdash; `false` to keep the WordPress default.
+
+**Source:** `app/Modules/AdminFooter/AdminFooter.php:27`
+
+**Usage:**
+```php
+add_filter('fluent_cart/admin/footer/show_text', function ($show) {
+    // Leave the WordPress footer alone for everyone but shop managers
+    return current_user_can('fluent_cart_admin');
+});
+```
+</details>
 
 ## Admin Tables
 

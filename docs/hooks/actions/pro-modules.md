@@ -50,14 +50,17 @@ add_action('fluent_cart_sl/product_version_updated', function ($data) {
 **When it runs:**
 Fires when the release manifest and its signature are written for a licensed product. This is the signed-release counterpart to `product_version_updated` — it carries the artifacts that updater clients verify against.
 
+It fires only when the manifest or the signature actually changed, and it is deliberately independent of the version: signing switched on for an already-published version, a corrected paste, or a re-sign during key rotation all move the pair without moving the version. Clearing both values fires it too, since that is equally a cache invalidation. Treat every occurrence as a reason to invalidate anything caching version responses — a customer's site verifies the pair and refuses the update when it does not match, so a stale cached pair blocks updates rather than merely being out of date.
+
 **Parameters:**
 
 - `$data` (array): Release artifact data
     - `product_id` (int) — ID of the licensed product
     - `version` (string) — Version the artifacts belong to
-    - `manifest` (array) — The stored release manifest
+    - `manifest` (string) — The stored release manifest, kept byte for byte as supplied
     - `signature` (string) — Detached signature for the manifest
-    - `previous_manifest` (array|null) — The manifest being replaced, if any
+    - `previous_manifest` (string) — The manifest being replaced; `''` when there was none
+    - `previous_signature` (string) — The signature being replaced; `''` when there was none
 
 **Source:** `fluent-cart-pro/app/Modules/Licensing/Http/Controllers/ProductLicenseController.php:196`
 
@@ -91,7 +94,7 @@ Fires when a license is brought back to active status: its backing subscription 
 **Parameters:**
 
 - `$data` (array): Reactivation data
-    - `license` ([`\FluentCart\App\Models\License`](/database/models/license)) — The reactivated license
+    - `license` ([`\FluentCartPro\App\Modules\Licensing\Models\License`](/database/models/license)) — The reactivated license
     - `subscription` ([`\FluentCart\App\Models\Subscription`](/database/models/subscription)) — The subscription that triggered it
 
 **Source:** `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:295`, `fluent-cart-pro/app/Modules/Licensing/Hooks/Handlers/LicenseGenerationHandler.php:475`

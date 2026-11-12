@@ -709,3 +709,53 @@ add_action('fluent_cart/order_paid_async_private_handle', function ($data) {
 </details>
 
 ---
+
+---
+
+## Order Emails
+
+### <code> email/order_entitlements </code>
+<details>
+<summary><code>fluent_cart/email/order_entitlements</code> &mdash; Print what an order grants in the order email</summary>
+
+**When it runs:**
+This action fires while FluentCart renders an order email, after the licenses block and before the downloads block. Use it to show what the order grants, for example a membership or course access. It fires in two places:
+
+- `order_paid_customer`: the default body of the paid-order email to the customer.
+- `payment_receipt`: the payment receipt smartcode, which custom email bodies use.
+
+The output is captured into the email body. **Echo your HTML** and escape your own values. Use inline styles, because email clients drop most CSS.
+
+The action does not fire for the email preview in the admin, because the preview uses a sample order.
+
+**Parameters:**
+
+- `$data` (array): Order and render context
+    ```php
+    $data = [
+        'order'   => $order,                // \FluentCart\App\Models\Order
+        'context' => 'order_paid_customer', // or 'payment_receipt'
+    ];
+    ```
+
+**Source:**
+- `app/Views/emails/order/paid/customer.php:52`
+- `app/Services/ShortCodeParser/Parsers/OrderParser.php:340`
+
+**Usage:**
+```php
+add_action('fluent_cart/email/order_entitlements', function ($data) {
+    $order = $data['order'];
+
+    $levels = my_plugin_get_levels_for_order($order->id);
+    if (!$levels) {
+        return;
+    }
+
+    echo '<h3 style="margin: 20px 0 10px;">' . esc_html__('Your memberships', 'my-plugin') . '</h3>';
+    foreach ($levels as $level) {
+        echo '<p style="margin: 0 0 6px;">' . esc_html($level->title) . '</p>';
+    }
+}, 10, 1);
+```
+</details>

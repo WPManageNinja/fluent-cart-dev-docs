@@ -842,6 +842,7 @@ This filter is applied when rendering the product action menu in the admin produ
         ],
     ];
     ```
+    Each item has a `label`, a `link` and an optional `icon`. The `icon` is an inline SVG string. The tab prints it as given, before the label, at 14px. Use `fill="currentColor"` or `stroke="currentColor"` so the icon follows the tab color.
 - `$context` (array): Context data with product info
     ```php
     $context = [
@@ -852,7 +853,7 @@ This filter is applied when rendering the product action menu in the admin produ
 
 **Returns:** `array` — The modified menu items array
 
-**Source:** `app/Helpers/AdminHelper.php:30`
+**Source:** `app/Helpers/AdminHelper.php:39`
 
 **Usage:**
 ```php
@@ -863,6 +864,7 @@ add_filter('fluent_cart/product_admin_items', function ($menuItems, $context) {
     $menuItems['product_analytics'] = [
         'label' => 'Analytics',
         'link'  => $baseUrl . 'products/' . $productId . '/analytics',
+        'icon'  => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M3 17h14v-2H3v2zm2-4h2V7H5v6zm4 0h2V3H9v10zm4 0h2V9h-2v4z"/></svg>',
     ];
     return $menuItems;
 }, 10, 2);

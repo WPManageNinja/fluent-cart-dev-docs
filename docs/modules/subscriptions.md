@@ -1,6 +1,6 @@
 ---
 title: Subscriptions Module
-description: FluentCart's subscription engine — the three collection methods (automatic, manual, system), the store-managed renewal engine, system auto-charge, dunning, and the shared write-spine both billing models converge on.
+description: FluentCart's subscription engine — the three collection methods (automatic, manual, system), the store-managed renewal engine, system auto-charge, dunning, the shared write-spine both billing models converge on, and how first payments that differ from renewals (signup fee, trial, coupon, upgrade credit) become simulated trials on each gateway.
 ---
 
 # Subscriptions Module
@@ -270,6 +270,145 @@ This is the cleanest way to understand the split:
 2. **No local dunning or retries.** Retry ladders are the gateway's. FluentCart mirrors the resulting status.
 3. **The recurring amount is not editable** — `canUpdateDetails()` is renewal-engine-only, and `recurring_total` is overwritten from the gateway's plan amount on every sync.
 4. **The one local cron that does touch it** is a safety net: `Subscription::checkAndExpireSubscriptions()` (queried `whereNotIn('collection_method', ['manual','system'])`) expires a subscription whose `next_billing_date` is past the grace period — i.e. the webhook never arrived or the gateway silently stopped billing. It charges nothing; it only marks the row expired.
+
+## First payments and simulated trials
+
+A subscription's first payment is often not the same as its renewals. A signup fee makes it bigger. A free trial makes it zero. A first-payment coupon or an upgrade credit makes it smaller. FluentCart supports all of these on every gateway that runs subscriptions, including gateways that have no signup fee, cannot charge a different first amount, or have no trial at all.
+
+The way FluentCart fills that gap can make a subscription look like it is on a trial, in the FluentCart admin and in the gateway's dashboard. **That "Trialing" status is expected. It is not a bug.**
+
+::: tip At a glance
+| Question | Short answer |
+|---|---|
+| Why does admin show "Trialing" when I never offered a trial? | The first payment was lower than the renewal price. FluentCart charged that amount at checkout and told the gateway to wait one billing period before its first renewal. Most gateways call that wait a trial. |
+| What does the customer see? | "Active". The customer portal hides a trial that FluentCart created this way. |
+| Is the customer charged twice? | No. The first period is paid once, at checkout. The gateway's first charge is for the second period. |
+| When does it go away? | On the next billing date, when the gateway starts billing. |
+:::
+
+### The two numbers
+
+Every subscription checkout ends with two numbers: **what the customer pays now**, and **what the customer pays on each renewal**. FluentCart works both out first, then compares the cost of the first period with the renewal price:
+
+| First period costs… | Example | What FluentCart sets up |
+|---|---|---|
+| The same as a renewal | Plain $20/month | Nothing special. |
+| More than a renewal | $20/month + $15 signup fee | A $35 first payment, then $20 renewals. |
+| Less than a renewal | $20/month with a 50% first-month coupon | A $10 first payment. The first renewal waits one full billing period. FluentCart marks this wait as a **simulated trial**. |
+| Nothing | Free trial, 100% coupon, full upgrade credit | No charge (or a card check). The first renewal waits for the trial, or for one billing period. |
+
+A simulated trial is the wait after a first payment that was lower than the renewal price. Nobody offered it as a trial. FluentCart uses it because "charge something now, start billing later" is the one tool almost every gateway has.
+
+These lower the first payment and can create one:
+
+- A coupon that applies to the first payment only.
+- A plan upgrade's prorated credit, or an upgrade discount.
+- A shipping discount on the first order only, when renewals bill full shipping.
+- A 100% discount.
+
+A coupon that applies to every renewal lowers the renewal price instead, so it creates no simulated trial.
+
+**Length:** one billing period in days. Monthly uses the number of days in the month of checkout, yearly 365, quarterly 90, weekly 7. A real free trial on the same plan is added on top. The total is capped at 365 days by default (filter `fluent_cart/max_trial_days_allowed`).
+
+### Example: a first-month coupon
+
+A customer buys a $20/month plan on 10 March with a coupon for 50% off the first month.
+
+1. FluentCart charges **$10** at checkout.
+2. The first period costs less than a renewal, so it adds a simulated trial of **31 days** (March has 31).
+3. The gateway is told to start billing on **10 April**, at $20.
+4. Until 10 April, the admin and the gateway dashboard may show **Trialing**. The customer portal shows **Active**.
+5. On 10 April the gateway charges $20, and the status becomes Active everywhere.
+
+### Example: a plan upgrade
+
+A customer on a $10/month plan upgrades to a $30/month plan. The unused part of their current month is worth $5, so FluentCart gives a $5 upgrade credit.
+
+1. FluentCart charges **$25** at checkout.
+2. $25 is less than the $30 renewal, so the new subscription gets a simulated trial of one billing period.
+3. The gateway first bills $30 one month later.
+4. Until then the new subscription may show **Trialing** in the admin, even though the customer has paid and never saw a trial.
+
+### How gateways carry it out
+
+FluentCart sends the gateway the same plan whatever the gateway can do. Each gateway uses the closest tool it has:
+
+| Gateway can… | What FluentCart does |
+|---|---|
+| Run a trial and add a one-off first charge | Uses both. The wait is the gateway's own trial, and the first payment is an extra charge on the first invoice. |
+| Run a trial, but has no signup fee | Uses a trial period priced at the first payment. |
+| Neither | Charges the first payment itself as a one-time payment, then creates the gateway subscription with a later start date. |
+| Not delay the start at all | Can still take a lower or higher first payment, but cannot run a real free trial. FluentCart refuses that checkout. |
+
+Whatever the tool, the gateway reports its own status, and FluentCart shows that status in the admin. Gateways that model the wait as a trial report **Trialing**. Gateways that model it as a later start date may report either **Trialing** or **Active** until billing starts.
+
+### Why the admin and the portal differ
+
+The admin shows the status the gateway reports. The customer portal reads a corrected status (`overridden_status`):
+
+| Subscription | Admin shows | Customer portal shows |
+|---|---|---|
+| Simulated trial, gateway reports trialing | Trialing | **Active** |
+| Real free trial, gateway reports active, still inside the trial | Active | **Trialing** |
+| Everything else | The stored status | The same |
+
+So the admin always shows what the gateway reports, and the customer sees what they bought.
+
+Other places that tell the two kinds of trial apart:
+
+- **Product and checkout labels.** "Free Trial: N days" is never shown for a simulated trial.
+- **Reminders.** A simulated trial gets renewal reminders, like any paid subscription. Only a real trial gets trial-ending reminders.
+- **Subscription reports.** A trialing subscription with a simulated trial is counted as "discounted", not as a trial.
+- **Plan upgrades.** A subscription on a real trial gets no prorated credit when it upgrades. One on a simulated trial does, because the customer paid for that period.
+
+### Installments
+
+On a plan with a fixed number of payments, the first payment at checkout already covers the first period. So the gateway must bill one fewer time (`getInitialRemoteBillTimes()`). Gateways that take a payment count get the reduced count. Gateways that do not are ended by FluentCart: when the last payment is recorded, the subscription completes and `SubscriptionEOT` cancels it at the gateway (see [Events](#events)).
+
+### Reactivation
+
+A canceled or expired subscription that is reactivated usually gets a **new** gateway subscription. If the customer still has paid days left, the new one waits until they run out (`getReactivationTrialDays()`). That wait is a simulated trial too, so it can show "Trialing" in the admin.
+
+If the reactivation payment is the last installment, most gateways create no new gateway subscription, and FluentCart completes the subscription locally.
+
+### Store-managed subscriptions
+
+A [store-managed](#store-managed-the-renewal-engine-manual-system) subscription has no gateway subscription. FluentCart runs the schedule itself, so it needs no trial trick. On first activation:
+
+- A real free trial starts as **Trialing**.
+- A simulated trial starts as **Active**.
+
+### For support
+
+When a merchant reports "Trialing" on a subscription with no trial:
+
+1. Open the order. If the first payment was lower than the renewal price (coupon, upgrade, discount), this is a simulated trial.
+2. Check the next billing date. It should be one billing period after the first payment.
+3. Check that the customer portal shows "Active".
+4. Nothing to fix. The status follows the gateway and becomes "Active" when the gateway starts billing.
+
+### Code reference
+
+Paths are relative to `fluent-cart/`. Each gateway's own handling lives in its `Processor` / `Confirmations` classes.
+
+| What | Where |
+|---|---|
+| First payment vs renewal, simulated trial decision | `app/Helpers/CheckoutProcessor.php` · `convertToSubscriptionFormat()` (config flag `is_trial_days_simulated`) |
+| Discounts that lower the first payment (coupon, `prorate_credit`, `upgrade_discount`) | `app/Helpers/CheckoutProcessor.php` discount total |
+| First-order-only shipping discount | `app/Helpers/CheckoutProcessor.php` (`billRenewalsFullShipping`) |
+| Simulated trial length, 365-day cap | `app/Helpers/Helper.php` · `calculateAdjustedTrialDaysForInterval()` |
+| Interval days | `app/Services/Payments/PaymentHelper.php` · `getIntervalDays()` |
+| Customer-facing status | `app/Models/Subscription.php` · `getOverriddenStatusAttribute()` |
+| Payment count sent to the gateway | `app/Models/Subscription.php` · `getInitialRemoteBillTimes()` |
+| Paid days left on reactivation | `app/Models/Subscription.php` · `getReactivationTrialDays()` |
+| $0 first period counting | `app/Helpers/CheckoutProcessor.php` · `syncInitialCycleCounting()` (`billed_cycles_offset`) |
+| Store-managed first status | `app/Helpers/StatusHelper.php` |
+| "Free Trial" label | `app/Helpers/Helper.php` · `generateTrialInfo()` |
+| Reminders | `app/Services/Reminders/ReminderService.php` |
+| Reports ("discounted") | `app/Services/Report/SubscriptionReportService.php` |
+| Upgrade credit and real trials | `app/Services/PlanUpgradeService.php` |
+| Admin list status | `resources/admin/Modules/Subscriptions/Components/SubscriptionsTable.vue` (raw `status`) |
+| Portal status | `resources/public/customer-profile/Vue/parts/SubscriptionTable.vue` (`overridden_status`) |
 
 ## Store-managed: the renewal engine (`manual` + `system`)
 

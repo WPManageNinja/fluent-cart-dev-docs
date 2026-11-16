@@ -232,3 +232,93 @@ add_action('fluent_cart/mcp_tool_exception', function ($data) {
 }, 10, 1);
 ```
 </details>
+
+---
+
+## Multi-Currency
+
+Pro owns the rate store. Core defines the extension points and holds no rates of its own — see the
+[core multi-currency hooks](./modules#multi-currency) for the filters that resolve and round a rate.
+
+### <code> currency/rate_rejected </code>
+<details>
+<summary><code>fluent_cart/currency/rate_rejected</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a new rate moved too far and was not activated</summary>
+
+**When it runs:**
+Fires from `RateStore::record()` when the incoming rate differs from the active one by more than the
+sanity band — 10% by default, adjustable through
+[`currency/rate_sanity_band`](../filters/pro-modules#currency-rate-sanity-band). The rate is **not**
+stored and prices keep using the previous one. `record()` then returns a `WP_Error` with code
+`rate_out_of_band`.
+
+A warning activity has already been written by the time this fires. Use the hook to alert whoever owns
+the feed, because a rejected rate means prices are now stale until someone intervenes.
+
+**Parameters:**
+
+- `$data` (array): The rejected rate
+    ```php
+    $data = [
+        'base'     => 'USD',          // (string) Base currency
+        'quote'    => 'EUR',          // (string) Quote currency
+        'rate'     => '0.918400',     // (string) The normalised rate that was refused
+        'source'   => 'ecb',          // (string) Provider slug that supplied it
+        'previous' => CurrencyRate,   // The rate still in effect (Pro model)
+    ];
+    ```
+
+**Source:** `fluent-cart-pro/app/Modules/MultiCurrency/RateStore.php:222`
+
+**Usage:**
+```php
+add_action('fluent_cart/currency/rate_rejected', function ($data) {
+    // Prices are stale until this is resolved — page the feed owner
+    my_plugin_notify_ops(sprintf(
+        '%s/%s rate %s from %s was rejected; still on %s',
+        $data['base'],
+        $data['quote'],
+        $data['rate'],
+        $data['source'],
+        $data['previous']->rate
+    ));
+}, 10, 1);
+```
+</details>
+
+### <code> currency/rate_changed </code>
+<details>
+<summary><code>fluent_cart/currency/rate_changed</code> <Badge type="warning" text="Pro" /> &mdash; Fires when a new exchange rate becomes active</summary>
+
+**When it runs:**
+Fires from `RateStore::record()` after the new rate row is created and the cache has been flushed
+through core, so every listener on
+[`currency/rates_flushed`](./modules#currency-rates-flushed) has already dropped the old value. From
+this point on, conversions use the new rate.
+
+`previous` is `null` for the first rate ever recorded for a pair.
+
+**Parameters:**
+
+- `$data` (array): The rate change
+    ```php
+    $data = [
+        'rate'     => CurrencyRate,      // The newly active rate (Pro model)
+        'previous' => CurrencyRate|null, // The rate it replaced; null on the first one
+    ];
+    ```
+
+**Source:** `fluent-cart-pro/app/Modules/MultiCurrency/RateStore.php:245`
+
+**Usage:**
+```php
+add_action('fluent_cart/currency/rate_changed', function ($data) {
+    // Keep an audit trail of every rate that ever priced an order
+    my_plugin_log_rate(
+        $data['rate']->base,
+        $data['rate']->quote,
+        $data['rate']->rate,
+        $data['previous'] ? $data['previous']->rate : null
+    );
+}, 10, 1);
+```
+</details>

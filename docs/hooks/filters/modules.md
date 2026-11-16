@@ -1,6 +1,6 @@
 # Modules
 
-Filters exposed by FluentCart's optional built-in modules: the **MCP server** (`app/Modules/MCP/`), which exposes store data and actions to AI agents through the WordPress Abilities API, and the **Advanced Variation** product type (`app/Services/AdvancedVariationService.php`, `app/Hooks/Handlers/AdvancedVariationHandler.php`), which lets a product combine multiple attribute groups into a large set of purchasable variants.
+Filters exposed by FluentCart's optional built-in modules: the **MCP server** (`app/Modules/MCP/`), which exposes store data and actions to AI agents through the WordPress Abilities API; the **Advanced Variation** product type (`app/Services/AdvancedVariationService.php`, `app/Hooks/Handlers/AdvancedVariationHandler.php`), which lets a product combine multiple attribute groups into a large set of purchasable variants; and the **Multi-Currency** module (`app/Modules/MultiCurrency/`), which prices a store in more than one currency: exchange rates, rounding rules and the storefront currency switcher.
 
 ---
 
@@ -457,5 +457,412 @@ add_filter('fluent_cart/mcp_tool_index', function ($index) {
     $index['loyalty'] = ['list-loyalty-points', 'get-loyalty-summary'];
     return $index;
 }, 10, 1);
+```
+</details>
+
+---
+
+## Multi-Currency
+
+Filters exposed by the multi-currency module (`app/Modules/MultiCurrency/`). Core defines every
+extension point and ships manual rate entry; FluentCart Pro supplies the rate store, a daily feed and
+the dropdown switcher. Rates are stored as `DECIMAL(24,12)` and amounts stay in cents.
+
+### <code> currency/enabled_currencies </code>
+<details>
+<summary><code>fluent_cart/currency/enabled_currencies</code> &mdash; Filter which currencies the store offers</summary>
+
+**When it runs:**
+Applied in `MultiCurrencySettings::currencyCodes()`. The incoming list is the configured currency
+codes, or an empty array when multi-currency is switched off. Whatever you return is upper-cased,
+de-duplicated and re-indexed afterwards, so case and duplicates do not matter.
+
+**Parameters:**
+- `$codes` (string[]): The configured currency codes. Empty when the module is disabled.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'base_currency' => 'USD', // The store's base currency
+    ];
+    ```
+
+**Returns:** `string[]` — The currency codes to offer
+
+**Source:** `app/Modules/MultiCurrency/Services/MultiCurrencySettings.php:170`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/enabled_currencies', function ($codes, $context) {
+    // Offer CAD only to visitors routed through a Canadian edge
+    if (($_SERVER['HTTP_CF_IPCOUNTRY'] ?? '') !== 'CA') {
+        return array_diff($codes, ['CAD']);
+    }
+
+    return $codes;
+}, 10, 2);
+```
+</details>
+
+### <code> currency/rate_providers </code>
+<details>
+<summary><code>fluent_cart/currency/rate_providers</code> &mdash; Register a source of exchange rates</summary>
+
+**When it runs:**
+Applied in `MultiCurrencySettings::rateProviders()` when the settings screen lists the available rate
+sources. Core ships manual entry only; add a slug here to offer your own feed. Registering a provider
+does not activate it — a feed never replaces manual rates until the merchant selects it.
+
+Writing rates is separate: on your own schedule, call
+`\FluentCartPro\App\Modules\MultiCurrency\RateStore::record()` with your slug as the source. That
+requires FluentCart Pro, which owns the rate store.
+
+**Parameters:**
+- `$providers` (array): Provider slug => label. Default `['manual' => 'Enter rates manually']`.
+
+**Returns:** `array` — The provider list
+
+**Source:** `app/Modules/MultiCurrency/Services/MultiCurrencySettings.php:71`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/rate_providers', function ($providers) {
+    $providers['my_feed'] = __('My FX feed', 'my-plugin');
+    return $providers;
+});
+```
+</details>
+
+### <code> currency/rate_provider_notes </code>
+<details>
+<summary><code>fluent_cart/currency/rate_provider_notes</code> &mdash; Add a note beside a rate provider</summary>
+
+**When it runs:**
+Applied in `MultiCurrencySettings::rateProviderNotes()` to render a short note next to a provider on
+the settings screen — a source credit or terms-of-use line. Plain text, not HTML, keyed by the same
+slug used in [`currency/rate_providers`](#currency-rate-providers).
+
+**Parameters:**
+- `$notes` (array): Provider slug => note. Default empty.
+
+**Returns:** `array` — The notes
+
+**Source:** `app/Modules/MultiCurrency/Services/MultiCurrencySettings.php:58`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/rate_provider_notes', function ($notes) {
+    $notes['my_feed'] = __('Rates by My FX feed. Attribution required.', 'my-plugin');
+    return $notes;
+});
+```
+</details>
+
+### <code> currency/rate_lock_ttl </code>
+<details>
+<summary><code>fluent_cart/currency/rate_lock_ttl</code> &mdash; Filter how long a cart's rate stays locked</summary>
+
+**When it runs:**
+Applied in `MultiCurrencySettings::rateLockSeconds()`. A cart freezes its exchange rate for this long
+so prices do not move while the customer shops; after it expires the cart re-prices at the current
+rate.
+
+**The value is in minutes, and the method returns seconds.** Return minutes here — a negative value is
+floored to `0`, which disables the lock and re-prices on every read.
+
+**Parameters:**
+- `$minutes` (int): Lock duration in minutes, from the `rate_lock_minutes` setting.
+
+**Returns:** `int` — Lock duration in minutes
+
+**Source:** `app/Modules/MultiCurrency/Services/MultiCurrencySettings.php:228`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/rate_lock_ttl', function ($minutes) {
+    return 120; // two hours
+});
+```
+</details>
+
+### <code> currency/exchange_rate </code>
+<details>
+<summary><code>fluent_cart/currency/exchange_rate</code> &mdash; Supply the raw exchange rate for a currency pair</summary>
+
+**When it runs:**
+Applied in `ExchangeRateService::current()` to resolve the rate for one pair. **Core stores no rates**
+— it starts from `null` and relies on a listener to answer. Pro's `RateStore::storedRate()` answers at
+**priority 5** with the stored row, so a live feed registered at the default priority 10 can replace
+it.
+
+Return the raw rate, *before* margin. The margin from [`currency/fx_margin`](#currency-fx-margin) is
+applied to whatever you return. A return value that is not an array, or whose `rate` is not a valid
+positive rate, is treated as "no rate" and the conversion is refused.
+
+**Parameters:**
+- `$rate` (array|null): `null` on the way in, or an earlier listener's answer.
+    ```php
+    $rate = [
+        'rate'         => '0.918400',          // (string|float) Raw rate, before margin
+        'rate_id'      => 12,                  // (int|null) The stored row's id, when there is one
+        'source'       => 'ecb',               // (string) Provider slug; 'manual' skips the store margin
+        'margin'       => '0',                 // (string|float) Percent; used as the default margin
+        'effective_at' => '2026-11-12 00:00:00', // (string) GMT timestamp the rate took effect
+    ];
+    ```
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'base'    => 'USD',  // The store's base currency
+        'quote'   => 'EUR',  // The currency being priced
+        'context' => [...],  // Caller-supplied context, may be empty
+    ];
+    ```
+
+**Returns:** `array|null` — The raw rate, or `null` for none
+
+**Source:** `app/Modules/MultiCurrency/Services/ExchangeRateService.php:49`
+
+**Usage:**
+```php
+// Replace Pro's stored rate with a live one. Priority 10 runs after Pro's 5.
+add_filter('fluent_cart/currency/exchange_rate', function ($rate, $context) {
+    $live = my_plugin_live_rate($context['base'], $context['quote']);
+    if (!$live) {
+        return $rate; // fall back to whatever was stored
+    }
+
+    return [
+        'rate'         => $live,
+        'rate_id'      => null,
+        'source'       => 'my_feed',
+        'margin'       => 0,
+        'effective_at' => gmdate('Y-m-d H:i:s'),
+    ];
+}, 10, 2);
+```
+</details>
+
+### <code> currency/fx_margin </code>
+<details>
+<summary><code>fluent_cart/currency/fx_margin</code> &mdash; Filter the merchant markup applied to a rate</summary>
+
+**When it runs:**
+Applied in `ExchangeRateService::current()` right after the raw rate is resolved. The margin is a
+percentage added to the raw rate, and the result is the rate frozen on the order — the rate the
+customer actually paid.
+
+The default depends on where the rate came from: a `manual` rate uses its own stored margin; a feed
+rate gets `0` while the provider setting is still `manual`, so a leftover feed row is never marked up
+unseen; otherwise the store's configured margin applies.
+
+**Parameters:**
+- `$margin` (float): The default margin in percent, resolved as described above.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'base'  => 'USD', // The store's base currency
+        'quote' => 'EUR', // The currency being priced
+    ];
+    ```
+
+**Returns:** `float` — The margin in percent. `0` applies no markup.
+
+**Source:** `app/Modules/MultiCurrency/Services/ExchangeRateService.php:71`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/fx_margin', function ($margin, $context) {
+    // Absorb the spread on a currency you hold a balance in
+    return $context['quote'] === 'EUR' ? 0.0 : $margin;
+}, 10, 2);
+```
+</details>
+
+### <code> currency/resolve_for_request </code>
+<details>
+<summary><code>fluent_cart/currency/resolve_for_request</code> &mdash; Pick the currency for a visitor who has not chosen one</summary>
+
+**When it runs:**
+Applied in `CurrencyContext::resolve()` only after the earlier checks fall through: the module must be
+enabled, and the visitor must not already have an explicit choice — a chosen currency always wins over
+this filter. Admin screens, cron and CLI never price in a visitor's currency.
+
+A returned currency that is not selectable is discarded and the base currency is used, so an
+unavailable guess cannot break pricing.
+
+**Parameters:**
+- `$currency` (string): The base currency, as the default guess.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'country' => 'DE', // Visitor country from HTTP_CF_IPCOUNTRY, '' when absent
+    ];
+    ```
+
+**Returns:** `string` — The currency code to price in
+
+**Source:** `app/Modules/MultiCurrency/Services/CurrencyContext.php:236`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/resolve_for_request', function ($currency, $context) {
+    $map = ['DE' => 'EUR', 'FR' => 'EUR', 'GB' => 'GBP'];
+
+    return $map[$context['country']] ?? $currency;
+}, 10, 2);
+```
+</details>
+
+### <code> currency/rounding_rules </code>
+<details>
+<summary><code>fluent_cart/currency/rounding_rules</code> &mdash; Filter the rounding rules offered in settings</summary>
+
+**When it runs:**
+Applied in `RoundingRules::options()` when the settings screen lists the rounding choices. The defaults
+are "round to the smallest unit of the currency" plus one entry per configured step.
+
+Adding a key here only puts it in the dropdown. To make a new rule actually round, also handle it in
+[`currency/rounding_rule`](#currency-rounding-rule), which receives your key as `rule`.
+
+**Parameters:**
+- `$options` (array): Rule key => label.
+
+**Returns:** `array` — The rule list
+
+**Source:** `app/Modules/MultiCurrency/Services/RoundingRules.php:55`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/rounding_rules', function ($options) {
+    $options['nearest_5'] = __('Round to the nearest 5', 'my-plugin');
+    return $options;
+});
+```
+</details>
+
+### <code> currency/rounding_rule </code>
+<details>
+<summary><code>fluent_cart/currency/rounding_rule</code> &mdash; Filter a rounded amount</summary>
+
+**When it runs:**
+Applied in `RoundingRules::finish()`, the last step of both `apply()` and `price()`, after the selected
+rule has already rounded the amount. Use it for charm pricing, or to implement a rule you added
+through [`currency/rounding_rules`](#currency-rounding-rules).
+
+The result is cast to `int` and floored at `0`, so a negative return cannot produce a negative price.
+Amounts are in **cents**; for a zero-decimal currency the smallest unit is 100 stored units.
+
+**Parameters:**
+- `$rounded` (int): The already-rounded amount in cents.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'raw_amount' => 3999,    // (int|float) The amount before rounding
+        'currency'   => 'EUR',   // (string) Upper-cased currency code
+        'rule'       => 'up_1',  // (string) The rule applied
+        'charm'      => 'none',  // (string) Charm-pricing key; always 'none' when called from apply()
+    ];
+    ```
+
+**Returns:** `int` — The final amount in cents
+
+**Source:** `app/Modules/MultiCurrency/Services/RoundingRules.php:127`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/rounding_rule', function ($rounded, $context) {
+    if ($context['currency'] === 'EUR' && $context['rule'] === 'up_1') {
+        return max(0, $rounded - 10); // 40.00 becomes 39.90
+    }
+
+    return $rounded;
+}, 10, 2);
+```
+</details>
+
+### <code> currency_switcher/render </code>
+<details>
+<summary><code>fluent_cart/currency_switcher/render</code> &mdash; Replace the currency switcher's markup</summary>
+
+**When it runs:**
+Applied in `CurrencySwitcher::render()` for both the shortcode and the block. Return a string to use
+your own markup instead of the default `<select>`; return anything else and the default renders.
+
+It is **not** applied when fewer than two currencies are selectable — a store with one currency shows
+no switcher at all, so a listener here never runs. This is the hook Pro's dropdown uses to replace the
+select with its button and panel.
+
+If you replace the markup, also set `style` to `button` in
+[`currency_switcher/editor_preview`](#currency-switcher-editor-preview) so the block editor's preview
+matches what the storefront renders.
+
+**Parameters:**
+- `$html` (string|null): `null` on the way in, or an earlier listener's markup.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'atts'       => [...],          // (array) Shortcode attributes, or the block's after its allowlist
+        'currencies' => ['USD','EUR'],  // (string[]) Selectable currency codes
+        'current'    => 'EUR',          // (string) The currency in effect
+    ];
+    ```
+
+**Returns:** `string|null` — Your markup, or `null` to keep the default
+
+**Source:** `app/Modules/MultiCurrency/Services/CurrencySwitcher.php:86`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency_switcher/render', function ($html, $context) {
+    $out = '<ul class="my-switcher">';
+    foreach ($context['currencies'] as $code) {
+        $class = $code === $context['current'] ? ' class="is-current"' : '';
+        $out .= '<li' . $class . '>' . esc_html($code) . '</li>';
+    }
+
+    return $out . '</ul>';
+}, 10, 2);
+```
+</details>
+
+### <code> currency_switcher/editor_preview </code>
+<details>
+<summary><code>fluent_cart/currency_switcher/editor_preview</code> &mdash; Filter the switcher's preview in the block editor</summary>
+
+**When it runs:**
+Applied in `CurrencySwitcherBlockEditor::localizeData()` when the block editor loads, so the preview
+shown to an editor matches what the storefront will render. Admin only — it has no effect on the
+storefront.
+
+A plugin that replaces the frontend markup through
+[`currency_switcher/render`](#currency-switcher-render) should set `style` to `button` here, and may add
+a `flag` URL to each currency. The block's sidebar options appear only for the `button` style, because
+core's `select` ignores them.
+
+**Parameters:**
+- `$preview` (array): The preview descriptor
+    ```php
+    $preview = [
+        'style'      => 'select', // (string) 'select' | 'button'
+        'currencies' => [
+            ['code' => 'USD', 'symbol' => '$', 'name' => 'US Dollar'],
+        ],
+    ];
+    ```
+
+**Returns:** `array` — The preview descriptor
+
+**Source:** `app/Hooks/Handlers/BlockEditors/CurrencySwitcherBlockEditor.php:123`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency_switcher/editor_preview', function ($preview) {
+    $preview['style'] = 'button';
+    foreach ($preview['currencies'] as &$currency) {
+        $currency['flag'] = plugins_url('flags/' . strtolower($currency['code']) . '.svg', __FILE__);
+    }
+
+    return $preview;
+});
 ```
 </details>

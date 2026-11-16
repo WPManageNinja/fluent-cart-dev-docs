@@ -660,7 +660,7 @@ export default defineConfig({
                   { text: 'Products & Coupons', link: '/hooks/actions/products-and-coupons' },
                   { text: 'Payments & Integrations', link: '/hooks/actions/payments-and-integrations' },
                   { text: 'Admin & Templates', link: '/hooks/actions/admin-and-templates' },
-                  { text: 'Modules (MCP & Variations)', link: '/hooks/actions/modules' },
+                  { text: 'Modules (MCP, Variations & Currency)', link: '/hooks/actions/modules' },
                   { text: 'Pro Modules', link: '/hooks/actions/pro-modules' },
                 ]
               },
@@ -673,7 +673,7 @@ export default defineConfig({
                   { text: 'Orders & Payments', link: '/hooks/filters/orders-and-payments' },
                   { text: 'Products & Pricing', link: '/hooks/filters/products-and-pricing' },
                   { text: 'Settings & Configuration', link: '/hooks/filters/settings-and-configuration' },
-                  { text: 'Modules (MCP & Variations)', link: '/hooks/filters/modules' },
+                  { text: 'Modules (MCP, Variations & Currency)', link: '/hooks/filters/modules' },
                   { text: 'Pro Modules', link: '/hooks/filters/pro-modules' },
                 ]
              },

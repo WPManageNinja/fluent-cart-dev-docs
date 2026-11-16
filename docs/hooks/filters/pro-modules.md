@@ -518,3 +518,291 @@ add_filter('fluent_cart_pro/licensed_addons/allowed_hosts', function ($hosts) {
 });
 ```
 </details>
+
+---
+
+## Multi-Currency
+
+Pro supplies the rate store, the ECB feed and the dropdown switcher. The filters that resolve, mark up
+and round a rate are in core — see the [core multi-currency hooks](./modules#multi-currency).
+
+### <code> currency/rate_sanity_band </code>
+<details>
+<summary><code>fluent_cart/currency/rate_sanity_band</code> <Badge type="warning" text="Pro" /> &mdash; Filter how far a new rate may move before it is refused</summary>
+
+**When it runs:**
+Applied in `RateStore::movesTooFar()` before a rate is stored. A new rate that differs from the active
+one by more than this fraction is refused: it is not stored, prices keep the previous rate,
+[`currency/rate_rejected`](../actions/pro-modules#currency-rate-rejected) fires and `record()` returns
+a `WP_Error`.
+
+The value is a **fraction, not a percent** — `0.10` means 10%. The check is skipped entirely when
+there is no positive previous rate, so the first rate for a pair is always accepted.
+
+**Parameters:**
+- `$band` (float): The permitted movement as a fraction. Default `0.10`.
+
+**Returns:** `float` — The permitted movement
+
+**Source:** `fluent-cart-pro/app/Modules/MultiCurrency/RateStore.php:290`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/rate_sanity_band', function ($band) {
+    return 0.25; // tolerate a 25% move on a volatile pair
+});
+```
+</details>
+
+### <code> currency/historical_rate </code>
+<details>
+<summary><code>fluent_cart/currency/historical_rate</code> <Badge type="warning" text="Pro" /> &mdash; Supply the rate for a currency pair on a past date</summary>
+
+**When it runs:**
+Applied from `AccountingExportService` while building an export, to find the rate that applied on a
+given day. `base` is always `EUR`, and the export uses only answers whose `source` is `ecb` — Pro's own
+ECB provider answers it.
+
+Three return shapes, and the difference matters:
+
+| Return | Meaning |
+|---|---|
+| `array` | A rate for that date |
+| `null` | No rate for that date |
+| `WP_Error` | The provider could not answer — **the export stops asking for the rest of the request** |
+
+Returning `WP_Error` is a circuit breaker: each further date would be another timeout, so one failure
+switches the whole batch to blank rates. Pass an array or `WP_Error` from an earlier provider through
+unchanged rather than overwriting it.
+
+**Parameters:**
+- `$found` (array|WP_Error|null): `null` on the way in, or an earlier listener's answer.
+    ```php
+    $found = [
+        'rate'   => '0.918400', // (string|float) The rate on that date
+        'source' => 'ecb',      // (string) Only 'ecb' answers are used by the export
+    ];
+    ```
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'base'  => 'EUR',        // (string) Always EUR for the export
+        'quote' => 'USD',        // (string) The currency being converted
+        'date'  => '2026-11-12', // (string) Y-m-d, UTC
+    ];
+    ```
+
+**Returns:** `array|WP_Error|null` — The rate, none, or a provider failure
+
+**Source:** `fluent-cart-pro/app/Modules/AccountingExport/Services/AccountingExportService.php:1396`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency/historical_rate', function ($found, $context) {
+    if ($found !== null) {
+        return $found; // another provider already answered
+    }
+
+    $rate = my_plugin_rate_on($context['quote'], $context['date']);
+    if ($rate === false) {
+        return new WP_Error('unavailable', 'Rate service unreachable');
+    }
+
+    return $rate ? ['rate' => $rate, 'source' => 'ecb'] : null;
+}, 10, 2);
+```
+</details>
+
+### <code> accounting_export/row </code>
+<details>
+<summary><code>fluent_cart/accounting_export/row</code> <Badge type="warning" text="Pro" /> &mdash; Filter one row of the accounting export</summary>
+
+**When it runs:**
+Applied in `AccountingExportService::row()` for every tax line of every exported order, after each
+column has been computed and before the row is collected.
+
+Return the array with your columns added or changed. Three internal keys (`_base`, `_tax`, `_line`) are
+attached *after* this filter and stripped again before rows leave the service, so you will not see
+them and must not add them.
+
+**Parameters:**
+- `$row` (array): The export row. Columns include `base_currency`, `sales_rate`,
+  `taxable_amount_base`, `tax_base`, `order_gross_base`, `ecb_eur_rate_on_date`,
+  `ecb_eur_rate_period_end` and `ecb_period_end_date`.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'order'    => Order, // The order being exported
+        'tax_line' => [...], // The tax line this row represents
+    ];
+    ```
+
+**Returns:** `array` — The row to export
+
+**Source:** `fluent-cart-pro/app/Modules/AccountingExport/Services/AccountingExportService.php:1310`
+
+**Usage:**
+```php
+add_filter('fluent_cart/accounting_export/row', function ($row, $context) {
+    // Add the ledger code your accountant expects
+    $row['ledger_code'] = my_plugin_ledger_code_for($context['order']);
+    return $row;
+}, 10, 2);
+```
+</details>
+
+### <code> currency_switcher/dropdown_enabled </code>
+<details>
+<summary><code>fluent_cart/currency_switcher/dropdown_enabled</code> <Badge type="warning" text="Pro" /> &mdash; Turn Pro's dropdown switcher off and keep core's select</summary>
+
+**When it runs:**
+Applied in two places in `CurrencyDropdown`: `isAvailable()`, which decides whether the storefront
+renders the dropdown, and `editorPreview()`, which decides whether the block editor previews it.
+Returning `false` keeps core's plain `<select>` in both.
+
+Both call sites already require multi-currency to be enabled with at least two selectable currencies,
+so the filter is not reached on a single-currency store.
+
+**Parameters:**
+- `$enabled` (bool): Whether to use the dropdown. Default `true`.
+
+**Returns:** `bool` — `false` to fall back to core's select
+
+**Source:** `fluent-cart-pro/app/Modules/MultiCurrency/CurrencyDropdown.php:60, 99`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency_switcher/dropdown_enabled', function ($enabled) {
+    // Keep the native select on the checkout page only
+    return !is_page('checkout');
+});
+```
+</details>
+
+### <code> currency_switcher/button_html </code>
+<details>
+<summary><code>fluent_cart/currency_switcher/button_html</code> <Badge type="warning" text="Pro" /> &mdash; Filter the switcher button's markup</summary>
+
+**When it runs:**
+Applied in `CurrencyDropdownRenderer::renderButton()` for the clickable element that opens the
+dropdown.
+
+::: warning
+Keep `data-fluent-cart-currency-switcher` on the clickable element. The JavaScript binds to that
+attribute, so markup without it renders but never opens the panel.
+:::
+
+**Parameters:**
+- `$html` (string): The button markup.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'currency'      => ['code' => 'EUR', 'symbol' => '€', 'name' => 'Euro', 'flag' => '...'],
+        'display'       => 'EUR',   // (string) The resolved label text
+        'show_flag'     => true,    // (bool)
+        'show_symbol'   => 'yes',   // (string) '' | 'yes' | 'no'
+        'flag_position' => 'left',  // (string) 'left' | 'right'
+        'atts'          => [...],   // (array) Shortcode or block attributes
+    ];
+    ```
+
+**Returns:** `string` — The button markup
+
+**Source:** `fluent-cart-pro/app/Modules/MultiCurrency/CurrencyDropdownRenderer.php:201`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency_switcher/button_html', function ($html, $context) {
+    return sprintf(
+        '<button type="button" class="my-switcher" data-fluent-cart-currency-switcher>%s</button>',
+        esc_html($context['display'])
+    );
+}, 10, 2);
+```
+</details>
+
+### <code> currency_switcher/dropdown_html </code>
+<details>
+<summary><code>fluent_cart/currency_switcher/dropdown_html</code> <Badge type="warning" text="Pro" /> &mdash; Filter the whole dropdown panel</summary>
+
+**When it runs:**
+Applied in `CurrencyDropdownRenderer::getHtml()` for the panel that holds the currency options. The
+already-rendered rows arrive as `items_html`, so you can wrap them rather than rebuild them.
+
+::: warning
+Keep `data-fluent-cart-currency-dropdown` on the panel, and
+`data-fluent-cart-currency-option="CODE"` on each option. The JavaScript needs both.
+:::
+
+**Parameters:**
+- `$html` (string): The panel markup.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'currencies' => [...],   // (array[]) Each {code, symbol, name, flag}
+        'current'    => 'EUR',   // (string) The currency in effect
+        'items_html' => '...',   // (string) The rendered option rows
+    ];
+    ```
+
+**Returns:** `string` — The panel markup
+
+**Source:** `fluent-cart-pro/app/Modules/MultiCurrency/CurrencyDropdownRenderer.php:62`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency_switcher/dropdown_html', function ($html, $context) {
+    return '<div class="my-panel" data-fluent-cart-currency-dropdown>'
+        . '<p class="my-panel__title">' . esc_html__('Choose a currency', 'my-plugin') . '</p>'
+        . $context['items_html']
+        . '</div>';
+}, 10, 2);
+```
+</details>
+
+### <code> currency_switcher/item_html </code>
+<details>
+<summary><code>fluent_cart/currency_switcher/item_html</code> <Badge type="warning" text="Pro" /> &mdash; Filter one row of the dropdown</summary>
+
+**When it runs:**
+Applied in `CurrencyDropdownRenderer::renderItem()` once per currency.
+
+::: warning
+Keep `data-fluent-cart-currency-option="CODE"` on the link, or clicking the row will not switch
+currency.
+:::
+
+When the switcher is configured with `list_*` options, the panel's own script rewrites or removes
+`.fct-currency-dropdown-label` — setting the link's `aria-label` when it removes it — and removes or
+repositions `.fct-currency-dropdown-flag` elements as the panel opens. Custom markup that drops those
+class names simply opts out of that behaviour; keep them if you want it.
+
+**Parameters:**
+- `$html` (string): The row markup.
+- `$context` (array): Context data
+    ```php
+    $context = [
+        'currency'   => ['code' => 'EUR', 'symbol' => '€', 'name' => 'Euro', 'flag' => '...'],
+        'is_current' => false,  // (bool) Whether this is the currency in effect
+        'url'        => '...',  // (string) The switch URL for this currency
+    ];
+    ```
+
+**Returns:** `string` — The row markup
+
+**Source:** `fluent-cart-pro/app/Modules/MultiCurrency/CurrencyDropdownRenderer.php:109`
+
+**Usage:**
+```php
+add_filter('fluent_cart/currency_switcher/item_html', function ($html, $context) {
+    return sprintf(
+        '<a href="%s" data-fluent-cart-currency-option="%s"%s>%s &mdash; %s</a>',
+        esc_url($context['url']),
+        esc_attr($context['currency']['code']),
+        $context['is_current'] ? ' aria-current="true"' : '',
+        esc_html($context['currency']['code']),
+        esc_html($context['currency']['name'])
+    );
+}, 10, 2);
+```
+</details>

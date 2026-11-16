@@ -437,25 +437,3 @@ add_filter('fluent_cart/mcp_server_route', function ($route) {
 ```
 </details>
 
-### <code> mcp_tool_index </code>
-<details>
-<summary><code>fluent_cart/mcp_tool_index</code> &mdash; Filter the tool index returned by get-store-context</summary>
-
-**When it runs:**
-Runs when `ContextTools` builds the `tool_index` section of the `get-store-context` MCP tool payload — a grouped index that helps an MCP client pick the right tool for a task before calling `list-*`/`query-*`/`get-*` tools. Empty groups are already filtered out before this filter runs.
-
-**Parameters:**
-- `$index` (array): The tool index, grouped by category
-
-**Returns:** `array` — The tool index to return to MCP clients
-
-**Source:** `app/Modules/MCP/Tools/ContextTools.php:408`
-
-**Usage:**
-```php
-add_filter('fluent_cart/mcp_tool_index', function ($index) {
-    $index['loyalty'] = ['list-loyalty-points', 'get-loyalty-summary'];
-    return $index;
-}, 10, 1);
-```
-</details>

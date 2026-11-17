@@ -64,10 +64,15 @@ class YourGateway extends AbstractPaymentGateway
 
     public function makePaymentFromPaymentInstance(PaymentInstance $paymentInstance)
     {
-        // Your payment processing logic here
+        // Create the payment at your gateway, then tell checkout where to go.
         return [
-            'success' => true,
-            'redirect_url' => 'https://your-gateway.com/checkout/...'
+            'status'       => 'success',
+            'nextAction'   => 'your_gateway',
+            'actionName'   => 'redirect',
+            'message'      => __('Redirecting to payment...', 'your-plugin'),
+            'payment_args' => [
+                'checkout_url' => 'https://your-gateway.com/checkout/...',
+            ],
         ];
     }
 }
@@ -141,6 +146,15 @@ The event object provides these important properties:
 4. **Webhook Handling** - Gateway processes payment confirmations
 5. **Order Completion** - FluentCart updates order status
 
+## Publishing your gateway
+
+Your gateway ships as its own WordPress plugin and registers itself through
+`fluent_cart/register_payment_methods`. No review or approval is required.
+
+- Review is optional. Send us the plugin before you publish and we will review it.
+- There are no listing or commercial requirements, and no exclusivity.
+- Never store raw card details. Tokenize the card with your gateway and save only
+  the token it returns.
 
 ## Next Steps
 

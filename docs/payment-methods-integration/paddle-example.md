@@ -593,6 +593,18 @@ class IPN
 }
 ```
 
+`isWebhookVerificationDisabled()` is true only in test mode:
+
+```php
+public function isWebhookVerificationDisabled()
+{
+    return $this->getMode() === 'test' && $this->get('disable_webhook_verification') === 'yes';
+}
+```
+
+In live mode the signature is always checked, whatever the setting says. If you offer a
+"disable verification" setting, gate it to test mode the same way.
+
 ### Individual Event Handlers
 
 #### Payment Completion Handler
@@ -779,7 +791,7 @@ public function handleSubscriptionPaymentReceived($webhookData)
 - **Robust Error Handling**: Comprehensive validation and error responses
 - **Data Correlation**: Uses custom data fields to correlate webhooks with local records
 - **Status Management**: Proper status transformations and updates
-- **Signature Verification**: Optional but recommended security verification
+- **Signature Verification**: Required in live mode. It can be switched off in test mode only
 - **Logging Integration**: Uses FluentCart's action system for debugging
 
 ## Web Hook Implementation

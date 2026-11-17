@@ -89,10 +89,14 @@ itself once active:
 `paystack`, `razorpay`, `mercado_pago`, `flutterwave`, `square`, `airwallex`, `sslcommerz`
 
 ::: warning Feature flags are declarative
-`has()` tests membership of `$supportedFeatures`. Some flags are acted on — notably
-`subscriptions`, `system_subscription`, `offline`, `local_refund_only`, `refund`,
-`payment` and `multi_currency`. Others, including `webhook`, are declared by every
-built-in gateway but never queried, so adding one does not switch any behaviour on.
+`has()` tests membership of `$supportedFeatures`. Core acts on these flags: `payment`,
+`refund`, `local_refund_only`, `offline`, `multi_currency`, `subscriptions`,
+`system_subscription`, `manual_subscription`, `zero_recurring`, `verify_vendor_ids`,
+`resume_subscription`, `pause_subscription`, `dispute_handler` and `card_update`.
+
+`webhook`, `custom_payment`, `upgrade_plan` and `first_cycle_discount` are declared by
+built-in gateways but never queried through `has()`, so adding one does not switch any
+behaviour on.
 :::
 
 ## Building a custom gateway

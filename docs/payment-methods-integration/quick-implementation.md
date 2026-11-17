@@ -51,8 +51,9 @@ Create a settings class that extends `BaseGatewaySettings`:
 <?php
 namespace YourPlugin\PaymentMethods\YourGateway;
 
-use FluentCart\App\Modules\PaymentMethods\Core\BaseGatewaySettings;
 use FluentCart\App\Helpers\Helper;
+use FluentCart\App\Modules\PaymentMethods\Core\BaseGatewaySettings;
+use FluentCart\Framework\Support\Arr;
 
 class YourGatewaySettings extends BaseGatewaySettings
 {
@@ -61,33 +62,90 @@ class YourGatewaySettings extends BaseGatewaySettings
     public static function getDefaults()
     {
         return [
-            'is_active' => 'no',
-            'payment_mode' => 'test', // test or live
-            'test_api_key' => '',
-            'test_secret_key' => '',
-            'live_api_key' => '',
-            'live_secret_key' => '',
+            'is_active'           => 'no',
+            'payment_mode'        => 'test', // test or live
+            'test_api_key'        => '',
+            'test_secret_key'     => '',
+            'test_webhook_secret' => '',
+            'live_api_key'        => '',
+            'live_secret_key'     => '',
+            'live_webhook_secret' => '',
         ];
     }
 
-    public function getApiKey()
+    // Required by BaseGatewaySettings.
+    public function get($key = '')
     {
-        $mode = $this->get('payment_mode');
-        return $this->get($mode . '_api_key');
+        if ($key) {
+            return Arr::get($this->settings, $key);
+        }
+
+        return $this->settings;
     }
 
-    public function getSecretKey()
+    // Required by BaseGatewaySettings.
+    public function getMode()
     {
-        $mode = $this->get('payment_mode');
-        return Helper::decryptKey($this->get($mode . '_secret_key'));
+        return $this->get('payment_mode');
+    }
+
+    // Required by BaseGatewaySettings.
+    public function isActive()
+    {
+        return $this->get('is_active') === 'yes';
     }
 
     public function isTestMode()
     {
-        return $this->get('payment_mode') === 'test';
+        return $this->getMode() === 'test';
+    }
+
+    public function getApiKey($mode = '')
+    {
+        $mode = $mode ?: $this->getMode();
+
+        return $this->get($mode . '_api_key');
+    }
+
+    public function getSecretKey($mode = '')
+    {
+        $mode = $mode ?: $this->getMode();
+
+        return (string) Helper::decryptKey($this->get($mode . '_secret_key'));
+    }
+
+    public function getWebhookSecret($mode = '')
+    {
+        $mode = $mode ?: $this->getMode();
+
+        return (string) Helper::decryptKey($this->get($mode . '_webhook_secret'));
     }
 }
 ```
+
+Encrypt the secret fields when the settings are saved. Add this to your gateway class
+(Step 3):
+
+```php
+public static function beforeSettingsUpdate($data, $oldSettings): array
+{
+    $secretFields = ['test_secret_key', 'live_secret_key', 'test_webhook_secret', 'live_webhook_secret'];
+
+    foreach ($secretFields as $field) {
+        $value = Arr::get($data, $field, '');
+
+        // Encrypt only a value that changed. The stored one is already encrypted.
+        if ($value && $value !== Arr::get($oldSettings, $field, '')) {
+            $data[$field] = Helper::encryptKey($value);
+        }
+    }
+
+    return $data;
+}
+```
+
+Call `Helper::decryptKey()` only on a field you encrypted here. It returns `false` for a plain
+value that is valid base64, and most API keys are.
 
 ### Step 3: Create your Gateway Class
 
@@ -97,6 +155,7 @@ Create base class that implements all required methods:
 <?php
 namespace YourPlugin\PaymentMethods\YourGateway;
 
+use FluentCart\App\Helpers\Helper;
 use FluentCart\App\Modules\PaymentMethods\Core\AbstractPaymentGateway;
 use FluentCart\App\Services\Payments\PaymentInstance;
 use FluentCart\Framework\Support\Arr;
@@ -293,16 +352,21 @@ Create a class for API communications with your payment provider:
 <?php
 namespace YourPlugin\PaymentMethods\YourGateway;
 
+use FluentCart\Framework\Support\Arr;
+
 class API
 {
     private $settings;
+    private $mode;
     private $baseUrl;
 
-    public function __construct(YourGatewaySettings $settings)
+    // $mode: pass the payment's own mode when you read or change an existing payment.
+    public function __construct(YourGatewaySettings $settings, $mode = '')
     {
         $this->settings = $settings;
-        $this->baseUrl = $settings->isTestMode() 
-            ? 'https://api-test.yourgateway.com/v1' 
+        $this->mode = $mode ?: $settings->getMode();
+        $this->baseUrl = $this->mode === 'test'
+            ? 'https://api-test.yourgateway.com/v1'
             : 'https://api.yourgateway.com/v1';
     }
 
@@ -311,7 +375,7 @@ class API
         $args = [
             'method' => $method,
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->settings->getApiKey(),
+                'Authorization' => 'Bearer ' . $this->settings->getApiKey($this->mode),
                 'Content-Type' => 'application/json',
             ],
             'timeout' => 30
@@ -334,10 +398,10 @@ class API
         $data = json_decode($body, true);
         $code = wp_remote_retrieve_response_code($response);
 
-        if ($code >= 400) {
+        if ($code >= 400 || !is_array($data)) {
             return [
                 'success' => false,
-                'message' => $data['error'] ?? 'API request failed'
+                'message' => is_array($data) ? Arr::get($data, 'error', 'API request failed') : 'Unreadable API response'
             ];
         }
 
@@ -350,6 +414,11 @@ class API
     public function createPayment($paymentData)
     {
         return $this->makeRequest('POST', '/payments', $paymentData);
+    }
+
+    public function getPayment($paymentId)
+    {
+        return $this->makeRequest('GET', '/payments/' . $paymentId);
     }
 
     public function createSubscription($subscriptionData)
@@ -366,6 +435,10 @@ class API
     }
 }
 ```
+
+A payment that already exists is read, captured or refunded in the mode it was created in
+(`$transaction->payment_mode`), not the store's current mode. Only a new payment uses the
+current mode.
 
 ## Step 5: Payment processing
 
@@ -399,8 +472,17 @@ private function handleOneTimePayment(PaymentInstance $paymentInstance)
     
     // Prepare payment data for the API
     $paymentData = [
-       ....
+        'amount'   => (int) $transaction->total,   // cents; convert only if your gateway expects decimals
+        'currency' => $transaction->currency,
+        // Stamp our transaction on the payment. Confirm and webhook check it later.
+        'metadata' => ['transaction_uuid' => $transaction->uuid],
     ];
+
+    // A double click or a retried request must not create a second charge.
+    $seed = $paymentInstance->getIdempotencySeed();
+    if ($seed) {
+        $paymentData['idempotency_key'] = 'fct_' . $seed; // send it the way your gateway expects
+    }
     
     // Create payment in your gateway
     $result = $api->createPayment($paymentData);
@@ -436,8 +518,17 @@ private function handleOneTimePayment(PaymentInstance $paymentInstance)
     
     // Prepare payment data for the API
     $paymentData = [
-       ....
+        'amount'   => (int) $transaction->total,   // cents; convert only if your gateway expects decimals
+        'currency' => $transaction->currency,
+        // Stamp our transaction on the payment. Confirm and webhook check it later.
+        'metadata' => ['transaction_uuid' => $transaction->uuid],
     ];
+
+    // A double click or a retried request must not create a second charge.
+    $seed = $paymentInstance->getIdempotencySeed();
+    if ($seed) {
+        $paymentData['idempotency_key'] = 'fct_' . $seed; // send it the way your gateway expects
+    }
     
     // Create payment in your gateway
     $result = $api->createPayment($paymentData);
@@ -464,6 +555,10 @@ private function handleOneTimePayment(PaymentInstance $paymentInstance)
 
 
 ```
+
+`getIdempotencySeed()` returns the same value for a repeated submit of the same payment and
+a new value after a failed attempt is retried. It returns an empty string when there is no
+transaction yet. In that case send no idempotency key. Do not fall back to a fixed key.
 
 ### Return format of `makePaymentFromPaymentInstance()`
 
@@ -497,16 +592,14 @@ return [
 
 ## Step 6: Confirm Payment
 
-Payment confirmation can be done in two ways:
-
-#### Ajax call from your your-gateway-checkout.js (onsite payment)
+A payment is confirmed in one method. The ajax handler, the webhook and a return-page check
+all call it, so the checks cannot differ between them.
 
 ```php
 <?php
 
-#YourGateway.php 
+#YourGateway.php
 
-// init ajax handler in boot/constructor
 public function boot()
 {
     ....
@@ -514,150 +607,186 @@ public function boot()
     add_action('wp_ajax_nopriv_fluent_cart_confirm_your_gateway_payment', [$this, 'confirmPayment']);
 }
 
-// Example 
+// Ajax call from your-gateway-checkout.js (onsite payment)
 public function confirmPayment()
 {
+    $transactionUuid = sanitize_text_field(wp_unslash(Arr::get($_REQUEST, 'transaction_id', '')));
+    $paymentId = sanitize_text_field(wp_unslash(Arr::get($_REQUEST, 'payment_id', '')));
 
-    // Get data from request
-    $transactionId = sanitize_text_field($_REQUEST['transaction_id'] ?? '');
-    $paymentId = sanitize_text_field($_REQUEST['payment_id'] ??
+    $transaction = OrderTransaction::query()
+        ->where('uuid', $transactionUuid)
+        ->where('payment_method', 'your_gateway')
+        ->first();
 
-    // Find the transaction by UUID (ref_id)
-    $transaction = OrderTransaction::query()->where('uuid', $transactionId)->first();
-    
     if (!$transaction) {
         wp_send_json([
-            'message' => 'Transaction ID is required to confirm the payment.',
-            'status' => 'failed'
-        ], 400);
+            'message' => __('Transaction not found.', 'your-plugin'),
+            'status'  => 'failed'
+        ], 404);
     }
-    
-    // Check if already processed
-    if ($transaction->status === Status::TRANSACTION_SUCCEEDED) {
+
+    // Prefer the payment ID saved in Step 5 over the one the browser sent.
+    $paymentId = $transaction->vendor_charge_id ?: $paymentId;
+
+    $confirmed = $this->confirmTransaction($transaction, $paymentId);
+
+    if (is_wp_error($confirmed)) {
         wp_send_json([
-            'redirect_url' => $transaction->getReceiptPageUrl(),
-            'order' => [
-                'uuid' => $transaction->order->uuid,
-            ],
-            'message' => __('Payment already confirmed.', 'fluent-cart'),
-            'status' => 'success'
-        ], 200);
+            'message' => $confirmed->get_error_message(),
+            'status'  => 'failed'
+        ], 422);
     }
-    
-    // Verify payment with gateway API
-    // $paymentStatus = YourGatewayAPI::verifyPayment($paymentId);
-    
-    // Update transaction and order status
+
+    wp_send_json([
+        'redirect_url' => $transaction->getReceiptPageUrl(),
+        'order'        => [
+            'uuid' => $transaction->order->uuid,
+        ],
+        'message'      => __('Payment confirmed successfully.', 'your-plugin'),
+        'status'       => 'success'
+    ], 200);
+}
+
+/**
+ * @return true|\WP_Error
+ */
+public function confirmTransaction(OrderTransaction $transaction, $paymentId)
+{
+    // Already confirmed by the other path (webhook or ajax).
+    if ($transaction->status === Status::TRANSACTION_SUCCEEDED) {
+        return true;
+    }
+
+    // The ID can come from a request body. Check its format before it reaches a URL.
+    // Widen the pattern if your gateway's IDs use other characters.
+    if (!preg_match('/^[a-zA-Z0-9_-]+$/', (string) $paymentId)) {
+        return new \WP_Error('invalid_payment_id', __('Invalid payment reference.', 'your-plugin'));
+    }
+
+    // Ask the gateway, in the mode the payment was created in.
+    $api = new API($this->settings, $transaction->payment_mode);
+    $result = $api->getPayment($paymentId);
+
+    if (!Arr::get($result, 'success')) {
+        return new \WP_Error('payment_lookup_failed', __('Could not verify the payment.', 'your-plugin'));
+    }
+
+    $payment = Arr::get($result, 'data', []);
+
+    // Only your gateway's final "money captured" status counts as paid.
+    if (Arr::get($payment, 'status') !== 'paid') {
+        return new \WP_Error('payment_not_paid', __('The payment is not completed yet.', 'your-plugin'));
+    }
+
+    // It must be the payment created for this transaction, for this amount and currency.
+    $sameTransaction = Arr::get($payment, 'metadata.transaction_uuid') === $transaction->uuid;
+    $sameAmount = (int) Arr::get($payment, 'amount') === (int) $transaction->total;
+    $sameCurrency = strtoupper((string) Arr::get($payment, 'currency')) === strtoupper((string) $transaction->currency);
+
+    if (!$sameTransaction || !$sameAmount || !$sameCurrency) {
+        return new \WP_Error('payment_mismatch', __('The payment does not match this order.', 'your-plugin'));
+    }
+
     $transaction->fill([
-        'status' => Status::TRANSACTION_SUCCEEDED,
+        'status'           => Status::TRANSACTION_SUCCEEDED,
         'vendor_charge_id' => $paymentId,
-        // Add other fields as needed
     ]);
     $transaction->save();
 
-    
-    // Update order status
     $order = Order::query()->find($transaction->order_id);
     (new StatusHelper($order))->syncOrderStatuses($transaction);
-    
-    // Send success response
-    wp_send_json([
-        'redirect_url' => $transaction->getReceiptPageUrl(),
-        'order' => [
-            'uuid' => $transaction->order->uuid,
-        ],
-        'message' => __('Payment confirmed successfully.', 'fluent-cart'),
-        'status' => 'success'
-    ],
 
+    return true;
 }
-
 ```
 
-#### With IPN/Webhooks (Hosted payment)
+- Mark a payment paid only after the gateway reports its final captured status. A status such
+  as "authorized", "pending" or "processing" is not paid.
+- Compare the amount in the unit your gateway uses. FluentCart amounts are in cents.
+
+#### Webhook / IPN
+
+Set this URL in your gateway's dashboard. In code it is
+`$this->getListenerUrl()['listener_url']`:
+
+```
+https://your-site.com/?fluent-cart=fct_payment_listener_ipn&method=your_gateway
+```
 
 ```php
 <?php
 
-// YourGateway.php 
-
-// init ipn handler in boot/constructor
-public function boot()
-{
-    ....
-    add_action('fluent_cart/payments/your_gateway/webhook_payment_completed', [$this, 'handlePaymentCompleted']);
-    ....
-}
+#YourGateway.php
 
 public function handleIPN(): void
 {
-    // Process the webhook
-    $this->processWebhookEvent($data);
-}
+    $rawBody = file_get_contents('php://input');
+    $event = json_decode($rawBody, true);
 
-// Example of webhook processing
-public function processWebhookEvent($data)
-{
-    $eventType = $data['event'] ?? '';
-    $eventTypeFormatted = str_replace('.', '_', $eventType);
-
-    // Fire specific event handler
-    if (has_action('fluent_cart/payments/your_gateway/webhook_' . $eventTypeFormatted)) {
-        do_action('fluent_cart/payments/your_gateway/webhook_' . $eventTypeFormatted, [
-            'data' => $data,
-            'raw' => $rawPayload,
-            'order' => $order
-        ]);
+    if (!is_array($event)) {
+        $this->sendWebhookResponse(400, 'Invalid payload');
     }
-}
 
+    // 1. Verify the event before acting on it.
+    $secret = $this->settings->getWebhookSecret();
 
-// Example of payment confirmation
-public function handlePaymentCompleted($data)
-{
-    $paymentId = $data['payment']['id'] ?? '';
+    if (!$secret) {
+        // No secret saved for this mode: reject. Never accept an unverified event.
+        $this->sendWebhookResponse(500, 'Webhook secret not configured');
+    }
 
-    // Find the transaction
-    $transaction = OrderTransaction::query()->where('uuid', $transactionId)->first();
+    // Read headers from $_SERVER. getallheaders() is missing on some hosts.
+    $signature = sanitize_text_field(wp_unslash(Arr::get($_SERVER, 'HTTP_X_YOURGATEWAY_SIGNATURE', '')));
+
+    if (!$signature || !hash_equals(hash_hmac('sha256', $rawBody, $secret), $signature)) {
+        $this->sendWebhookResponse(401, 'Invalid signature');
+    }
+
+    // 2. Is it ours? Find the transaction by the uuid stamped in Step 5.
+    $transactionUuid = sanitize_text_field(Arr::get($event, 'data.metadata.transaction_uuid', ''));
+
+    $transaction = OrderTransaction::query()
+        ->where('uuid', $transactionUuid)
+        ->where('payment_method', 'your_gateway')
+        ->first();
 
     if (!$transaction) {
-        return;
+        // Another site on the same gateway account, or not a FluentCart payment.
+        $this->sendWebhookResponse(200, 'Not for this store');
     }
 
-    // Check if already processed
-    if ($transaction->status === Status::TRANSACTION_SUCCEEDED) {
-        return;
+    // 3. Act on the gateway's live state, through the same method as Step 6.
+    if (Arr::get($event, 'type') === 'payment.completed') {
+        $confirmed = $this->confirmTransaction($transaction, Arr::get($event, 'data.id', ''));
+
+        if (is_wp_error($confirmed) && $confirmed->get_error_code() === 'payment_lookup_failed') {
+            // The gateway could not be reached. A non-2xx makes it deliver the event again.
+            $this->sendWebhookResponse(503, 'Try again');
+        }
     }
 
-    // Get transaction details from YourGateway
-    $yourGatewayTransaction = API::getYourGatewayObject("transactions/{$paymentId}", [], $transaction->payment_mode);
-
-    if (is_wp_error($yourGatewayTransaction)) {
-        return;
-    }
-
-    $data = Arr::get($yourGatewayTransaction, 'data');
-    $transactionStatus = Arr::get($data, 'status');
-
-    // Check if payment is completed
-    if ($transactionStatus !== 'paid' && $transactionStatus !== 'completed') {
-        return;
-    }
-
-    // Update transaction and order status
-    $transaction->fill([
-        'status' => Status::TRANSACTION_SUCCEEDED,
-        'vendor_charge_id' => $paymentId,
-        // Add other fields as needed
-    ]);
-    $transaction->save();
-
-    // Update order status
-    $order = Order::query()->find($transaction->order_id);
-    (new StatusHelper($order))->syncOrderStatuses($transaction);
+    $this->sendWebhookResponse(200, 'OK');
 }
 
+private function sendWebhookResponse($code, $message)
+{
+    wp_send_json(['message' => $message], $code);
+}
 ```
+
+- **Verify first.** Check the signature the way your gateway documents it. If your gateway
+  sends no signature, fetch the object from its API by ID and act only on what the API
+  returns.
+- **Act on live state, not on the event body.** `confirmTransaction()` fetches the payment
+  again, so an event that claims "completed" for an unpaid payment changes nothing.
+- **A repeated delivery answers 200.** Gateways send the same event more than once.
+  `confirmTransaction()` returns early when the transaction is already succeeded. Answer 200
+  for work that is already done, or the gateway keeps retrying.
+- **Work that is not safe to repeat needs a claim.** If a handler has no such built-in check,
+  claim the event ID first with `add_option($key, '1', '', false)`, answer 200 when the claim
+  is already taken, and delete the claim if the work throws. Do not expire the claim.
+- **Look up by an ID of yours.** Match on the uuid you stamped, or on a vendor ID you saved,
+  scoped to your gateway's `payment_method`. One gateway account often serves several sites.
 
 ### Step 7: (optional) Create your-gateway-checkout.js
 
@@ -910,17 +1039,33 @@ For subscription renewals, use `SubscriptionService`. There is no
 **first**, the subscription second.
 
 ```php
-\FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::recordRenewalPayment(
+$recorded = \FluentCart\App\Modules\Subscriptions\Services\SubscriptionService::recordRenewalPayment(
     [
-        'amount'         => $amount,          // cents
-        'transaction_id' => $paymentId,
-        'payment_method' => 'your_gateway',
-        'status'         => 'completed'
+        'total'            => $amount,      // cents
+        'vendor_charge_id' => $paymentId,   // also used to skip a charge already recorded
+        'payment_method'   => 'your_gateway',
     ],
     $subscription,          // optional
     []                      // optional subscription update args
 );
+
+if (is_wp_error($recorded) && $recorded->get_error_code() !== 'transaction_exists') {
+    // Not recorded. Answer non-2xx so the gateway delivers the event again.
+    status_header(500);
+    exit;
+}
 ```
+
+- `status` defaults to `Status::TRANSACTION_SUCCEEDED`. `total` defaults to the
+  subscription's recurring total.
+- The call returns the `OrderTransaction`, or a `WP_Error`. `transaction_exists` means the
+  charge is already recorded: treat it as done.
+- Do not add your own duplicate check around this call. It matches by `vendor_charge_id`.
+
+A store can also bill subscriptions itself instead of through the gateway (Store Billing).
+Which mode a store uses is the merchant's setting; your gateway only declares what it
+supports. See [Subscriptions](/modules/subscriptions) for `manual_subscription`,
+`system_subscription`, `shouldChargeSubscriptionAsOneTime()` and `chargeRenewal()`.
 
 ## Important Hooks
 
@@ -964,7 +1109,13 @@ Learn more about hooks in [FluentCart Hooks](../hooks/) documentation.
 2. **Configure**: Go to FluentCart → Settings → Payment Methods
 3. **Test Payment**: Test a one-time payment on the checkout page
 4. **Test Subscription**: Test a subscription product if supported
-5. **Test Web Hook**: Test web hook processing using a tool like RequestBin
+5. **Test Webhooks**: Send test events from your gateway's dashboard or CLI and check that:
+   - an event with a wrong or missing signature is rejected and the order does not change
+   - the same event sent twice answers 200 both times and the order changes once
+   - an event for a payment this site did not create answers 200 and changes nothing
+6. **Test Confirmation**: A payment that is not captured yet, or whose amount or currency
+   differs from the order, is not marked paid
+7. **Test Refunds**: A full refund, then two partial refunds of the same amount on one order
 
 ## Common Pitfalls
 
@@ -975,6 +1126,16 @@ A few things that aren't obvious from the interface/base class alone and can cos
 - **`getOrderInfo(array $data)` is required.** It's declared on `PaymentGatewayInterface`, not flagged with an `abstract` keyword on `AbstractPaymentGateway` itself — easy to miss and skip, but omitting it is a fatal error.
 - **Read the store currency via `CurrencySettings::get('currency')`** (`FluentCart\Api\CurrencySettings`), not by re-deriving it from settings/options yourself.
 - **Don't eagerly `require` your gateway class file** — see the warning in [Step 1](#step-1-register-your-gateway). Load it lazily from inside the `fluent_cart/register_payment_methods` callback, not at plugin bootstrap or on `fluentcart_loaded`.
+- **Never store raw card details.** Tokenize the card with your gateway and save only the
+  token it returns.
+- **Show customers only the invoice number.** In emails and other customer-facing text use
+  `invoice_no`. The order `uuid` opens the receipt page without a login, and the `id` is a
+  running number. When `invoice_no` is empty, show no number.
+- **Keep `isCurrencySupported()` and `isEnabled()` fast.** FluentCart calls them when it
+  builds the checkout payment list. Read saved settings only. Call your gateway's API when
+  the merchant saves the settings, not here.
+- **Read webhook headers from `$_SERVER`.** `getallheaders()` is not available on every host.
+  `X-Yourgateway-Signature` is `$_SERVER['HTTP_X_YOURGATEWAY_SIGNATURE']`.
 
 ## Additional Resources
 

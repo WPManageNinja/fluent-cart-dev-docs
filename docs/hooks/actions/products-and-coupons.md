@@ -92,6 +92,87 @@ add_action('fluent_cart/product_updated', function($data) {
 
 ---
 
+## Stock & Variations
+
+Fired when a product's stock or its variation set changes. Both hooks carry product **post IDs**, not
+variation IDs, so a listener that works per variation has to load them from the product.
+
+### <code> product_stock_changed </code>
+<details>
+<summary><code>fluent_cart/product_stock_changed</code> &mdash; Fires after a product's stock has changed</summary>
+
+**When it runs:**
+Fires on three paths:
+
+- `ProductController::updateInventory()`, behind `PUT /products/{postId}/update-inventory/{variantId}`,
+  and only when the available quantity or the stock status actually changed. Saving the same numbers
+  again fires nothing.
+- `CheckoutApi::updateStock()`, straight after an order is created at checkout, with every product ID
+  in that order.
+- `ProductResource::update()`, when a product is saved from the editor or through the bulk product
+  update service, after the product's `min_price` and `max_price` have been recalculated.
+
+**Parameters:**
+
+- `$data` (array): The affected products
+    ```php
+    $data = [
+        'post_ids'   => [19743],  // Product post IDs, always an array even for one product
+        'other_info' => null,     // Extra context; the core paths pass none
+    ];
+    ```
+
+**Source:** `app/Http/Controllers/ProductController.php:1627`, `api/Checkout/CheckoutApi.php:754` and `api/Resource/ProductResource.php:351`
+
+**Usage:**
+```php
+add_action('fluent_cart/product_stock_changed', function ($data) {
+    foreach ($data['post_ids'] as $postId) {
+        // Drop a cached availability badge for this product
+        delete_transient('my_plugin_stock_' . $postId);
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> product_variations_changed </code>
+<details>
+<summary><code>fluent_cart/product_variations_changed</code> &mdash; Fires after an advanced-variation product's combinations are rewritten</summary>
+
+**When it runs:**
+Fires from `AdvancedVariationService::syncVariantOption()`, the advanced-variation branch of
+`POST /products/{postId}/update-variant-option`. Generating, reordering, adding, updating and removing
+combinations all land there, and all fire this hook. It runs after
+[`product/variants_updated`](#product-variants-updated).
+
+The event's own listener re-resolves the product's `default_variation_id` against the new combination
+set, so by the time a third-party listener runs, the default variation is already the first
+combination by `serial_index`.
+
+**Parameters:**
+
+- `$data` (array): The affected product
+    ```php
+    $data = [
+        'post_ids' => [19743], // Product post IDs, always an array
+    ];
+    ```
+
+**Source:** `app/Services/AdvancedVariationService.php:290`
+
+**Usage:**
+```php
+add_action('fluent_cart/product_variations_changed', function ($data) {
+    foreach ($data['post_ids'] as $postId) {
+        // Re-index the product after its combination set is rewritten
+        my_plugin_queue_reindex($postId);
+    }
+}, 10, 1);
+```
+</details>
+
+---
+
 ## Single Product Page Rendering
 
 Hooks that fire during the server-side rendering of a single product page. All rendering hooks use **output buffering** -- your callback should `echo` HTML directly rather than return a value.

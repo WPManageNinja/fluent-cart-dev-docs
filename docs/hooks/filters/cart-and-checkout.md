@@ -617,6 +617,50 @@ add_filter('fluent_cart/shipping/auto_select_single_method', function ($shouldAu
 ```
 </details>
 
+### <code> checkout/order_shipping_charge </code>
+<details>
+<summary><code>fluent_cart/checkout/order_shipping_charge</code> &mdash; Discount the shipping charge for this order</summary>
+
+**When it runs:**
+Runs twice per checkout, on two different jobs:
+
+- `CheckoutApi::placeOrder()` applies it to the order's shipping charge. The difference between the
+  charge before and after the filter becomes the order's `shipping_discount`, and the cart's stored
+  charge is rewritten only when the filter actually lowered it. `fluent_cart/cart/shipping_total`
+  runs afterwards and can turn both figures into net amounts for an inclusive-tax store.
+- `TaxModule` applies it again to the sum of the line items' shipping charges, so shipping **tax**
+  is calculated on the discounted figure. Here the return is clamped into the range `0` to the
+  original charge, and when it comes back unchanged the line items are left alone. The discounted
+  total is then re-shared across the lines, each share floored and the leftover cents given to the
+  largest remainders, so the shares add up exactly.
+
+`fluent_cart/cart/shipping_total` — and the Shipping row the cart summary draws from it — is a
+separate hook and is not affected by this one.
+
+**Parameters:**
+
+- `$shippingCharge` (int): The shipping charge **in cents**
+- `$context` (array): `['cart' => Cart]` — the priced cart
+
+**Returns:** `int` — the charge to use, in cents
+
+**Source:** `api/Checkout/CheckoutApi.php:275` and `app/Modules/Tax/TaxModule.php:867`
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/order_shipping_charge', function ($shippingCharge, $context) {
+    $cart = $context['cart'];
+
+    // Free postage once the cart passes a threshold (amounts are in cents)
+    if ($cart->getEstimatedTotal() >= 10000) {
+        return 0;
+    }
+
+    return $shippingCharge;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Checkout Validation
@@ -1146,6 +1190,171 @@ add_filter('fluent_cart/enable_modal_checkout', function ($enabled) {
 ```
 </details>
 
+### <code> checkout/render_cart </code>
+<details>
+<summary><code>fluent_cart/checkout/render_cart</code> &mdash; Supply the cart the checkout renders from</summary>
+
+**When it runs:**
+Runs at the top of both checkout surfaces — the checkout block
+(`CheckoutBlockEditor`) and the `[fluent_cart_checkout]` shortcode
+(`CheckoutPageHandler`) — before any asset is enqueued, so one listener covers both. The two call
+sites differ only in their `surface` value.
+
+Return a [Cart](/database/models/cart) to render that cart instead of the shopper's own. Returning
+`null`, the default, keeps the shipped behaviour: the checkout falls back to
+`CartHelper::getCart()`, unless the placement names specific products, in which case
+[`checkout/render_custom_product_checkout`](../actions/cart-and-checkout#checkout-render-custom-product-checkout)
+takes over.
+
+Checkout assets are loaded for whatever this filter returns, which is why it runs before the enqueue
+rather than after it.
+
+**Parameters:**
+
+- `$cart` (Cart|null): `null` by default
+- `$context` (array): Where the checkout was placed
+    ```php
+    $context = [
+        'surface'    => 'checkout-block', // 'checkout-block' or 'checkout-shortcode'
+        'attributes' => [...],            // Block or shortcode attributes
+        'block'      => $block,           // \WP_Block on the block surface; null on the shortcode
+    ];
+    ```
+
+**Returns:** `\FluentCart\App\Models\Cart|null`
+
+**Source:** `app/Hooks/Handlers/BlockEditors/Checkout/CheckoutBlockEditor.php:104` and `app/Hooks/Handlers/ShortCodes/Checkout/CheckoutPageHandler.php:43`
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/render_cart', function ($cart, $context) {
+    // Serve a quote the add-on prepared, when the placement asks for one
+    $quoteId = (int) ($context['attributes']['my_plugin_quote_id'] ?? 0);
+    if (!$quoteId) {
+        return $cart;
+    }
+
+    return my_plugin_cart_for_quote($quoteId) ?: $cart;
+}, 10, 2);
+```
+</details>
+
+### <code> checkout/empty_message </code>
+<details>
+<summary><code>fluent_cart/checkout/empty_message</code> &mdash; The message an empty checkout shows</summary>
+
+**When it runs:**
+Runs on both checkout surfaces when there is no cart, or the cart has no `cart_data`, just before
+`CartRenderer::renderEmpty()` draws the empty state. Returning `null` keeps the default,
+"Your cart is empty."
+
+The message is also used as the `aria-label` of the empty-state region and is escaped when printed,
+so return plain text rather than markup.
+
+**Parameters:**
+
+- `$message` (string|null): `null` by default
+- `$context` (array): `['surface' => string, 'attributes' => array]` — `surface` is
+  `checkout-block` or `checkout-shortcode`
+
+**Returns:** `string|null`
+
+**Source:** `app/Hooks/Handlers/BlockEditors/Checkout/CheckoutBlockEditor.php:137` and `app/Hooks/Handlers/ShortCodes/Checkout/CheckoutPageHandler.php:74`
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/empty_message', function ($message, $context) {
+    // Explain why the add-on's own checkout has nothing to show
+    if (!empty($context['attributes']['my_plugin_quote_id'])) {
+        return __('This quote has expired. Please request a new one.', 'my-plugin');
+    }
+
+    return $message;
+}, 10, 2);
+```
+</details>
+
+### <code> checkout/cart_summary_html </code>
+<details>
+<summary><code>fluent_cart/checkout/cart_summary_html</code> &mdash; Replace the cart summary markup</summary>
+
+**When it runs:**
+Runs in `CartSummaryRender` each time the summary is about to be drawn. Return a string to render it
+instead of core's markup; any non-string return — `null` by default — leaves core's summary alone.
+
+`context` says how much is being asked for: `summary` is the whole box, `items` is the line-item list
+on its own, which InnerBlocks draws without going through the full summary. The two cannot both be
+taken over in one render — a listener that replaces the whole summary returns before the item list is
+reached.
+
+A listener owns escaping whatever it returns, since core cannot escape arbitrary markup without
+destroying it.
+
+**Parameters:**
+
+- `$html` (string|null): `null` by default
+- `$context` (array): What is being drawn
+    ```php
+    $context = [
+        'cart'         => $cart,     // \FluentCart\App\Models\Cart
+        'with_wrapper' => true,      // Whether core would draw its wrapper element
+        'context'      => 'summary', // 'summary' (the whole box) or 'items' (the line-item list)
+    ];
+    ```
+
+**Returns:** `string|null`
+
+**Source:** `app/Services/Renderer/CartSummaryRender.php:125`
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/cart_summary_html', function ($html, $context) {
+    // Take over only the line-item list, and leave the rest of the box to core
+    if ($context['context'] !== 'items') {
+        return $html;
+    }
+
+    return my_plugin_render_items($context['cart']); // listener escapes its own output
+}, 10, 2);
+```
+</details>
+
+### <code> checkout/selected_payment_method </code>
+<details>
+<summary><code>fluent_cart/checkout/selected_payment_method</code> &mdash; The payment method rendered as checked</summary>
+
+**When it runs:**
+Runs while the payment-method list is rendered, on the checkout page (`CheckoutRenderer`) and in the
+modal checkout (`ModalCheckoutRenderer`), with the same arguments in both. The incoming value is the
+shopper's stored selection, or the first active method's `route` meta when there is none.
+
+The return is cast to a string. A route that is not in the list leaves **no** gateway checked, which
+is the point for an add-on that renders its own selector — the page then arrives with the add-on's
+choice in effect, instead of a gateway being checked and switched over by JavaScript after load.
+
+**Parameters:**
+
+- `$selectedPaymentMethod` (string): The route of the method that would be checked
+- `$context` (array): `['cart' => Cart, 'payment_methods' => array]` — the active payment methods as
+  rendered, which may not be zero-indexed
+
+**Returns:** `string` — the method's `route`, or a value outside the list to check none
+
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:893` and `app/Services/Renderer/ModalCheckoutRenderer.php:701`
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/selected_payment_method', function ($selected, $context) {
+    // An add-on renders its own saved-card selector, so check no gateway here
+    if (my_plugin_has_saved_card($context['cart'])) {
+        return 'my-plugin-saved-card';
+    }
+
+    return $selected;
+}, 10, 2);
+```
+</details>
+
 ---
 
 ## Checkout Data & Session
@@ -1366,6 +1575,105 @@ add_filter('fluent_cart/apply_order_bump', function ($response, $data) {
         'message' => __('Order bump applied!', 'fluent-cart'),
         'cart'    => $cart,
     ];
+}, 10, 2);
+```
+</details>
+
+### <code> checkout/order_data </code>
+<details>
+<summary><code>fluent_cart/checkout/order_data</code> &mdash; Adjust the prepared order data before the order is written</summary>
+
+**When it runs:**
+Runs once the totals are calculated and the order payload is assembled, but before the order,
+transaction and subscription rows are derived from it. Two processors fire it with the same
+arguments: `CheckoutProcessor` for a storefront checkout, and `AdminOrderProcessor` for a manually
+created admin order.
+
+On the storefront path the returned `total_amount` is checked immediately afterwards: a value that is
+not numeric, not finite, or `PHP_INT_MAX` or larger aborts the checkout with
+"The order total is too large to process." The admin path has no such check.
+
+**Parameters:**
+
+- `$orderData` (array): The prepared order row. All money is **in cents**. Keys include
+  `currency`, `rate`, `subtotal`, `total_amount`, `total_paid`, `total_refund`, `tax_total`,
+  `shipping_total`, `shipping_tax`, `shipping_discount`, `coupon_discount_total`,
+  `manual_discount_total`, `fee_total`, `payment_method`, `payment_method_title`, `payment_status`,
+  `shipping_status`, `status`, `type`, `mode`, `fulfillment_type`, `tax_behavior`, `customer_id`,
+  `ip_address`, `note` and `config`.
+- `$context` (array): What the payload was built from
+    ```php
+    $context = [
+        'items' => [...], // Formatted order items with prices and quantities
+        'args'  => [...], // Checkout arguments: customer data, payment method, shipping, tax, coupons, fees, IP data
+    ];
+    ```
+
+**Returns:** `array` — the order data to write
+
+**Source:** `app/Helpers/CheckoutProcessor.php:1248` and `app/Helpers/AdminOrderProcessor.php:308`
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/order_data', function ($orderData, $context) {
+    // Tag the order with the channel it came from
+    $config = \FluentCart\Framework\Support\Arr::get($orderData, 'config', []);
+    $config['my_plugin_channel'] = my_plugin_current_channel();
+    $orderData['config'] = $config;
+
+    return $orderData;
+}, 10, 2);
+```
+</details>
+
+### <code> checkout/route_response </code>
+<details>
+<summary><code>fluent_cart/checkout/route_response</code> &mdash; Serve a checkout verb of your own on the checkout route</summary>
+
+**When it runs:**
+Runs in the **default branch** of the checkout AJAX route
+(`wp_ajax_fluent_cart_checkout_routes` and its `nopriv` twin), which dispatches on the
+`fc_checkout_action` parameter. Core's own verbs — `apply_coupon`, `remove_coupon`,
+`get_checkout_summary_view`, `reapply_coupon`, `get_order_info`, `save_checkout_data`,
+`get_country_info`, `update_address_select`, `get_shipping_methods_list_view`,
+`fluent_cart_cart_update`, `fluent_cart_cart_status`, `apply_order_bump` and
+`get_product_modal_view` — are handled before the filter and never reach it. It fires only for a verb
+core does not know.
+
+The point is to reuse this route's nonce policy instead of standing up a second endpoint: the request
+has already been rejected with a 403 unless it carried an `X-WP-Nonce` header valid for `fluentcart`
+or `wp_rest`.
+
+What you return decides the response:
+
+| Return | Response |
+|---|---|
+| `array` | JSON, 200, with a `_bench` key added by core |
+| `WP_Error` | JSON `{ message }`, 422 |
+| `null` (default) | an empty 200, unchanged from today |
+
+**Parameters:**
+
+- `$result` (array|WP_Error|null): `null` by default
+- `$context` (array): `['action' => string]` — the requested `fc_checkout_action`
+
+**Returns:** `array|\WP_Error|null`
+
+**Source:** `app/Hooks/Cart/WebCheckoutHandler.php:128`
+
+**Usage:**
+```php
+add_filter('fluent_cart/checkout/route_response', function ($result, $context) {
+    if ($context['action'] !== 'my_plugin_estimate') {
+        return $result;
+    }
+
+    $cart = \FluentCart\App\Helpers\CartHelper::getCart();
+    if (!$cart) {
+        return new \WP_Error('no_cart', __('No active cart.', 'my-plugin'));
+    }
+
+    return ['estimate' => my_plugin_estimate($cart)];
 }, 10, 2);
 ```
 </details>

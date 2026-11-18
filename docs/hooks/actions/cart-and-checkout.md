@@ -532,6 +532,44 @@ add_action('fluent_cart/order_bump_succeed', function ($data) {
 ```
 </details>
 
+### <code> checkout/before_order_processing </code>
+<details>
+<summary><code>fluent_cart/checkout/before_order_processing</code> &mdash; Last point to change the cart before the order is built from it</summary>
+
+**When it runs:**
+Fires in `CheckoutApi::placeOrder()` after the cart has been recalculated and handed back to the
+checkout helper, and immediately before `CheckoutProcessor` turns that cart into order data. Shipping,
+tax and fees are already settled on the cart at this point.
+
+This is the last place a listener can write into `cart_data` and have the order pick the change up —
+anything written after this runs against a cart the order no longer reads.
+
+**Parameters:**
+
+- `$data` (array): The cart about to be turned into an order
+    ```php
+    $data = [
+        'cart' => $cart, // \FluentCart\App\Models\Cart — the recalculated cart
+    ];
+    ```
+
+**Source:** `api/Checkout/CheckoutApi.php:345`
+
+**Usage:**
+```php
+add_action('fluent_cart/checkout/before_order_processing', function ($data) {
+    $cart = $data['cart'];
+
+    // Persist a rule decision on the cart so the order inherits it
+    $checkoutData = $cart->checkout_data ?? [];
+    $checkoutData['my_plugin_rule_id'] = my_plugin_resolve_rule($cart);
+    $cart->checkout_data = $checkoutData;
+    $cart->save();
+}, 10, 1);
+```
+</details>
+
+
 ## Checkout Page Rendering
 
 All hooks in this section fire during server-side HTML rendering of the checkout page. They use output buffering, so you should **echo** (not return) any custom HTML you want to inject.
@@ -1098,6 +1136,81 @@ add_action('fluent_cart/checkout/before_summary_total', function ($data) {
     echo '<span class="fct_summary_label">Processing Fee</span>';
     echo '<span class="fct_summary_value">$2.50</span>';
     echo '</li>';
+}, 10, 1);
+```
+</details>
+
+### <code> checkout/before_summary_coupon </code>
+<details>
+<summary><code>fluent_cart/checkout/before_summary_coupon</code> &mdash; Before the applied-coupon row in the cart summary</summary>
+
+**When it runs:**
+Fires inside `CartSummaryRender`, after the summary's extra lines and immediately before the
+applied-coupon row. It fires inside the summary's `<ul>`, so a listener must echo complete `<li>`
+elements and escape its own output.
+
+**Parameters:**
+
+- `$data` (array): The cart being summarised
+    ```php
+    $data = [
+        'cart' => $cart, // \FluentCart\App\Models\Cart
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CartSummaryRender.php:207`
+
+**Usage:**
+```php
+add_action('fluent_cart/checkout/before_summary_coupon', function ($data) {
+    $credit = my_plugin_store_credit_for($data['cart']);
+    if (!$credit) {
+        return;
+    }
+
+    echo '<li><span class="fct_summary_label">' . esc_html__('Store credit', 'my-plugin') . '</span>';
+    echo '<span class="fct_summary_value">'
+        . esc_html(\FluentCart\App\Helpers\Helper::toDecimal($credit))
+        . '</span></li>';
+}, 10, 1);
+```
+</details>
+
+### <code> checkout/render_custom_product_checkout </code>
+<details>
+<summary><code>fluent_cart/checkout/render_custom_product_checkout</code> &mdash; Render a checkout for products an add-on supplies</summary>
+
+**When it runs:**
+Fires from `CheckoutRenderer::renderCustomProductCheckout()`, on both the checkout block and the
+checkout shortcode, when the placed checkout names specific products in its attributes and
+[`checkout/render_cart`](../filters/cart-and-checkout#checkout-render-cart) did not supply a cart.
+
+The call is output-buffered: a listener echoes its markup, and whatever it writes becomes the
+checkout. Without a listener the buffer is empty and the surface renders nothing — core never falls
+back to the shopper's own cart here.
+
+**Parameters:**
+
+- `$context` (array): Where the checkout was placed
+    ```php
+    $context = [
+        'surface'    => 'checkout-block', // 'checkout-block' or 'checkout-shortcode'
+        'attributes' => [...],            // The block or shortcode attributes, including the product selection
+        'block'      => $block,           // \WP_Block on the block surface; null on the shortcode
+    ];
+    ```
+
+**Source:** `app/Services/Renderer/CheckoutRenderer.php:151`
+
+**Usage:**
+```php
+add_action('fluent_cart/checkout/render_custom_product_checkout', function ($context) {
+    $cart = my_plugin_build_cart_from($context['attributes']);
+    if (!$cart) {
+        return;
+    }
+
+    \FluentCart\App\Services\Renderer\CheckoutRenderer::renderCustomProductCart($cart, $context);
 }, 10, 1);
 ```
 </details>

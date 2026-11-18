@@ -981,6 +981,181 @@ add_action('fluent_cart/subscription_updated', function ($data) {
 
 ---
 
+## Term, Validity & Reactivation
+
+Fired when a subscription reaches the end of its billing term, when its paid-for validity runs out,
+when an admin skips a billing period, and when a dead subscription comes back. These four are
+dispatched through `EventDispatcher::dispatch()`, so each hook receives the event's payload as a single
+array, and `customer` is an empty array rather than `null` when the subscription has none.
+
+### <code> subscription_eot </code>
+<details>
+<summary><code>fluent_cart/subscription_eot</code> &mdash; Fires when a subscription reaches the end of its term</summary>
+
+**When it runs:**
+Fires on two paths. From `SubscriptionService::syncSubscriptionStates()` when the subscription has a
+fixed term and has now been billed for all of it — `bill_times` is greater than zero and `bill_count`
+has reached it — which is evaluated before the status-change hooks for the same sync. And from
+`SubscriptionService::updateSubscription()` when an admin edit sets the status to `completed`.
+
+**Parameters:**
+
+- `$data` (array): The subscription that reached its term
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'order'        => $order,        // \FluentCart\App\Models\Order — the subscription's parent order
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer, or [] when there is none
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:459` and `app/Modules/Subscriptions/Services/SubscriptionService.php:1256`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_eot', function ($data) {
+    $data['subscription']->addLog(
+        'Term completed',
+        'The subscription has been billed for its full term.',
+        'info'
+    );
+}, 10, 1);
+```
+</details>
+
+### <code> subscription_expired_validity </code>
+<details>
+<summary><code>fluent_cart/subscription_expired_validity</code> &mdash; Fires when a subscription's paid-for validity runs out</summary>
+
+**When it runs:**
+Fires on three paths, in each case straight after the `validity_expired_at` meta has been written on
+the subscription:
+
+- `SubscriptionService::syncSubscriptionStates()`, when a sync leaves the subscription `expired`
+- `SubscriptionService::updateSubscription()`, when an admin edit sets the status to `expired`
+- `Subscription::checkAndExpireSubscriptions()`, which the hourly scheduler runs over subscriptions
+  whose validity has run out
+
+The `validity_expired_at` meta doubles as the idempotency marker for the expiry, so a listener can
+read it to know when the expiry was recorded.
+
+**Parameters:**
+
+- `$data` (array): The expired subscription
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'order'        => $order,        // \FluentCart\App\Models\Order
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer, or [] when there is none
+        'reason'       => 'Subscription validity expired', // Defaults to this translated string when the caller passes none
+    ];
+    ```
+
+None of the three core paths passes a reason, so `reason` carries the default unless another caller
+supplies one.
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:501`,
+`app/Modules/Subscriptions/Services/SubscriptionService.php:1252` and `app/Models/Subscription.php:1738`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_expired_validity', function ($data) {
+    // Revoke whatever the subscription was paying for
+    my_plugin_revoke_access($data['subscription']->customer_id);
+}, 10, 1);
+```
+</details>
+
+### <code> subscription_period_skipped </code>
+<details>
+<summary><code>fluent_cart/subscription_period_skipped</code> &mdash; Fires when an admin skips a billing period</summary>
+
+**When it runs:**
+Fires from `RenewalService::skipNextPeriod()`, through
+`SubscriptionService::dispatchStatusEvent()`, after the next billing date has been advanced and the
+skip has been written to the subscription log. The route behind it is
+`POST /orders/{order}/subscriptions/{subscription}/skip-renewal`.
+
+**Parameters:**
+
+- `$data` (array): The skipped period
+    ```php
+    $data = [
+        'subscription'          => $subscription, // \FluentCart\App\Models\Subscription
+        'order'                 => $order,        // \FluentCart\App\Models\Order
+        'customer'              => $customer,     // \FluentCart\App\Models\Customer, or [] when there is none
+        'old_next_billing_date' => '2026-12-01 00:00:00', // The date before the skip
+        'new_next_billing_date' => '2027-01-01 00:00:00', // The date after it
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:640`, dispatched from `app/Modules/StoreManagedRenewal/Services/RenewalService.php:1010`
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_period_skipped', function ($data) {
+    // Keep an external entitlement window in step with the new billing date
+    my_plugin_extend_access(
+        $data['subscription']->id,
+        $data['new_next_billing_date']
+    );
+}, 10, 1);
+```
+</details>
+
+### <code> subscription_reactivated </code>
+<details>
+<summary><code>fluent_cart/subscription_reactivated</code> &mdash; Fires when a canceled or expired subscription becomes active again</summary>
+
+**When it runs:**
+Fires only on a real return from the dead: the subscription is now `active` and its previous status
+was `canceled` or `expired`. Core checks that condition in
+`SubscriptionService::syncSubscriptionStates()` (a gateway sync), in
+`SubscriptionService::updateSubscription()` (an admin edit) and in
+`SubscriptionService::reactivateSubscriptionLocally()`, behind
+`PUT /orders/{order}/subscriptions/{subscription}/reactivate`.
+
+FluentCart Pro fires it on two more paths: after a renewal cart is completed, and after an
+Authorize.Net reactivation completes. Those two do not pass a previous status, so `old_status` is
+`null` there.
+
+**Parameters:**
+
+- `$data` (array): The reactivated subscription
+    ```php
+    $data = [
+        'subscription' => $subscription, // \FluentCart\App\Models\Subscription
+        'order'        => $order,        // \FluentCart\App\Models\Order|null
+        'customer'     => $customer,     // \FluentCart\App\Models\Customer, or [] when there is none
+        'old_status'   => 'canceled',    // 'canceled' or 'expired' on the core paths; null on the two Pro paths
+    ];
+    ```
+
+**Source:** `app/Modules/Subscriptions/Services/SubscriptionService.php:506`,
+`app/Modules/Subscriptions/Services/SubscriptionService.php:917` and
+`app/Modules/Subscriptions/Services/SubscriptionService.php:1267`.
+Also fires from `fluent-cart-pro/app/Hooks/Handlers/SubscriptionRenewalHandler.php:149` and
+`fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetSubscriptions.php:1284`.
+
+**Usage:**
+```php
+add_action('fluent_cart/subscription_reactivated', function ($data) {
+    $subscription = $data['subscription'];
+
+    // old_status is null on the Pro paths, so guard before using it
+    $from = $data['old_status'] ?: 'unknown';
+
+    $subscription->addLog(
+        'Subscription reactivated',
+        sprintf('Previous status: %s', $from),
+        'info'
+    );
+}, 10, 1);
+```
+</details>
+
+---
+
 ## System Auto-Charge <Badge type="tip" text="system" />
 
 These fire only for `system` subscriptions — store-managed subscriptions that auto-charge a saved token each renewal. See [Store-managed + auto-charge](/modules/subscriptions#store-managed-auto-charge-system).

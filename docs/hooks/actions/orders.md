@@ -8,6 +8,211 @@ Each hook passes an associative array as its single parameter. The `order` value
 
 ---
 
+## Order Create, Update & Delete
+
+Fired when an order row is created, edited or removed. Every hook here is dispatched through
+`EventDispatcher::dispatch()`, which runs the event's own listeners first and then fires the hook with
+the event's payload as a single array.
+
+### <code> order_created </code>
+<details>
+<summary><code>fluent_cart/order_created</code> &mdash; Fires after a new order has been created</summary>
+
+**When it runs:**
+Fires on two paths. At checkout, from `CheckoutApi::finalizeOrder()` — after the billing and shipping
+addresses are attached, the customer names are synced and the UTM data is written, and before stock is
+updated and the gateway takes over. For an order created in the admin, from `OrderController::store()`
+once `OrderResource::updatedPlaceOrder()` has returned a saved order.
+
+**Parameters:**
+
+- `$data` (array): The new order
+    ```php
+    $data = [
+        'order'       => $order,       // \FluentCart\App\Models\Order — customer, shipping_address and billing_address are eager-loaded
+        'prev_order'  => null,         // \FluentCart\App\Models\Order|null — see below
+        'customer'    => $customer,    // \FluentCart\App\Models\Customer, or [] when the order has none
+        'transaction' => $transaction, // \FluentCart\App\Models\OrderTransaction at checkout; [] on the admin path
+    ];
+    ```
+
+`prev_order` is the order already attached to this cart. It is present only when the shopper submits
+the same cart again and that earlier order has neither reached a success status nor left a retryable
+payment status — a second attempt at a payment that failed. When the attached order has already
+succeeded, checkout detaches it and `prev_order` is `null`. On the admin path it is always `null`.
+
+`transaction` is the order's latest transaction at checkout. The admin path does not pass one, and the
+event turns the missing value into an empty array rather than `null`.
+
+**Source:** `api/Checkout/CheckoutApi.php` (line 645), `app/Http/Controllers/OrderController.php` (line 120)
+
+**Usage:**
+```php
+add_action('fluent_cart/order_created', function ($data) {
+    $order = $data['order'];
+
+    // A second attempt on the same cart carries the earlier order
+    if ($data['prev_order']) {
+        $order->addLog(
+            'Retry of a previous attempt',
+            sprintf('Previous order ID: %d', $data['prev_order']->id),
+            'info'
+        );
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> order_updated </code>
+<details>
+<summary><code>fluent_cart/order_updated</code> &mdash; Fires after an order has been edited</summary>
+
+**When it runs:**
+Fires from `OrderResource::update()`, reached from the admin order editor through
+`POST /orders/{order_id}`. By the time it runs the order items, applied coupons and tax have all been
+rewritten and the order has been re-read from the database, so `order` is the saved state and
+`old_order` is the snapshot taken before the edit.
+
+**Parameters:**
+
+- `$data` (array): Both sides of the edit
+    ```php
+    $data = [
+        'order'     => $order,    // \FluentCart\App\Models\Order — the saved order, re-read after the update
+        'old_order' => $oldOrder, // \FluentCart\App\Models\Order — the order as it was before the update
+    ];
+    ```
+
+Both models have `customer`, `shipping_address` and `billing_address` eager-loaded.
+
+**Source:** `api/Resource/OrderResource.php` (line 1735)
+
+**Usage:**
+```php
+add_action('fluent_cart/order_updated', function ($data) {
+    $order = $data['order'];
+    $old   = $data['old_order'];
+
+    if ($order->total !== $old->total) {
+        $order->addLog(
+            'Order total changed',
+            sprintf(
+                'From %s to %s',
+                \FluentCart\App\Helpers\Helper::toDecimal($old->total),
+                \FluentCart\App\Helpers\Helper::toDecimal($order->total)
+            ),
+            'info'
+        );
+    }
+}, 10, 1);
+```
+</details>
+
+### <code> order_before_delete </code>
+<details>
+<summary><code>fluent_cart/order_before_delete</code> &mdash; Fires while an order is being deleted, inside the transaction</summary>
+
+**When it runs:**
+Fires from both delete paths — `OrderController::deleteOrder()` for `DELETE /orders/{order_id}`, and
+`OrderResource::delete()` for the bulk action `POST /orders/do-bulk-action` with
+`action=delete_orders`.
+
+It runs **inside the database transaction** and before `deleteOrderRelatedData()`, so the order items,
+transactions and stock-movement meta are all still readable. That is also the reason to keep a listener
+short: work done here is inside a transaction that can still roll back, and anything written outside
+the database will not roll back with it.
+
+**Parameters:**
+
+- `$data` (array): The order about to be deleted
+    ```php
+    $data = [
+        'order'               => $order, // \FluentCart\App\Models\Order
+        'connected_order_ids' => [12,13], // IDs deleted together with it, the order's own ID included
+        'is_test_mode'        => false,   // Whether the deletion is running against test-mode orders
+        'type'                => 'payment', // The order's `type` column, passed as given
+    ];
+    ```
+
+**Source:** `app/Http/Controllers/OrderController.php` (line 666), `api/Resource/OrderResource.php` (line 1914)
+
+**Usage:**
+```php
+add_action('fluent_cart/order_before_delete', function ($data) {
+    // The items are still there to read — after this they are gone
+    $variationIds = $data['order']->order_items->pluck('object_id')->toArray();
+    update_option('my_plugin_last_deleted_variations', $variationIds, 'no');
+}, 10, 1);
+```
+</details>
+
+### <code> order_deleted </code>
+<details>
+<summary><code>fluent_cart/order_deleted</code> &mdash; Fires after an order has been deleted</summary>
+
+**When it runs:**
+Fires after the delete transaction is committed, on both the single and the bulk delete path. It fires
+for every order type except `renewal`; a renewal order fires
+[`renewal_order_deleted`](#renewal-order-deleted) instead, never both.
+
+**Parameters:**
+
+- `$data` (array): The deleted order
+    ```php
+    $data = [
+        'order'               => $order,    // \FluentCart\App\Models\Order — the in-memory model; the row is gone
+        'customer'            => $customer, // \FluentCart\App\Models\Customer, or [] when the order has none
+        'connected_order_ids' => [12,13],   // IDs deleted together with it, the order's own ID included
+    ];
+    ```
+
+The relations were loaded before the cleanup ran, so `customer`, `shipping_address` and
+`billing_address` are readable on the model even though the rows no longer exist.
+
+**Source:** `app/Http/Controllers/OrderController.php` (line 683), `api/Resource/OrderResource.php` (line 1926)
+
+**Usage:**
+```php
+add_action('fluent_cart/order_deleted', function ($data) {
+    error_log(sprintf('FluentCart order %s deleted.', $data['order']->invoice_no));
+}, 10, 1);
+```
+</details>
+
+### <code> renewal_order_deleted </code>
+<details>
+<summary><code>fluent_cart/renewal_order_deleted</code> &mdash; Fires after a renewal order has been deleted</summary>
+
+**When it runs:**
+Fires after the delete transaction is committed, in place of
+[`order_deleted`](#order-deleted), when the deleted order's `type` is `renewal`. Both delete paths
+make the same choice, so exactly one of the two hooks fires per order.
+
+**Parameters:**
+
+- `$data` (array): The deleted renewal order
+    ```php
+    $data = [
+        'order'    => $order,    // \FluentCart\App\Models\Order — the renewal order
+        'customer' => $customer, // \FluentCart\App\Models\Customer, or [] when the order has none
+    ];
+    ```
+
+Unlike `order_deleted`, this payload carries no `connected_order_ids`.
+
+**Source:** `app/Http/Controllers/OrderController.php` (line 681), `api/Resource/OrderResource.php` (line 1924)
+
+**Usage:**
+```php
+add_action('fluent_cart/renewal_order_deleted', function ($data) {
+    // Keep an external ledger in step when a renewal is removed
+    my_plugin_void_renewal_entry($data['order']->id);
+}, 10, 1);
+```
+</details>
+
+---
+
 ## Order Status Changes
 
 Fired when the **order status** field changes (e.g. `processing` &rarr; `completed`). Both a dynamic, status-specific hook and a generic hook fire on every change.
@@ -164,6 +369,48 @@ add_action('fluent_cart/payment_status_changed', function ($data) {
     if ($data['new_status'] === 'paid') {
         wp_mail($order->customer->email, 'Payment Confirmed', 'Your payment has been received.');
     }
+}, 10, 1);
+```
+</details>
+
+### <code> order_payment_failed </code> <Badge type="warning" text="Pro" />
+<details>
+<summary><code>fluent_cart/order_payment_failed</code> &mdash; Fires when an Authorize.Net payment is marked failed</summary>
+
+**When it runs:**
+Fires from `AuthorizeDotNetHelper::markTransactionFailed()`, which the Authorize.Net gateway calls
+when a charge is declined or errors, and which its IPN webhook calls when the gateway reports a
+failure after the fact.
+
+Everything is already written by the time it fires: the transaction is saved with a failed status and
+carries the gateway's reason and context in its `meta`, and the order's `payment_status` and `status`
+are both set to `failed`.
+
+**Parameters:**
+
+- `$data` (array): The failed payment
+    ```php
+    $data = [
+        'order'       => $order,       // \FluentCart\App\Models\Order — customer, order_items, shipping_address and billing_address are eager-loaded
+        'customer'    => $customer,    // \FluentCart\App\Models\Customer|null
+        'transaction' => $transaction, // \FluentCart\App\Models\OrderTransaction — the failed transaction
+        'old_status'  => 'pending',    // The order's payment status before the failure
+        'new_status'  => 'failed',     // Always 'failed'
+        'reason'      => 'Card declined', // The message the gateway returned
+    ];
+    ```
+
+**Source:** `app/Events/Order/OrderPaymentFailed.php` (line 15), dispatched from
+`fluent-cart-pro/app/Modules/PaymentMethods/AuthorizeDotNetGateway/AuthorizeDotNetHelper.php` (line 299)
+
+**Usage:**
+```php
+add_action('fluent_cart/order_payment_failed', function ($data) {
+    $data['order']->addLog(
+        'Payment failed at gateway',
+        $data['reason'],
+        'error'
+    );
 }, 10, 1);
 ```
 </details>
